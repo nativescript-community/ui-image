@@ -1,60 +1,23 @@
-<Page xmlns="http://schemas.nativescript.org/tns.xsd" xmlns:i="nativescript-image-cache-it"  loaded="pageLoaded">
- <grid-layout rows="auto,*">
- <grid-layout columns="*,auto">
- <text-field text="{{newImg}}"/>
- <button col="1" text="Add Image" tap="addImage"/>
- </grid-layout>
+<Page xmlns="http://schemas.nativescript.org/tns.xsd" xmlns:lv="nativescript-pro-ui/listview" xmlns:img="nativescript-image" loaded="pageLoaded">
+    <StackLayout style.backgroundColor="#444">
 
-<!--<scroll-view row="1">
-  <repeater items="{{images}}">
-<repeater.itemTemplate>
-<grid-layout columns="auto,*">
-<i:ImageCacheIt override="300 300" centerCrop="true" stretch="fill" imageUri="{{url}}"/>
-<stack-layout col="1">
-<label text="{{url}}"/>
-</stack-layout>
-</grid-layout>
-</repeater.itemTemplate>
-</repeater>
-</scroll-view>-->
+        <lv:RadListView items="{{ dataItems }}" width="100%" height="100%" style.backgroundColor="#444" itemTemplateSelector="$index == -1 ? 'trailers' : 'test'" loadOnDemandMode="Auto" loadMoreDataRequested="{{onLoadMoreItemsRequested}}">
+            <lv:RadListView.itemTemplates>
+                <template key="test">
+                    <StackLayout  height="100" style.backgroundColor="#444">
+                <StackLayout orientation="horizontal" margin="5" style="border-radius:3;">
+                    <img:Image imageUri="{{ poster_path }}" width="70" stretch="aspectFill" />
+                    <AbsoluteLayout width="100%">
+                        <img:Image stretch="aspectFill" width="100%" height="100%" style="opacity:0.2" imageUri="{{ backdrop_path }}" />
+                        <FlexboxLayout flexDirection="column" margin="7">
+                            <label text="{{ title }}" style.color="#fff"  width="100%" height="100%"  textWrap="true" />
+                        </FlexboxLayout>
+                    </AbsoluteLayout>
+                </StackLayout>
+                    </StackLayout>
+                    </template>
+            </lv:RadListView.itemTemplates>
+        </lv:RadListView>
 
-
-  <list-view row="1" items="{{images}}">
-<list-view.itemTemplate>
-<grid-layout columns="auto,*">
-<i:ImageCacheIt width="200" height="200" imageUri="{{url}}"/>
-<stack-layout col="1">
-<label text="{{url}}"/>
-</stack-layout>
-</grid-layout>
-</list-view.itemTemplate>
-</list-view>
-
-
-<!--<scroll-view row="1"> 
-  <repeater  items="{{images}}">
-<repeater.itemTemplate>
-<grid-layout columns="auto,*">
-<Image width="300" height="300" src="{{url}}"/>
-<stack-layout col="1">
-<label text="{{url}}"/>
-</stack-layout>
-</grid-layout>
-</repeater.itemTemplate>
-</repeater>
-</scroll-view>-->
-
-
-<!--<list-view row="1" items="{{images}}">
-<list-view.itemTemplate>
-<grid-layout columns="auto,*">
-<Image width="300" height="300" src="{{url}}"/>
-<stack-layout col="1">
-<label text="{{url}}"/>
-</stack-layout>
-</grid-layout>
-</list-view.itemTemplate>
-</list-view>-->
-
- </grid-layout>  
+    </StackLayout>
 </Page>
