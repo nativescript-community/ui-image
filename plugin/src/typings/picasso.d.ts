@@ -1,4 +1,3 @@
-/// <reference path="../../../references.d.ts" />
 declare module com {
 	export module squareup {
 		export module picasso {

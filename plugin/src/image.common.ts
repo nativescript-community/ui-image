@@ -15,14 +15,14 @@ export const onlyTransitionIfRemoteProperty = new Property<Image, boolean>({ nam
 
 export const decodeHeightProperty = new Property<Image, PercentLength>({
     name: 'decodeHeight',
-    defaultValue:{unit:'dip', value:0},
+    defaultValue: { unit: 'dip', value: 0 },
     equalityComparer: PercentLength.equals,
     valueConverter: PercentLength.parse
 });
 
 export const decodeWidthProperty = new Property<Image, PercentLength>({
     name: 'decodeWidth',
-    defaultValue:{unit:'dip', value:0},
+    defaultValue: { unit: 'dip', value: 0 },
     equalityComparer: PercentLength.equals,
     valueConverter: PercentLength.parse
 });

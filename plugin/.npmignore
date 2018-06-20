@@ -1,4 +1,8 @@
-*.map
+node_modules/
+bin/
+hooks/
 *.ts
-!*.d.ts
+*.map
+*.old
 tsconfig.json
+!*.d.ts

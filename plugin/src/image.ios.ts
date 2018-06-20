@@ -1,5 +1,5 @@
 /// <reference path="./typings/objc!SDWebImage.d.ts" />
-/// <reference path="../../references.d.ts" />
+/// <reference path="../references.d.ts" />
 import * as common from './image.common';
 import * as app from 'application';
 import * as fs from 'file-system';
@@ -18,7 +18,7 @@ const enum SDImageCacheType {
 
 export class Image extends common.Image {
     nativeView: UIImageView;
-    tintColor:UIColor
+    tintColor: UIColor;
     // private _imageSourceAffectsLayout: boolean = true;
     // private _templateImageWasCreated: boolean;
 
@@ -48,27 +48,26 @@ export class Image extends common.Image {
         if (!(this.onlyTransitionIfRemote && cacheType !== SDImageCacheType.SDImageCacheTypeMemory) && this.transition) {
             switch (this.transition) {
                 case 'fade':
-                this.nativeView.alpha = 0.0;
-                this.nativeView.image = image;
-                UIView.animateWithDurationAnimations(0.2, ()=>{
-                    this.nativeView.alpha = this.opacity;
-                });
-                break;
+                    this.nativeView.alpha = 0.0;
+                    this.nativeView.image = image;
+                    UIView.animateWithDurationAnimations(0.2, () => {
+                        this.nativeView.alpha = this.opacity;
+                    });
+                    break;
                 case 'curlUp':
-                UIView.transitionWithViewDurationOptionsAnimationsCompletion(
-                    this.nativeView,
-                    0.3,
-                    UIViewAnimationOptions.TransitionCrossDissolve,
-                    () => {
-                        this.nativeView.image = image;
-                    },
-                    null
-                );
-                break;
+                    UIView.transitionWithViewDurationOptionsAnimationsCompletion(
+                        this.nativeView,
+                        0.3,
+                        UIViewAnimationOptions.TransitionCrossDissolve,
+                        () => {
+                            this.nativeView.image = image;
+                        },
+                        null
+                    );
+                    break;
                 default:
-                this.nativeView.image = image;
+                    this.nativeView.image = image;
             }
-            
         } else {
             this.nativeView.image = image;
         }
@@ -79,7 +78,7 @@ export class Image extends common.Image {
         //         this.nativeView.alpha = this.opacity;
         //     });
         // }
-    };
+    }
     private onLoadProgress = (p1: number, p2: number) => {};
 
     private handleSetImage() {

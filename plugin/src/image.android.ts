@@ -1,6 +1,6 @@
 /// <reference path="./typings/picasso.d.ts" />
 /// <reference path="./typings/okhttp.d.ts" />
-/// <reference path="../../references.d.ts" />
+/// <reference path="../references.d.ts" />
 import * as common from './image.common';
 import * as app from 'application';
 import * as fs from 'file-system';
@@ -14,7 +14,7 @@ global.moduleMerge(common, exports);
 
 let AndroidImageView: typeof org.nativescript.widgets.ImageView;
 
-var PicassoTargetClass;
+let PicassoTargetClass;
 function ensurePicassoTargetClass() {
     if (PicassoTargetClass) {
         return;
@@ -39,7 +39,7 @@ function ensurePicassoTargetClass() {
 
     PicassoTargetClass = PicassoTarget;
 }
-var PicassoTransformClass;
+let PicassoTransformClass;
 function ensurePicassoTransformClass() {
     if (PicassoTransformClass) {
         return;
@@ -58,7 +58,7 @@ function ensurePicassoTransformClass() {
 export class Image extends common.Image {
     picasso: com.squareup.picasso.Picasso;
     nativeViewProtected: android.widget.ImageView;
-    target: typeof PicassoTargetClass;
+    target: com.squareup.picasso.Target;
     constructor() {
         super();
         ensurePicassoTargetClass();
@@ -99,26 +99,26 @@ export class Image extends common.Image {
         return new android.widget.ImageView(this._context);
     }
 
-    public onImageLoaded(bitmap: android.graphics.Bitmap)  {
+    public onImageLoaded(bitmap: android.graphics.Bitmap) {
         this.nativeView.setImageBitmap(bitmap);
         this.handlingUri = null;
         this.notify({
-            eventName: "loaded",
+            eventName: 'loaded',
             image: bitmap,
             object: this
         });
     }
-    public onImageError()  {
+    public onImageError() {
         this.nativeView.setImageBitmap(null);
         this.handlingUri = null;
         this.notify({
-            eventName: "error",
+            eventName: 'error',
             image: null,
             object: this
         });
     }
 
-    handlingUri
+    handlingUri;
     private handleSetImage() {
         if (!this.viewInit) {
             return;
@@ -129,7 +129,7 @@ export class Image extends common.Image {
             if (this.handlingUri === this.imageUri) {
                 return;
             }
-            this.handlingUri = this.imageUri
+            this.handlingUri = this.imageUri;
             const builder = this.picasso.load(this.getImage(this.imageUri));
             if (this.placeHolder) {
                 builder.placeholder(imageSrc.fromFileOrResource(this.placeHolder).android);
@@ -139,8 +139,8 @@ export class Image extends common.Image {
             }
             if (this.decodeWidth || this.decodeHeight) {
                 let screen = platform.screen.mainScreen;
-                let decodeWidth = this.decodeWidth?PercentLength.toDevicePixels(this.decodeWidth, 0, this.getMeasuredWidth() || screen.widthPixels):0;
-                let decodeHeight = this.decodeHeight?PercentLength.toDevicePixels(this.decodeHeight, 0, this.getMeasuredHeight() || screen.heightPixels):0;
+                let decodeWidth = this.decodeWidth ? PercentLength.toDevicePixels(this.decodeWidth, 0, this.getMeasuredWidth() || screen.widthPixels) : 0;
+                let decodeHeight = this.decodeHeight ? PercentLength.toDevicePixels(this.decodeHeight, 0, this.getMeasuredHeight() || screen.heightPixels) : 0;
                 if (decodeWidth > 0 || decodeHeight > 0) {
                     // console.log('resizing image', this.cssType, this.nativeView.id, this.id, decodeWidth, decodeHeight);
                     builder.resize(decodeWidth, decodeHeight);
@@ -165,11 +165,11 @@ export class Image extends common.Image {
             this.nativeViewProtected.setImageBitmap(null);
         }
     }
-    viewInit = false
+    viewInit = false;
     public initNativeView() {
-         super.initNativeView();
-         this.viewInit = true;
-    //    console.log('initNativeView', this.imageUri, !!this.nativeView);
+        super.initNativeView();
+        this.viewInit = true;
+        //    console.log('initNativeView', this.imageUri, !!this.nativeView);
         this.handleSetImage();
     }
     [common.imageUriProperty.getDefault](): any {
