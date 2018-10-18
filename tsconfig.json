@@ -7,7 +7,10 @@
         "noLib": false,
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
-        "lib": ["es6", "dom"],
+        "lib": [
+            "es6",
+            "dom"
+        ],
         "sourceMap": true,
         "pretty": true,
         "allowUnreachableCode": false,
@@ -19,6 +22,8 @@
         "noImplicitUseStrict": false,
         "noFallthroughCasesInSwitch": true,
         "baseUrl": ".",
+        "outDir": "./plugin",
+        "rootDir": "src",
         "paths": {
             "*": [
                 "./node_modules/tns-core-modules/*",
@@ -27,8 +32,14 @@
         }
     },
     "include": [
-        "src/*.ts",
-        "*.d.ts"
+        "src/**/*.ts",
+        "references.d.ts",
+        "src/references.d.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        ".git",
+        "dist"
     ],
     "compileOnSave": false
 }

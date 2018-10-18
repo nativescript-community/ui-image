@@ -1,43 +1,50 @@
-/// <reference path="./typings/picasso.d.ts" />
-/// <reference path="./typings/okhttp.d.ts" />
-/// <reference path="../references.d.ts" />
 import * as common from './image.common';
-import * as app from 'application';
 import * as fs from 'file-system';
 import * as utils from 'utils/utils';
-import * as types from 'utils/types';
 import * as imageSrc from 'image-source';
 import * as platform from 'platform';
-import { View, layout, PercentLength, Length } from 'ui/core/view';
+import { PercentLength } from 'ui/core/view';
 import { Color } from 'color';
 global.moduleMerge(common, exports);
+import { Options } from './image';
 
 let AndroidImageView: typeof org.nativescript.widgets.ImageView;
 
-let PicassoTargetClass;
+declare interface PicassoTargetListener {
+    onImageLoaded(bitmap: android.graphics.Bitmap, from?: com.squareup.picasso.Picasso.LoadedFrom);
+    onImageError();
+    // onPrepareLoad(placeHolderDrawable);
+}
+
+interface PicassoTarget extends com.squareup.picasso.Target {
+    // tslint:disable-next-line:no-misused-new
+    new (listener: PicassoTargetListener): PicassoTarget;
+}
+
+let PicassoTarget: PicassoTarget;
 function ensurePicassoTargetClass() {
-    if (PicassoTargetClass) {
+    if (PicassoTarget) {
         return;
     }
 
-    class PicassoTarget extends com.squareup.picasso.Target {
-        constructor(private view: Image) {
+    class PicassoTargetImpl extends com.squareup.picasso.Target {
+        constructor(private listener: PicassoTargetListener) {
             super();
             return global.__native(this);
         }
 
         public onBitmapLoaded(bitmap: android.graphics.Bitmap, from: com.squareup.picasso.Picasso.LoadedFrom) {
-            this.view.onImageLoaded(bitmap);
+            this.listener.onImageLoaded(bitmap);
         }
 
         public onBitmapFailed(errorDrawable) {
-            this.view.onImageError();
+            this.listener.onImageError();
         }
 
         public onPrepareLoad(placeHolderDrawable) {}
     }
 
-    PicassoTargetClass = PicassoTarget;
+    PicassoTarget = PicassoTargetImpl as any;
 }
 let PicassoTransformClass;
 function ensurePicassoTransformClass() {
@@ -55,14 +62,75 @@ function ensurePicassoTransformClass() {
     PicassoTransformClass = PicassoTransform;
 }
 
+function getImage(src: string): string {
+    let nativeImage;
+    if (!src) {
+        return nativeImage;
+    }
+    if (src.substr(0, 1) === '/') {
+        nativeImage = new java.io.File(nativeImage);
+    } else if (src.startsWith('~/')) {
+        nativeImage = new java.io.File(fs.path.join(fs.knownFolders.currentApp().path, src.replace('~/', '')));
+    } else if (src.startsWith('https://') || src.startsWith('http://')) {
+        nativeImage = src;
+    } else if (src.startsWith('res://')) {
+        nativeImage = utils.ad.resources.getDrawableId(src.replace('res://', ''));
+    }
+    return nativeImage;
+}
+
+function createPicassoBuilder(
+    picasso: com.squareup.picasso.Picasso,
+    options: Options
+) {
+    const builder = picasso.load(getImage(options.imageUri));
+    if (this.placeHolder) {
+        builder.placeholder(imageSrc.fromFileOrResource(options.placeHolder).android);
+    }
+    if (this.errorHolder) {
+        builder.error(imageSrc.fromFileOrResource(options.errorHolder).android);
+    }
+    if (options.decodeWidth || options.decodeHeight) {
+        const screen = platform.screen.mainScreen;
+        const decodeWidth = options.decodeWidth ? PercentLength.toDevicePixels(options.decodeWidth, 0, this.getMeasuredWidth() || screen.widthPixels) : 0;
+        const decodeHeight = options.decodeHeight ? PercentLength.toDevicePixels(options.decodeHeight, 0, this.getMeasuredHeight() || screen.heightPixels) : 0;
+        if (decodeWidth > 0 || decodeHeight > 0) {
+            // console.log('resizing image', this.cssType, this.nativeView.id, this.id, decodeWidth, decodeHeight);
+            builder.resize(decodeWidth, decodeHeight);
+        }
+    }
+    if (options.centerCrop) {
+        builder.centerCrop();
+    }
+    // if (this.fade === false) {
+    builder.noFade();
+    return builder;
+}
+
+export function loadImage(options: Options) {
+    ensurePicassoTargetClass();
+    return new Promise((resolve, reject) => {
+        const target = new PicassoTarget({
+            onImageLoaded(bitmap: android.graphics.Bitmap, from?: com.squareup.picasso.Picasso.LoadedFrom) {
+                resolve({ android: bitmap });
+            },
+            onImageError() {
+                reject();
+            }
+        });
+        const builder = createPicassoBuilder(Image.getPicassoInstance(), options);
+        builder.into(target);
+    });
+}
+
 export class Image extends common.Image {
     picasso: com.squareup.picasso.Picasso;
     nativeViewProtected: android.widget.ImageView;
-    target: com.squareup.picasso.Target;
+    // target: com.squareup.picasso.Target;
     constructor() {
         super();
-        ensurePicassoTargetClass();
-        this.target = new PicassoTargetClass(this);
+        // ensurePicassoTargetClass();
+        // this.target = new PicassoTargetClass(this);
     }
     static picassoInstance;
     // static picassoHttpClient
@@ -123,35 +191,14 @@ export class Image extends common.Image {
         if (!this.viewInit) {
             return;
         }
-        const imageView = this.nativeViewProtected;
+        // const imageView = this.nativeViewProtected;
         // imageView.setImageBitmap(null);
         if (this.imageUri) {
             if (this.handlingUri === this.imageUri) {
                 return;
             }
             this.handlingUri = this.imageUri;
-            const builder = this.picasso.load(this.getImage(this.imageUri));
-            if (this.placeHolder) {
-                builder.placeholder(imageSrc.fromFileOrResource(this.placeHolder).android);
-            }
-            if (this.errorHolder) {
-                builder.error(imageSrc.fromFileOrResource(this.errorHolder).android);
-            }
-            if (this.decodeWidth || this.decodeHeight) {
-                let screen = platform.screen.mainScreen;
-                let decodeWidth = this.decodeWidth ? PercentLength.toDevicePixels(this.decodeWidth, 0, this.getMeasuredWidth() || screen.widthPixels) : 0;
-                let decodeHeight = this.decodeHeight ? PercentLength.toDevicePixels(this.decodeHeight, 0, this.getMeasuredHeight() || screen.heightPixels) : 0;
-                if (decodeWidth > 0 || decodeHeight > 0) {
-                    // console.log('resizing image', this.cssType, this.nativeView.id, this.id, decodeWidth, decodeHeight);
-                    builder.resize(decodeWidth, decodeHeight);
-                }
-            }
-            if (this.centerCrop) {
-                builder.centerCrop();
-            }
-            // if (this.fade === false) {
-            builder.noFade();
-            // }
+            const builder = createPicassoBuilder(this.picasso, this);
             builder.into(this.nativeView);
             //     this.builder.into(this.nativeView, new Callback() {
             //         public void onLoad() {
@@ -189,22 +236,7 @@ export class Image extends common.Image {
             this.nativeViewProtected.setColorFilter(value.android);
         }
     }
-    private getImage(src: string): string {
-        let nativeImage;
-        if (!src) {
-            return nativeImage;
-        }
-        if (src.substr(0, 1) === '/') {
-            nativeImage = new java.io.File(nativeImage);
-        } else if (src.startsWith('~/')) {
-            nativeImage = new java.io.File(fs.path.join(fs.knownFolders.currentApp().path, src.replace('~/', '')));
-        } else if (src.startsWith('https://') || src.startsWith('http://')) {
-            nativeImage = src;
-        } else if (src.startsWith('res://')) {
-            nativeImage = utils.ad.resources.getDrawableId(src.replace('res://', ''));
-        }
-        return nativeImage;
-    }
+
     [common.stretchProperty.getDefault](): common.Stretch {
         return 'aspectFit';
     }

@@ -1,19 +1,32 @@
-/// <reference path="./typings/objc!SDWebImage.d.ts" />
-/// <reference path="../references.d.ts" />
 import * as common from './image.common';
-import * as app from 'application';
-import * as fs from 'file-system';
-import * as utils from 'utils/utils';
-import * as types from 'utils/types';
 import * as imageSrc from 'image-source';
-import { View, layout } from 'ui/core/view';
+import { layout } from 'ui/core/view';
 import { Color } from 'color';
+import { Options } from './image';
 global.moduleMerge(common, exports);
 
 const enum SDImageCacheType {
     SDImageCacheTypeNone,
     SDImageCacheTypeDisk,
     SDImageCacheTypeMemory
+}
+
+export function loadImage(options: Options) {
+    return new Promise((resolve, reject) => {
+        const manager = SDWebImageManager.sharedManager();
+        manager.loadImageWithURLOptionsProgressCompleted(
+            NSURL.URLWithString(options.imageUri),
+            SDWebImageOptions.ScaleDownLargeImages | SDWebImageOptions.AvoidAutoSetImage,
+            function() {},
+            function(image: UIImage, p2: NSData, error: NSError, p4: number, p5: boolean, p6: NSURL) {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve({ ios: image });
+                }
+            }
+        );
+    });
 }
 
 export class Image extends common.Image {
@@ -43,7 +56,6 @@ export class Image extends common.Image {
         if (this.tintColor) {
             image = image.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
         }
-        console.log('handleImageLoaded2', this.nativeView.tintColor, image, this.onlyTransitionIfRemote, this.transition, error, cacheType);
         this.isLoading = false;
         if (!(this.onlyTransitionIfRemote && cacheType !== SDImageCacheType.SDImageCacheTypeMemory) && this.transition) {
             switch (this.transition) {
@@ -85,7 +97,7 @@ export class Image extends common.Image {
         if (this.imageUri) {
             // if (this.imageUri.startsWith("http")) {
             // this.isLoading = true;
-            let options = SDWebImageOptions.ScaleDownLargeImages | SDWebImageOptions.AvoidAutoSetImage;
+            const options = SDWebImageOptions.ScaleDownLargeImages | SDWebImageOptions.AvoidAutoSetImage;
             // if (this.onlyTransitionIfRemote) {
             //     options |= SDWebImageOptions.ForceTransition;
             // }
@@ -113,7 +125,7 @@ export class Image extends common.Image {
     }
 
     public createNativeView() {
-        let result = UIImageView.new();
+        const result = UIImageView.new();
         result.tintColor = null;
         return result;
     }

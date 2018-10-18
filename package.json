@@ -1,0 +1,28 @@
+{
+    "name": "nativescript-image",
+    "version": "1.0.0",
+    "dependencies": {
+        "eslint-config-prettier": "^3.1.0"
+    },
+    "devDependencies": {
+        "eslint": "^5.6.0",
+        "prompt": "^1.0.0",
+        "rimraf": "^2.6.2",
+        "tns-core-modules": "4.2.1",
+        "tns-platform-declarations": "^4.2.1",
+        "tslint": "^5.11.0",
+        "tslint-config-prettier": "^1.15.0",
+        "tslint-config-standard": "^8.0.1",
+        "typescript": "~2.7.2"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Akylas/nativescript-image.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/Akylas/nativescript-image/issues"
+    },
+    "homepage": "https://github.com/Akylas/nativescript-image#readme"
+}

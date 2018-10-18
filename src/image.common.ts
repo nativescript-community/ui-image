@@ -1,6 +1,7 @@
-import { View, Property, PercentLength } from 'tns-core-modules/ui/core/view';
+import { PercentLength, Property, View } from 'tns-core-modules/ui/core/view';
 import { Stretch } from 'tns-core-modules/ui/enums';
 import { Color } from 'color';
+
 
 export const tintColorProperty = new Property<Image, Color>({ name: 'tintColor' });
 export const imageUriProperty = new Property<Image, string>({ name: 'imageUri' });

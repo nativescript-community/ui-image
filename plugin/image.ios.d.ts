@@ -1,6 +1,6 @@
-/// <reference path="typings/objc!SDWebImage.d.ts" />
-/// <reference path="../references.d.ts" />
 import * as common from './image.common';
+import { Options } from './image';
+export declare function loadImage(options: Options): Promise<{}>;
 export declare class Image extends common.Image {
     nativeView: UIImageView;
     tintColor: UIColor;

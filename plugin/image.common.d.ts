@@ -1,5 +1,13 @@
-import { View, Property, PercentLength } from 'tns-core-modules/ui/core/view';
+import { PercentLength, Property, View } from 'tns-core-modules/ui/core/view';
 import { Color } from 'color';
+export interface Options {
+    imageUri: string;
+    placeHolder?: string;
+    errorHolder?: string;
+    centerCrop?: boolean;
+    decodeWidth?: PercentLength;
+    decodeHeight?: PercentLength;
+}
 export declare const tintColorProperty: Property<Image, Color>;
 export declare const imageUriProperty: Property<Image, string>;
 export declare const placeHolderProperty: Property<Image, string>;
