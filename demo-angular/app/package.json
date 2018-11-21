@@ -25,10 +25,10 @@
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/NativeScript/nativescript-image"
+        "url": "https://github.com/Akylas/nativescript-image"
     },
     "bugs": {
-        "url": "https://github.com/NativeScript/nativescript-image/issues"
+        "url": "https://github.com/Akylas/nativescript-image/issues"
     },
     "readme": "Sample {N} project that demonstrates the nativescript-image plugin with all of its features in action"
 }

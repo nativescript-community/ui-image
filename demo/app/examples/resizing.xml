@@ -5,5 +5,5 @@
                         aspectRatio="1.49"
                         decodeWidth="665"
                         decodeHeight="500"
-                        imageUri="https://raw.githubusercontent.com/NativeScript/nativescript-image/master/examples-data/dessert1.jpg"/>
+                        imageUri="https://raw.githubusercontent.com/Akylas/nativescript-image/master/examples-data/dessert1.jpg"/>
 </GridLayout>

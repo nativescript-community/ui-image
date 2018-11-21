@@ -5,7 +5,7 @@ import { Label } from 'tns-core-modules/ui/label';
 import * as imageModel from 'nativescript-image';
 import { writeToOutputLabel } from './appLogger';
 
-const imageUri = 'https://raw.githubusercontent.com/NativeScript/nativescript-image/master/examples-data/breakfast1.jpg';
+const imageUri = 'https://raw.githubusercontent.com/Akylas/nativescript-image/master/examples-data/breakfast1.jpg';
 
 export function onCheckCache(args: EventData) {
     const button = args.object as Button;

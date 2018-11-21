@@ -9,5 +9,5 @@
                         roundBottomLeft="true"
                         roundTopLeft="true"
                         roundTopRight="true"
-                        imageUri="https://raw.githubusercontent.com/NativeScript/nativescript-image/master/examples-data/breakfast2.jpg"/>
+                        imageUri="https://raw.githubusercontent.com/Akylas/nativescript-image/master/examples-data/breakfast2.jpg"/>
 </GridLayout>
