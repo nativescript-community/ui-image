@@ -1,246 +1,543 @@
-import * as common from './image.common';
-import * as fs from 'file-system';
-import * as utils from 'utils/utils';
-import * as imageSrc from 'image-source';
-import * as platform from 'platform';
-import { PercentLength } from 'ui/core/view';
-import { Color } from 'color';
-global.moduleMerge(common, exports);
-import { Options } from './image';
+export * from './image-common';
+import { AnimatedImage, EventData, ImageBase, ImageError as ImageErrorBase, ImageInfo as ImageInfoBase, ImagePipelineConfigSetting, ScaleType, Stretch } from './image-common';
+import * as utils from 'tns-core-modules/utils/utils';
+import * as types from 'tns-core-modules/utils/types';
+import * as application from 'tns-core-modules/application';
+import * as imageSource from 'tns-core-modules/image-source';
+import * as fs from 'tns-core-modules/file-system';
+import { Color } from 'tns-core-modules/color/color';
 
-let AndroidImageView: typeof org.nativescript.widgets.ImageView;
-
-declare interface PicassoTargetListener {
-    onImageLoaded(bitmap: android.graphics.Bitmap, from?: com.squareup.picasso.Picasso.LoadedFrom);
-    onImageError();
-    // onPrepareLoad(placeHolderDrawable);
-}
-
-interface PicassoTarget extends com.squareup.picasso.Target {
-    // tslint:disable-next-line:no-misused-new
-    new (listener: PicassoTargetListener): PicassoTarget;
-}
-
-let PicassoTarget: PicassoTarget;
-function ensurePicassoTargetClass() {
-    if (PicassoTarget) {
-        return;
-    }
-
-    class PicassoTargetImpl extends com.squareup.picasso.Target {
-        constructor(private listener: PicassoTargetListener) {
-            super();
-            return global.__native(this);
-        }
-
-        public onBitmapLoaded(bitmap: android.graphics.Bitmap, from: com.squareup.picasso.Picasso.LoadedFrom) {
-            this.listener.onImageLoaded(bitmap);
-        }
-
-        public onBitmapFailed(errorDrawable) {
-            this.listener.onImageError();
-        }
-
-        public onPrepareLoad(placeHolderDrawable) {}
-    }
-
-    PicassoTarget = PicassoTargetImpl as any;
-}
-let PicassoTransformClass;
-function ensurePicassoTransformClass() {
-    if (PicassoTransformClass) {
-        return;
-    }
-
-    class PicassoTransform extends com.squareup.picasso.Transformation {
-        constructor(private view: Image) {
-            super();
-            return global.__native(this);
+export function initialize(config?: ImagePipelineConfigSetting): void {
+    if (application.android) {
+        if (config && config.isDownsampleEnabled) {
+            const imagePipelineConfig = com.facebook.imagepipeline.core.ImagePipelineConfig.newBuilder(application.android.context)
+                .setDownsampleEnabled(true)
+                .build();
+            com.facebook.drawee.backends.pipeline.Image.initialize(application.android.context, imagePipelineConfig);
+        } else {
+            com.facebook.drawee.backends.pipeline.Image.initialize(application.android.context);
         }
     }
-
-    PicassoTransformClass = PicassoTransform;
 }
 
-function getImage(src: string): string {
-    let nativeImage;
-    if (!src) {
-        return nativeImage;
+export function getImagePipeline(): ImagePipeline {
+    if (application.android) {
+        const nativePipe = com.facebook.drawee.backends.pipeline.Image.getImagePipeline();
+        const imagePineLine = new ImagePipeline();
+        imagePineLine.android = nativePipe;
+
+        return imagePineLine;
     }
-    if (src.substr(0, 1) === '/') {
-        nativeImage = new java.io.File(nativeImage);
-    } else if (src.startsWith('~/')) {
-        nativeImage = new java.io.File(fs.path.join(fs.knownFolders.currentApp().path, src.replace('~/', '')));
-    } else if (src.startsWith('https://') || src.startsWith('http://')) {
-        nativeImage = src;
-    } else if (src.startsWith('res://')) {
-        nativeImage = utils.ad.resources.getDrawableId(src.replace('res://', ''));
-    }
-    return nativeImage;
+
+    return null;
 }
 
-function createPicassoBuilder(
-    picasso: com.squareup.picasso.Picasso,
-    options: Options
-) {
-    const builder = picasso.load(getImage(options.imageUri));
-    if (this.placeHolder) {
-        builder.placeholder(imageSrc.fromFileOrResource(options.placeHolder).android);
-    }
-    if (this.errorHolder) {
-        builder.error(imageSrc.fromFileOrResource(options.errorHolder).android);
-    }
-    if (options.decodeWidth || options.decodeHeight) {
-        const screen = platform.screen.mainScreen;
-        const decodeWidth = options.decodeWidth ? PercentLength.toDevicePixels(options.decodeWidth, 0, this.getMeasuredWidth() || screen.widthPixels) : 0;
-        const decodeHeight = options.decodeHeight ? PercentLength.toDevicePixels(options.decodeHeight, 0, this.getMeasuredHeight() || screen.heightPixels) : 0;
-        if (decodeWidth > 0 || decodeHeight > 0) {
-            // console.log('resizing image', this.cssType, this.nativeView.id, this.id, decodeWidth, decodeHeight);
-            builder.resize(decodeWidth, decodeHeight);
-        }
-    }
-    if (options.centerCrop) {
-        builder.centerCrop();
-    }
-    // if (this.fade === false) {
-    builder.noFade();
-    return builder;
+export function shutDown(): void {
+    com.facebook.drawee.view.SimpleDraweeView.shutDown();
+    com.facebook.drawee.backends.pipeline.Image.shutDown();
 }
 
-export function loadImage(options: Options) {
-    ensurePicassoTargetClass();
-    return new Promise((resolve, reject) => {
-        const target = new PicassoTarget({
-            onImageLoaded(bitmap: android.graphics.Bitmap, from?: com.squareup.picasso.Picasso.LoadedFrom) {
-                resolve({ android: bitmap });
-            },
-            onImageError() {
-                reject();
-            }
-        });
-        const builder = createPicassoBuilder(Image.getPicassoInstance(), options);
-        builder.into(target);
-    });
+export class ImagePipeline {
+    private _android: com.facebook.imagepipeline.core.ImagePipeline;
+
+    // Currently not available in 0.9.0+
+    private isInDiskCacheSync(uri: string) {
+        return this._android.isInDiskCacheSync(android.net.Uri.parse(uri));
+    }
+
+    isInBitmapMemoryCache(uri: string): boolean {
+        return this._android.isInBitmapMemoryCache(android.net.Uri.parse(uri));
+    }
+
+    evictFromMemoryCache(uri: string): void {
+        this._android.evictFromMemoryCache(android.net.Uri.parse(uri));
+    }
+
+    evictFromDiskCache(uri: string): void {
+        this._android.evictFromDiskCache(android.net.Uri.parse(uri));
+    }
+
+    evictFromCache(uri: string): void {
+        this._android.evictFromCache(android.net.Uri.parse(uri));
+    }
+
+    clearCaches() {
+        this._android.clearCaches();
+    }
+
+    clearMemoryCaches() {
+        this._android.clearMemoryCaches();
+    }
+
+    clearDiskCaches() {
+        this._android.clearDiskCaches();
+    }
+
+    get android(): any {
+        return this._android;
+    }
+
+    set android(value: any) {
+        this._android = value;
+    }
 }
 
-export class Image extends common.Image {
-    picasso: com.squareup.picasso.Picasso;
-    nativeViewProtected: android.widget.ImageView;
-    // target: com.squareup.picasso.Target;
-    constructor() {
-        super();
-        // ensurePicassoTargetClass();
-        // this.target = new PicassoTargetClass(this);
-    }
-    static picassoInstance;
-    // static picassoHttpClient
-    // static httpClient:okhttp3.OkHttpClient
-    // static  getOkHttpClientInstance() {
-    //     if (Image.httpClient == null) {
-    //         Image.httpClient = new okhttp3.OkHttpClient().newBuilder().build();
-    //     }
-    //     return Image.httpClient;
-    // }
-    // static getPicassoHttpClientInstance() {
-    //     if (!Image.picassoHttpClient) {
-    //         Image.picassoHttpClient = Image.getOkHttpClientInstance().newBuilder().build();
-    //     }
-    //     return Image.picassoHttpClient;
-    // }
-    static getPicassoInstance() {
-        if (!Image.picassoInstance) {
-            // Image.picassoInstance = new com.squareup.picasso.Picasso.Builder(app.android.context).downloader(new com.squareup.picasso.OkHttp3Downloader(
-            //     Image.getPicassoHttpClientInstance())).build();
-            Image.picassoInstance = (com.squareup.picasso.Picasso as any).get();
-        }
-        return Image.picassoInstance;
+export class ImageError implements ImageErrorBase {
+    private _stringValue;
+    private _message;
+    private _errorType;
+
+    constructor(throwable: java.lang.Throwable) {
+        this._message = throwable.getMessage();
+        this._errorType = throwable.getClass().getName();
+        this._stringValue = throwable.toString();
     }
 
-    get android(): android.widget.ImageView {
-        return this.nativeView;
+    getMessage(): string {
+        return this._message;
     }
+
+    getErrorType(): string {
+        return this._errorType;
+    }
+
+    toString(): string {
+        return this._stringValue;
+    }
+}
+
+export interface QualityInfo {
+    getQuality();
+
+    isOfFullQuality();
+
+    isOfGoodEnoughQuality();
+}
+
+export class ImageInfo implements ImageInfoBase {
+    private _nativeImageInfo: com.facebook.imagepipeline.image.ImageInfo;
+
+    constructor(imageInfo) {
+        this._nativeImageInfo = imageInfo;
+    }
+
+    getHeight(): number {
+        return this._nativeImageInfo.getHeight();
+    }
+
+    getWidth(): number {
+        return this._nativeImageInfo.getWidth();
+    }
+
+    getQualityInfo(): QualityInfo {
+        return this._nativeImageInfo.getQualityInfo();
+    }
+}
+
+export class FinalEventData extends EventData {
+    private _imageInfo: ImageInfo;
+    private _animatable: AnimatedImage;
+
+    get imageInfo(): ImageInfo {
+        return this._imageInfo;
+    }
+
+    set imageInfo(value: ImageInfo) {
+        this._imageInfo = value;
+    }
+
+    get animatable(): AnimatedImage {
+        return this._animatable;
+    }
+
+    set animatable(value: AnimatedImage) {
+        this._animatable = value;
+    }
+}
+
+export class IntermediateEventData extends EventData {
+    private _imageInfo: ImageInfo;
+
+    get imageInfo(): ImageInfo {
+        return this._imageInfo;
+    }
+
+    set imageInfo(value: ImageInfo) {
+        this._imageInfo = value;
+    }
+}
+
+export class FailureEventData extends EventData {
+    private _error: ImageError;
+
+    get error(): ImageError {
+        return this._error;
+    }
+
+    set error(value: ImageError) {
+        this._error = value;
+    }
+}
+
+export class Image extends ImageBase {
+    nativeViewProtected: com.facebook.drawee.view.SimpleDraweeView;
+
     public createNativeView() {
-        this.picasso = Image.getPicassoInstance();
-        if (!AndroidImageView) {
-            AndroidImageView = org.nativescript.widgets.ImageView;
-        }
-        return new android.widget.ImageView(this._context);
+        return new com.facebook.drawee.view.SimpleDraweeView(this._context);
     }
 
-    public onImageLoaded(bitmap: android.graphics.Bitmap) {
-        this.nativeView.setImageBitmap(bitmap);
-        this.handlingUri = null;
-        this.notify({
-            eventName: 'loaded',
-            image: bitmap,
-            object: this
-        });
-    }
-    public onImageError() {
-        this.nativeView.setImageBitmap(null);
-        this.handlingUri = null;
-        this.notify({
-            eventName: 'error',
-            image: null,
-            object: this
-        });
+    public initNativeView(): void {
+        this.initDrawee();
+        this.updateHierarchy();
     }
 
-    handlingUri;
-    private handleSetImage() {
-        if (!this.viewInit) {
-            return;
+    public disposeNativeView() {
+        this.nativeViewProtected.setImageURI(null, null);
+    }
+
+    public updateImageUri() {
+        const imagePipeLine = getImagePipeline();
+        const isInCache = imagePipeLine.isInBitmapMemoryCache(this.imageUri);
+        if (isInCache) {
+            imagePipeLine.evictFromCache(this.imageUri);
+            const imageUri = this.imageUri;
+            this.imageUri = null;
+            this.imageUri = imageUri;
         }
-        // const imageView = this.nativeViewProtected;
-        // imageView.setImageBitmap(null);
-        if (this.imageUri) {
-            if (this.handlingUri === this.imageUri) {
-                return;
+    }
+
+    protected onImageUriChanged(oldValue: string, newValue: string) {
+        this.initImage();
+    }
+
+    protected onPlaceholderImageUriChanged(oldValue: string, newValue: string) {
+        this.updateHierarchy();
+    }
+
+    protected onFailureImageUriChanged(oldValue: string, newValue: string) {
+        this.updateHierarchy();
+    }
+
+    protected onActualImageScaleTypeChanged(oldValue: string, newValue: string) {
+        this.updateHierarchy();
+    }
+
+    protected onFadeDurationChanged(oldValue: number, newValue: number) {
+        this.updateHierarchy();
+    }
+
+    protected onBackgroundUriChanged(oldValue: string, newValue: string) {
+        this.updateHierarchy();
+    }
+
+    protected onProgressiveRenderingEnabledChanged(oldValue: boolean, newValue: boolean) {}
+
+    protected onShowProgressBarChanged(oldValue: boolean, newValue: boolean) {
+        this.updateHierarchy();
+    }
+
+    protected onProgressBarColorChanged(oldValue: string, newValue: string) {
+        this.updateHierarchy();
+    }
+
+    protected onRoundAsCircleChanged(oldValue: boolean, newValue: boolean) {
+        this.updateHierarchy();
+    }
+
+    protected onRoundTopLeftChanged(oldValue: boolean, newValue: boolean) {
+        this.updateHierarchy();
+    }
+
+    protected onRoundTopRightChanged(oldValue: boolean, newValue: boolean) {
+        this.updateHierarchy();
+    }
+
+    protected onRoundBottomLeftChanged(oldValue: boolean, newValue: boolean) {
+        this.updateHierarchy();
+    }
+
+    protected onRoundBottomRightChanged(oldValue: boolean, newValue: boolean) {
+        this.updateHierarchy();
+    }
+
+    protected onRoundedCornerRadiusChanged(oldValue: number, newValue: number) {
+        this.updateHierarchy();
+    }
+
+    protected onBlurRadiusChanged(oldValue: number, newValue: number) {
+        this.initImage();
+    }
+
+    protected onBlurDownSamplingChanged(oldValue: number, newValue: number) {
+        this.initImage();
+    }
+
+    protected onAutoPlayAnimationsPChanged(oldValue: boolean, newValue: boolean) {}
+
+    protected onTapToRetryEnabledChanged(oldValue: boolean, newValue: boolean) {}
+
+    protected onAspectRatioChanged(oldValue: number, newValue: number) {
+        this.initImage();
+    }
+
+    private initDrawee() {
+        this.initImage();
+    }
+
+    private initImage() {
+        if (this.nativeViewProtected) {
+            this.nativeViewProtected.setImageURI(null);
+            if (this.imageUri) {
+                let uri;
+                if (utils.isFileOrResourcePath(this.imageUri)) {
+                    const res = utils.ad.getApplicationContext().getResources();
+                    if (!res) {
+                        return;
+                    }
+
+                    if (this.imageUri.indexOf(utils.RESOURCE_PREFIX) === 0) {
+                        const resName = this.imageUri.substr(utils.RESOURCE_PREFIX.length);
+                        const identifier = res.getIdentifier(resName, 'drawable', utils.ad.getApplication().getPackageName());
+                        if (0 < identifier) {
+                            uri = new android.net.Uri.Builder()
+                                .scheme(com.facebook.common.util.UriUtil.LOCAL_RESOURCE_SCHEME)
+                                .path(java.lang.String.valueOf(identifier))
+                                .build();
+                        }
+                    } else if (this.imageUri.indexOf('~/') === 0) {
+                        uri = android.net.Uri.parse(`file:${fs.path.join(fs.knownFolders.currentApp().path, this.imageUri.replace('~/', ''))}`);
+                    } else if (this.imageUri.indexOf('/') === 0) {
+                        uri = android.net.Uri.parse(`file:${this.imageUri}`);
+                    }
+                } else {
+                    uri = android.net.Uri.parse(this.imageUri);
+                }
+
+                if (!uri) {
+                    console.log(`Error: 'imageUri' not valid: ${this.imageUri}`);
+                    return;
+                }
+
+                const progressiveRenderingEnabledValue = this.progressiveRenderingEnabled !== undefined ? this.progressiveRenderingEnabled : false;
+                const requestBuilder = com.facebook.imagepipeline.request.ImageRequestBuilder.newBuilderWithSource(uri).setProgressiveRenderingEnabled(progressiveRenderingEnabledValue);
+
+                if (this.decodeWidth && this.decodeHeight) {
+                    requestBuilder.setResizeOptions(new com.facebook.imagepipeline.common.ResizeOptions(this.decodeWidth, this.decodeHeight));
+                }
+                if (this.blurRadius) {
+                    const postProcessor: any = new jp.wasabeef.fresco.processors.BlurPostprocessor(this._context, this.blurRadius, this.blurDownSampling || 1);
+                    requestBuilder.setPostprocessor(postProcessor);
+                }
+
+                const request = requestBuilder.build();
+
+                const that: WeakRef<Image> = new WeakRef(this);
+                const listener = new com.facebook.drawee.controller.ControllerListener<com.facebook.imagepipeline.image.ImageInfo>({
+                    onFinalImageSet(id, imageInfo, animatable) {
+                        if (that && that.get()) {
+                            const info = new ImageInfo(imageInfo);
+
+                            const args = {
+                                eventName: ImageBase.finalImageSetEvent,
+                                object: that.get(),
+                                imageInfo: info,
+                                animatable: animatable as AnimatedImage
+                            } as FinalEventData;
+
+                            that.get().notify(args);
+                        } else {
+                            console.log("Warning: WeakRef<Image> was GC and no '" + ImageBase.finalImageSetEvent + "' callback will be raised.");
+                        }
+                    },
+                    onFailure(id, throwable) {
+                        if (that && that.get()) {
+                            const imageError = new ImageError(throwable);
+                            const args: FailureEventData = {
+                                eventName: ImageBase.failureEvent,
+                                object: that.get(),
+                                error: imageError
+                            } as FailureEventData;
+
+                            that.get().notify(args);
+                        } else {
+                            console.log("Warning: WeakRef<Image> was GC and no '" + ImageBase.failureEvent + "' callback will be raised.");
+                        }
+                    },
+                    onIntermediateImageFailed(id, throwable) {
+                        if (that && that.get()) {
+                            const imageError = new ImageError(throwable);
+                            const args: FailureEventData = {
+                                eventName: ImageBase.intermediateImageFailedEvent,
+                                object: that.get(),
+                                error: imageError
+                            } as FailureEventData;
+
+                            that.get().notify(args);
+                        } else {
+                            console.log("Warning: WeakRef<Image> was GC and no '" + ImageBase.intermediateImageFailedEvent + "' callback will be raised.");
+                        }
+                    },
+                    onIntermediateImageSet(id, imageInfo) {
+                        if (that && that.get()) {
+                            const info = new ImageInfo(imageInfo);
+                            const args: IntermediateEventData = {
+                                eventName: ImageBase.intermediateImageSetEvent,
+                                object: that.get(),
+                                imageInfo: info
+                            } as IntermediateEventData;
+
+                            that.get().notify(args);
+                        } else {
+                            console.log("Warning: WeakRef<Image> was GC and no '" + ImageBase.intermediateImageSetEvent + "' callback will be raised.");
+                        }
+                    },
+                    onRelease(id) {
+                        if (that && that.get()) {
+                            const args: EventData = {
+                                eventName: ImageBase.releaseEvent,
+                                object: that.get()
+                            } as EventData;
+
+                            that.get().notify(args);
+                        } else {
+                            console.log("Warning: WeakRef<Image> was GC and no '" + ImageBase.releaseEvent + "' callback will be raised.");
+                        }
+                    },
+                    onSubmit(id, callerContext) {
+                        if (that && that.get()) {
+                            const args: EventData = {
+                                eventName: ImageBase.submitEvent,
+                                object: that.get()
+                            } as EventData;
+
+                            that.get().notify(args);
+                        } else {
+                            console.log("Warning: WeakRef<Image> was GC and no 'submitEvent' callback will be raised.");
+                        }
+                    }
+                });
+                const builder = com.facebook.drawee.backends.pipeline.Image.newDraweeControllerBuilder();
+                builder.setImageRequest(request);
+                builder.setControllerListener(listener);
+                builder.setOldController(this.nativeViewProtected.getController());
+                if (this.autoPlayAnimations) {
+                    builder.setAutoPlayAnimations(this.autoPlayAnimations);
+                }
+
+                if (this.tapToRetryEnabled) {
+                    builder.setTapToRetryEnabled(this.tapToRetryEnabled);
+                }
+
+                const controller = builder.build();
+                if (this.aspectRatio) {
+                    this.nativeViewProtected.setAspectRatio(this.aspectRatio);
+                }
+
+                this.nativeViewProtected.setController(controller);
             }
-            this.handlingUri = this.imageUri;
-            const builder = createPicassoBuilder(this.picasso, this);
-            builder.into(this.nativeView);
-            //     this.builder.into(this.nativeView, new Callback() {
-            //         public void onLoad() {
-            //           if (playAnimation.get()) {
-            //             // TODO play fade
-            //           }
-            //         }
-            //         //..
-            // });
-        } else {
-            this.nativeViewProtected.setImageBitmap(null);
-        }
-    }
-    viewInit = false;
-    public initNativeView() {
-        super.initNativeView();
-        this.viewInit = true;
-        //    console.log('initNativeView', this.imageUri, !!this.nativeView);
-        this.handleSetImage();
-    }
-    [common.imageUriProperty.getDefault](): any {
-        return undefined;
-    }
-    [common.imageUriProperty.setNative](src: string) {
-        if (!this.imageUri) {
-            return;
-        }
-        // console.log('imageUriProperty', this.imageUri);
-        this.handleSetImage();
-    }
-    [common.tintColorProperty.setNative](value: Color) {
-        if (value === undefined) {
-            this.nativeViewProtected.clearColorFilter();
-        } else {
-            this.nativeViewProtected.setColorFilter(value.android);
         }
     }
 
-    [common.stretchProperty.getDefault](): common.Stretch {
-        return 'aspectFit';
+    private updateHierarchy() {
+        if (this.nativeViewProtected) {
+            let failureImageDrawable;
+            let placeholderImageDrawable;
+            let backgroundDrawable;
+            if (this.failureImageUri) {
+                failureImageDrawable = this.getDrawable(this.failureImageUri);
+            }
+
+            if (this.placeholderImageUri) {
+                placeholderImageDrawable = this.getDrawable(this.placeholderImageUri);
+            }
+
+            if (this.backgroundUri) {
+                backgroundDrawable = this.getDrawable(this.backgroundUri);
+            }
+
+            const builder: GenericDraweeHierarchyBuilder = new GenericDraweeHierarchyBuilder();
+            if (this.failureImageUri && failureImageDrawable) {
+                builder.setFailureImage(failureImageDrawable);
+            }
+
+            if (this.tintColor) {
+                builder.setActualImageColorFilter(new android.graphics.PorterDuffColorFilter(this.tintColor.android, android.graphics.PorterDuff.Mode.MULTIPLY));
+            }
+
+            if (this.placeholderImageUri && placeholderImageDrawable) {
+                builder.setPlaceholderImage(placeholderImageDrawable);
+            }
+
+            if (this.actualImageScaleType) {
+                builder.setActualImageScaleType(this.actualImageScaleType);
+            }
+
+            if (this.fadeDuration) {
+                builder.setFadeDuration(this.fadeDuration);
+            }
+
+            if (this.backgroundUri && backgroundDrawable) {
+                builder.setBackground(backgroundDrawable);
+            }
+
+            if (this.showProgressBar) {
+                builder.setProgressBarImage(this.progressBarColor);
+            }
+
+            if (this.roundAsCircle) {
+                builder.setRoundingParamsAsCircle();
+            }
+
+            if (this.roundBottomLeft || this.roundBottomRight || this.roundTopLeft || this.roundTopRight) {
+                const topLeftRadius = this.roundTopLeft ? this.roundedCornerRadius : 0;
+                const topRightRadius = this.roundTopRight ? this.roundedCornerRadius : 0;
+                const bottomRightRadius = this.roundBottomRight ? this.roundedCornerRadius : 0;
+                const bottomLeftRadius = this.roundBottomLeft ? this.roundedCornerRadius : 0;
+                builder.setCornersRadii(topLeftRadius, topRightRadius, bottomRightRadius, bottomLeftRadius);
+            }
+
+            const hierarchy = builder.build();
+            this.nativeViewProtected.setHierarchy(hierarchy);
+        }
     }
-    [common.stretchProperty.setNative](value: common.Stretch) {
+
+    private getDrawable(path: string) {
+        let drawable;
+        if (utils.isFileOrResourcePath(path)) {
+            if (path.indexOf(utils.RESOURCE_PREFIX) === 0) {
+                drawable = this.getDrawableFromResource(path);
+            } else {
+                drawable = this.getDrawableFromLocalFile(path);
+            }
+        }
+
+        return drawable;
+    }
+
+    private getDrawableFromLocalFile(localFilePath: string) {
+        const img = imageSource.fromFile(localFilePath);
+        let drawable: android.graphics.drawable.BitmapDrawable = null;
+        if (img) {
+            drawable = new android.graphics.drawable.BitmapDrawable(utils.ad.getApplicationContext().getResources(), img.android);
+        }
+
+        return drawable;
+    }
+
+    private getDrawableFromResource(resourceName: string) {
+        const img = imageSource.fromResource(resourceName.substr(utils.RESOURCE_PREFIX.length));
+        let drawable: android.graphics.drawable.BitmapDrawable = null;
+        if (img) {
+            drawable = new android.graphics.drawable.BitmapDrawable(utils.ad.getApplicationContext().getResources(), img.android);
+        }
+
+        return drawable;
+    }
+    [ImageBase.tintColorProperty.setNative](value: Color) {
+        console.log('test', 'tintColorProperty', value);
+        this.updateHierarchy();
+    }
+    [ImageBase.stretchProperty.setNative](value: Stretch) {
         switch (value) {
             case 'aspectFit':
                 this.nativeViewProtected.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
@@ -258,7 +555,167 @@ export class Image extends common.Image {
         }
     }
 
-    public clearItem() {
-        // this.builder.
+    startAnimating() {
+        if (this.nativeViewProtected) {
+            const controller = this.nativeViewProtected.getController();
+            if (controller) {
+                const animatable = controller.getAnimatable();
+                if (animatable) {
+                    animatable.start();
+                }
+            }
+        }
     }
+    stopAnimating() {
+        if (this.nativeViewProtected) {
+            const controller = this.nativeViewProtected.getController();
+            if (controller) {
+                const animatable = controller.getAnimatable();
+                if (animatable) {
+                    animatable.stop();
+                }
+            }
+        }
+    }
+}
+
+class GenericDraweeHierarchyBuilder {
+    private nativeBuilder: com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
+
+    constructor() {
+        const res = application.android.context.getResources();
+        this.nativeBuilder = new com.facebook.drawee.generic.GenericDraweeHierarchyBuilder(res);
+    }
+
+    public setPlaceholderImage(drawable): GenericDraweeHierarchyBuilder {
+        if (!application.android) {
+            return null;
+        }
+
+        this.nativeBuilder.setPlaceholderImage(drawable);
+
+        return this;
+    }
+    public setActualImageColorFilter(filter: android.graphics.ColorFilter): GenericDraweeHierarchyBuilder {
+        if (!application.android) {
+            return null;
+        }
+
+        this.nativeBuilder.setActualImageColorFilter(filter);
+
+        return this;
+    }
+
+    public setFailureImage(drawable): GenericDraweeHierarchyBuilder {
+        if (!application.android) {
+            return null;
+        }
+
+        this.nativeBuilder.setFailureImage(drawable);
+
+        return this;
+    }
+
+    public setActualImageScaleType(scaleType: string): GenericDraweeHierarchyBuilder {
+        if (!application.android) {
+            return null;
+        }
+
+        this.nativeBuilder.setActualImageScaleType(getScaleType(scaleType));
+
+        return this;
+    }
+
+    public build(): com.facebook.drawee.generic.GenericDraweeHierarchy {
+        if (!application.android) {
+            return null;
+        }
+
+        return this.nativeBuilder.build();
+    }
+
+    public setFadeDuration(duration: number): GenericDraweeHierarchyBuilder {
+        if (!application.android) {
+            return null;
+        }
+
+        this.nativeBuilder.setFadeDuration(duration);
+
+        return this;
+    }
+
+    public setBackground(drawable): GenericDraweeHierarchyBuilder {
+        if (!application.android) {
+            return null;
+        }
+
+        this.nativeBuilder.setBackground(drawable);
+
+        return this;
+    }
+
+    public setProgressBarImage(color: string): GenericDraweeHierarchyBuilder {
+        if (!application.android) {
+            return null;
+        }
+
+        const drawable = new com.facebook.drawee.drawable.ProgressBarDrawable();
+        if (color) {
+            drawable.setColor(android.graphics.Color.parseColor(color));
+        }
+
+        this.nativeBuilder.setProgressBarImage(drawable);
+
+        return this;
+    }
+
+    public setRoundingParamsAsCircle(): GenericDraweeHierarchyBuilder {
+        if (!application.android) {
+            return null;
+        }
+
+        const params = com.facebook.drawee.generic.RoundingParams.asCircle();
+        this.nativeBuilder.setRoundingParams(params);
+
+        return this;
+    }
+
+    public setCornersRadii(topLeft: number, topRight: number, bottomRight: number, bottomLeft: number): GenericDraweeHierarchyBuilder {
+        if (!application.android) {
+            return null;
+        }
+
+        const params = new com.facebook.drawee.generic.RoundingParams();
+        params.setCornersRadii(topLeft, topRight, bottomRight, bottomLeft);
+        this.nativeBuilder.setRoundingParams(params);
+
+        return this;
+    }
+}
+
+function getScaleType(scaleType: string) {
+    if (types.isString(scaleType)) {
+        switch (scaleType) {
+            case ScaleType.Center:
+                return com.facebook.drawee.drawable.ScalingUtils.ScaleType.CENTER;
+            case ScaleType.CenterCrop:
+                return com.facebook.drawee.drawable.ScalingUtils.ScaleType.CENTER_CROP;
+            case ScaleType.CenterInside:
+                return com.facebook.drawee.drawable.ScalingUtils.ScaleType.CENTER_INSIDE;
+            case ScaleType.FitCenter:
+                return com.facebook.drawee.drawable.ScalingUtils.ScaleType.FIT_CENTER;
+            case ScaleType.FitEnd:
+                return com.facebook.drawee.drawable.ScalingUtils.ScaleType.FIT_END;
+            case ScaleType.FitStart:
+                return com.facebook.drawee.drawable.ScalingUtils.ScaleType.FIT_START;
+            case ScaleType.FitXY:
+                return com.facebook.drawee.drawable.ScalingUtils.ScaleType.FIT_XY;
+            case ScaleType.FocusCrop:
+                return com.facebook.drawee.drawable.ScalingUtils.ScaleType.FOCUS_CROP;
+            default:
+                break;
+        }
+    }
+
+    return null;
 }

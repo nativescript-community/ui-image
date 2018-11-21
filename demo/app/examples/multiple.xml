@@ -1,0 +1,14 @@
+ <lv:RadListView xmlns:lv="nativescript-ui-listview" xmlns:image="nativescript-image" items="{{ dataItems }}" id="listView">
+    <lv:RadListView.itemTemplate>
+        <StackLayout rows="*, 20" backgroundColor="blue">
+                <image:Image row="0" verticalAlignment="top"
+                                    aspectRatio="{{ aspectRatio, aspectRatio }}"
+                                    backgroundUri="res://ns_logo"
+                                    backgroundColor="red"
+                                    imageUri="{{ imageUri }}"/>
+                <!-- <StackLayout backgroundColor="blue" verticalAlignment="top" row="1"> -->
+                    <Label height="22" backgroundColor="yellow" text="{{ id }}" verticalAlignment="center" horizontalAlignment="center"/>
+                <!-- </StackLayout> -->
+        </StackLayout>
+    </lv:RadListView.itemTemplate>
+</lv:RadListView>

@@ -1,0 +1,12 @@
+<ScrollView>
+    <StackLayout>
+        <Button text="change" tap="onChangeTap"/>
+        <image:Image verticalAlignment="center"
+                            row="1"
+                            id="imageDrawee"
+                            xmlns:image="nativescript-image"
+                            imageUri="https://raw.githubusercontent.com/NativeScript/nativescript-image/master/examples-data/drink1.jpg"
+                            aspectRatio="1.49"
+                            placeholderImageUri="res://ns_logo"/>
+    </StackLayout>
+</ScrollView>

@@ -1,0 +1,6 @@
+<image:Image xmlns:image="nativescript-image"
+                    verticalAlignment="center"
+                    placeholderImageUri="res://ns_logo"
+                    aspectRatio="1.49"
+                    blurRadius="25"
+                    imageUri="https://raw.githubusercontent.com/NativeScript/nativescript-image/master/examples-data/dessert1.jpg"/>
