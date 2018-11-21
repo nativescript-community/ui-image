@@ -2,18 +2,30 @@ export * from './image-common';
 import { ImageBase, ImagePipelineConfigSetting, ScaleType, Stretch } from './image-common';
 import * as utils from 'tns-core-modules/utils/utils';
 import * as types from 'tns-core-modules/utils/types';
-import * as application from 'tns-core-modules/application';
 import * as imageSource from 'tns-core-modules/image-source';
 import * as fs from 'tns-core-modules/file-system';
-import { Color } from 'tns-core-modules/color/color';
 
-import { layout, traceCategories, traceEnabled, traceWrite } from 'tns-core-modules/ui/core/view';
+import { layout } from 'tns-core-modules/ui/core/view';
 
-const enum SDImageCacheType {
-    SDImageCacheTypeNone,
-    SDImageCacheTypeDisk,
-    SDImageCacheTypeMemory
-}
+// class SDImageAspectRatioTransformer extends NSObject {
+//     aspectRatio: number;
+//     static transformerWithAspectRatio(ratio: number) {
+//         const transformer = SDImageAspectRatioTransformer.alloc().init();
+
+//         return transformer;
+//     }
+
+//     transformerKey() {
+//         return `SDImageResizingTransformer(${this.aspectRatio})`;
+//     }
+
+//     transformedImageWithImageForKey(image: UIImage, key: string) {
+//         if (!image) {
+//             return null;
+//         }
+//         // return [image sd_resizedImageWithSize:self.size scaleMode:self.scaleMode];
+//     }
+// }
 
 function getScaleType(scaleType: string) {
     if (types.isString(scaleType)) {
@@ -61,6 +73,7 @@ function getUIImageScaleType(scaleType: string) {
 }
 
 export function initialize(config?: ImagePipelineConfigSetting): void {}
+export function shutDown(): void {}
 
 export class ImagePipeline {
     private _ios: SDImageCache;
@@ -214,25 +227,25 @@ export class Image extends ImageBase {
         let scaleW = 1;
         let scaleH = 1;
         if (Image.needsSizeAdjustment(imageStretch) && (widthIsFinite || heightIsFinite)) {
-            // if (aspectRatio !== undefined) {
-            //   if (!widthIsFinite) {
-            //     scaleH = 1;
-            //     scaleW = scaleH / aspectRatio;
-            //   } else if (!heightIsFinite) {
-            //     scaleW = 1;
-            //     scaleH = scaleW * aspectRatio;
-            //   }
-            // } else {
-            scaleW = nativeWidth > 0 ? measureWidth / nativeWidth : 0;
-            scaleH = nativeHeight > 0 ? measureHeight / nativeHeight : 0;
-
-            if (aspectRatio !== undefined) {
+            if (aspectRatio > 0) {
                 if (!widthIsFinite) {
-                    scaleW = (nativeWidth / nativeHeight) * scaleW * aspectRatio;
+                    scaleH = 1;
+                    scaleW = scaleH / aspectRatio;
                 } else if (!heightIsFinite) {
-                    scaleH = ((nativeWidth / nativeHeight) * scaleW) / aspectRatio;
+                    scaleW = 1;
+                    scaleH = scaleW * aspectRatio;
                 }
             } else {
+                scaleW = nativeWidth > 0 ? measureWidth / nativeWidth : 0;
+                scaleH = nativeHeight > 0 ? measureHeight / nativeHeight : 0;
+
+                // if (aspectRatio !== undefined) {
+                //     if (!widthIsFinite) {
+                //         scaleW = (nativeWidth / nativeHeight) * scaleW * aspectRatio;
+                //     } else if (!heightIsFinite) {
+                //         scaleH = ((nativeWidth / nativeHeight) * scaleW) / aspectRatio;
+                //     }
+                // } else {
                 if (!widthIsFinite) {
                     scaleW = scaleH;
                 } else if (!heightIsFinite) {
@@ -334,33 +347,33 @@ export class Image extends ImageBase {
         //   image = image.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
         // }
         this.isLoading = false;
-        if (!(this.onlyTransitionIfRemote && cacheType !== SDImageCacheType.SDImageCacheTypeMemory) && this.transition) {
-            switch (this.transition) {
-                case 'fade':
-                    this.nativeViewProtected.alpha = 0.0;
-                    this._setNativeImage(image);
-                    UIView.animateWithDurationAnimations(0.2, () => {
-                        this.nativeViewProtected.alpha = this.opacity;
-                    });
-                    break;
-                case 'curlUp':
-                    UIView.transitionWithViewDurationOptionsAnimationsCompletion(
-                        this.nativeViewProtected,
-                        0.3,
-                        UIViewAnimationOptions.TransitionCrossDissolve,
-                        () => {
-                            this._setNativeImage(image);
-                        },
-                        null
-                    );
-                    break;
-                default:
-                    this._setNativeImage(image);
-            }
-        } else {
-            // console.log("setting image", !!image, !!image && image.size);
-            this._setNativeImage(image);
-        }
+        // if (!(this.onlyTransitionIfRemote && cacheType !== SDImageCacheType.SDImageCacheTypeMemory) && this.transition) {
+        //     switch (this.transition) {
+        //         case 'fade':
+        //             this.nativeViewProtected.alpha = 0.0;
+        //             this._setNativeImage(image);
+        //             UIView.animateWithDurationAnimations(0.2, () => {
+        //                 this.nativeViewProtected.alpha = this.opacity;
+        //             });
+        //             break;
+        //         case 'curlUp':
+        //             UIView.transitionWithViewDurationOptionsAnimationsCompletion(
+        //                 this.nativeViewProtected,
+        //                 0.3,
+        //                 UIViewAnimationOptions.TransitionCrossDissolve,
+        //                 () => {
+        //                     this._setNativeImage(image);
+        //                 },
+        //                 null
+        //             );
+        //             break;
+        //         default:
+        //             this._setNativeImage(image);
+        //     }
+        // } else {
+        // console.log("setting image", !!image, !!image && image.size);
+        this._setNativeImage(image);
+        // }
         if (!this.autoPlayAnimations) {
             this.nativeViewProtected.stopAnimating();
         }
@@ -399,9 +412,9 @@ export class Image extends ImageBase {
             if (this.imageUri) {
                 this.isLoading = true;
                 let options = SDWebImageOptions.ScaleDownLargeImages | SDWebImageOptions.AvoidAutoSetImage;
-                // if (this.onlyTransitionIfRemote) {
-                //     options |= SDWebImageOptions.ForceTransition;
-                // }
+                if (this.onlyTransitionIfRemote === false) {
+                    options |= SDWebImageOptions.ForceTransition;
+                }
                 const context: NSDictionary<string, any> = NSMutableDictionary.dictionary();
                 const transformers = [];
                 if (!!this.progressiveRenderingEnabled) {
@@ -419,32 +432,36 @@ export class Image extends ImageBase {
                 //   // );
                 // }
                 if (this.decodeWidth && this.decodeHeight) {
-                    console.log('crop ', this.decodeWidth, this.decodeHeight / 2);
                     transformers.push(
-                        SDImageCroppingTransformer.transformerWithRect(CGRectMake(0, 0, this.decodeWidth, this.decodeHeight / 2))
-                        // SDImageResizingTransformer.transformerWithSizeScaleMode(
-                        //   CGSizeMake(this.decodeWidth, this.decodeHeight),
-                        //   getScaleType(this.actualImageScaleType)
-                        // )
+                        SDImageCroppingTransformer.transformerWithRect(CGRectMake(0, 0, this.decodeWidth, this.decodeHeight * 2))
                     );
-                    // requestBuilder.setResizeOptions(
-                    //   new com.facebook.imagepipeline.common.ResizeOptions(
-                    //     this.decodeWidth,
-                    //     this.decodeHeight
-                    //   )
-                    // );
                 }
                 if (this.tintColor) {
                     transformers.push(SDImageTintTransformer.transformerWithColor(this.tintColor.ios));
                 }
                 if (this.blurRadius) {
                     transformers.push(SDImageBlurTransformer.transformerWithRadius(this.blurRadius));
-                    // const postProcessor: any = new jp.wasabeef.fresco.processors.BlurPostprocessor(
-                    //   this._context,
-                    //   this.blurRadius,
-                    //   this.blurDownSampling || 1
-                    // );
-                    // requestBuilder.setPostprocessor(postProcessor);
+                }
+                if (this.roundAsCircle) {
+                    transformers.push(SDImageRoundCornerTransformer.transformerWithRadiusCornersBorderWidthBorderColor(1000000, UIRectCorner.AllCorners, 0, null));
+                    transformers.push(SDImageFlippingTransformer.transformerWithHorizontalVertical(false, true));
+                }
+                if (this.roundBottomLeft || this.roundBottomRight || this.roundTopLeft || this.roundTopRight) {
+                    let corners = 0;
+                    if (this.roundTopLeft) {
+                        corners = corners | UIRectCorner.BottomLeft;
+                    }
+                    if (this.roundTopRight) {
+                        corners = corners | UIRectCorner.BottomRight;
+                    }
+                    if (this.roundBottomRight) {
+                        corners = corners | UIRectCorner.TopRight;
+                    }
+                    if (this.roundBottomLeft) {
+                        corners = corners | UIRectCorner.TopLeft;
+                    }
+                    transformers.push(SDImageRoundCornerTransformer.transformerWithRadiusCornersBorderWidthBorderColor(this.roundedCornerRadius, corners, 0, null));
+                    transformers.push(SDImageFlippingTransformer.transformerWithHorizontalVertical(false, true));
                 }
                 // console.log("loading image", this.imageUri);
 

@@ -2,8 +2,7 @@
     <image:Image xmlns:image="nativescript-image" 
                         verticalAlignment="center"
                         placeholderImageUri="res://ns_logo"
-                        aspectRatio="1.49"
-                        decodeWidth="665"
-                        decodeHeight="500"
+                        decodeWidth="50"
+                        decodeHeight="100"
                         imageUri="https://raw.githubusercontent.com/Akylas/nativescript-image/master/examples-data/dessert1.jpg"/>
 </GridLayout>

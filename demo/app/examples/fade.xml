@@ -3,6 +3,5 @@
     <image:Image verticalAlignment="center" row="1"
                         id="imageDrawee"
                         xmlns:image="nativescript-image"
-                        fadeDuration="3000"
-                        aspectRatio="1.49"/>
+                        fadeDuration="3000"/>
 </StackLayout>

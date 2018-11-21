@@ -3486,8 +3486,8 @@ declare module com {
 		export module drawee {
 			export module backends {
 				export module pipeline {
-					export class Image extends java.lang.Object {
-						public static class: java.lang.Class<com.facebook.drawee.backends.pipeline.Image>;
+					export class Fresco extends java.lang.Object {
+						public static class: java.lang.Class<com.facebook.drawee.backends.pipeline.Fresco>;
 						public static newDraweeControllerBuilder(): com.facebook.drawee.backends.pipeline.PipelineDraweeControllerBuilder;
 						public static getImagePipelineFactory(): com.facebook.imagepipeline.core.ImagePipelineFactory;
 						public static initialize(param0: globalAndroid.content.Context, param1: com.facebook.imagepipeline.core.ImagePipelineConfig): void;

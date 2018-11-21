@@ -2,7 +2,6 @@
     <image:Image xmlns:image="nativescript-image" 
                         verticalAlignment="center"
                         placeholderImageUri="res://ns_logo"
-                        aspectRatio="0.754"
                         progressiveRenderingEnabled="true"
                         showProgressBar="true"
                         progressBarColor="blue"

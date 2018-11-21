@@ -1,6 +1,7 @@
 export * from './image-common';
 import { ImageBase, ImagePipelineConfigSetting } from './image-common';
 export declare function initialize(config?: ImagePipelineConfigSetting): void;
+export declare function shutDown(): void;
 export declare class ImagePipeline {
     private _ios;
     constructor();

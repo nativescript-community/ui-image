@@ -13,16 +13,16 @@ export function initialize(config?: ImagePipelineConfigSetting): void {
             const imagePipelineConfig = com.facebook.imagepipeline.core.ImagePipelineConfig.newBuilder(application.android.context)
                 .setDownsampleEnabled(true)
                 .build();
-            com.facebook.drawee.backends.pipeline.Image.initialize(application.android.context, imagePipelineConfig);
+            com.facebook.drawee.backends.pipeline.Fresco.initialize(application.android.context, imagePipelineConfig);
         } else {
-            com.facebook.drawee.backends.pipeline.Image.initialize(application.android.context);
+            com.facebook.drawee.backends.pipeline.Fresco.initialize(application.android.context);
         }
     }
 }
 
 export function getImagePipeline(): ImagePipeline {
     if (application.android) {
-        const nativePipe = com.facebook.drawee.backends.pipeline.Image.getImagePipeline();
+        const nativePipe = com.facebook.drawee.backends.pipeline.Fresco.getImagePipeline();
         const imagePineLine = new ImagePipeline();
         imagePineLine.android = nativePipe;
 
@@ -34,7 +34,7 @@ export function getImagePipeline(): ImagePipeline {
 
 export function shutDown(): void {
     com.facebook.drawee.view.SimpleDraweeView.shutDown();
-    com.facebook.drawee.backends.pipeline.Image.shutDown();
+    com.facebook.drawee.backends.pipeline.Fresco.shutDown();
 }
 
 export class ImagePipeline {
@@ -181,6 +181,7 @@ export class FailureEventData extends EventData {
 
 export class Image extends ImageBase {
     nativeViewProtected: com.facebook.drawee.view.SimpleDraweeView;
+    // actualImageScaleType = ScaleType.FitCenter;
 
     public createNativeView() {
         return new com.facebook.drawee.view.SimpleDraweeView(this._context);
@@ -189,6 +190,13 @@ export class Image extends ImageBase {
     public initNativeView(): void {
         this.initDrawee();
         this.updateHierarchy();
+    }
+
+    onImageSet(imageInfo: com.facebook.imagepipeline.image.ImageInfo, animatable: android.graphics.drawable.Animatable) {
+        if (!this.aspectRatio) {
+            console.log('onImageSet', this.decodeWidth, this.decodeHeight, imageInfo.getWidth(), imageInfo.getHeight());
+            this.nativeViewProtected.setAspectRatio((imageInfo.getWidth()) / (imageInfo.getHeight()));
+        }
     }
 
     public disposeNativeView() {
@@ -318,15 +326,19 @@ export class Image extends ImageBase {
                     return;
                 }
 
-                const progressiveRenderingEnabledValue = this.progressiveRenderingEnabled !== undefined ? this.progressiveRenderingEnabled : false;
-                const requestBuilder = com.facebook.imagepipeline.request.ImageRequestBuilder.newBuilderWithSource(uri).setProgressiveRenderingEnabled(progressiveRenderingEnabledValue);
+                // const progressiveRenderingEnabledValue = this.progressiveRenderingEnabled !== undefined ? this.progressiveRenderingEnabled : false;
+                let requestBuilder = com.facebook.imagepipeline.request.ImageRequestBuilder.newBuilderWithSource(uri);
+                if (this.progressiveRenderingEnabled === true) {
+                    requestBuilder = requestBuilder.setProgressiveRenderingEnabled(this.progressiveRenderingEnabled);
+                }
 
                 if (this.decodeWidth && this.decodeHeight) {
-                    requestBuilder.setResizeOptions(new com.facebook.imagepipeline.common.ResizeOptions(this.decodeWidth, this.decodeHeight));
+                    console.log('apply resize', this.decodeWidth, this.decodeHeight);
+                    requestBuilder = requestBuilder.setResizeOptions(new com.facebook.imagepipeline.common.ResizeOptions(this.decodeWidth, this.decodeHeight));
                 }
                 if (this.blurRadius) {
                     const postProcessor: any = new jp.wasabeef.fresco.processors.BlurPostprocessor(this._context, this.blurRadius, this.blurDownSampling || 1);
-                    requestBuilder.setPostprocessor(postProcessor);
+                    requestBuilder = requestBuilder.setPostprocessor(postProcessor);
                 }
 
                 const request = requestBuilder.build();
@@ -334,7 +346,9 @@ export class Image extends ImageBase {
                 const that: WeakRef<Image> = new WeakRef(this);
                 const listener = new com.facebook.drawee.controller.ControllerListener<com.facebook.imagepipeline.image.ImageInfo>({
                     onFinalImageSet(id, imageInfo, animatable) {
-                        if (that && that.get()) {
+                        const nativeView = that && that.get();
+                        if (nativeView) {
+                            nativeView.onImageSet(imageInfo, animatable);
                             const info = new ImageInfo(imageInfo);
 
                             const args = {
@@ -344,7 +358,7 @@ export class Image extends ImageBase {
                                 animatable: animatable as AnimatedImage
                             } as FinalEventData;
 
-                            that.get().notify(args);
+                            nativeView.notify(args);
                         } else {
                             console.log("Warning: WeakRef<Image> was GC and no '" + ImageBase.finalImageSetEvent + "' callback will be raised.");
                         }
@@ -416,7 +430,7 @@ export class Image extends ImageBase {
                         }
                     }
                 });
-                const builder = com.facebook.drawee.backends.pipeline.Image.newDraweeControllerBuilder();
+                const builder = com.facebook.drawee.backends.pipeline.Fresco.newDraweeControllerBuilder();
                 builder.setImageRequest(request);
                 builder.setControllerListener(listener);
                 builder.setOldController(this.nativeViewProtected.getController());
@@ -537,23 +551,23 @@ export class Image extends ImageBase {
         console.log('test', 'tintColorProperty', value);
         this.updateHierarchy();
     }
-    [ImageBase.stretchProperty.setNative](value: Stretch) {
-        switch (value) {
-            case 'aspectFit':
-                this.nativeViewProtected.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
-                break;
-            case 'aspectFill':
-                this.nativeViewProtected.setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP);
-                break;
-            case 'fill':
-                this.nativeViewProtected.setScaleType(android.widget.ImageView.ScaleType.FIT_XY);
-                break;
-            case 'none':
-            default:
-                this.nativeViewProtected.setScaleType(android.widget.ImageView.ScaleType.MATRIX);
-                break;
-        }
-    }
+    // [ImageBase.stretchProperty.setNative](value: Stretch) {
+    //     switch (value) {
+    //         case 'aspectFit':
+    //             this.nativeViewProtected.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
+    //             break;
+    //         case 'aspectFill':
+    //             this.nativeViewProtected.setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP);
+    //             break;
+    //         case 'fill':
+    //             this.nativeViewProtected.setScaleType(android.widget.ImageView.ScaleType.FIT_XY);
+    //             break;
+    //         case 'none':
+    //         default:
+    //             this.nativeViewProtected.setScaleType(android.widget.ImageView.ScaleType.MATRIX);
+    //             break;
+    //     }
+    // }
 
     startAnimating() {
         if (this.nativeViewProtected) {
@@ -588,8 +602,8 @@ class GenericDraweeHierarchyBuilder {
     }
 
     public setPlaceholderImage(drawable): GenericDraweeHierarchyBuilder {
-        if (!application.android) {
-            return null;
+        if (!this.nativeBuilder) {
+            return this;
         }
 
         this.nativeBuilder.setPlaceholderImage(drawable);
@@ -597,8 +611,8 @@ class GenericDraweeHierarchyBuilder {
         return this;
     }
     public setActualImageColorFilter(filter: android.graphics.ColorFilter): GenericDraweeHierarchyBuilder {
-        if (!application.android) {
-            return null;
+        if (!this.nativeBuilder) {
+            return this;
         }
 
         this.nativeBuilder.setActualImageColorFilter(filter);
@@ -607,7 +621,7 @@ class GenericDraweeHierarchyBuilder {
     }
 
     public setFailureImage(drawable): GenericDraweeHierarchyBuilder {
-        if (!application.android) {
+        if (!this.nativeBuilder) {
             return null;
         }
 
@@ -617,9 +631,10 @@ class GenericDraweeHierarchyBuilder {
     }
 
     public setActualImageScaleType(scaleType: string): GenericDraweeHierarchyBuilder {
-        if (!application.android) {
-            return null;
+        if (!this.nativeBuilder) {
+            return this;
         }
+        console.log('setActualImageScaleType', scaleType);
 
         this.nativeBuilder.setActualImageScaleType(getScaleType(scaleType));
 
@@ -627,7 +642,7 @@ class GenericDraweeHierarchyBuilder {
     }
 
     public build(): com.facebook.drawee.generic.GenericDraweeHierarchy {
-        if (!application.android) {
+        if (!this.nativeBuilder) {
             return null;
         }
 
@@ -635,7 +650,7 @@ class GenericDraweeHierarchyBuilder {
     }
 
     public setFadeDuration(duration: number): GenericDraweeHierarchyBuilder {
-        if (!application.android) {
+        if (!this.nativeBuilder) {
             return null;
         }
 
@@ -645,8 +660,8 @@ class GenericDraweeHierarchyBuilder {
     }
 
     public setBackground(drawable): GenericDraweeHierarchyBuilder {
-        if (!application.android) {
-            return null;
+        if (!this.nativeBuilder) {
+            return this;
         }
 
         this.nativeBuilder.setBackground(drawable);
@@ -655,7 +670,7 @@ class GenericDraweeHierarchyBuilder {
     }
 
     public setProgressBarImage(color: string): GenericDraweeHierarchyBuilder {
-        if (!application.android) {
+        if (!this.nativeBuilder) {
             return null;
         }
 
@@ -670,8 +685,8 @@ class GenericDraweeHierarchyBuilder {
     }
 
     public setRoundingParamsAsCircle(): GenericDraweeHierarchyBuilder {
-        if (!application.android) {
-            return null;
+        if (!this.nativeBuilder) {
+            return this;
         }
 
         const params = com.facebook.drawee.generic.RoundingParams.asCircle();
@@ -681,8 +696,8 @@ class GenericDraweeHierarchyBuilder {
     }
 
     public setCornersRadii(topLeft: number, topRight: number, bottomRight: number, bottomLeft: number): GenericDraweeHierarchyBuilder {
-        if (!application.android) {
-            return null;
+        if (!this.nativeBuilder) {
+            return this;
         }
 
         const params = new com.facebook.drawee.generic.RoundingParams();

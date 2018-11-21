@@ -54,6 +54,7 @@ export declare class Image extends ImageBase {
     nativeViewProtected: com.facebook.drawee.view.SimpleDraweeView;
     createNativeView(): com.facebook.drawee.view.SimpleDraweeView;
     initNativeView(): void;
+    onImageSet(imageInfo: com.facebook.imagepipeline.image.ImageInfo, animatable: android.graphics.drawable.Animatable): void;
     disposeNativeView(): void;
     updateImageUri(): void;
     protected onImageUriChanged(oldValue: string, newValue: string): void;

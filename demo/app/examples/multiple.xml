@@ -2,7 +2,6 @@
     <lv:RadListView.itemTemplate>
         <StackLayout rows="*, 20" backgroundColor="blue">
                 <image:Image row="0" verticalAlignment="top"
-                                    aspectRatio="{{ aspectRatio, aspectRatio }}"
                                     backgroundUri="res://ns_logo"
                                     backgroundColor="red"
                                     imageUri="{{ imageUri }}"/>

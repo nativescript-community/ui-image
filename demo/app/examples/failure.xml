@@ -5,7 +5,6 @@
                         placeholderImageUri="res://ns_logo"            
                         backgroundColor="blue"
                         failureImageUri="res://ns_logo_black"
-                        aspectRatio="1.49"
                         showProgressBar="true"
                         failure="onFailure"
                         imageUri="http://error.jpgerror"/>

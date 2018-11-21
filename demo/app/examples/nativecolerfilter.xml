@@ -3,5 +3,4 @@
                     loaded="onLoaded"
                     tintColor="red"
                     placeholderImageUri="res://ns_logo"
-                    aspectRatio="1.49"
                     imageUri="https://raw.githubusercontent.com/Akylas/nativescript-image/master/examples-data/dessert1.jpg"/>

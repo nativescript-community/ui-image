@@ -3,7 +3,6 @@
                 id="opacityDrawee"
                 verticalAlignment="center"
                 placeholderImageUri="res://ns_logo"
-                aspectRatio="1.49"
                 opacity="0.5"
                 imageUri="https://raw.githubusercontent.com/Akylas/nativescript-image/master/examples-data/breakfast1.jpg"/>
     <Label text="With css: " row="1"/>
@@ -12,7 +11,6 @@
                 row="2"
                 class="opacityDrawee"
                 placeholderImageUri="res://ns_logo"
-                aspectRatio="1.49"
                 imageUri="https://raw.githubusercontent.com/Akylas/nativescript-image/master/examples-data/breakfast1.jpg"/>
     <Button text="Set 1" row="3" tap="onSeOpacityTo1"/>
     <Button text="Set 0.5" row="4" tap="onSeOpacityTo05"/>

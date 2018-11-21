@@ -4,7 +4,6 @@
                             placeholderImageUri="res://ns_logo"
                             verticalAlignment="top"
                             width="75%"
-                            aspectRatio="0.754"
                             progressiveRenderingEnabled="true"
                             showProgressBar="true"
                             progressBarColor="#3C5AFD"
