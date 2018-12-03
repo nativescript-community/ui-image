@@ -1,5 +1,6 @@
-<image:Image xmlns:image="nativescript-image"
-                    verticalAlignment="center"
-                    placeholderImageUri="res://ns_logo"
-                    imageUri="https://raw.githubusercontent.com/Akylas/nativescript-image/master/examples-data/breakfast1.jpg"
-                    actualImageScaleType="centerInside"/>
+
+<img:Img xmlns:img="nativescript-image"
+            verticalAlignment="center"
+            placeholderImageUri="res://ns_logo"
+            src="https://raw.githubusercontent.com/Akylas/nativescript-image/master/examples-data/breakfast1.jpg"
+            stretch="centerInside"/>

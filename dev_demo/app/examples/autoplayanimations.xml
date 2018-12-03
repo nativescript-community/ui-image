@@ -1,0 +1,8 @@
+<GridLayout>
+    <img:Img  xmlns:img="nativescript-image"
+                        verticalAlignment="center"
+                        placeholderImageUri="res://ns_logo"
+                        width="100"
+                        autoPlayAnimations="true"
+                        src="res://animation"/>
+</GridLayout>

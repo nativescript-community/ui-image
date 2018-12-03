@@ -1,10 +1,10 @@
-<ScrollView xmlns:image="nativescript-image">
+<ScrollView xmlns:img="nativescript-image">
     <StackLayout>
-        <image:Image verticalAlignment="center"
+        <img:Img verticalAlignment="center"
                             placeholderImageUri="res://ns_logo"
-                            imageUri="~/images/drink.jpg"/>
-        <image:Image verticalAlignment="center"
+                            src="~/images/drink.jpg"/>
+        <img:Img verticalAlignment="center"
                             placeholderImageUri="res://ns_logo"
-                            imageUri="~/images/dessert.jpg"/>
+                            src="~/images/dessert.jpg"/>
     </StackLayout>
 </ScrollView>

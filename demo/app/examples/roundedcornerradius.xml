@@ -1,5 +1,5 @@
 <GridLayout>
-    <image:Image xmlns:image="nativescript-image" 
+    <img:Img xmlns:img="nativescript-image" 
                         verticalAlignment="center"
                         backgroundColor="red"
                         placeholderImageUri="res://ns_logo"
@@ -9,5 +9,5 @@
                         roundBottomLeft="true"
                         roundTopLeft="false"
                         roundTopRight="true"
-                        imageUri="https://raw.githubusercontent.com/Akylas/nativescript-image/master/examples-data/breakfast2.jpg"/>
+                        src="https://raw.githubusercontent.com/Akylas/nativescript-image/master/examples-data/breakfast2.jpg"/>
 </GridLayout>

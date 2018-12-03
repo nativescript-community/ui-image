@@ -15,15 +15,15 @@
   "dependencies": {
     "nativescript-image": "../plugin",
     "nativescript-theme-core": "^1.0.4",
-    "nativescript-ui-listview": "^3.8.0",
-    "tns-core-modules": "^5.0.0"
+    "nativescript-ui-listview": "^5.0.0",
+    "tns-core-modules": "^5.0.5"
   },
   "devDependencies": {
-    "nativescript-dev-typescript": "~0.7.0",
-    "nativescript-dev-webpack": "~0.18.0",
-    "tns-platform-declarations": "^5.0.0",
+    "nativescript-dev-typescript": "~0.7.8",
+    "nativescript-dev-webpack": "~0.18.1",
+    "tns-platform-declarations": "^5.0.5",
     "tslint": "~5.11.0",
-    "typescript": "^3.1.6"
+    "typescript": "^3.2.1"
   },
   "scripts": {
     "build.plugin": "cd ../src && npm run build",

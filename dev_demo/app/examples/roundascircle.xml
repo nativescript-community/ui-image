@@ -1,0 +1,6 @@
+<img:Img 
+      xmlns:img="nativescript-image"
+                    verticalAlignment="center"
+                    placeholderImageUri="res://ns_logo"
+                    roundAsCircle="true"
+                    src="https://raw.githubusercontent.com/Akylas/nativescript-image/master/examples-data/breakfast2.jpg"/>

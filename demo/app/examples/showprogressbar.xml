@@ -1,9 +1,9 @@
 <GridLayout>
-    <image:Image xmlns:image="nativescript-image" 
+    <img:Img xmlns:img="nativescript-image" 
                         verticalAlignment="center"
                         placeholderImageUri="res://ns_logo"
                         progressiveRenderingEnabled="true"
                         showProgressBar="true"
                         progressBarColor="blue"
-                        imageUri="http://pooyak.com/p/progjpeg/jpegload.cgi?o=1"/>
+                        src="http://pooyak.com/p/progjpeg/jpegload.cgi?o=1"/>
 </GridLayout>

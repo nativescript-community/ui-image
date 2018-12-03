@@ -1,0 +1,19 @@
+<GridLayout rows="*, auto, *, auto, auto, auto, auto">
+    <img:Img  xmlns:img="nativescript-image"
+                id="opacityDrawee"
+                verticalAlignment="center"
+                placeholderImageUri="res://ns_logo"
+                opacity="0.5"
+                src="https://raw.githubusercontent.com/Akylas/nativescript-image/master/examples-data/breakfast1.jpg"/>
+    <Label text="With css: " row="1"/>
+    <img:Img  xmlns:img="nativescript-image"
+                verticalAlignment="center"
+                row="2"
+                class="opacityDrawee"
+                placeholderImageUri="res://ns_logo"
+                src="https://raw.githubusercontent.com/Akylas/nativescript-image/master/examples-data/breakfast1.jpg"/>
+    <Button text="Set 1" row="3" tap="onSeOpacityTo1"/>
+    <Button text="Set 0.5" row="4" tap="onSeOpacityTo05"/>
+    <Button text="Set 0.1" row="5" tap="onSeOpacityTo01"/>
+    <Button text="Animate css" row="6" tap="onAnimateCss"/>
+</GridLayout>

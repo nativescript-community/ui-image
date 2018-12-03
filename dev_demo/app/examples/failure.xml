@@ -1,0 +1,13 @@
+<ScrollView>
+    <GridLayout rows="*, auto">
+        <img:Img  xmlns:img="nativescript-image" 
+                        height="200" width="400"
+                        placeholderImageUri="res://ns_logo"            
+                        backgroundColor="blue"
+                        failureImageUri="res://ns_logo_black"
+                        showProgressBar="true"
+                        failure="onFailure"
+                        src="http://error.jpgerror"/>
+        <Label id="outputLabel" text="output: " row="1" textWrap="true"/>
+    </GridLayout>
+</ScrollView>

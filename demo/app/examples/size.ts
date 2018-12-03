@@ -1,5 +1,5 @@
 import { EventData } from 'tns-core-modules/data/observable';
-import { Image } from 'nativescript-image';
+import { Img } from 'nativescript-image';
 import { Button } from 'tns-core-modules/ui/button';
 import { GridLayout } from 'tns-core-modules/ui/layouts/grid-layout';
 
@@ -23,8 +23,8 @@ export function onChangeTap(args: EventData) {
     const button = args.object as Button;
     const gridLayout = button.parent as GridLayout;
     const drawee = gridLayout.getViewById('imageDrawee') as Image;
-    drawee.aspectRatio = images[currentIndex].aspectRation;
-    drawee.imageUri = images[currentIndex].uri;
+    // drawee.aspectRatio = images[currentIndex].aspectRation;
+    drawee.src = images[currentIndex].uri;
 
     currentIndex++;
     if (currentIndex >= images.length) {

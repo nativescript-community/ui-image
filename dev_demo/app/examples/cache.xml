@@ -1,0 +1,13 @@
+<ScrollView>
+    <StackLayout>
+       <img:Img id="imageDrawee" xmlns:img="nativescript-image"
+                            verticalAlignment="center"
+                            placeholderImageUri="res://ns_logo"
+                            src="https://raw.githubusercontent.com/Akylas/nativescript-image/master/examples-data/breakfast1.jpg"/>
+        <Button text="Check cache" textWrap="true" tap="onCheckCache"/>
+        <Button text="Clear cache" textWrap="true" tap="onClearCache"/>
+        <Button text="Set image" textWrap="true" tap="onSetImage"/>
+        <Button text="Reset image" textWrap="true" tap="onResetImage"/>
+        <Label id="outputLabel" text="output:" textWrap="true"/>
+    </StackLayout>
+</ScrollView>

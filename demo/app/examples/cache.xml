@@ -1,9 +1,9 @@
-<ScrollView xmlns:image="nativescript-image" >
+<ScrollView xmlns:img="nativescript-image" >
     <StackLayout>
-       <image:Image id="imageDrawee"
+       <img:Img id="imageDrawee"
                             verticalAlignment="center"
                             placeholderImageUri="res://ns_logo"
-                            imageUri="https://raw.githubusercontent.com/Akylas/nativescript-image/master/examples-data/breakfast1.jpg"/>
+                            src="https://raw.githubusercontent.com/Akylas/nativescript-image/master/examples-data/breakfast1.jpg"/>
         <Button text="Check cache" textWrap="true" tap="onCheckCache"/>
         <Button text="Clear cache" textWrap="true" tap="onClearCache"/>
         <Button text="Set image" textWrap="true" tap="onSetImage"/>

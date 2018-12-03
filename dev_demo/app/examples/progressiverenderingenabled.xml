@@ -1,0 +1,7 @@
+<GridLayout >
+    <img:Img xmlns:img="nativescript-image"
+                        verticalAlignment="center"
+                        placeholderImageUri="res://ns_logo"
+                        progressiveRenderingEnabled="true"
+                        src="http://pooyak.com/p/progjpeg/jpegload.cgi?o=1"/>
+</GridLayout>

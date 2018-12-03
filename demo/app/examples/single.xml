@@ -1,4 +1,4 @@
-<image:Image xmlns:image="nativescript-image" 
+<img:Img xmlns:img="nativescript-image" 
                     verticalAlignment="center"
                     placeholderImageUri="res://ns_logo"
-                    imageUri="https://raw.githubusercontent.com/Akylas/nativescript-image/master/examples-data/dessert1.jpg"/>
+                    src="https://raw.githubusercontent.com/Akylas/nativescript-image/master/examples-data/dessert1.jpg"/>

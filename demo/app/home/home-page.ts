@@ -2,7 +2,7 @@ import { ViewModel } from './home-view-model';
 import { EventData } from 'tns-core-modules/data/observable';
 import * as imageModel from 'nativescript-image';
 
-export function onNavigatingTo(args) {
+export function pageLoaded(args) {
     this.page = args.object;
     this.page.bindingContext = new ViewModel();
 }

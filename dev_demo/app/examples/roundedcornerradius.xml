@@ -1,0 +1,13 @@
+<GridLayout>
+    <img:Img  xmlns:img="nativescript-image"
+                        verticalAlignment="center"
+                        backgroundColor="red"
+                        placeholderImageUri="res://ns_logo"
+                        margin="10"
+                        roundedCornerRadius="50"
+                        roundBottomRight="true"
+                        roundBottomLeft="true"
+                        roundTopLeft="false"
+                        roundTopRight="true"
+                        src="https://raw.githubusercontent.com/Akylas/nativescript-image/master/examples-data/breakfast2.jpg"/>
+</GridLayout>

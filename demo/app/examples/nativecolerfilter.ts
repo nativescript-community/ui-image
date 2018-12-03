@@ -1,4 +1,4 @@
-import { Image } from 'nativescript-image';
+import { Img } from 'nativescript-image';
 
 // export function onLoaded(args) {
 //     let drawee = args.object as Image;
