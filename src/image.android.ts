@@ -490,6 +490,8 @@ export class Img extends ImageBase {
 
             if (this.fadeDuration) {
                 builder.setFadeDuration(this.fadeDuration);
+            } else {
+                builder.setFadeDuration(0);
             }
 
             if (this.backgroundUri && backgroundDrawable) {
