@@ -1,10 +1,14 @@
 import { booleanConverter, Color, Property, View } from 'tns-core-modules/ui/core/view';
 import * as observableModule from 'tns-core-modules/data/observable';
-import { isIOS } from 'tns-core-modules/platform';
+import { isAndroid, isIOS } from 'tns-core-modules/platform';
 
 export type Transition = 'fade' | 'curlUp';
 
 export enum ScaleType {
+    None = 'none',
+    Fill = 'fill',
+    AspectFill = 'aspectFill',
+    AspectFit = 'aspectFit',
     Center = 'center',
     CenterCrop = 'centerCrop',
     CenterInside = 'centerInside',
@@ -66,10 +70,10 @@ export class ImageBase extends View {
     public static releaseEvent: string = 'release';
     public static submitEvent: string = 'submit';
 
-    public imageUri: string;
+    public src: string;
     public placeholderImageUri: string;
     public failureImageUri: string;
-    public actualImageScaleType: ScaleType;
+    public stretch: ScaleType;
     public fadeDuration: number;
     public backgroundUri: string;
     public progressiveRenderingEnabled: boolean;
@@ -88,371 +92,43 @@ export class ImageBase extends View {
     public aspectRatio: number;
     public decodeWidth: number;
     public decodeHeight: number;
+    onlyTransitionIfRemote: boolean;
+    tintColor: Color;
+    transition: Transition;
 
     public readonly isLoading: boolean;
 
-    public static imageUriProperty = new Property<ImageBase, string>({
-        name: 'imageUri',
-        defaultValue: undefined,
-        valueConverter: v => v,
-        valueChanged: (target, oldValue, newValue) => {
-            target.onImageUriPropertyChanged(oldValue, newValue);
-        }
-    });
+    public static srcProperty = new Property<ImageBase, string>({ name: 'src' });
+    public static placeholderImageUriProperty = new Property<ImageBase, string>({ name: 'placeholderImageUri' });
+    public static failureImageUriProperty = new Property<ImageBase, string>({ name: 'failureImageUri' });
+    public static stretchProperty = new Property<ImageBase, string>({ name: 'stretch' });
+    public static fadeDurationProperty = new Property<ImageBase, number>({ name: 'fadeDuration', valueConverter: v => parseFloat(v) });
+    public static backgroundUriProperty = new Property<ImageBase, string>({ name: 'backgroundUri' });
+    public static progressiveRenderingEnabledProperty = new Property<ImageBase, boolean>({ name: 'progressiveRenderingEnabled', valueConverter: booleanConverter });
+    public static showProgressBarProperty = new Property<ImageBase, boolean>({ name: 'showProgressBar', valueConverter: booleanConverter });
+    public static progressBarColorProperty = new Property<ImageBase, string>({ name: 'progressBarColor', defaultValue: undefined });
+    public static roundAsCircleProperty = new Property<ImageBase, boolean>({ name: 'roundAsCircle', valueConverter: booleanConverter, affectsLayout: isAndroid });
+    public static roundTopLeftProperty = new Property<ImageBase, boolean>({ name: 'roundTopLeft', defaultValue: undefined, valueConverter: booleanConverter, affectsLayout: isAndroid });
+    public static roundTopRightProperty = new Property<ImageBase, boolean>({ name: 'roundTopRight', valueConverter: booleanConverter, affectsLayout: isAndroid });
+    public static roundBottomLeftProperty = new Property<ImageBase, boolean>({ name: 'roundBottomLeft', valueConverter: booleanConverter, affectsLayout: isAndroid });
+    public static roundBottomRightProperty = new Property<ImageBase, boolean>({ name: 'roundBottomRight', valueConverter: booleanConverter, affectsLayout: isAndroid });
+    public static roundedCornerRadiusProperty = new Property<ImageBase, number>({ name: 'roundedCornerRadius', valueConverter: v => parseFloat(v) });
+    public static blurRadiusProperty = new Property<ImageBase, number>({ name: 'blurRadius', valueConverter: v => parseFloat(v) });
+    public static blurDownSamplingProperty = new Property<ImageBase, number>({ name: 'blurDownSampling', valueConverter: v => parseFloat(v) });
+    public static autoPlayAnimationsProperty = new Property<ImageBase, boolean>({ name: 'autoPlayAnimations', valueConverter: booleanConverter });
+    public static tapToRetryEnabledProperty = new Property<ImageBase, boolean>({ name: 'tapToRetryEnabled', valueConverter: booleanConverter });
+    public static aspectRatioProperty = new Property<ImageBase, number>({ name: 'aspectRatio', affectsLayout: true, valueConverter: v => parseFloat(v) });
+    public static decodeWidthProperty = new Property<ImageBase, number>({ name: 'decodeWidth', valueConverter: v => parseFloat(v) });
+    public static decodeHeightProperty = new Property<ImageBase, number>({ name: 'decodeHeight', valueConverter: v => parseFloat(v) });
+    public static onlyTransitionIfRemoteProperty = new Property<ImageBase, boolean>({ name: 'onlyTransitionIfRemote', valueConverter: booleanConverter });
+    public static tintColorProperty = new Property<ImageBase, Color>({ name: 'tintColor' });
+    public static transitionProperty = new Property<ImageBase, Transition>({ name: 'transition' });
 
-    public static placeholderImageUriProperty = new Property<ImageBase, string>({
-        name: 'placeholderImageUri',
-        defaultValue: undefined,
-        valueConverter: v => v,
-        valueChanged: (target, oldValue, newValue) => {
-            target.onPlaceholderImageUriPropertyChanged(oldValue, newValue);
-        }
-    });
-
-    public static failureImageUriProperty = new Property<ImageBase, string>({
-        name: 'failureImageUri',
-        defaultValue: undefined,
-        valueConverter: v => v,
-        valueChanged: (target, oldValue, newValue) => {
-            target.onFailureImageUriPropertyChanged(oldValue, newValue);
-        }
-    });
-
-    public static actualImageScaleTypeProperty = new Property<ImageBase, string>({
-        name: 'actualImageScaleType',
-        defaultValue: undefined,
-        valueConverter: v => v,
-        valueChanged: (target, oldValue, newValue) => {
-            target.onActualImageScaleTypePropertyChanged(oldValue, newValue);
-        }
-    });
-
-    public static fadeDurationProperty = new Property<ImageBase, number>({
-        name: 'fadeDuration',
-        defaultValue: undefined,
-        valueConverter: v => parseFloat(v),
-        valueChanged: (target, oldValue, newValue) => {
-            target.onFadeDurationPropertyChanged(oldValue, newValue);
-        }
-    });
-
-    public static backgroundUriProperty = new Property<ImageBase, string>({
-        name: 'backgroundUri',
-        defaultValue: undefined,
-        valueConverter: v => v,
-        valueChanged: (target, oldValue, newValue) => {
-            target.onBackgroundUriPropertyChanged(oldValue, newValue);
-        }
-    });
-
-    public static progressiveRenderingEnabledProperty = new Property<ImageBase, boolean>({
-        name: 'progressiveRenderingEnabled',
-        defaultValue: undefined,
-        valueConverter: booleanConverter,
-        valueChanged: (target, oldValue, newValue) => {
-            target.onProgressiveRenderingEnabledPropertyChanged(oldValue, newValue);
-        }
-    });
-
-    public static showProgressBarProperty = new Property<ImageBase, boolean>({
-        name: 'showProgressBar',
-        defaultValue: undefined,
-        valueConverter: booleanConverter,
-        valueChanged: (target, oldValue, newValue) => {
-            target.onShowProgressBarPropertyChanged(oldValue, newValue);
-        }
-    });
-
-    public static progressBarColorProperty = new Property<ImageBase, string>({
-        name: 'progressBarColor',
-        defaultValue: undefined,
-        valueConverter: v => v,
-        valueChanged: (target, oldValue, newValue) => {
-            target.onProgressBarColorPropertyChanged(oldValue, newValue);
-        }
-    });
-
-    public static roundAsCircleProperty = new Property<ImageBase, boolean>({
-        name: 'roundAsCircle',
-        defaultValue: undefined,
-        valueConverter: booleanConverter,
-        affectsLayout: true,
-        valueChanged: (target, oldValue, newValue) => {
-            target.onRoundAsCirclePropertyChanged(oldValue, newValue);
-        }
-    });
-
-    public static roundTopLeftProperty = new Property<ImageBase, boolean>({
-        name: 'roundTopLeft',
-        defaultValue: undefined,
-        valueConverter: booleanConverter,
-        affectsLayout: true,
-        valueChanged: (target, oldValue, newValue) => {
-            target.onRoundTopLeftPropertyChanged(oldValue, newValue);
-        }
-    });
-
-    public static roundTopRightProperty = new Property<ImageBase, boolean>({
-        name: 'roundTopRight',
-        defaultValue: undefined,
-        valueConverter: booleanConverter,
-        affectsLayout: true,
-        valueChanged: (target, oldValue, newValue) => {
-            target.onRoundTopRightPropertyChanged(oldValue, newValue);
-        }
-    });
-
-    public static roundBottomLeftProperty = new Property<ImageBase, boolean>({
-        name: 'roundBottomLeft',
-        defaultValue: undefined,
-        valueConverter: booleanConverter,
-        valueChanged: (target, oldValue, newValue) => {
-            target.onRoundBottomLeftPropertyChanged(oldValue, newValue);
-        }
-    });
-
-    public static roundBottomRightProperty = new Property<ImageBase, boolean>({
-        name: 'roundBottomRight',
-        defaultValue: undefined,
-        valueConverter: booleanConverter,
-        valueChanged: (target, oldValue, newValue) => {
-            target.onRoundBottomRightPropertyChanged(oldValue, newValue);
-        }
-    });
-
-    public static roundedCornerRadiusProperty = new Property<ImageBase, number>({
-        name: 'roundedCornerRadius',
-        defaultValue: undefined,
-        valueConverter: v => parseFloat(v),
-        valueChanged: (target, oldValue, newValue) => {
-            target.onRoundedCornerRadiusPropertyChanged(oldValue, newValue);
-        }
-    });
-
-    public static blurRadiusProperty = new Property<ImageBase, number>({
-        name: 'blurRadius',
-        defaultValue: undefined,
-        valueConverter: v => parseFloat(v),
-        valueChanged: (target, oldValue, newValue) => {
-            target.onBlurRadiusPropertyChanged(oldValue, newValue);
-        }
-    });
-
-    public static blurDownSamplingProperty = new Property<ImageBase, number>({
-        name: 'blurDownSampling',
-        defaultValue: undefined,
-        valueConverter: v => parseFloat(v),
-        valueChanged: (target, oldValue, newValue) => {
-            target.onBlurDownSamplingPropertyChanged(oldValue, newValue);
-        }
-    });
-
-    public static autoPlayAnimationsProperty = new Property<ImageBase, boolean>({
-        name: 'autoPlayAnimations',
-        defaultValue: undefined,
-        valueConverter: booleanConverter,
-        valueChanged: (target, oldValue, newValue) => {
-            target.onAutoPlayAnimationsPropertyChanged(oldValue, newValue);
-        }
-    });
-
-    public static tapToRetryEnabledProperty = new Property<ImageBase, boolean>({
-        name: 'tapToRetryEnabled',
-        defaultValue: undefined,
-        valueConverter: booleanConverter,
-        valueChanged: (target, oldValue, newValue) => {
-            target.onTapToRetryEnabledPropertyChanged(oldValue, newValue);
-        }
-    });
-
-    public static aspectRatioProperty = new Property<ImageBase, number>({
-        name: 'aspectRatio',
-        defaultValue: undefined,
-        affectsLayout: isIOS,
-        valueConverter: v => parseFloat(v),
-        valueChanged: (target, oldValue, newValue) => {
-            target.onAspectRatioPropertyChanged(oldValue, newValue);
-        }
-    });
-
-    public static decodeWidthProperty = new Property<ImageBase, number>({
-        name: 'decodeWidth',
-        defaultValue: undefined,
-        valueConverter: v => parseFloat(v),
-        valueChanged: (target, oldValue, newValue) => {
-            target.onDecodeWidthPropertyChanged(oldValue, newValue);
-        }
-    });
-
-    public static decodeHeightProperty = new Property<ImageBase, number>({
-        name: 'decodeHeight',
-        defaultValue: undefined,
-        valueConverter: v => parseFloat(v),
-        valueChanged: (target, oldValue, newValue) => {
-            target.onDecodeHeightPropertyChanged(oldValue, newValue);
-        }
-    });
-
-    onlyTransitionIfRemote: boolean;
-    public static onlyTransitionIfRemoteProperty = new Property<ImageBase, boolean>({
-        name: 'onlyTransitionIfRemote',
-        defaultValue: undefined,
-        valueConverter: booleanConverter
-    });
-
-    tintColor: Color;
-    public static tintColorProperty = new Property<ImageBase, Color>({
-        name: 'tintColor',
-        defaultValue: undefined
-    });
-
-    transition: Transition;
-    public static transitionProperty = new Property<ImageBase, Transition>({
-        name: 'transition',
-        defaultValue: undefined
-    });
-    public stretch: Stretch = 'aspectFit';
-    public static stretchProperty = new Property<ImageBase, Stretch>({
-        name: 'stretch',
-        defaultValue: 'aspectFit'
-    });
-
-    private onImageUriPropertyChanged(oldValue: string, newValue: string) {
-        this.onImageUriChanged(oldValue, newValue);
-    }
-
-    private onPlaceholderImageUriPropertyChanged(oldValue: string, newValue: string) {
-        this.onPlaceholderImageUriChanged(oldValue, newValue);
-    }
-
-    private onFailureImageUriPropertyChanged(oldValue: string, newValue: string) {
-        this.onFailureImageUriChanged(oldValue, newValue);
-    }
-
-    private onActualImageScaleTypePropertyChanged(oldValue: string, newValue: string) {
-        this.onActualImageScaleTypeChanged(oldValue, newValue);
-    }
-
-    private onFadeDurationPropertyChanged(oldValue: number, newValue: number) {
-        this.onFadeDurationChanged(oldValue, newValue);
-    }
-
-    private onBackgroundUriPropertyChanged(oldValue: string, newValue: string) {
-        this.onBackgroundUriChanged(oldValue, newValue);
-    }
-
-    private onProgressiveRenderingEnabledPropertyChanged(oldValue: boolean, newValue: boolean) {
-        this.onProgressiveRenderingEnabledChanged(oldValue, newValue);
-    }
-
-    private onShowProgressBarPropertyChanged(oldValue: boolean, newValue: boolean) {
-        this.onShowProgressBarChanged(oldValue, newValue);
-    }
-
-    private onProgressBarColorPropertyChanged(oldValue: string, newValue: string) {
-        this.onProgressBarColorChanged(oldValue, newValue);
-    }
-
-    private onRoundAsCirclePropertyChanged(oldValue: boolean, newValue: boolean) {
-        this.onRoundAsCircleChanged(oldValue, newValue);
-    }
-
-    private onRoundTopLeftPropertyChanged(oldValue: boolean, newValue: boolean) {
-        this.onRoundTopLeftChanged(oldValue, newValue);
-    }
-
-    private onRoundTopRightPropertyChanged(oldValue: boolean, newValue: boolean) {
-        this.onRoundTopRightChanged(oldValue, newValue);
-    }
-
-    private onRoundBottomLeftPropertyChanged(oldValue: boolean, newValue: boolean) {
-        this.onRoundBottomLeftChanged(oldValue, newValue);
-    }
-
-    private onRoundBottomRightPropertyChanged(oldValue: boolean, newValue: boolean) {
-        this.onRoundBottomRightChanged(oldValue, newValue);
-    }
-
-    private onRoundedCornerRadiusPropertyChanged(oldValue: number, newValue: number) {
-        this.onRoundedCornerRadiusChanged(oldValue, newValue);
-    }
-
-    private onBlurRadiusPropertyChanged(oldValue: number, newValue: number) {
-        this.onBlurRadiusChanged(oldValue, newValue);
-    }
-
-    private onBlurDownSamplingPropertyChanged(oldValue: number, newValue: number) {
-        this.onBlurDownSamplingChanged(oldValue, newValue);
-    }
-
-    private onAutoPlayAnimationsPropertyChanged(oldValue: boolean, newValue: boolean) {
-        this.onAutoPlayAnimationsPChanged(oldValue, newValue);
-    }
-
-    private onTapToRetryEnabledPropertyChanged(oldValue: boolean, newValue: boolean) {
-        this.onTapToRetryEnabledChanged(oldValue, newValue);
-    }
-
-    private onAspectRatioPropertyChanged(oldValue: number, newValue: number) {
-        this.onAspectRatioChanged(oldValue, newValue);
-    }
-
-    private onDecodeWidthPropertyChanged(oldValue: number, newValue: number) {
-        this.onDecodeWidthChanged(oldValue, newValue);
-    }
-
-    private onDecodeHeightPropertyChanged(oldValue: number, newValue: number) {
-        this.onDecodeHeightChanged(oldValue, newValue);
-    }
-
-    protected onImageUriChanged(oldValue: string, newValue: string) {}
-
-    protected onPlaceholderImageUriChanged(oldValue: string, newValue: string) {}
-
-    protected onFailureImageUriChanged(oldValue: string, newValue: string) {}
-
-    protected onActualImageScaleTypeChanged(oldValue: string, newValue: string) {}
-
-    protected onFadeDurationChanged(oldValue: number, newValue: number) {}
-
-    protected onBackgroundUriChanged(oldValue: string, newValue: string) {}
-
-    protected onProgressiveRenderingEnabledChanged(oldValue: boolean, newValue: boolean) {}
-
-    protected onShowProgressBarChanged(oldValue: boolean, newValue: boolean) {}
-
-    protected onProgressBarColorChanged(oldValue: string, newValue: string) {}
-
-    protected onRoundAsCircleChanged(oldValue: boolean, newValue: boolean) {}
-
-    protected onRoundTopLeftChanged(oldValue: boolean, newValue: boolean) {}
-
-    protected onRoundTopRightChanged(oldValue: boolean, newValue: boolean) {}
-
-    protected onRoundBottomLeftChanged(oldValue: boolean, newValue: boolean) {}
-
-    protected onRoundBottomRightChanged(oldValue: boolean, newValue: boolean) {}
-
-    protected onRoundedCornerRadiusChanged(oldValue: number, newValue: number) {}
-
-    protected onBlurRadiusChanged(oldValue: number, newValue: number) {}
-
-    protected onBlurDownSamplingChanged(oldValue: number, newValue: number) {}
-
-    protected onAutoPlayAnimationsPChanged(oldValue: boolean, newValue: boolean) {}
-
-    protected onTapToRetryEnabledChanged(oldValue: boolean, newValue: boolean) {}
-
-    protected onAspectRatioChanged(oldValue: number, newValue: number) {}
-
-    protected onDecodeWidthChanged(oldValue: number, newValue: number) {}
-
-    protected onDecodeHeightChanged(oldValue: number, newValue: number) {}
 }
-ImageBase.imageUriProperty.register(ImageBase);
+ImageBase.srcProperty.register(ImageBase);
 ImageBase.placeholderImageUriProperty.register(ImageBase);
 ImageBase.failureImageUriProperty.register(ImageBase);
-ImageBase.actualImageScaleTypeProperty.register(ImageBase);
+ImageBase.stretchProperty.register(ImageBase);
 ImageBase.fadeDurationProperty.register(ImageBase);
 ImageBase.backgroundUriProperty.register(ImageBase);
 ImageBase.progressiveRenderingEnabledProperty.register(ImageBase);

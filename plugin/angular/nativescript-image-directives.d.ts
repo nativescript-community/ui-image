@@ -1,4 +1,4 @@
-export declare class ImageDirective {
+export declare class ImgDirective {
     constructor();
 }
-export declare const NSFRESCO_DIRECTIVES: (typeof ImageDirective)[];
+export declare const NSIMG_DIRECTIVES: (typeof ImgDirective)[];

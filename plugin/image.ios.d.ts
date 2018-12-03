@@ -16,21 +16,16 @@ export declare class ImagePipeline {
     readonly ios: SDImageCache;
 }
 export declare function getImagePipeline(): ImagePipeline;
-export declare class Image extends ImageBase {
+export declare class Img extends ImageBase {
     nativeViewProtected: SDAnimatedImageView;
     isLoading: boolean;
     private _imageSourceAffectsLayout;
     createNativeView(): SDAnimatedImageView;
-    initNativeView(): void;
+    _setNativeClipToBounds(): void;
     onMeasure(widthMeasureSpec: number, heightMeasureSpec: number): void;
     private static needsSizeAdjustment(scaleType);
-    private static computeScaleFactor(measureWidth, measureHeight, widthIsFinite, heightIsFinite, nativeWidth, nativeHeight, imageStretch, aspectRatio?);
+    private computeScaleFactor(measureWidth, measureHeight, widthIsFinite, heightIsFinite, nativeWidth, nativeHeight);
     updateImageUri(): void;
-    protected onImageUriChanged(oldValue: string, newValue: string): void;
-    protected onPlaceholderImageUriChanged(oldValue: string, newValue: string): void;
-    protected onFailureImageUriChanged(oldValue: string, newValue: string): void;
-    protected onActualImageScaleTypeChanged(oldValue: string, newValue: string): void;
-    private initDrawee();
     _setNativeImage(nativeImage: UIImage): void;
     private handleImageLoaded;
     private onLoadProgress;

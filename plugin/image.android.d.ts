@@ -5,7 +5,7 @@ export declare function getImagePipeline(): ImagePipeline;
 export declare function shutDown(): void;
 export declare class ImagePipeline {
     private _android;
-    private isInDiskCacheSync(uri);
+    isInDiskCacheSync(uri: string): boolean;
     isInBitmapMemoryCache(uri: string): boolean;
     evictFromMemoryCache(uri: string): void;
     evictFromDiskCache(uri: string): void;
@@ -50,33 +50,13 @@ export declare class FailureEventData extends EventData {
     private _error;
     error: ImageError;
 }
-export declare class Image extends ImageBase {
+export declare class Img extends ImageBase {
     nativeViewProtected: com.facebook.drawee.view.SimpleDraweeView;
+    isLoading: boolean;
     createNativeView(): com.facebook.drawee.view.SimpleDraweeView;
-    initNativeView(): void;
     onImageSet(imageInfo: com.facebook.imagepipeline.image.ImageInfo, animatable: android.graphics.drawable.Animatable): void;
     disposeNativeView(): void;
     updateImageUri(): void;
-    protected onImageUriChanged(oldValue: string, newValue: string): void;
-    protected onPlaceholderImageUriChanged(oldValue: string, newValue: string): void;
-    protected onFailureImageUriChanged(oldValue: string, newValue: string): void;
-    protected onActualImageScaleTypeChanged(oldValue: string, newValue: string): void;
-    protected onFadeDurationChanged(oldValue: number, newValue: number): void;
-    protected onBackgroundUriChanged(oldValue: string, newValue: string): void;
-    protected onProgressiveRenderingEnabledChanged(oldValue: boolean, newValue: boolean): void;
-    protected onShowProgressBarChanged(oldValue: boolean, newValue: boolean): void;
-    protected onProgressBarColorChanged(oldValue: string, newValue: string): void;
-    protected onRoundAsCircleChanged(oldValue: boolean, newValue: boolean): void;
-    protected onRoundTopLeftChanged(oldValue: boolean, newValue: boolean): void;
-    protected onRoundTopRightChanged(oldValue: boolean, newValue: boolean): void;
-    protected onRoundBottomLeftChanged(oldValue: boolean, newValue: boolean): void;
-    protected onRoundBottomRightChanged(oldValue: boolean, newValue: boolean): void;
-    protected onRoundedCornerRadiusChanged(oldValue: number, newValue: number): void;
-    protected onBlurRadiusChanged(oldValue: number, newValue: number): void;
-    protected onBlurDownSamplingChanged(oldValue: number, newValue: number): void;
-    protected onAutoPlayAnimationsPChanged(oldValue: boolean, newValue: boolean): void;
-    protected onTapToRetryEnabledChanged(oldValue: boolean, newValue: boolean): void;
-    protected onAspectRatioChanged(oldValue: number, newValue: number): void;
     private initDrawee();
     private initImage();
     private updateHierarchy();

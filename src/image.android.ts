@@ -40,8 +40,7 @@ export function shutDown(): void {
 export class ImagePipeline {
     private _android: com.facebook.imagepipeline.core.ImagePipeline;
 
-    // Currently not available in 0.9.0+
-    private isInDiskCacheSync(uri: string) {
+    isInDiskCacheSync(uri: string) {
         return this._android.isInDiskCacheSync(android.net.Uri.parse(uri));
     }
 
@@ -179,23 +178,24 @@ export class FailureEventData extends EventData {
     }
 }
 
-export class Image extends ImageBase {
+export class Img extends ImageBase {
     nativeViewProtected: com.facebook.drawee.view.SimpleDraweeView;
-    // actualImageScaleType = ScaleType.FitCenter;
+    isLoading = false;
+    // stretch = ScaleType.FitCenter;
 
     public createNativeView() {
         return new com.facebook.drawee.view.SimpleDraweeView(this._context);
     }
 
-    public initNativeView(): void {
-        this.initDrawee();
-        this.updateHierarchy();
-    }
+    // public initNativeView(): void {
+    //     this.initDrawee();
+    //     this.updateHierarchy();
+    // }
 
     onImageSet(imageInfo: com.facebook.imagepipeline.image.ImageInfo, animatable: android.graphics.drawable.Animatable) {
         if (!this.aspectRatio) {
-            console.log('onImageSet', this.decodeWidth, this.decodeHeight, imageInfo.getWidth(), imageInfo.getHeight());
-            this.nativeViewProtected.setAspectRatio((imageInfo.getWidth()) / (imageInfo.getHeight()));
+            // console.log('onImageSet', this.decodeWidth, this.decodeHeight, imageInfo.getWidth(), imageInfo.getHeight());
+            this.nativeViewProtected.setAspectRatio(imageInfo.getWidth() / imageInfo.getHeight());
         }
     }
 
@@ -205,86 +205,80 @@ export class Image extends ImageBase {
 
     public updateImageUri() {
         const imagePipeLine = getImagePipeline();
-        const isInCache = imagePipeLine.isInBitmapMemoryCache(this.imageUri);
+        const isInCache = imagePipeLine.isInBitmapMemoryCache(this.src);
         if (isInCache) {
-            imagePipeLine.evictFromCache(this.imageUri);
-            const imageUri = this.imageUri;
-            this.imageUri = null;
-            this.imageUri = imageUri;
+            imagePipeLine.evictFromCache(this.src);
+            const src = this.src;
+            this.src = null;
+            this.src = src;
         }
     }
 
-    protected onImageUriChanged(oldValue: string, newValue: string) {
+    [ImageBase.srcProperty.setNative]() {
         this.initImage();
     }
 
-    protected onPlaceholderImageUriChanged(oldValue: string, newValue: string) {
+    [ImageBase.placeholderImageUriProperty.setNative]() {
         this.updateHierarchy();
     }
 
-    protected onFailureImageUriChanged(oldValue: string, newValue: string) {
+    [ImageBase.failureImageUriProperty.setNative]() {
         this.updateHierarchy();
     }
 
-    protected onActualImageScaleTypeChanged(oldValue: string, newValue: string) {
+    [ImageBase.stretchProperty.setNative]() {
         this.updateHierarchy();
     }
 
-    protected onFadeDurationChanged(oldValue: number, newValue: number) {
+    [ImageBase.fadeDurationProperty.setNative]() {
         this.updateHierarchy();
     }
 
-    protected onBackgroundUriChanged(oldValue: string, newValue: string) {
+    [ImageBase.backgroundUriProperty.setNative]() {
         this.updateHierarchy();
     }
 
-    protected onProgressiveRenderingEnabledChanged(oldValue: boolean, newValue: boolean) {}
-
-    protected onShowProgressBarChanged(oldValue: boolean, newValue: boolean) {
+    [ImageBase.showProgressBarProperty.setNative]() {
         this.updateHierarchy();
     }
 
-    protected onProgressBarColorChanged(oldValue: string, newValue: string) {
+    [ImageBase.progressBarColorProperty.setNative]() {
         this.updateHierarchy();
     }
 
-    protected onRoundAsCircleChanged(oldValue: boolean, newValue: boolean) {
+    [ImageBase.roundAsCircleProperty.setNative]() {
         this.updateHierarchy();
     }
 
-    protected onRoundTopLeftChanged(oldValue: boolean, newValue: boolean) {
+    [ImageBase.roundTopLeftProperty.setNative]() {
         this.updateHierarchy();
     }
 
-    protected onRoundTopRightChanged(oldValue: boolean, newValue: boolean) {
+    [ImageBase.roundTopRightProperty.setNative]() {
         this.updateHierarchy();
     }
 
-    protected onRoundBottomLeftChanged(oldValue: boolean, newValue: boolean) {
+    [ImageBase.roundBottomLeftProperty.setNative]() {
         this.updateHierarchy();
     }
 
-    protected onRoundBottomRightChanged(oldValue: boolean, newValue: boolean) {
+    [ImageBase.roundBottomRightProperty.setNative]() {
         this.updateHierarchy();
     }
 
-    protected onRoundedCornerRadiusChanged(oldValue: number, newValue: number) {
+    [ImageBase.roundedCornerRadiusProperty.setNative]() {
         this.updateHierarchy();
     }
 
-    protected onBlurRadiusChanged(oldValue: number, newValue: number) {
+    [ImageBase.blurRadiusProperty.setNative]() {
         this.initImage();
     }
 
-    protected onBlurDownSamplingChanged(oldValue: number, newValue: number) {
+    [ImageBase.blurDownSamplingProperty.setNative]() {
         this.initImage();
     }
 
-    protected onAutoPlayAnimationsPChanged(oldValue: boolean, newValue: boolean) {}
-
-    protected onTapToRetryEnabledChanged(oldValue: boolean, newValue: boolean) {}
-
-    protected onAspectRatioChanged(oldValue: number, newValue: number) {
+    [ImageBase.aspectRatioProperty.setNative]() {
         this.initImage();
     }
 
@@ -294,17 +288,18 @@ export class Image extends ImageBase {
 
     private initImage() {
         if (this.nativeViewProtected) {
-            this.nativeViewProtected.setImageURI(null);
-            if (this.imageUri) {
+            // this.nativeViewProtected.setImageURI(null);
+            if (this.src) {
                 let uri;
-                if (utils.isFileOrResourcePath(this.imageUri)) {
+                this.isLoading = true;
+                if (utils.isFileOrResourcePath(this.src)) {
                     const res = utils.ad.getApplicationContext().getResources();
                     if (!res) {
                         return;
                     }
 
-                    if (this.imageUri.indexOf(utils.RESOURCE_PREFIX) === 0) {
-                        const resName = this.imageUri.substr(utils.RESOURCE_PREFIX.length);
+                    if (this.src.indexOf(utils.RESOURCE_PREFIX) === 0) {
+                        const resName = this.src.substr(utils.RESOURCE_PREFIX.length);
                         const identifier = res.getIdentifier(resName, 'drawable', utils.ad.getApplication().getPackageName());
                         if (0 < identifier) {
                             uri = new android.net.Uri.Builder()
@@ -312,17 +307,17 @@ export class Image extends ImageBase {
                                 .path(java.lang.String.valueOf(identifier))
                                 .build();
                         }
-                    } else if (this.imageUri.indexOf('~/') === 0) {
-                        uri = android.net.Uri.parse(`file:${fs.path.join(fs.knownFolders.currentApp().path, this.imageUri.replace('~/', ''))}`);
-                    } else if (this.imageUri.indexOf('/') === 0) {
-                        uri = android.net.Uri.parse(`file:${this.imageUri}`);
+                    } else if (this.src.indexOf('~/') === 0) {
+                        uri = android.net.Uri.parse(`file:${fs.path.join(fs.knownFolders.currentApp().path, this.src.replace('~/', ''))}`);
+                    } else if (this.src.indexOf('/') === 0) {
+                        uri = android.net.Uri.parse(`file:${this.src}`);
                     }
                 } else {
-                    uri = android.net.Uri.parse(this.imageUri);
+                    uri = android.net.Uri.parse(this.src);
                 }
 
                 if (!uri) {
-                    console.log(`Error: 'imageUri' not valid: ${this.imageUri}`);
+                    console.log(`Error: 'src' not valid: ${this.src}`);
                     return;
                 }
 
@@ -331,9 +326,9 @@ export class Image extends ImageBase {
                 if (this.progressiveRenderingEnabled === true) {
                     requestBuilder = requestBuilder.setProgressiveRenderingEnabled(this.progressiveRenderingEnabled);
                 }
+                requestBuilder.setRotationOptions(com.facebook.imagepipeline.common.RotationOptions.autoRotate());
 
                 if (this.decodeWidth && this.decodeHeight) {
-                    console.log('apply resize', this.decodeWidth, this.decodeHeight);
                     requestBuilder = requestBuilder.setResizeOptions(new com.facebook.imagepipeline.common.ResizeOptions(this.decodeWidth, this.decodeHeight));
                 }
                 if (this.blurRadius) {
@@ -343,11 +338,12 @@ export class Image extends ImageBase {
 
                 const request = requestBuilder.build();
 
-                const that: WeakRef<Image> = new WeakRef(this);
+                const that: WeakRef<Img> = new WeakRef(this);
                 const listener = new com.facebook.drawee.controller.ControllerListener<com.facebook.imagepipeline.image.ImageInfo>({
                     onFinalImageSet(id, imageInfo, animatable) {
                         const nativeView = that && that.get();
                         if (nativeView) {
+                            nativeView.isLoading = false;
                             nativeView.onImageSet(imageInfo, animatable);
                             const info = new ImageInfo(imageInfo);
 
@@ -364,11 +360,13 @@ export class Image extends ImageBase {
                         }
                     },
                     onFailure(id, throwable) {
-                        if (that && that.get()) {
+                        const nativeView = that && that.get();
+                        if (nativeView) {
+                            nativeView.isLoading = false;
                             const imageError = new ImageError(throwable);
                             const args: FailureEventData = {
                                 eventName: ImageBase.failureEvent,
-                                object: that.get(),
+                                object: nativeView,
                                 error: imageError
                             } as FailureEventData;
 
@@ -378,11 +376,12 @@ export class Image extends ImageBase {
                         }
                     },
                     onIntermediateImageFailed(id, throwable) {
-                        if (that && that.get()) {
+                        const nativeView = that && that.get();
+                        if (nativeView) {
                             const imageError = new ImageError(throwable);
                             const args: FailureEventData = {
                                 eventName: ImageBase.intermediateImageFailedEvent,
-                                object: that.get(),
+                                object: nativeView,
                                 error: imageError
                             } as FailureEventData;
 
@@ -392,11 +391,12 @@ export class Image extends ImageBase {
                         }
                     },
                     onIntermediateImageSet(id, imageInfo) {
-                        if (that && that.get()) {
+                        const nativeView = that && that.get();
+                        if (nativeView) {
                             const info = new ImageInfo(imageInfo);
                             const args: IntermediateEventData = {
                                 eventName: ImageBase.intermediateImageSetEvent,
-                                object: that.get(),
+                                object: nativeView,
                                 imageInfo: info
                             } as IntermediateEventData;
 
@@ -406,10 +406,11 @@ export class Image extends ImageBase {
                         }
                     },
                     onRelease(id) {
-                        if (that && that.get()) {
+                        const nativeView = that && that.get();
+                        if (nativeView) {
                             const args: EventData = {
                                 eventName: ImageBase.releaseEvent,
-                                object: that.get()
+                                object: nativeView
                             } as EventData;
 
                             that.get().notify(args);
@@ -418,10 +419,11 @@ export class Image extends ImageBase {
                         }
                     },
                     onSubmit(id, callerContext) {
-                        if (that && that.get()) {
+                        const nativeView = that && that.get();
+                        if (nativeView) {
                             const args: EventData = {
                                 eventName: ImageBase.submitEvent,
-                                object: that.get()
+                                object: nativeView
                             } as EventData;
 
                             that.get().notify(args);
@@ -454,9 +456,9 @@ export class Image extends ImageBase {
 
     private updateHierarchy() {
         if (this.nativeViewProtected) {
-            let failureImageDrawable;
-            let placeholderImageDrawable;
-            let backgroundDrawable;
+            let failureImageDrawable: android.graphics.drawable.BitmapDrawable;
+            let placeholderImageDrawable: android.graphics.drawable.BitmapDrawable;
+            let backgroundDrawable: android.graphics.drawable.BitmapDrawable;
             if (this.failureImageUri) {
                 failureImageDrawable = this.getDrawable(this.failureImageUri);
             }
@@ -482,8 +484,8 @@ export class Image extends ImageBase {
                 builder.setPlaceholderImage(placeholderImageDrawable);
             }
 
-            if (this.actualImageScaleType) {
-                builder.setActualImageScaleType(this.actualImageScaleType);
+            if (this.stretch) {
+                builder.setActualImageScaleType(this.stretch);
             }
 
             if (this.fadeDuration) {
@@ -516,7 +518,7 @@ export class Image extends ImageBase {
     }
 
     private getDrawable(path: string) {
-        let drawable;
+        let drawable: android.graphics.drawable.BitmapDrawable;
         if (utils.isFileOrResourcePath(path)) {
             if (path.indexOf(utils.RESOURCE_PREFIX) === 0) {
                 drawable = this.getDrawableFromResource(path);
@@ -548,7 +550,6 @@ export class Image extends ImageBase {
         return drawable;
     }
     [ImageBase.tintColorProperty.setNative](value: Color) {
-        console.log('test', 'tintColorProperty', value);
         this.updateHierarchy();
     }
     // [ImageBase.stretchProperty.setNative](value: Stretch) {
@@ -634,7 +635,6 @@ class GenericDraweeHierarchyBuilder {
         if (!this.nativeBuilder) {
             return this;
         }
-        console.log('setActualImageScaleType', scaleType);
 
         this.nativeBuilder.setActualImageScaleType(getScaleType(scaleType));
 
@@ -713,6 +713,7 @@ function getScaleType(scaleType: string) {
         switch (scaleType) {
             case ScaleType.Center:
                 return com.facebook.drawee.drawable.ScalingUtils.ScaleType.CENTER;
+            case ScaleType.AspectFill:
             case ScaleType.CenterCrop:
                 return com.facebook.drawee.drawable.ScalingUtils.ScaleType.CENTER_CROP;
             case ScaleType.CenterInside:
@@ -722,7 +723,9 @@ function getScaleType(scaleType: string) {
             case ScaleType.FitEnd:
                 return com.facebook.drawee.drawable.ScalingUtils.ScaleType.FIT_END;
             case ScaleType.FitStart:
+            case ScaleType.AspectFit:
                 return com.facebook.drawee.drawable.ScalingUtils.ScaleType.FIT_START;
+            case ScaleType.Fill:
             case ScaleType.FitXY:
                 return com.facebook.drawee.drawable.ScalingUtils.ScaleType.FIT_XY;
             case ScaleType.FocusCrop:

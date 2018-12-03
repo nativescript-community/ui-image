@@ -1,9 +1,9 @@
 import { Directive } from '@angular/core';
 
 @Directive({
-    selector: 'Image'
+    selector: 'Img'
 })
-export class ImageDirective {
+export class ImgDirective {
     constructor() {}
 }
-export const NSFRESCO_DIRECTIVES = [ImageDirective];
+export const NSIMG_DIRECTIVES = [ImgDirective];

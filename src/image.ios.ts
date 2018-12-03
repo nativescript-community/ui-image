@@ -6,6 +6,7 @@ import * as imageSource from 'tns-core-modules/image-source';
 import * as fs from 'tns-core-modules/file-system';
 
 import { layout } from 'tns-core-modules/ui/core/view';
+import { screen } from 'tns-core-modules/platform/platform';
 
 // class SDImageAspectRatioTransformer extends NSObject {
 //     aspectRatio: number;
@@ -27,19 +28,26 @@ import { layout } from 'tns-core-modules/ui/core/view';
 //     }
 // }
 
+const supportedLocalFormats = ['png', 'jpg', 'gif', 'jpeg', 'webp'];
+
+let screenScale = -1;
+
 function getScaleType(scaleType: string) {
     if (types.isString(scaleType)) {
         switch (scaleType) {
             case ScaleType.Center:
             case ScaleType.CenterCrop:
+            case ScaleType.AspectFill:
                 return SDImageScaleMode.AspectFill;
             case ScaleType.CenterInside:
             case ScaleType.FitCenter:
             case ScaleType.FitEnd:
             case ScaleType.FitStart:
+            case ScaleType.AspectFit:
                 return SDImageScaleMode.AspectFit;
             case ScaleType.FitXY:
             case ScaleType.FocusCrop:
+            case ScaleType.Fill:
                 return SDImageScaleMode.Fill;
             default:
                 break;
@@ -55,16 +63,20 @@ function getUIImageScaleType(scaleType: string) {
                 return UIViewContentMode.Center;
             case ScaleType.FocusCrop:
             case ScaleType.CenterCrop:
+            case ScaleType.AspectFill:
                 return UIViewContentMode.ScaleAspectFill;
             case ScaleType.CenterInside:
-            case ScaleType.FitCenter:
+            case ScaleType.AspectFit:
                 return UIViewContentMode.ScaleAspectFit;
             case ScaleType.FitEnd:
                 return UIViewContentMode.Right;
             case ScaleType.FitStart:
                 return UIViewContentMode.Right;
+            case ScaleType.Fill:
             case ScaleType.FitXY:
                 return UIViewContentMode.ScaleToFill;
+            case ScaleType.None:
+                return UIViewContentMode.TopLeft;
             default:
                 break;
         }
@@ -124,20 +136,26 @@ export function getImagePipeline(): ImagePipeline {
     return imagePineLine;
 }
 
-export class Image extends ImageBase {
+export class Img extends ImageBase {
     nativeViewProtected: SDAnimatedImageView;
     isLoading = false;
     private _imageSourceAffectsLayout: boolean = true;
     public createNativeView() {
         const result = SDAnimatedImageView.new();
         result.contentMode = UIViewContentMode.ScaleAspectFit;
+        result.clipsToBounds = true;
         result.tintColor = null;
         return result;
     }
 
-    public initNativeView(): void {
-        this.initDrawee();
-        // this.updateHierarchy();
+    // public initNativeView(): void {
+    //     this.initDrawee();
+    //     // this.updateHierarchy();
+    // }
+
+    _setNativeClipToBounds() {
+        // Always set clipsToBounds for images
+        this.nativeViewProtected.clipsToBounds = true;
     }
 
     public onMeasure(widthMeasureSpec: number, heightMeasureSpec: number): void {
@@ -160,19 +178,9 @@ export class Image extends ImageBase {
         this._imageSourceAffectsLayout = widthMode !== layout.EXACTLY || heightMode !== layout.EXACTLY;
 
         if (nativeWidth !== 0 && nativeHeight !== 0 && (finiteWidth || finiteHeight)) {
-            //   console.log(
-            //     "onMeasure",
-            //     !!image,
-            //     width,
-            //     height,
-            //     finiteWidth,
-            //     finiteHeight,
-            //     nativeWidth,
-            //     nativeHeight,
-            //     this.stretch
-            //   );
+            // console.log('onMeasure', !!image, width, height, finiteWidth, finiteHeight, nativeWidth, nativeHeight, this.stretch);
 
-            const scale = Image.computeScaleFactor(width, height, finiteWidth, finiteHeight, nativeWidth, nativeHeight, this.actualImageScaleType, this.aspectRatio);
+            const scale = this.computeScaleFactor(width, height, finiteWidth, finiteHeight, nativeWidth, nativeHeight);
             const resultW = Math.round(nativeWidth * scale.width);
             const resultH = Math.round(nativeHeight * scale.height);
 
@@ -190,10 +198,14 @@ export class Image extends ImageBase {
             //     traceCategories.Layout
             //   );
             // }
+            // if (this._imageSourceAffectsLayout) {
+            //     this._imageSourceAffectsLayout = false;
+            //     this.requestLayout();
+            // }
         }
 
-        const widthAndState = Image.resolveSizeAndState(measureWidth, width, widthMode, 0);
-        const heightAndState = Image.resolveSizeAndState(measureHeight, height, heightMode, 0);
+        const widthAndState = Img.resolveSizeAndState(measureWidth, width, widthMode, 0);
+        const heightAndState = Img.resolveSizeAndState(measureHeight, height, heightMode, 0);
 
         this.setMeasuredDimension(widthAndState, heightAndState);
     }
@@ -214,45 +226,57 @@ export class Image extends ImageBase {
         }
     }
 
-    private static computeScaleFactor(
+    private computeScaleFactor(
         measureWidth: number,
         measureHeight: number,
         widthIsFinite: boolean,
         heightIsFinite: boolean,
         nativeWidth: number,
-        nativeHeight: number,
-        imageStretch: ScaleType,
-        aspectRatio?: number
+        nativeHeight: number
     ): { width: number; height: number } {
         let scaleW = 1;
         let scaleH = 1;
-        if (Image.needsSizeAdjustment(imageStretch) && (widthIsFinite || heightIsFinite)) {
-            if (aspectRatio > 0) {
-                if (!widthIsFinite) {
-                    scaleH = 1;
-                    scaleW = scaleH / aspectRatio;
-                } else if (!heightIsFinite) {
-                    scaleW = 1;
-                    scaleH = scaleW * aspectRatio;
-                }
-            } else {
-                scaleW = nativeWidth > 0 ? measureWidth / nativeWidth : 0;
-                scaleH = nativeHeight > 0 ? measureHeight / nativeHeight : 0;
+        if (Img.needsSizeAdjustment(this.stretch) && (widthIsFinite || heightIsFinite)) {
+            // if (aspectRatio > 0) {
+            //   console.log('handling aspectRatio', aspectRatio);
+            //     if (!widthIsFinite) {
+            //         scaleH = 1;
+            //         scaleW = scaleH / aspectRatio;
+            //     } else if (!heightIsFinite) {
+            //         scaleW = 1;
+            //         scaleH = scaleW * aspectRatio;
+            //     }
+            // } else {
+            scaleW = nativeWidth > 0 ? measureWidth / nativeWidth : 0;
+            scaleH = nativeHeight > 0 ? measureHeight / nativeHeight : 0;
 
-                // if (aspectRatio !== undefined) {
-                //     if (!widthIsFinite) {
-                //         scaleW = (nativeWidth / nativeHeight) * scaleW * aspectRatio;
-                //     } else if (!heightIsFinite) {
-                //         scaleH = ((nativeWidth / nativeHeight) * scaleW) / aspectRatio;
-                //     }
-                // } else {
+            if (this.aspectRatio > 0) {
+                if (!widthIsFinite) {
+                    scaleW = (nativeWidth / nativeHeight) * scaleW * this.aspectRatio;
+                } else if (!heightIsFinite) {
+                    scaleH = (nativeWidth / nativeHeight) * scaleW * this.aspectRatio;
+                }
+                // console.log(
+                //     'handling aspectRatio',
+                //     widthIsFinite,
+                //     heightIsFinite,
+                //     this.aspectRatio,
+                //     measureWidth,
+                //     measureHeight,
+                //     nativeWidth,
+                //     nativeHeight,
+                //     scaleW,
+                //     scaleH,
+                //     this._imageSourceAffectsLayout
+                // );
+            } else {
                 if (!widthIsFinite) {
                     scaleW = scaleH;
                 } else if (!heightIsFinite) {
                     scaleH = scaleW;
                 } else {
                     // No infinite dimensions.
-                    switch (imageStretch) {
+                    switch (this.stretch) {
                         case ScaleType.CenterInside:
                         case ScaleType.FitCenter:
                             scaleH = scaleW < scaleH ? scaleW : scaleH;
@@ -279,55 +303,33 @@ export class Image extends ImageBase {
 
     public updateImageUri() {
         const imagePipeLine = getImagePipeline();
-        const isInCache = imagePipeLine.isInBitmapMemoryCache(this.imageUri);
+        const isInCache = imagePipeLine.isInBitmapMemoryCache(this.src);
         if (isInCache) {
-            imagePipeLine.evictFromCache(this.imageUri);
-            const imageUri = this.imageUri;
-            this.imageUri = null;
-            this.imageUri = imageUri;
+            imagePipeLine.evictFromCache(this.src);
+            const src = this.src;
+            this.src = null;
+            this.src = src;
         }
     }
 
-    protected onImageUriChanged(oldValue: string, newValue: string) {
-        this.initImage();
-    }
-
-    protected onPlaceholderImageUriChanged(oldValue: string, newValue: string) {
-        // this.updateHierarchy();
-    }
-
-    protected onFailureImageUriChanged(oldValue: string, newValue: string) {
-        // this.updateHierarchy();
-    }
-
-    protected onActualImageScaleTypeChanged(oldValue: string, newValue: string) {
-        if (!this.nativeView) {
-            return;
-        }
-        this.nativeViewProtected.contentMode = getUIImageScaleType(newValue);
-    }
-
-    private initDrawee() {
-        this.initImage();
-    }
+    // private initDrawee() {
+    //     this.initImage();
+    // }
 
     public _setNativeImage(nativeImage: UIImage) {
         this.nativeViewProtected.image = nativeImage;
-        // console.log(
-        //   "_setNativeImage",
-        //   !!nativeImage,
-        //   this._imageSourceAffectsLayout
-        // );
+        // console.log('_setNativeImage', !!nativeImage, this._imageSourceAffectsLayout);
         if (this._imageSourceAffectsLayout) {
+            this._imageSourceAffectsLayout = false;
             this.requestLayout();
         }
     }
 
     private handleImageLoaded = (image: UIImage, error: NSError, cacheType: number) => {
         if (error) {
-            console.log('error loading image', this.imageUri, error.localizedDescription);
+            console.log('error loading image', this.src, error.localizedDescription);
             const args = {
-                eventName: Image.failureEvent,
+                eventName: Img.failureEvent,
                 object: this,
                 error
             };
@@ -392,11 +394,11 @@ export class Image extends ImageBase {
     private getUIImage(path: string) {
         let image;
         if (utils.isFileOrResourcePath(path)) {
-            if (path.indexOf(utils.RESOURCE_PREFIX) === 0) {
-                image = imageSource.fromFileOrResource(path);
-            } else {
-                image = imageSource.fromFileOrResource(path);
-            }
+            // if (path.indexOf(utils.RESOURCE_PREFIX) === 0) {
+            //     image = imageSource.fromFileOrResource(path);
+            // } else {
+            image = imageSource.fromFileOrResource(path);
+            // }
         }
         // console.log("getUIImage", path, !!image, !!image && !!image.ios);
         if (image) {
@@ -408,8 +410,7 @@ export class Image extends ImageBase {
 
     private initImage() {
         if (this.nativeViewProtected) {
-            // this.nativeViewProtected.image = null;
-            if (this.imageUri) {
+            if (this.src) {
                 this.isLoading = true;
                 let options = SDWebImageOptions.ScaleDownLargeImages | SDWebImageOptions.AvoidAutoSetImage;
                 if (this.onlyTransitionIfRemote === false) {
@@ -420,21 +421,8 @@ export class Image extends ImageBase {
                 if (!!this.progressiveRenderingEnabled) {
                     options = options | SDWebImageOptions.ProgressiveLoad;
                 }
-                // if (this.actualImageScaleType) {
-                //   transformers.push(
-                //     SDImageResizingTransformer.transformerWithSizeScaleMode()
-                //   );
-                //   // requestBuilder.setResizeOptions(
-                //   //   new com.facebook.imagepipeline.common.ResizeOptions(
-                //   //     this.decodeWidth,
-                //   //     this.decodeHeight
-                //   //   )
-                //   // );
-                // }
                 if (this.decodeWidth && this.decodeHeight) {
-                    transformers.push(
-                        SDImageCroppingTransformer.transformerWithRect(CGRectMake(0, 0, this.decodeWidth, this.decodeHeight * 2))
-                    );
+                    transformers.push(SDImageResizingTransformer.transformerWithSizeScaleMode(CGSizeMake(this.decodeWidth, this.decodeHeight), SDImageScaleMode.AspectFit));
                 }
                 if (this.tintColor) {
                     transformers.push(SDImageTintTransformer.transformerWithColor(this.tintColor.ios));
@@ -463,25 +451,29 @@ export class Image extends ImageBase {
                     transformers.push(SDImageRoundCornerTransformer.transformerWithRadiusCornersBorderWidthBorderColor(this.roundedCornerRadius, corners, 0, null));
                     transformers.push(SDImageFlippingTransformer.transformerWithHorizontalVertical(false, true));
                 }
-                // console.log("loading image", this.imageUri);
-
                 if (transformers.length > 0) {
-                    //   console.log("adding context transformers ", transformers.length);
                     context.setValueForKey(SDImagePipelineTransformer.transformerWithTransformers(transformers), SDWebImageContextImageTransformer);
                 }
-                let uri: any = this.imageUri;
+                let uri: any = this.src;
 
-                if (this.imageUri.indexOf(utils.RESOURCE_PREFIX) === 0) {
-                    const resName = this.imageUri.substr(utils.RESOURCE_PREFIX.length);
-                    uri =
-                        NSBundle.mainBundle.URLForResourceWithExtension(resName, 'png') ||
-                        NSBundle.mainBundle.URLForResourceWithExtension(resName, 'jpg') ||
-                        NSBundle.mainBundle.URLForResourceWithExtension(resName, 'gif');
+                if (this.src.indexOf(utils.RESOURCE_PREFIX) === 0) {
+                    const resName = this.src.substr(utils.RESOURCE_PREFIX.length);
+                    if (screenScale === -1) {
+                        screenScale = screen.mainScreen.scale;
+                    }
+                    supportedLocalFormats.some(v => {
+                        for (let i = screenScale; i >= 1; i--) {
+                            uri = NSBundle.mainBundle.URLForResourceWithExtension(i > 1 ? `${resName}@${i}x` : resName, v);
+                            if (!!uri) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    });
+                } else if (this.src.indexOf('~/') === 0) {
+                    uri = NSURL.alloc().initFileURLWithPath(`${fs.path.join(fs.knownFolders.currentApp().path, this.src.replace('~/', ''))}`);
                 }
-                if (this.imageUri.indexOf('~/') === 0) {
-                    uri = NSURL.alloc().initFileURLWithPath(`${fs.path.join(fs.knownFolders.currentApp().path, this.imageUri.replace('~/', ''))}`);
-                }
-                // console.log("about to load", this.imageUri, uri);
+                // console.log('about to load', this.src, uri, new Error().stack);
                 this.nativeViewProtected.sd_setImageWithURLPlaceholderImageOptionsContextProgressCompleted(
                     uri as any,
                     this.placeholderImageUri ? this.getUIImage(this.placeholderImageUri) : null,
@@ -493,22 +485,23 @@ export class Image extends ImageBase {
             }
         }
     }
+    [ImageBase.srcProperty.setNative]() {
+        this.initImage();
+    }
+
+    [ImageBase.placeholderImageUriProperty.setNative]() {
+        this.initImage();
+    }
+
+    [ImageBase.failureImageUriProperty.setNative]() {
+        // this.updateHierarchy();
+    }
+
     [ImageBase.stretchProperty.setNative](value: Stretch) {
-        switch (value) {
-            case 'aspectFit':
-                this.nativeView.contentMode = UIViewContentMode.ScaleAspectFit;
-                break;
-            case 'aspectFill':
-                this.nativeView.contentMode = UIViewContentMode.ScaleAspectFill;
-                break;
-            case 'fill':
-                this.nativeView.contentMode = UIViewContentMode.ScaleToFill;
-                break;
-            case 'none':
-            default:
-                this.nativeView.contentMode = UIViewContentMode.TopLeft;
-                break;
+        if (!this.nativeView) {
+            return;
         }
+        this.nativeViewProtected.contentMode = getUIImageScaleType(value);
     }
 
     startAnimating() {

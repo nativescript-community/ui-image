@@ -1,13 +1,13 @@
 import { NgModule } from '@angular/core';
 import { registerElement } from 'nativescript-angular/element-registry';
 
-import { NSFRESCO_DIRECTIVES } from './nativescript-image-directives';
-import { Image } from '../image';
+import { NSIMG_DIRECTIVES } from './nativescript-image-directives';
+import { Img } from '../image';
 
 @NgModule({
-    declarations: [NSFRESCO_DIRECTIVES],
-    exports: [NSFRESCO_DIRECTIVES]
+    declarations: [NSIMG_DIRECTIVES],
+    exports: [NSIMG_DIRECTIVES]
 })
 export class TNSImageModule {}
 
-registerElement('Image', () => Image);
+registerElement('Img', () => Img);

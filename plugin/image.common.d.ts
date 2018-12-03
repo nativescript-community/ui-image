@@ -1,6 +1,6 @@
 import { PercentLength, Property } from 'tns-core-modules/ui/core/view';
 import { Image as NImage } from 'tns-core-modules/ui/image';
-export declare const imageUriProperty: Property<Image, string>;
+export declare const srcProperty: Property<Image, string>;
 export declare const placeHolderProperty: Property<Image, string>;
 export declare const errorHolderProperty: Property<Image, string>;
 export declare const resizeProperty: Property<Image, string>;
@@ -12,7 +12,7 @@ export declare const decodeHeightProperty: Property<Image, PercentLength>;
 export declare const decodeWidthProperty: Property<Image, PercentLength>;
 export declare class Image extends NImage {
     constructor();
-    imageUri: string;
+    src: string;
     placeHolder: string;
     errorHolder: string;
     centerCrop: boolean;

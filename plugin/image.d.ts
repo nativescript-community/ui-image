@@ -21,7 +21,7 @@ declare function getImagePipeline(): ImagePipeline;
 /**
 * Encapsulates the common abstraction behind a platform specific object (typically a Bitmap) that is used view to show remote or local images.
 */
-export class Image extends viewModule.View {
+export class Img extends viewModule.View {
     /**
      * This event is fired after the final image has been set.
      */
@@ -53,7 +53,7 @@ export class Image extends viewModule.View {
     static submitEvent: string;
 
     /**
-     * Removes all images with the specified Uri from the memory or/and disk and reinitialize the 'imageUri'.
+     * Removes all images with the specified Uri from the memory or/and disk and reinitialize the 'src'.
      */
     updateImageUri(): void;
 
@@ -65,7 +65,7 @@ export class Image extends viewModule.View {
     /**
      * String value used for the image URI.
      */
-    imageUri: string;
+    src: string;
 
     /**
     * String value used for the placeholder image URI.
@@ -88,7 +88,7 @@ export class Image extends viewModule.View {
     * 'fitXY' - Scales width and height independently, so that the child matches the parent exactly.
     * 'focusCrop' - Scales the child so that both dimensions will be greater than or equal to the corresponding dimension of the parent.
     */
-    actualImageScaleType: string;
+    stretch: string;
 
     /**
      * Number value used for the fade-in duration. This value is in milliseconds.
