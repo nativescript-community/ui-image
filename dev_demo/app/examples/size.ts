@@ -21,9 +21,9 @@ let currentIndex = 1;
 export function onChangeTap(args: EventData) {
     const button = args.object as Button;
     const gridLayout = button.parent as GridLayout;
-    const drawee = gridLayout.getViewById('imageDrawee') as Img;
-    // drawee.aspectRatio = images[currentIndex].aspectRation;
-    drawee.src = images[currentIndex].uri;
+    const imageView = gridLayout.getViewById('imageView') as Img;
+    // imageView.aspectRatio = images[currentIndex].aspectRation;
+    imageView.src = images[currentIndex].uri;
 
     currentIndex++;
     if (currentIndex >= images.length) {
