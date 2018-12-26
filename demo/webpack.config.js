@@ -34,6 +34,7 @@ module.exports = env => {
         // when bundling with `tns run android|ios --bundle`.
         appPath = "app",
         appResourcesPath = "app/App_Resources",
+        development = false,
 
         // You can provide the following flags when running 'tns run android|ios'
         snapshot, // --env.snapshot
@@ -51,6 +52,19 @@ module.exports = env => {
 
     const entryModule = nsWebpack.getEntryModule(appFullPath);
     const entryPath = `.${sep}${entryModule}.ts`;
+
+    let aliases = {
+        '~': appFullPath
+    };
+    if (!!development) {
+        const srcFullPath = resolve(projectRoot, '..', 'src');
+        console.log('running webpack for live development', srcFullPath);
+        aliases = Object.assign(aliases, {
+            '#':srcFullPath,
+            'nativescript-image': '#',
+            'nativescript-image$': '#/image'
+        });
+    }
 
     const config = {
         mode: uglify ? "production" : "development",
@@ -83,9 +97,7 @@ module.exports = env => {
                 "node_modules/tns-core-modules",
                 "node_modules",
             ],
-            alias: {
-                '~': appFullPath
-            },
+            alias: aliases,
             // don't resolve symlinks to symlinked modules
             symlinks: false
         },

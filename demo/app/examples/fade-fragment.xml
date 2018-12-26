@@ -1,7 +1,7 @@
 <StackLayout>
     <Button text="set / unset" tap="onSetTap"/>
     <img:Img verticalAlignment="center" row="1"
-                        id="imageDrawee"
+                        id="imageView"
                         xmlns:img="nativescript-image"
                         fadeDuration="3000"/>
 </StackLayout>

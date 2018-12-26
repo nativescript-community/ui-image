@@ -1,7 +1,6 @@
 import { EventData } from 'tns-core-modules/data/observable';
 import { Img } from 'nativescript-image';
-import { Button } from 'tns-core-modules/ui/button';
-import { GridLayout } from 'tns-core-modules/ui/layouts/grid-layout';
+import { View } from 'tns-core-modules/ui/page/page';
 
 class ImageData {
     public uri: string;
@@ -20,11 +19,9 @@ const images: ImageData[] = new Array(
 let currentIndex = 1;
 
 export function onChangeTap(args: EventData) {
-    const button = args.object as Button;
-    const gridLayout = button.parent as GridLayout;
-    const drawee = gridLayout.getViewById('imageDrawee') as Image;
-    // drawee.aspectRatio = images[currentIndex].aspectRation;
-    drawee.src = images[currentIndex].uri;
+    console.log('onChangeTap');
+    const imageView = (args.object as View).page.getViewById('imageView') as Img;
+    imageView.src = images[currentIndex].uri;
 
     currentIndex++;
     if (currentIndex >= images.length) {

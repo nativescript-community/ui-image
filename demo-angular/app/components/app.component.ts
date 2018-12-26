@@ -10,21 +10,21 @@ export class AppComponent implements OnInit {
     constructor() {
     }
 
-    @ViewChild("drawee") imageDraweeComponent: ElementRef;
+    @ViewChild("imageView") imageViewComponent: ElementRef;
 
     ngOnInit() {
 
     }
 
     onAnimateToZero(args) {
-        this.imageDraweeComponent.nativeElement.animate({
+        this.imageViewComponent.nativeElement.animate({
             opacity: 0,
             duration: 500
         });
     }
 
     onAnimateToOne(args) {
-        this.imageDraweeComponent.nativeElement.animate({
+        this.imageViewComponent.nativeElement.animate({
             opacity: 1,
             duration: 500
         });
