@@ -47,12 +47,14 @@ export declare class ImageBase extends View {
     static releaseEvent: string;
     static submitEvent: string;
     src: string;
+    lowerResSrc: string;
     placeholderImageUri: string;
     failureImageUri: string;
     stretch: ScaleType;
     fadeDuration: number;
     backgroundUri: string;
     progressiveRenderingEnabled: boolean;
+    localThumbnailPreviewsEnabled: boolean;
     showProgressBar: boolean;
     progressBarColor: string;
     roundAsCircle: boolean;
@@ -73,12 +75,14 @@ export declare class ImageBase extends View {
     transition: Transition;
     readonly isLoading: boolean;
     static srcProperty: Property<ImageBase, string>;
+    static lowerResSrcProperty: Property<ImageBase, string>;
     static placeholderImageUriProperty: Property<ImageBase, string>;
     static failureImageUriProperty: Property<ImageBase, string>;
     static stretchProperty: Property<ImageBase, string>;
     static fadeDurationProperty: Property<ImageBase, number>;
     static backgroundUriProperty: Property<ImageBase, string>;
     static progressiveRenderingEnabledProperty: Property<ImageBase, boolean>;
+    static localThumbnailPreviewsEnabledProperty: Property<ImageBase, boolean>;
     static showProgressBarProperty: Property<ImageBase, boolean>;
     static progressBarColorProperty: Property<ImageBase, string>;
     static roundAsCircleProperty: Property<ImageBase, boolean>;
@@ -97,4 +101,5 @@ export declare class ImageBase extends View {
     static onlyTransitionIfRemoteProperty: Property<ImageBase, boolean>;
     static tintColorProperty: Property<ImageBase, Color>;
     static transitionProperty: Property<ImageBase, Transition>;
+    protected handleImageProgress(value: number, totalSize?: number): void;
 }

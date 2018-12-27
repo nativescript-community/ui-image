@@ -1,5 +1,16 @@
 export * from './image-common';
-import { ImageBase, ImagePipelineConfigSetting } from './image-common';
+import { EventData, ImageBase, ImageInfo as ImageInfoBase, ImagePipelineConfigSetting } from './image-common';
+export declare class ImageInfo implements ImageInfoBase {
+    private width;
+    private height;
+    constructor(width: number, height: number);
+    getHeight(): number;
+    getWidth(): number;
+}
+export interface FinalEventData extends EventData {
+    imageInfo: ImageInfo;
+    ios: UIImage;
+}
 export declare function initialize(config?: ImagePipelineConfigSetting): void;
 export declare function shutDown(): void;
 export declare class ImagePipeline {

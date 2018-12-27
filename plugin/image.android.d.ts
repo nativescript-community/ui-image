@@ -41,6 +41,7 @@ export declare class FinalEventData extends EventData {
     private _animatable;
     imageInfo: ImageInfo;
     animatable: AnimatedImage;
+    readonly android: AnimatedImage;
 }
 export declare class IntermediateEventData extends EventData {
     private _imageInfo;
@@ -57,7 +58,6 @@ export declare class Img extends ImageBase {
     onImageSet(imageInfo: com.facebook.imagepipeline.image.ImageInfo, animatable: android.graphics.drawable.Animatable): void;
     disposeNativeView(): void;
     updateImageUri(): void;
-    private initDrawee();
     private initImage();
     private updateHierarchy();
     private getDrawable(path);
