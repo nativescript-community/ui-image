@@ -1,10 +1,10 @@
-<GridLayout>
+<GridLayout rows="auto">
     <img:Img xmlns:img="nativescript-image" 
                         verticalAlignment="center"
-                        backgroundColor="red"
+                        backgroundColor="blue"
                         placeholderImageUri="res://ns_logo"
                         margin="10"
-                        roundedCornerRadius="50"
+                        roundedCornerRadius="150"
                         roundBottomRight="true"
                         roundBottomLeft="true"
                         roundTopLeft="false"

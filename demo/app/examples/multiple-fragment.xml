@@ -1,10 +1,13 @@
- <lv:RadListView xmlns:lv="nativescript-ui-listview" xmlns:img="nativescript-image" items="{{ dataItems }}" id="listView" width="100%" height="100%">
+ <lv:RadListView xmlns:lv="nativescript-ui-listview" xmlns:img="nativescript-image" items="{{ dataItems }}" id="listView" width="100%" height="100%" >
     <lv:RadListView.itemTemplate>
         <StackLayout rows="*, 20" backgroundColor="blue">
             <img:Img row="0" verticalAlignment="top"
                                 backgroundUri="res://ns_logo"
                                 backgroundColor="red"
-                                src="{{ src }}"/>
+                                src="{{ src }}" 
+                                minHeight="200"
+                                finalImageSet="onFinalImageSet"
+                                />
             <Label height="22" backgroundColor="yellow" text="{{ id }}" verticalAlignment="center" horizontalAlignment="center"/>
         </StackLayout>
     </lv:RadListView.itemTemplate>

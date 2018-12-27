@@ -47,7 +47,7 @@ export function onNavigatingTo(args) {
             theModule.onNavigatingTo(args);
         }
     } catch (e) {
-        console.log('error', e);
+        // console.log('error', e);
     }
 
     const container = page.getViewById('container');

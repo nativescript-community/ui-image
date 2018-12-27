@@ -5,7 +5,7 @@ export function onFinalImageSet(args: FinalEventData) {
     const imageView = args.object as Img;
     const message = '>>>>>> onFinalImageSet ';
     writeToOutputLabel(imageView, message);
-    const animatedImage = args.animatable as AnimatedImage;
+    const animatedImage = args.android as AnimatedImage;
     if (animatedImage) {
         writeToOutputLabel(imageView, '>>>>>> animatedImage: isRunning(): ' + animatedImage.isRunning());
         writeToOutputLabel(imageView, '>>>>>> animatedImage: start() ');
