@@ -37,6 +37,34 @@ export function shutDown(): void {
     com.facebook.drawee.backends.pipeline.Fresco.shutDown();
 }
 
+function getUri(src: string) {
+    let uri;
+    if (utils.isFileOrResourcePath(src)) {
+        const res = utils.ad.getApplicationContext().getResources();
+        if (!res) {
+            return;
+        }
+
+        if (src.indexOf(utils.RESOURCE_PREFIX) === 0) {
+            const resName = src.substr(utils.RESOURCE_PREFIX.length);
+            const identifier = res.getIdentifier(resName, 'drawable', utils.ad.getApplication().getPackageName());
+            if (0 < identifier) {
+                uri = new android.net.Uri.Builder()
+                    .scheme(com.facebook.common.util.UriUtil.LOCAL_RESOURCE_SCHEME)
+                    .path(java.lang.String.valueOf(identifier))
+                    .build();
+            }
+        } else if (src.indexOf('~/') === 0) {
+            uri = android.net.Uri.parse(`file:${fs.path.join(fs.knownFolders.currentApp().path, src.replace('~/', ''))}`);
+        } else if (src.indexOf('/') === 0) {
+            uri = android.net.Uri.parse(`file:${src}`);
+        }
+    } else {
+        uri = android.net.Uri.parse(src);
+    }
+    return uri;
+}
+
 export class ImagePipeline {
     private _android: com.facebook.imagepipeline.core.ImagePipeline;
 
@@ -152,6 +180,9 @@ export class FinalEventData extends EventData {
     set animatable(value: AnimatedImage) {
         this._animatable = value;
     }
+    get android(): AnimatedImage {
+        return this._animatable;
+    }
 }
 
 export class IntermediateEventData extends EventData {
@@ -215,6 +246,9 @@ export class Img extends ImageBase {
     }
 
     [ImageBase.srcProperty.setNative]() {
+        this.initImage();
+    }
+    [ImageBase.lowerResSrcProperty.setNative]() {
         this.initImage();
     }
 
@@ -282,51 +316,32 @@ export class Img extends ImageBase {
         this.initImage();
     }
 
-    private initDrawee() {
-        this.initImage();
-    }
+    // private initDrawee() {
+    //     this.initImage();
+    // }
 
     private initImage() {
         if (this.nativeViewProtected) {
             // this.nativeViewProtected.setImageURI(null);
             if (this.src) {
-                let uri;
                 this.isLoading = true;
-                if (utils.isFileOrResourcePath(this.src)) {
-                    const res = utils.ad.getApplicationContext().getResources();
-                    if (!res) {
-                        return;
-                    }
-
-                    if (this.src.indexOf(utils.RESOURCE_PREFIX) === 0) {
-                        const resName = this.src.substr(utils.RESOURCE_PREFIX.length);
-                        const identifier = res.getIdentifier(resName, 'drawable', utils.ad.getApplication().getPackageName());
-                        if (0 < identifier) {
-                            uri = new android.net.Uri.Builder()
-                                .scheme(com.facebook.common.util.UriUtil.LOCAL_RESOURCE_SCHEME)
-                                .path(java.lang.String.valueOf(identifier))
-                                .build();
-                        }
-                    } else if (this.src.indexOf('~/') === 0) {
-                        uri = android.net.Uri.parse(`file:${fs.path.join(fs.knownFolders.currentApp().path, this.src.replace('~/', ''))}`);
-                    } else if (this.src.indexOf('/') === 0) {
-                        uri = android.net.Uri.parse(`file:${this.src}`);
-                    }
-                } else {
-                    uri = android.net.Uri.parse(this.src);
-                }
-
+                const uri = getUri(this.src);
                 if (!uri) {
                     console.log(`Error: 'src' not valid: ${this.src}`);
                     return;
                 }
 
                 // const progressiveRenderingEnabledValue = this.progressiveRenderingEnabled !== undefined ? this.progressiveRenderingEnabled : false;
-                let requestBuilder = com.facebook.imagepipeline.request.ImageRequestBuilder.newBuilderWithSource(uri);
-                if (this.progressiveRenderingEnabled === true) {
+                let requestBuilder = com.facebook.imagepipeline.request.ImageRequestBuilder.newBuilderWithSource(uri).setRotationOptions(
+                    com.facebook.imagepipeline.common.RotationOptions.autoRotate()
+                );
+
+                if (this.progressiveRenderingEnabled !== undefined) {
                     requestBuilder = requestBuilder.setProgressiveRenderingEnabled(this.progressiveRenderingEnabled);
                 }
-                requestBuilder.setRotationOptions(com.facebook.imagepipeline.common.RotationOptions.autoRotate());
+                if (this.localThumbnailPreviewsEnabled !== undefined) {
+                    requestBuilder = requestBuilder.setLocalThumbnailPreviewsEnabled(this.localThumbnailPreviewsEnabled);
+                }
 
                 if (this.decodeWidth && this.decodeHeight) {
                     requestBuilder = requestBuilder.setResizeOptions(new com.facebook.imagepipeline.common.ResizeOptions(this.decodeWidth, this.decodeHeight));
@@ -335,7 +350,6 @@ export class Img extends ImageBase {
                     const postProcessor: any = new jp.wasabeef.fresco.processors.BlurPostprocessor(this._context, this.blurRadius, this.blurDownSampling || 1);
                     requestBuilder = requestBuilder.setPostprocessor(postProcessor);
                 }
-
                 const request = requestBuilder.build();
 
                 const that: WeakRef<Img> = new WeakRef(this);
@@ -436,6 +450,11 @@ export class Img extends ImageBase {
                 builder.setImageRequest(request);
                 builder.setControllerListener(listener);
                 builder.setOldController(this.nativeViewProtected.getController());
+
+                if (this.lowerResSrc) {
+                    builder.setLowResImageRequest(com.facebook.imagepipeline.request.ImageRequest.fromUri(getUri(this.lowerResSrc)));
+                }
+
                 if (this.autoPlayAnimations) {
                     builder.setAutoPlayAnimations(this.autoPlayAnimations);
                 }

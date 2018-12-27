@@ -71,12 +71,14 @@ export class ImageBase extends View {
     public static submitEvent: string = 'submit';
 
     public src: string;
+    public lowerResSrc: string;
     public placeholderImageUri: string;
     public failureImageUri: string;
     public stretch: ScaleType;
     public fadeDuration: number;
     public backgroundUri: string;
     public progressiveRenderingEnabled: boolean;
+    public localThumbnailPreviewsEnabled: boolean;
     public showProgressBar: boolean;
     public progressBarColor: string;
     public roundAsCircle: boolean;
@@ -99,12 +101,14 @@ export class ImageBase extends View {
     public readonly isLoading: boolean;
 
     public static srcProperty = new Property<ImageBase, string>({ name: 'src' });
+    public static lowerResSrcProperty = new Property<ImageBase, string>({ name: 'lowerResSrc' });
     public static placeholderImageUriProperty = new Property<ImageBase, string>({ name: 'placeholderImageUri' });
     public static failureImageUriProperty = new Property<ImageBase, string>({ name: 'failureImageUri' });
     public static stretchProperty = new Property<ImageBase, string>({ name: 'stretch' });
     public static fadeDurationProperty = new Property<ImageBase, number>({ name: 'fadeDuration', valueConverter: v => parseFloat(v) });
     public static backgroundUriProperty = new Property<ImageBase, string>({ name: 'backgroundUri' });
     public static progressiveRenderingEnabledProperty = new Property<ImageBase, boolean>({ name: 'progressiveRenderingEnabled', valueConverter: booleanConverter });
+    public static localThumbnailPreviewsEnabledProperty = new Property<ImageBase, boolean>({ name: 'localThumbnailPreviewsEnabled', valueConverter: booleanConverter });
     public static showProgressBarProperty = new Property<ImageBase, boolean>({ name: 'showProgressBar', valueConverter: booleanConverter });
     public static progressBarColorProperty = new Property<ImageBase, string>({ name: 'progressBarColor', defaultValue: undefined });
     public static roundAsCircleProperty = new Property<ImageBase, boolean>({ name: 'roundAsCircle', valueConverter: booleanConverter, affectsLayout: isAndroid });
@@ -124,14 +128,19 @@ export class ImageBase extends View {
     public static tintColorProperty = new Property<ImageBase, Color>({ name: 'tintColor' });
     public static transitionProperty = new Property<ImageBase, Transition>({ name: 'transition' });
 
+    protected handleImageProgress(value: number, totalSize?: number) {
+        // console.log('handleImageProgress ', value, totalSize);
+    }
 }
 ImageBase.srcProperty.register(ImageBase);
+ImageBase.lowerResSrcProperty.register(ImageBase);
 ImageBase.placeholderImageUriProperty.register(ImageBase);
 ImageBase.failureImageUriProperty.register(ImageBase);
 ImageBase.stretchProperty.register(ImageBase);
 ImageBase.fadeDurationProperty.register(ImageBase);
 ImageBase.backgroundUriProperty.register(ImageBase);
 ImageBase.progressiveRenderingEnabledProperty.register(ImageBase);
+ImageBase.localThumbnailPreviewsEnabledProperty.register(ImageBase);
 ImageBase.showProgressBarProperty.register(ImageBase);
 ImageBase.progressBarColorProperty.register(ImageBase);
 ImageBase.roundAsCircleProperty.register(ImageBase);

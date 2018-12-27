@@ -1,5 +1,5 @@
 export * from './image-common';
-import { ImageBase, ImagePipelineConfigSetting, ScaleType, Stretch } from './image-common';
+import { EventData, ImageBase, ImageInfo as ImageInfoBase, ImagePipelineConfigSetting, ScaleType, Stretch } from './image-common';
 import * as utils from 'tns-core-modules/utils/utils';
 import * as types from 'tns-core-modules/utils/types';
 import * as imageSource from 'tns-core-modules/image-source';
@@ -8,25 +8,61 @@ import * as fs from 'tns-core-modules/file-system';
 import { layout } from 'tns-core-modules/ui/core/view';
 import { screen } from 'tns-core-modules/platform/platform';
 
-// class SDImageAspectRatioTransformer extends NSObject {
-//     aspectRatio: number;
-//     static transformerWithAspectRatio(ratio: number) {
-//         const transformer = SDImageAspectRatioTransformer.alloc().init();
+class SDImageRoundAsCircleTransformer extends NSObject implements SDImageTransformer {
+    public static ObjCProtocols = [SDImageTransformer];
+    // _cornerRadius = 20;
+    // get cornerRadius() {
+    //     return this._cornerRadius;
+    // }
+    // get corners() {
+    //     return UIRectCorner.AllCorners;
+    // }
+    // get borderWidth() {
+    //     return 0;
+    // }
 
-//         return transformer;
-//     }
+    static transformer() {
+        const transformer = SDImageRoundAsCircleTransformer.alloc().init();
 
-//     transformerKey() {
-//         return `SDImageResizingTransformer(${this.aspectRatio})`;
-//     }
+        return transformer;
+    }
 
-//     transformedImageWithImageForKey(image: UIImage, key: string) {
-//         if (!image) {
-//             return null;
-//         }
-//         // return [image sd_resizedImageWithSize:self.size scaleMode:self.scaleMode];
-//     }
-// }
+    get transformerKey() {
+        return 'SDImageRoundAsCircleTransformer';
+    }
+
+    transformedImageWithImageForKey(image: UIImage, key: string) {
+        if (!image) {
+            return null;
+        }
+        const width = image.size.width;
+        const height = image.size.height;
+        const minwidth = Math.min(width, height);
+        const cornerRadius = minwidth / 2;
+        const result = (image as any)
+            .sd_resizedImageWithSizeScaleMode(CGSizeMake(minwidth, minwidth), SDImageScaleMode.AspectFill)
+            .sd_roundedCornerImageWithRadiusCornersBorderWidthBorderColor(cornerRadius, UIRectCorner.BottomLeft | UIRectCorner.BottomRight | UIRectCorner.TopLeft | UIRectCorner.TopRight, 0, null)
+            .sd_resizedImageWithSizeScaleMode(CGSizeMake(width, height), SDImageScaleMode.AspectFit);
+        return result;
+    }
+}
+
+export class ImageInfo implements ImageInfoBase {
+    constructor(private width: number, private height: number) {}
+
+    getHeight(): number {
+        return this.height;
+    }
+
+    getWidth(): number {
+        return this.width;
+    }
+}
+
+export interface FinalEventData extends EventData {
+    imageInfo: ImageInfo;
+    ios: UIImage;
+}
 
 const supportedLocalFormats = ['png', 'jpg', 'gif', 'jpeg', 'webp'];
 
@@ -162,10 +198,13 @@ export class Img extends ImageBase {
         // We don't call super because we measure native view with specific size.
         const width = layout.getMeasureSpecSize(widthMeasureSpec);
         const widthMode = layout.getMeasureSpecMode(widthMeasureSpec);
-
         const height = layout.getMeasureSpecSize(heightMeasureSpec);
         const heightMode = layout.getMeasureSpecMode(heightMeasureSpec);
+
         const image = this.nativeViewProtected.image;
+
+        // console.log('onMeasure', !!image, width, widthMode, height, heightMode);
+
         const nativeWidth = image ? layout.toDevicePixels(image.size.width) : 0;
         const nativeHeight = image ? layout.toDevicePixels(image.size.height) : 0;
 
@@ -178,14 +217,13 @@ export class Img extends ImageBase {
         this._imageSourceAffectsLayout = widthMode !== layout.EXACTLY || heightMode !== layout.EXACTLY;
 
         if (nativeWidth !== 0 && nativeHeight !== 0 && (finiteWidth || finiteHeight)) {
-            // console.log('onMeasure', !!image, width, height, finiteWidth, finiteHeight, nativeWidth, nativeHeight, this.stretch);
-
             const scale = this.computeScaleFactor(width, height, finiteWidth, finiteHeight, nativeWidth, nativeHeight);
             const resultW = Math.round(nativeWidth * scale.width);
             const resultH = Math.round(nativeHeight * scale.height);
 
             measureWidth = finiteWidth ? Math.min(resultW, width) : resultW;
             measureHeight = finiteHeight ? Math.min(resultH, height) : resultH;
+            // console.log('onMeasure', !!image, width, height, finiteWidth, finiteHeight, nativeWidth, nativeHeight, this.stretch, measureWidth, measureHeight);
 
             // if (traceEnabled()) {
             //   traceWrite(
@@ -312,13 +350,9 @@ export class Img extends ImageBase {
         }
     }
 
-    // private initDrawee() {
-    //     this.initImage();
-    // }
-
     public _setNativeImage(nativeImage: UIImage) {
         this.nativeViewProtected.image = nativeImage;
-        // console.log('_setNativeImage', !!nativeImage, this._imageSourceAffectsLayout);
+        console.log('_setNativeImage', !!nativeImage, this._imageSourceAffectsLayout);
         if (this._imageSourceAffectsLayout) {
             this._imageSourceAffectsLayout = false;
             this.requestLayout();
@@ -326,8 +360,8 @@ export class Img extends ImageBase {
     }
 
     private handleImageLoaded = (image: UIImage, error: NSError, cacheType: number) => {
+        console.log('handleImageLoaded', this.src, error, cacheType);
         if (error) {
-            console.log('error loading image', this.src, error.localizedDescription);
             const args = {
                 eventName: Img.failureEvent,
                 object: this,
@@ -336,15 +370,24 @@ export class Img extends ImageBase {
 
             this.notify(args);
             if (this.failureImageUri) {
-                // console.log("setting failure image");
-                this._setNativeImage(this.getUIImage(this.failureImageUri));
-            } else {
+                image = this.getUIImage(this.failureImageUri);
+                // this._setNativeImage();
+            // } else {
                 // console.log("clearing image");
-                this._setNativeImage(null);
-                this.nativeViewProtected.image = null;
+                // this._setNativeImage(null);
+                // this.nativeViewProtected.image = null;
             }
-        }
+        } else {
+            const args = {
+                eventName: ImageBase.finalImageSetEvent,
+                object: this,
+                imageInfo: new ImageInfo(image.size.width, image.size.height),
+                ios: image
+            } as FinalEventData;
 
+            this.notify(args);
+        }
+        this.handleImageProgress(1);
         // if (this.tintColor) {
         //   image = image.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
         // }
@@ -387,8 +430,8 @@ export class Img extends ImageBase {
         //     });
         // }
     }
-    private onLoadProgress = (p1: number, p2: number) => {
-        // console.log("onLoadProgresss ", p1, p2);
+    private onLoadProgress = (currentSize: number, totalSize: number) => {
+        this.handleImageProgress(totalSize > 0 ? currentSize / totalSize : -1, totalSize);
     }
 
     private getUIImage(path: string) {
@@ -431,7 +474,8 @@ export class Img extends ImageBase {
                     transformers.push(SDImageBlurTransformer.transformerWithRadius(this.blurRadius));
                 }
                 if (this.roundAsCircle) {
-                    transformers.push(SDImageRoundCornerTransformer.transformerWithRadiusCornersBorderWidthBorderColor(1000000, UIRectCorner.AllCorners, 0, null));
+                    console.log('this.roundAsCircle', this.roundAsCircle);
+                    transformers.push(SDImageRoundAsCircleTransformer.new());
                     transformers.push(SDImageFlippingTransformer.transformerWithHorizontalVertical(false, true));
                 }
                 if (this.roundBottomLeft || this.roundBottomRight || this.roundTopLeft || this.roundTopRight) {
@@ -473,7 +517,11 @@ export class Img extends ImageBase {
                 } else if (this.src.indexOf('~/') === 0) {
                     uri = NSURL.alloc().initFileURLWithPath(`${fs.path.join(fs.knownFolders.currentApp().path, this.src.replace('~/', ''))}`);
                 }
-                // console.log('about to load', this.src, uri, new Error().stack);
+
+                // SDWebImageManager.sharedManager.loadImageWithURLOptionsContextProgressCompleted(
+
+                // )
+                // console.log('about to load', this.src, uri, options);
                 this.nativeViewProtected.sd_setImageWithURLPlaceholderImageOptionsContextProgressCompleted(
                     uri as any,
                     this.placeholderImageUri ? this.getUIImage(this.placeholderImageUri) : null,
@@ -488,7 +536,6 @@ export class Img extends ImageBase {
     [ImageBase.srcProperty.setNative]() {
         this.initImage();
     }
-
     [ImageBase.placeholderImageUriProperty.setNative]() {
         this.initImage();
     }

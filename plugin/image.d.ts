@@ -1,4 +1,4 @@
-import * as viewModule from "tns-core-modules/ui/core/view";
+import * as viewModule from 'tns-core-modules/ui/core/view';
 
 /**
  * When called, initializes the android Image library. Calling this method is required.
@@ -19,8 +19,8 @@ declare function shutDown(): void;
 declare function getImagePipeline(): ImagePipeline;
 
 /**
-* Encapsulates the common abstraction behind a platform specific object (typically a Bitmap) that is used view to show remote or local images.
-*/
+ * Encapsulates the common abstraction behind a platform specific object (typically a Bitmap) that is used view to show remote or local images.
+ */
 export class Img extends viewModule.View {
     /**
      * This event is fired after the final image has been set.
@@ -33,8 +33,8 @@ export class Img extends viewModule.View {
     static failureEvent: string;
 
     /**
-    * This event is fired after the fetch of the intermediate image failed.
-    */
+     * This event is fired after the fetch of the intermediate image failed.
+     */
     static intermediateImageFailedEvent: string;
 
     /**
@@ -68,26 +68,31 @@ export class Img extends viewModule.View {
     src: string;
 
     /**
-    * String value used for the placeholder image URI.
-    */
+     * String value used for the lower res image URI.
+     */
+    lowerResSrc: string;
+
+    /**
+     * String value used for the placeholder image URI.
+     */
     placeholderImageUri: string;
 
     /**
-   * String value used for the failure image URI.
-   */
+     * String value used for the failure image URI.
+     */
     failureImageUri: string;
 
     /**
-    * String value used by Image image scale type. This property can be set to:
-    * 'center' - Performs no scaling.
-    * 'centerCrop' - Scales the child so that both dimensions will be greater than or equal to the corresponding dimension of the parent.
-    * 'centerInside' - Scales the child so that it fits entirely inside the parent.
-    * 'fitCenter' - Scales the child so that it fits entirely inside the parent.
-    * 'fitStart' - Scales the child so that it fits entirely inside the parent.
-    * 'fitEnd' - Scales the child so that it fits entirely inside the parent.
-    * 'fitXY' - Scales width and height independently, so that the child matches the parent exactly.
-    * 'focusCrop' - Scales the child so that both dimensions will be greater than or equal to the corresponding dimension of the parent.
-    */
+     * String value used by Image image scale type. This property can be set to:
+     * 'center' - Performs no scaling.
+     * 'centerCrop' - Scales the child so that both dimensions will be greater than or equal to the corresponding dimension of the parent.
+     * 'centerInside' - Scales the child so that it fits entirely inside the parent.
+     * 'fitCenter' - Scales the child so that it fits entirely inside the parent.
+     * 'fitStart' - Scales the child so that it fits entirely inside the parent.
+     * 'fitEnd' - Scales the child so that it fits entirely inside the parent.
+     * 'fitXY' - Scales width and height independently, so that the child matches the parent exactly.
+     * 'focusCrop' - Scales the child so that both dimensions will be greater than or equal to the corresponding dimension of the parent.
+     */
     stretch: string;
 
     /**
@@ -101,8 +106,8 @@ export class Img extends viewModule.View {
     backgroundUri: string;
 
     /**
-    * Boolean value used for enabling or disabling the streaming of progressive JPEG images.
-    */
+     * Boolean value used for enabling or disabling the streaming of progressive JPEG images.
+     */
     progressiveRenderingEnabled: boolean;
 
     /**
@@ -111,13 +116,13 @@ export class Img extends viewModule.View {
     showProgressBar: boolean;
 
     /**
-    * String value used for setting the color of the progress bar. Can be set to hex values ("#FF0000"") and predefined colors ("green").
-    */
+     * String value used for setting the color of the progress bar. Can be set to hex values ("#FF0000"") and predefined colors ("green").
+     */
     progressBarColor: string;
 
     /**
-    * Boolean value used for determining if the image should be rounded as a circle.
-    */
+     * Boolean value used for determining if the image should be rounded as a circle.
+     */
     roundAsCircle: boolean;
 
     /**
@@ -126,8 +131,8 @@ export class Img extends viewModule.View {
     roundBottomRight: boolean;
 
     /**
-    * Boolean value used for determining if the image's bottom left corner should be rounded.
-    */
+     * Boolean value used for determining if the image's bottom left corner should be rounded.
+     */
     roundBottomLeft: boolean;
 
     /**
@@ -179,12 +184,11 @@ export class Img extends viewModule.View {
      * Number value used as the resized image height
      */
     decodeHeight: number;
-
 }
 
 /**
-* Encapsulates the common abstraction behind a platform specific object (typically a Bitmap) quality.
-*/
+ * Encapsulates the common abstraction behind a platform specific object (typically a Bitmap) quality.
+ */
 export interface QualityInfo {
     getQuality(): number;
 
@@ -194,8 +198,8 @@ export interface QualityInfo {
 }
 
 /**
-* Encapsulates the common abstraction behind a platform specific object (typically a Bitmap's quality) details.
-*/
+ * Encapsulates the common abstraction behind a platform specific object (typically a Bitmap's quality) details.
+ */
 export class ImageInfo {
     getHeight(): number;
 
@@ -205,128 +209,125 @@ export class ImageInfo {
 }
 
 /**
-* Interface of the common abstraction behind a platform specific error object that is used by the Image's events.
-*/
+ * Interface of the common abstraction behind a platform specific error object that is used by the Image's events.
+ */
 export interface ImageError {
     /**
-    * Returns the message of the Error.
-    */
+     * Returns the message of the Error.
+     */
     getMessage(): string;
 
     /**
-    * Returns the type (typically the class name) of the Error.
-    */
+     * Returns the type (typically the class name) of the Error.
+     */
     getErrorType(): string;
 
     /**
-    * Returns the string representation of the Error.
-    */
+     * Returns the string representation of the Error.
+     */
     toString(): string;
 }
 
 /**
-* Encapsulates the common abstraction behind a platform specific error object that is used by the Image's events.
-*/
+ * Encapsulates the common abstraction behind a platform specific error object that is used by the Image's events.
+ */
 export class ImageError {
     /**
-    * Returns the message of the Error.
-    */
+     * Returns the message of the Error.
+     */
     getMessage(): string;
 
     /**
-    * Returns the type (typically the class name) of the Error.
-    */
+     * Returns the type (typically the class name) of the Error.
+     */
     getErrorType(): string;
 
     /**
-    * Returns the string representation of the Error.
-    */
+     * Returns the string representation of the Error.
+     */
     toString(): string;
 }
 
 /**
-* Instances of this class are provided to the handlers of the {@link release} and {@link submit}.
-*/
+ * Instances of this class are provided to the handlers of the {@link release} and {@link submit}.
+ */
 export class EventData {
     /**
-    * Returns the name of the event that has been fired.
-    */
+     * Returns the name of the event that has been fired.
+     */
     eventName: string;
 
     /**
-    * The object that fires the event.
-    */
+     * The object that fires the event.
+     */
     object: any;
 }
 
 /**
-* Instances of this class are provided to the handlers of the {@link finalImageSet}.
-*/
+ * Instances of this class are provided to the handlers of the {@link finalImageSet}.
+ */
 export class FinalEventData {
     /**
-    * Returns the name of the event that has been fired.
-    */
+     * Returns the name of the event that has been fired.
+     */
     eventName: string;
 
     /**
-    * The object that fires the event.
-    */
+     * The object that fires the event.
+     */
     object: any;
 
     /**
-    * Contains information about an image.
-    */
+     * Contains information about an image.
+     */
     imageInfo: ImageInfo;
-
-    /**
-    * An object that renders an animated image.
-    */
-    animatable: AnimatedImage;
+    android?: AnimatedImage;
+    ios?: UIImage;
 }
 
 /**
-* Instances of this class are provided to the handlers of the {@link intermediateImageSet}.
-*/
+ * Instances of this class are provided to the handlers of the {@link intermediateImageSet}.
+ */
 export class IntermediateEventData {
     /**
-    * Returns the name of the event that has been fired.
-    */
+     * Returns the name of the event that has been fired.
+     */
     eventName: string;
 
     /**
-    * The object that fires the event.
-    */
+     * The object that fires the event.
+     */
     object: any;
 
     /**
-    * Contains information about an image.
-    */
+     * Contains information about an image.
+     */
     imageInfo: ImageInfo;
 }
 
 /**
-* Instances of this class are provided to the handlers of the {@link failure} and {@link intermediateImageFailed}.
-*/
+ * Instances of this class are provided to the handlers of the {@link failure} and {@link intermediateImageFailed}.
+ */
 export class FailureEventData {
     /**
-    * Returns the name of the event that has been fired.
-    */
+     * Returns the name of the event that has been fired.
+     */
     eventName: string;
 
     /**
-    * The object that fires the event.
-    */
+     * The object that fires the event.
+     */
     object: any;
 
     /**
-    * An object containing information about the status of the event.
-    */
+     * An object containing information about the status of the event.
+     */
     error: ImageError;
 }
 
 /**
-* Interface of the common abstraction behind a platform specific animated image object.
-*/
+ * Interface of the common abstraction behind a platform specific animated image object.
+ */
 export interface AnimatedImage {
     /**
      * Starts the native Android Animatable image.
@@ -413,16 +414,16 @@ export enum ScaleType {
      */
     fitEnd,
     /**
-    * Scales the child so that it fits entirely inside the parent.
-    */
+     * Scales the child so that it fits entirely inside the parent.
+     */
     fitStart,
     /**
-    * Scales width and height independently, so that the child matches the parent exactly.
-    */
+     * Scales width and height independently, so that the child matches the parent exactly.
+     */
     fitXY,
     /**
-    * Scales the child so that both dimensions will be greater than or equal to the corresponding dimension of the parent.
-    */
+     * Scales the child so that both dimensions will be greater than or equal to the corresponding dimension of the parent.
+     */
     focusCrop
 }
 
@@ -431,5 +432,5 @@ export enum ScaleType {
  * For more details, see http://frescolib.org/docs/configure-image-pipeline.html
  */
 export interface ImagePipelineConfigSetting {
-  isDownsampleEnabled?: boolean;
+    isDownsampleEnabled?: boolean;
 }
