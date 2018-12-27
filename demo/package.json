@@ -1,32 +1,33 @@
 {
-  "description": "NativeScript Application",
-  "license": "SEE LICENSE IN <your-license-filename>",
-  "readme": "NativeScript Application",
-  "repository": "<fill-your-repository-here>",
-  "nativescript": {
-    "id": "org.nativescript.demo",
-    "tns-android": {
-      "version": "5.0.0"
+    "description": "NativeScript Application",
+    "license": "SEE LICENSE IN <your-license-filename>",
+    "readme": "NativeScript Application",
+    "repository": "<fill-your-repository-here>",
+    "nativescript": {
+        "id": "org.nativescript.demo",
+        "tns-android": {
+            "version": "5.0.0"
+        },
+        "tns-ios": {
+            "version": "5.0.1-rc-2018-11-15-163743-01"
+        }
     },
-    "tns-ios": {
-      "version": "5.0.1-rc-2018-11-15-163743-01"
+    "dependencies": {
+        "nativescript-collectionview": "1.0.17",
+        "nativescript-image": "../plugin",
+        "nativescript-theme-core": "^1.0.4",
+        "nativescript-ui-listview": "^5.0.1",
+        "tns-core-modules": "^5.1.1"
+    },
+    "devDependencies": {
+        "nativescript-dev-typescript": "~0.7.8",
+        "nativescript-dev-webpack": "~0.18.5",
+        "tns-platform-declarations": "^5.1.1",
+        "tslint": "~5.12.0",
+        "typescript": "^3.2.2"
+    },
+    "scripts": {
+        "build.plugin": "cd ../src && npm run build",
+        "ci.tslint": "npm i && tslint --config '../tslint.json' 'app/**/*.ts' --exclude '**/node_modules/**'"
     }
-  },
-  "dependencies": {
-    "nativescript-image": "../plugin",
-    "nativescript-theme-core": "^1.0.4",
-    "nativescript-ui-listview": "^5.0.1",
-    "tns-core-modules": "^5.1.1"
-  },
-  "devDependencies": {
-    "nativescript-dev-typescript": "~0.7.8",
-    "nativescript-dev-webpack": "~0.18.5",
-    "tns-platform-declarations": "^5.1.1",
-    "tslint": "~5.12.0",
-    "typescript": "^3.2.2"
-  },
-  "scripts": {
-    "build.plugin": "cd ../src && npm run build",
-    "ci.tslint": "npm i && tslint --config '../tslint.json' 'app/**/*.ts' --exclude '**/node_modules/**'"
-  }
 }
