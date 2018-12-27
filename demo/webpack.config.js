@@ -61,8 +61,8 @@ module.exports = env => {
         console.log('running webpack for live development', srcFullPath);
         aliases = Object.assign(aliases, {
             '#':srcFullPath,
-            'nativescript-image': '#',
-            'nativescript-image$': '#/image'
+            'nativescript-image': '#/image.' + platform,
+            'nativescript-image$': '#/image.' + platform
         });
     }
 
