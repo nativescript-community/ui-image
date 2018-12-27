@@ -352,7 +352,7 @@ export class Img extends ImageBase {
 
     public _setNativeImage(nativeImage: UIImage) {
         this.nativeViewProtected.image = nativeImage;
-        console.log('_setNativeImage', !!nativeImage, this._imageSourceAffectsLayout);
+        // console.log('_setNativeImage', !!nativeImage, this._imageSourceAffectsLayout);
         if (this._imageSourceAffectsLayout) {
             this._imageSourceAffectsLayout = false;
             this.requestLayout();
