@@ -740,11 +740,11 @@ function getScaleType(scaleType: string) {
             case ScaleType.CenterInside:
                 return com.facebook.drawee.drawable.ScalingUtils.ScaleType.CENTER_INSIDE;
             case ScaleType.FitCenter:
+            case ScaleType.AspectFit:
                 return com.facebook.drawee.drawable.ScalingUtils.ScaleType.FIT_CENTER;
             case ScaleType.FitEnd:
                 return com.facebook.drawee.drawable.ScalingUtils.ScaleType.FIT_END;
             case ScaleType.FitStart:
-            case ScaleType.AspectFit:
                 return com.facebook.drawee.drawable.ScalingUtils.ScaleType.FIT_START;
             case ScaleType.Fill:
             case ScaleType.FitXY:
