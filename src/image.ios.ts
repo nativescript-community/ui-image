@@ -101,13 +101,14 @@ function getUIImageScaleType(scaleType: string) {
             case ScaleType.CenterCrop:
             case ScaleType.AspectFill:
                 return UIViewContentMode.ScaleAspectFill;
-            case ScaleType.CenterInside:
             case ScaleType.AspectFit:
+            case ScaleType.CenterInside:
+            case ScaleType.FitCenter:
                 return UIViewContentMode.ScaleAspectFit;
             case ScaleType.FitEnd:
                 return UIViewContentMode.Right;
             case ScaleType.FitStart:
-                return UIViewContentMode.Right;
+                return UIViewContentMode.Left;
             case ScaleType.Fill:
             case ScaleType.FitXY:
                 return UIViewContentMode.ScaleToFill;
@@ -369,7 +370,7 @@ export class Img extends ImageBase {
             if (this.failureImageUri) {
                 image = this.getUIImage(this.failureImageUri);
                 // this._setNativeImage();
-            // } else {
+                // } else {
                 // console.log("clearing image");
                 // this._setNativeImage(null);
                 // this.nativeViewProtected.image = null;
