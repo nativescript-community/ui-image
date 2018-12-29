@@ -216,30 +216,24 @@ export class Img extends ImageBase {
 
         this._imageSourceAffectsLayout = widthMode !== layout.EXACTLY || heightMode !== layout.EXACTLY;
 
-        if (nativeWidth !== 0 && nativeHeight !== 0 && (finiteWidth || finiteHeight)) {
+        if (!image) {
+            if (this.aspectRatio > 0) {
+                const scale = this.computeScaleFactor(width, height, finiteWidth, finiteHeight, nativeWidth, nativeHeight);
+
+                measureWidth = finiteWidth ? width : height;
+                measureHeight = finiteHeight ? height : width;
+
+                measureWidth = Math.round(measureWidth * scale.width);
+                measureHeight = Math.round(measureHeight * scale.height);
+            }
+        } else {
             const scale = this.computeScaleFactor(width, height, finiteWidth, finiteHeight, nativeWidth, nativeHeight);
-            const resultW = Math.round(nativeWidth * scale.width);
-            const resultH = Math.round(nativeHeight * scale.height);
 
-            measureWidth = finiteWidth ? Math.min(resultW, width) : resultW;
-            measureHeight = finiteHeight ? Math.min(resultH, height) : resultH;
-            // console.log('onMeasure', !!image, width, height, finiteWidth, finiteHeight, nativeWidth, nativeHeight, this.stretch, measureWidth, measureHeight);
+            measureWidth = finiteWidth ? Math.min(nativeWidth, width) : nativeWidth;
+            measureHeight = finiteHeight ? Math.min(nativeHeight, height) : nativeHeight;
 
-            // if (traceEnabled()) {
-            //   traceWrite(
-            //     "Image stretch: " +
-            //       this.stretch +
-            //       ", nativeWidth: " +
-            //       nativeWidth +
-            //       ", nativeHeight: " +
-            //       nativeHeight,
-            //     traceCategories.Layout
-            //   );
-            // }
-            // if (this._imageSourceAffectsLayout) {
-            //     this._imageSourceAffectsLayout = false;
-            //     this.requestLayout();
-            // }
+            measureWidth = Math.round(measureWidth * scale.width);
+            measureHeight = Math.round(measureHeight * scale.height);
         }
 
         const widthAndState = Img.resolveSizeAndState(measureWidth, width, widthMode, 0);
@@ -254,9 +248,11 @@ export class Img extends ImageBase {
         }
         switch (scaleType) {
             case ScaleType.FocusCrop:
+            case ScaleType.Center:
             case ScaleType.CenterCrop:
             case ScaleType.CenterInside:
             case ScaleType.FitCenter:
+            case ScaleType.AspectFit:
             case ScaleType.FitXY:
                 return true;
             default:
@@ -285,14 +281,15 @@ export class Img extends ImageBase {
             //         scaleH = scaleW * aspectRatio;
             //     }
             // } else {
-            scaleW = nativeWidth > 0 ? measureWidth / nativeWidth : 0;
-            scaleH = nativeHeight > 0 ? measureHeight / nativeHeight : 0;
+            scaleW = nativeWidth > 0 ? measureWidth / nativeWidth : 1;
+            scaleH = nativeHeight > 0 ? measureHeight / nativeHeight : 1;
+            const nativeScale = nativeWidth > 0 && nativeHeight > 0 ? nativeWidth / nativeHeight : 1;
 
             if (this.aspectRatio > 0) {
                 if (!widthIsFinite) {
-                    scaleW = (nativeWidth / nativeHeight) * scaleW * this.aspectRatio;
+                    scaleW = nativeScale * scaleW * this.aspectRatio;
                 } else if (!heightIsFinite) {
-                    scaleH = (nativeWidth / nativeHeight) * scaleW * this.aspectRatio;
+                    scaleH = nativeScale * scaleW * this.aspectRatio;
                 }
                 // console.log(
                 //     'handling aspectRatio',
