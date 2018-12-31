@@ -461,33 +461,33 @@ export class Img extends ImageBase {
         //   image = image.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
         // }
         this.isLoading = false;
-        // if (!(this.onlyTransitionIfRemote && cacheType !== SDImageCacheType.SDImageCacheTypeMemory) && this.transition) {
-        //     switch (this.transition) {
-        //         case 'fade':
-        //             this.nativeViewProtected.alpha = 0.0;
-        //             this._setNativeImage(image);
-        //             UIView.animateWithDurationAnimations(0.2, () => {
-        //                 this.nativeViewProtected.alpha = this.opacity;
-        //             });
-        //             break;
-        //         case 'curlUp':
-        //             UIView.transitionWithViewDurationOptionsAnimationsCompletion(
-        //                 this.nativeViewProtected,
-        //                 0.3,
-        //                 UIViewAnimationOptions.TransitionCrossDissolve,
-        //                 () => {
-        //                     this._setNativeImage(image);
-        //                 },
-        //                 null
-        //             );
-        //             break;
-        //         default:
-        //             this._setNativeImage(image);
-        //     }
-        // } else {
+        if ((this.alwaysFade || cacheType !== SDImageCacheType.Memory) && this.fadeDuration > 0) {
+            // switch (this.transition) {
+            //     case 'fade':
+            this.nativeViewProtected.alpha = 0.0;
+            this._setNativeImage(image);
+            UIView.animateWithDurationAnimations(this.fadeDuration / 1000, () => {
+                this.nativeViewProtected.alpha = this.opacity;
+            });
+                //     break;
+                // case 'curlUp':
+                //     UIView.transitionWithViewDurationOptionsAnimationsCompletion(
+                //         this.nativeViewProtected,
+                //         0.3,
+                //         UIViewAnimationOptions.TransitionCrossDissolve,
+                //         () => {
+                //             this._setNativeImage(image);
+                //         },
+                //         null
+                //     );
+                //     break;
+                // default:
+                //     this._setNativeImage(image);
+            // }
+        } else {
         // console.log("setting image", !!image, !!image && image.size);
-        this._setNativeImage(image);
-        // }
+            this._setNativeImage(image);
+        }
         if (!this.autoPlayAnimations) {
             this.nativeViewProtected.stopAnimating();
         }
@@ -504,6 +504,9 @@ export class Img extends ImageBase {
     }
 
     private getUIImage(path: string) {
+        if (!path) {
+            return null;
+        }
         let image;
         if (utils.isFileOrResourcePath(path)) {
             // if (path.indexOf(utils.RESOURCE_PREFIX) === 0) {
@@ -525,7 +528,7 @@ export class Img extends ImageBase {
             if (this.src) {
                 this.isLoading = true;
                 let options = SDWebImageOptions.ScaleDownLargeImages | SDWebImageOptions.AvoidAutoSetImage;
-                if (this.onlyTransitionIfRemote === false) {
+                if (this.alwaysFade === true) {
                     options |= SDWebImageOptions.ForceTransition;
                 }
                 const context: NSDictionary<string, any> = NSMutableDictionary.dictionary();
@@ -543,7 +546,6 @@ export class Img extends ImageBase {
                     transformers.push(SDImageBlurTransformer.transformerWithRadius(this.blurRadius));
                 }
                 if (this.roundAsCircle) {
-                    console.log('this.roundAsCircle', this.roundAsCircle);
                     transformers.push(SDImageRoundAsCircleTransformer.new());
                     transformers.push(SDImageFlippingTransformer.transformerWithHorizontalVertical(false, true));
                 }

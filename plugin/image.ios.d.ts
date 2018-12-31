@@ -36,7 +36,6 @@ export declare class Img extends ImageBase {
     onMeasure(widthMeasureSpec: number, heightMeasureSpec: number): void;
     private static needsSizeAdjustment(scaleType);
     private computeScaleFactor(measureWidth, measureHeight, widthIsFinite, heightIsFinite, nativeWidth, nativeHeight);
-    updateImageUri(): void;
     _setNativeImage(nativeImage: UIImage): void;
     private handleImageLoaded;
     private onLoadProgress;

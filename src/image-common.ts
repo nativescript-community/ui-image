@@ -94,9 +94,10 @@ export class ImageBase extends View {
     public aspectRatio: number;
     public decodeWidth: number;
     public decodeHeight: number;
-    onlyTransitionIfRemote: boolean;
+    alwaysFade: boolean;
+    // fade: boolean;
     tintColor: Color;
-    transition: Transition;
+    // transition: Transition;
 
     public readonly isLoading: boolean;
 
@@ -105,7 +106,6 @@ export class ImageBase extends View {
     public static placeholderImageUriProperty = new Property<ImageBase, string>({ name: 'placeholderImageUri' });
     public static failureImageUriProperty = new Property<ImageBase, string>({ name: 'failureImageUri' });
     public static stretchProperty = new Property<ImageBase, string>({ name: 'stretch' });
-    public static fadeDurationProperty = new Property<ImageBase, number>({ name: 'fadeDuration', valueConverter: v => parseFloat(v) });
     public static backgroundUriProperty = new Property<ImageBase, string>({ name: 'backgroundUri' });
     public static progressiveRenderingEnabledProperty = new Property<ImageBase, boolean>({ name: 'progressiveRenderingEnabled', valueConverter: booleanConverter });
     public static localThumbnailPreviewsEnabledProperty = new Property<ImageBase, boolean>({ name: 'localThumbnailPreviewsEnabled', valueConverter: booleanConverter });
@@ -124,9 +124,10 @@ export class ImageBase extends View {
     public static aspectRatioProperty = new Property<ImageBase, number>({ name: 'aspectRatio', affectsLayout: true, valueConverter: v => parseFloat(v) });
     public static decodeWidthProperty = new Property<ImageBase, number>({ name: 'decodeWidth', valueConverter: v => parseFloat(v) });
     public static decodeHeightProperty = new Property<ImageBase, number>({ name: 'decodeHeight', valueConverter: v => parseFloat(v) });
-    public static onlyTransitionIfRemoteProperty = new Property<ImageBase, boolean>({ name: 'onlyTransitionIfRemote', valueConverter: booleanConverter });
     public static tintColorProperty = new Property<ImageBase, Color>({ name: 'tintColor' });
-    public static transitionProperty = new Property<ImageBase, Transition>({ name: 'transition' });
+    public static alwaysFadeProperty = new Property<ImageBase, boolean>({ name: 'alwaysFade', valueConverter: booleanConverter, defaultValue: false });
+    // public static fadeProperty = new Property<ImageBase, boolean>({ name: 'fade', valueConverter: booleanConverter });
+    public static fadeDurationProperty = new Property<ImageBase, number>({ name: 'fadeDuration', valueConverter: v => parseFloat(v) });
 
     protected handleImageProgress(value: number, totalSize?: number) {
         // console.log('handleImageProgress ', value, totalSize);
@@ -156,4 +157,4 @@ ImageBase.tapToRetryEnabledProperty.register(ImageBase);
 ImageBase.aspectRatioProperty.register(ImageBase);
 ImageBase.decodeWidthProperty.register(ImageBase);
 ImageBase.decodeHeightProperty.register(ImageBase);
-ImageBase.onlyTransitionIfRemoteProperty.register(ImageBase);
+ImageBase.alwaysFadeProperty.register(ImageBase);

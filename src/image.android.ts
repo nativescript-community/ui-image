@@ -32,6 +32,7 @@ export function getImagePipeline(): ImagePipeline {
     return null;
 }
 
+
 export function shutDown(): void {
     com.facebook.drawee.view.SimpleDraweeView.shutDown();
     com.facebook.drawee.backends.pipeline.Fresco.shutDown();
@@ -106,6 +107,49 @@ export class ImagePipeline {
 
     set android(value: any) {
         this._android = value;
+    }
+
+    fetchImage () {
+//         ImagePipeline imagePipeline = Fresco.getImagePipeline();
+
+// ImageRequest imageRequest = ImageRequestBuilder
+//        .newBuilderWithSource(imageUri)
+//        .setRequestPriority(Priority.HIGH)
+//        .setLowestPermittedRequestLevel(ImageRequest.RequestLevel.FULL_FETCH)
+//        .build();
+
+// DataSource<CloseableReference<CloseableImage>> dataSource =
+//        imagePipeline.fetchDecodedImage(imageRequest, mContext);
+
+// try {
+//    dataSource.subscribe(new BaseBitmapDataSubscriber() {
+//        @Override
+//        public void onNewResultImpl(@Nullable Bitmap bitmap) {
+//            if (bitmap == null) {
+//                Log.d(TAG, "Bitmap data source returned success, but bitmap null.");
+//                return;
+//            }
+//            // The bitmap provided to this method is only guaranteed to be around
+//            // for the lifespan of this method. The image pipeline frees the
+//            // bitmap's memory after this method has completed.
+//            //
+//            // This is fine when passing the bitmap to a system process as
+//            // Android automatically creates a copy.
+//            //
+//            // If you need to keep the bitmap around, look into using a
+//            // BaseDataSubscriber instead of a BaseBitmapDataSubscriber.
+//        }
+
+//        @Override
+//        public void onFailureImpl(DataSource dataSource) {
+//            // No cleanup required here
+//        }
+//    }, CallerThreadExecutor.getInstance());
+// } finally {
+//    if (dataSource != null) {
+//        dataSource.close();
+//    }
+// }
     }
 }
 

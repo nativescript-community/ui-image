@@ -14,6 +14,7 @@ export declare class ImagePipeline {
     clearMemoryCaches(): void;
     clearDiskCaches(): void;
     android: any;
+    fetchImage(): void;
 }
 export declare class ImageError implements ImageErrorBase {
     private _stringValue;

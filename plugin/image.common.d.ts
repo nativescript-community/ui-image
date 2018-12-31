@@ -7,7 +7,7 @@ export declare const resizeProperty: Property<Image, string>;
 export declare const overrideProperty: Property<Image, string>;
 export declare const centerCropProperty: Property<Image, boolean>;
 export declare const transitionProperty: Property<Image, Transition>;
-export declare const onlyTransitionIfRemoteProperty: Property<Image, boolean>;
+export declare const onlyFadeIfRemoteProperty: Property<Image, boolean>;
 export declare const decodeHeightProperty: Property<Image, PercentLength>;
 export declare const decodeWidthProperty: Property<Image, PercentLength>;
 export declare class Image extends NImage {
@@ -16,7 +16,7 @@ export declare class Image extends NImage {
     placeHolder: string;
     errorHolder: string;
     centerCrop: boolean;
-    onlyTransitionIfRemote: boolean;
+    onlyFadeIfRemote: boolean;
     stretch: Stretch;
     transition: Transition;
 }
