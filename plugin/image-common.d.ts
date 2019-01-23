@@ -13,7 +13,7 @@ export declare enum ScaleType {
     FitEnd = "fitEnd",
     FitStart = "fitStart",
     FitXY = "fitXY",
-    FocusCrop = "focusCrop",
+    FocusCrop = "focusCrop"
 }
 export interface AnimatedImage {
     start(): void;

@@ -10,4 +10,4 @@ import { Img } from '../image';
 })
 export class TNSImageModule {}
 
-registerElement('Img', () => Img);
+registerElement('NSImg', () => Img);

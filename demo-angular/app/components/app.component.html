@@ -1,7 +1,14 @@
 <ActionBar title="NativeScript-Image Angular sample app">
 </ActionBar>
-<GridLayout rows="*, auto, auto">
-    <Image #imageView verticalAlignment="center" placeholderImageUri="res://ns_logo" src="https://raw.githubusercontent.com/Akylas/nativescript-image/master/examples-data/breakfast1.jpg"></Image>
-    <Button text="Animate to 0" row="1" (tap)="onAnimateToZero($event)"></Button>
-    <Button text="Animate to 1" row="2" (tap)="onAnimateToOne($event)"></Button>
+<GridLayout rows="*, auto, auto, auto, auto, auto">
+    <NSImg #imageView
+        verticalAlignment="center"
+        placeholderImageUri="res://ns_logo"
+        src="https://raw.githubusercontent.com/Akylas/nativescript-image/master/examples-data/breakfast1.jpg">
+    </NSImg>
+    <Button text="Set 1" row="1" (tap)="onSeOpacityTo1()"></Button>
+    <Button text="Set 0.5" row="2" (tap)="onSeOpacityTo05()"></Button>
+    <Button text="Set 0.1" row="3" (tap)="onSeOpacityTo01()"></Button>
+    <Button text="Animate to 0.1" row="4" (tap)="onAnimateTo01()"></Button>
+    <Button text="Animate to 1" row="5" (tap)="onAnimateTo1()"></Button>
 </GridLayout>
