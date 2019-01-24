@@ -1,7 +1,7 @@
 import { Directive } from '@angular/core';
 
 @Directive({
-    selector: 'Img'
+    selector: 'NSImg'
 })
 export class ImgDirective {
     constructor() {}

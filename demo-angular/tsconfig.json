@@ -7,7 +7,11 @@
         "noLib": false,
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
-        "lib": ["es6", "dom", "es2015.iterable"],
+        "lib": [
+            "es6",
+            "dom",
+            "es2015.iterable"
+        ],
         "pretty": true,
         "allowUnreachableCode": false,
         "allowUnusedLabels": false,
@@ -19,11 +23,22 @@
         "noFallthroughCasesInSwitch": true,
         "baseUrl": ".",
         "paths": {
-            "~/*": ["app/*"],
-            "*": ["./node_modules/tns-core-modules/*", "./node_modules/*"]
+            "~/*": [
+                "app/*"
+            ],
+            "*": [
+                "./node_modules/tns-core-modules/*",
+                "./node_modules/*"
+            ]
         }
     },
-    "include": ["app/**/*", "references.d.ts"],
-    "exclude": ["node_modules", "platforms"],
+    "include": [
+        "app/**/*",
+        "references.d.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "platforms"
+    ],
     "compileOnSave": false
 }
