@@ -59,11 +59,11 @@ export declare class Img extends ImageBase {
     onImageSet(imageInfo: com.facebook.imagepipeline.image.ImageInfo, animatable: android.graphics.drawable.Animatable): void;
     disposeNativeView(): void;
     updateImageUri(): void;
-    private initImage();
-    private updateHierarchy();
-    private getDrawable(path);
-    private getDrawableFromLocalFile(localFilePath);
-    private getDrawableFromResource(resourceName);
+    private initImage;
+    private updateHierarchy;
+    private getDrawable;
+    private getDrawableFromLocalFile;
+    private getDrawableFromResource;
     startAnimating(): void;
     stopAnimating(): void;
 }

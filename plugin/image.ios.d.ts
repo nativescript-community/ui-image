@@ -34,13 +34,13 @@ export declare class Img extends ImageBase {
     createNativeView(): SDAnimatedImageView;
     _setNativeClipToBounds(): void;
     onMeasure(widthMeasureSpec: number, heightMeasureSpec: number): void;
-    private static needsSizeAdjustment(scaleType);
-    private computeScaleFactor(measureWidth, measureHeight, widthIsFinite, heightIsFinite, nativeWidth, nativeHeight);
+    private static needsSizeAdjustment;
+    private computeScaleFactor;
     _setNativeImage(nativeImage: UIImage): void;
     private handleImageLoaded;
     private onLoadProgress;
-    private getUIImage(path);
-    private initImage();
+    private getUIImage;
+    private initImage;
     startAnimating(): void;
     stopAnimating(): void;
 }

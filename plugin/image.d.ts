@@ -282,7 +282,7 @@ export class FinalEventData {
      */
     imageInfo: ImageInfo;
     android?: AnimatedImage;
-    ios?: UIImage;
+    ios?: any; // UIImage
 }
 
 /**
