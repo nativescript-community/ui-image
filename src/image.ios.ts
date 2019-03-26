@@ -408,16 +408,16 @@ export class Img extends ImageBase {
     //     this._android = undefined;
     // }
 
-    // public updateImageUri() {
-    //     const imagePipeLine = getImagePipeline();
-    //     const isInCache = imagePipeLine.isInBitmapMemoryCache(this.src);
-    //     if (isInCache) {
-    //         imagePipeLine.evictFromCache(this.src);
-    //         const src = this.src;
-    //         this.src = null;
-    //         this.src = src;
-    //     }
-    // }
+    public updateImageUri() {
+        const imagePipeLine = getImagePipeline();
+        const isInCache = imagePipeLine.isInBitmapMemoryCache(this.src);
+        if (isInCache) {
+            imagePipeLine.evictFromCache(this.src);
+            const src = this.src;
+            this.src = null;
+            this.src = src;
+        }
+    }
 
     public _setNativeImage(nativeImage: UIImage) {
         this.nativeViewProtected.image = nativeImage;
