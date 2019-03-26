@@ -1,5 +1,0 @@
-<img:Img 
-      xmlns:img="nativescript-image"
-                    verticalAlignment="center"
-                    placeholderImageUri="res://ns_logo"
-                    src="https://raw.githubusercontent.com/Akylas/nativescript-image/master/examples-data/dessert1.jpg"/>

@@ -1,9 +1,17 @@
 import { booleanConverter, Color, Property, View } from 'tns-core-modules/ui/core/view';
+import { Image, Stretch } from 'tns-core-modules/ui/image/image';
 import * as observableModule from 'tns-core-modules/data/observable';
 import { isAndroid, isIOS } from 'tns-core-modules/platform';
 
 export type Transition = 'fade' | 'curlUp';
 
+// declare module 'tns-core-modules/ui/image/image' {
+//     export enum Stretch {
+//       value3 = <any>'value3'
+//     }
+//   }
+
+// type ScaleType = 'none' | 'fill' | 'aspectFill' | 'aspectFit' | 'center' | 'centerCrop' | 'centerInside' | 'fitCenter' | 'fitEnd' | 'fitStart' | 'fitXY' | 'focusCrop';
 export enum ScaleType {
     None = 'none',
     Fill = 'fill',
@@ -62,7 +70,7 @@ export class EventData implements observableModule.EventData {
 }
 export type Stretch = 'none' | 'fill' | 'aspectFill' | 'aspectFit';
 
-export class ImageBase extends View {
+export class ImageBase extends Image {
     public static finalImageSetEvent: string = 'finalImageSet';
     public static failureEvent: string = 'failure';
     public static intermediateImageFailedEvent: string = 'intermediateImageFailed';
@@ -74,7 +82,7 @@ export class ImageBase extends View {
     public lowerResSrc: string;
     public placeholderImageUri: string;
     public failureImageUri: string;
-    public stretch: ScaleType;
+    public stretch: any;
     public fadeDuration: number;
     public backgroundUri: string;
     public progressiveRenderingEnabled: boolean;
