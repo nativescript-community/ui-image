@@ -50,7 +50,7 @@ export declare class ImageBase extends View {
     lowerResSrc: string;
     placeholderImageUri: string;
     failureImageUri: string;
-    stretch: ScaleType;
+    stretch: any;
     fadeDuration: number;
     backgroundUri: string;
     progressiveRenderingEnabled: boolean;

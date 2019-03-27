@@ -8,6 +8,7 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 const { NativeScriptWorkerPlugin } = require("nativescript-worker-loader/NativeScriptWorkerPlugin");
 const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+const hashSalt =  Date.now().toString();
 
 module.exports = env => {
     // Add your custom Activities, Services and other Android app components here.
@@ -34,7 +35,6 @@ module.exports = env => {
         // when bundling with `tns run android|ios --bundle`.
         appPath = "app",
         appResourcesPath = "app/App_Resources",
-        development = false,
 
         // You can provide the following flags when running 'tns run android|ios'
         snapshot, // --env.snapshot
@@ -43,28 +43,13 @@ module.exports = env => {
         sourceMap, // --env.sourceMap
         hmr, // --env.hmr,
     } = env;
-    const externals = (env.externals || []).map((e) => { // --env.externals
-        return new RegExp(e + ".*");
-    });
+    const externals = nsWebpack.getConvertedExternals(env.externals);
 
     const appFullPath = resolve(projectRoot, appPath);
     const appResourcesFullPath = resolve(projectRoot, appResourcesPath);
 
     const entryModule = nsWebpack.getEntryModule(appFullPath);
     const entryPath = `.${sep}${entryModule}.ts`;
-
-    let aliases = {
-        '~': appFullPath
-    };
-    if (!!development) {
-        const srcFullPath = resolve(projectRoot, '..', 'src');
-        console.log('running webpack for live development', srcFullPath);
-        aliases = Object.assign(aliases, {
-            '#':srcFullPath,
-            'nativescript-image': '#/image.' + platform,
-            'nativescript-image$': '#/image.' + platform
-        });
-    }
 
     const config = {
         mode: uglify ? "production" : "development",
@@ -87,6 +72,7 @@ module.exports = env => {
             libraryTarget: "commonjs2",
             filename: "[name].js",
             globalObject: "global",
+            hashSalt
         },
         resolve: {
             extensions: [".ts", ".js", ".scss", ".css"],
@@ -97,9 +83,11 @@ module.exports = env => {
                 "node_modules/tns-core-modules",
                 "node_modules",
             ],
-            alias: aliases,
-            // don't resolve symlinks to symlinked modules
-            symlinks: false
+            alias: {
+                '~': appFullPath
+            },
+            // resolve symlinks to symlinked modules
+            symlinks: true
         },
         resolveLoader: {
             // don't resolve symlinks to symlinked loaders
@@ -202,8 +190,11 @@ module.exports = env => {
                 {
                     test: /\.ts$/,
                     use: {
-                        loader: "awesome-typescript-loader",
-                        options: { configFileName: "tsconfig.tns.json" },
+                        loader: "ts-loader",
+                        options: {
+                            configFile: "tsconfig.tns.json",
+                            allowTsInNodeModules: true,
+                        },
                     }
                 },
             ]
