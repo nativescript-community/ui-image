@@ -4,6 +4,9 @@
     "dependencies": {
         "eslint-config-prettier": "^3.3.0"
     },
+    "scripts": {
+        "ci.tslint": "npm i && tslint '**/*.ts' --config './tslint.json' --exclude '**/node_modules/**' --exclude '**/platforms/**'"
+    },
     "devDependencies": {
         "@angular/core": "^7.1.4",
         "eslint": "^5.11.0",
