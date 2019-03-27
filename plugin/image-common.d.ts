@@ -2,18 +2,18 @@ import { Color, Property, View } from 'tns-core-modules/ui/core/view';
 import * as observableModule from 'tns-core-modules/data/observable';
 export declare type Transition = 'fade' | 'curlUp';
 export declare enum ScaleType {
-    None = "none",
-    Fill = "fill",
-    AspectFill = "aspectFill",
-    AspectFit = "aspectFit",
-    Center = "center",
-    CenterCrop = "centerCrop",
-    CenterInside = "centerInside",
-    FitCenter = "fitCenter",
-    FitEnd = "fitEnd",
-    FitStart = "fitStart",
-    FitXY = "fitXY",
-    FocusCrop = "focusCrop"
+    None = 'none',
+    Fill = 'fill',
+    AspectFill = 'aspectFill',
+    AspectFit = 'aspectFit',
+    Center = 'center',
+    CenterCrop = 'centerCrop',
+    CenterInside = 'centerInside',
+    FitCenter = 'fitCenter',
+    FitEnd = 'fitEnd',
+    FitStart = 'fitStart',
+    FitXY = 'fitXY',
+    FocusCrop = 'focusCrop'
 }
 export interface AnimatedImage {
     start(): void;

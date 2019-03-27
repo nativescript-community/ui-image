@@ -1,20 +1,16 @@
-import { Component, OnInit, ViewChild, ElementRef } from "@angular/core";
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 
 @Component({
-    selector: "my-app",
+    selector: 'my-app',
     moduleId: module.id,
-    templateUrl: "app.component.html"
+    templateUrl: 'app.component.html'
 })
 export class AppComponent implements OnInit {
+    constructor() {}
 
-    constructor() {
-    }
+    @ViewChild('imageView') imageViewComponent: ElementRef;
 
-    @ViewChild("imageView") imageViewComponent: ElementRef;
-
-    ngOnInit() {
-
-    }
+    ngOnInit() {}
 
     onSeOpacityTo1() {
         this.imageViewComponent.nativeElement.opacity = 1;

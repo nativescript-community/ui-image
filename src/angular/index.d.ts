@@ -1,1 +1,1 @@
-export * from "./nativescript-image.module";
+export * from './nativescript-image.module';
