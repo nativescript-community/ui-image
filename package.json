@@ -1,24 +1,31 @@
 {
     "name": "nativescript-image",
     "version": "1.0.0",
-    "dependencies": {
-        "eslint-config-prettier": "^3.3.0"
-    },
     "scripts": {
-        "ci.tslint": "npm i && tslint '**/*.ts' --config './tslint.json' --exclude '**/node_modules/**' --exclude '**/platforms/**'"
+        "ci.tslint": "npm i && tslint '**/*.ts' --config './tslint.json' --exclude '**/node_modules/**' --exclude '**/platforms/**'",
+        "ngc": "node --max-old-space-size=8192 ./node_modules/.bin/ngc",
+        "clean": "rimraf ./plugin/**/*.d.ts ./plugin/**/*.js ./plugin/**/*.js.map plugin/node_modules plugin/package-lock.json demo/node_modules demo-angular/node_modules",
+        "tsc": "tsc -skipLibCheck && cpy '**/*.d.ts' '../plugin' --parents --cwd=src",
+        "build": "npm i && npm run tsc && npm run ngc",
+        "tslint": "tslint \"**/*.ts\" --config tslint.json --exclude \"**/node_modules/**\" --exclude '**/platforms/**'",
+        "plugin.tscwatch": "npm run tsc -- -w",
+        "demo.android": "npm i && npm run tsc && cd demo && tns run android --syncAllFiles",
+        "demo.reset": "cd ../demo && rimraf platforms",
+        "demo.ng.android": "npm i && npm run tsc && cd demo-angular && tns run android --syncAllFiles",
+        "demo.ng.reset": "cd ../demo-angular && rimraf platforms",
+        "plugin.prepare": "npm run tsc && cd demo-angular && tns plugin remove nativescript-image && tns plugin add ../plugin && cd ../demo && tns plugin remove nativescript-image && tns plugin add ../plugin"
     },
     "devDependencies": {
-        "@angular/core": "^7.1.4",
-        "eslint": "^5.11.0",
-        "nativescript-angular": "^7.1.0",
+        "@angular/core": "^7.2.11",
+        "cpy-cli": "^2.0.0",
         "prompt": "^1.0.0",
-        "rimraf": "^2.6.2",
-        "tns-core-modules": "^5.2.2",
-        "tns-platform-declarations": "^5.2.2",
-        "tslint": "^5.12.0",
-        "tslint-config-prettier": "^1.17.0",
+        "rimraf": "^2.6.3",
+        "tns-core-modules": "^5.3.0",
+        "tns-platform-declarations": "^5.3.0",
+        "tslint": "^5.14.0",
+        "tslint-config-prettier": "^1.18.0",
         "tslint-config-standard": "^8.0.1",
-        "typescript": "~3.2.2"
+        "typescript": "~3.3.4000"
     },
     "repository": {
         "type": "git",
@@ -29,5 +36,8 @@
     "bugs": {
         "url": "https://github.com/Akylas/nativescript-image/issues"
     },
-    "homepage": "https://github.com/Akylas/nativescript-image#readme"
+    "homepage": "https://github.com/Akylas/nativescript-image#readme",
+    "dependencies": {
+        "nativescript-angular": "^7.2.3"
+    }
 }
