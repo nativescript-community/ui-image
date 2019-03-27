@@ -1,5 +1,4 @@
-import { Color, Property } from 'tns-core-modules/ui/core/view';
-import { Image } from 'tns-core-modules/ui/image/image';
+import { Color, Property, View } from 'tns-core-modules/ui/core/view';
 import * as observableModule from 'tns-core-modules/data/observable';
 export declare type Transition = 'fade' | 'curlUp';
 export declare enum ScaleType {
@@ -40,7 +39,7 @@ export declare class EventData implements observableModule.EventData {
     object: any;
 }
 export declare type Stretch = 'none' | 'fill' | 'aspectFill' | 'aspectFit';
-export declare class ImageBase extends Image {
+export declare class ImageBase extends View {
     static finalImageSetEvent: string;
     static failureEvent: string;
     static intermediateImageFailedEvent: string;

@@ -1,4 +1,4 @@
-const { relative, resolve } = require("path");
+const { relative, resolve, sep } = require("path");
 
 const webpack = require("webpack");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
@@ -12,6 +12,7 @@ const NsVueTemplateCompiler = require("nativescript-vue-template-compiler");
 const nsWebpack = require("nativescript-dev-webpack");
 const nativescriptTarget = require("nativescript-dev-webpack/nativescript-target");
 const { NativeScriptWorkerPlugin } = require("nativescript-worker-loader/NativeScriptWorkerPlugin");
+const hashSalt =  Date.now().toString();
 
 module.exports = env => {
     // Add your custom Activities, Services and other android app components here.
@@ -44,11 +45,10 @@ module.exports = env => {
         production, // --env.production
         report, // --env.report
         hmr, // --env.hmr
+        sourceMap, // --env.sourceMap
     } = env;
 
-    const externals = (env.externals || []).map((e) => { // --env.externals
-        return new RegExp(e + ".*");
-    });
+    const externals = nsWebpack.getConvertedExternals(env.externals);
 
     const mode = production ? "production" : "development"
 
@@ -56,7 +56,7 @@ module.exports = env => {
     const appResourcesFullPath = resolve(projectRoot, appResourcesPath);
 
     const entryModule = nsWebpack.getEntryModule(appFullPath);
-    const entryPath = resolve(appFullPath, entryModule);
+    const entryPath = `.${sep}${entryModule}`;
     console.log(`Bundling application for entryPath ${entryPath}...`);
 
     const config = {
@@ -81,6 +81,7 @@ module.exports = env => {
             libraryTarget: "commonjs2",
             filename: "[name].js",
             globalObject: "global",
+            hashSalt
         },
         resolve: {
             extensions: [".vue", ".ts", ".js", ".scss", ".css"],
@@ -111,7 +112,7 @@ module.exports = env => {
             "fs": "empty",
             "__dirname": false,
         },
-        devtool: "none",
+        devtool: sourceMap ? "inline-source-map" : "none",
         optimization: {
             splitChunks: {
                 cacheGroups: {
@@ -150,7 +151,7 @@ module.exports = env => {
         },
         module: {
             rules: [{
-                    test: entryPath,
+                    test: new RegExp(entryPath + ".(js|ts)"),
                     use: [
                         // Require all Android app components
                         platform === "android" && {
