@@ -69,3 +69,4 @@ Pods
 *.lock
 *.xcworkspace
 plugin/**/*.d.ts
+plugin**/*.json
