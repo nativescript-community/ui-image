@@ -17,7 +17,7 @@ matrix:
           jdk: oraclejdk8
           before_install: nvm install 8.11.4
           script:
-              - cd demo && npm i && tns build android --bundle --env.uglify --env.snapshot
+              - npm run build && cd demo && npm i && tns build android --bundle --env.uglify --env.snapshot
         - language: android
           os: linux
           env:
@@ -26,7 +26,7 @@ matrix:
           jdk: oraclejdk8
           before_install: nvm install 8.11.4
           script:
-              - cd demo-vue && npm i && tns build android --bundle --env.uglify --env.snapshot
+              - npm run build && cd demo-vue && npm i && tns build android --bundle --env.uglify --env.snapshot
         - os: osx
           env:
               - BuildiOS="12"
@@ -37,7 +37,7 @@ matrix:
           before_install: nvm install 8
           before_script: pod repo update
           script:
-              - cd demo && npm i && tns build ios --bundle --env.uglify
+              - npm run build && cd demo && npm i && tns build ios --bundle --env.uglify
         - os: osx
           env:
               - BuildiOS="12"
