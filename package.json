@@ -16,16 +16,20 @@
         "plugin.prepare": "npm run tsc && cd demo-angular && tns plugin remove nativescript-image && tns plugin add ../plugin && cd ../demo && tns plugin remove nativescript-image && tns plugin add ../plugin"
     },
     "devDependencies": {
-        "@angular/core": "^7.2.11",
+        "@angular/compiler": "~7.2.11",
+        "@angular/compiler-cli": "~7.2.11",
+        "@angular/core": "~7.2.11",
         "cpy-cli": "^2.0.0",
+        "nativescript-angular": "^7.2.3",
         "prompt": "^1.0.0",
         "rimraf": "^2.6.3",
-        "tns-core-modules": "^5.3.0",
-        "tns-platform-declarations": "^5.3.0",
+        "rxjs": "6.4.0",
+        "tns-core-modules": "^5.3.1",
+        "tns-platform-declarations": "^5.3.1",
         "tslint": "^5.14.0",
         "tslint-config-prettier": "^1.18.0",
         "tslint-config-standard": "^8.0.1",
-        "typescript": "~3.3.4000"
+        "typescript": "~3.2.4"
     },
     "repository": {
         "type": "git",
@@ -36,8 +40,5 @@
     "bugs": {
         "url": "https://github.com/Akylas/nativescript-image/issues"
     },
-    "homepage": "https://github.com/Akylas/nativescript-image#readme",
-    "dependencies": {
-        "nativescript-angular": "^7.2.3"
-    }
+    "homepage": "https://github.com/Akylas/nativescript-image#readme"
 }

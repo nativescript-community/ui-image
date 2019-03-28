@@ -7,10 +7,7 @@
         "noLib": false,
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
-        "lib": [
-            "es6",
-            "dom"
-        ],
+        "lib": ["es6", "dom"],
         "sourceMap": true,
         "pretty": true,
         "allowUnreachableCode": false,
@@ -25,21 +22,17 @@
         "outDir": "./plugin",
         "rootDir": "src",
         "paths": {
-            "*": [
-                "./node_modules/tns-core-modules/*",
-                "./node_modules/*"
-            ]
-        }
+            "*": ["./node_modules/tns-core-modules/*", "./node_modules/*"]
+        },
+        "plugins": [
+            {
+                "name": "typescript-tslint-plugin",
+                "ignoreDefinitionFiles": false,
+                "configFile": "./tslint.json"
+            }
+        ]
     },
-    "include": [
-        "src/**/*.ts",
-        "references.d.ts",
-        "src/references.d.ts"
-    ],
-    "exclude": [
-        "node_modules",
-        ".git",
-        "dist"
-    ],
+    "include": ["src/**/*.ts", "references.d.ts", "src/references.d.ts"],
+    "exclude": ["node_modules", ".git", "dist"],
     "compileOnSave": false
 }
