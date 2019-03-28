@@ -8,7 +8,7 @@
         "tsc": "tsc -skipLibCheck && cpy '**/*.d.ts' '../plugin' --parents --cwd=src",
         "build": "npm i && npm run tsc && npm run ngc",
         "tslint": "tslint \"**/*.ts\" --config tslint.json --exclude \"**/node_modules/**\" --exclude '**/platforms/**'",
-        "plugin.tscwatch": "npm run tsc -- -w",
+        "plugin.tscwatch": "npm run tsc --  -skipLibCheck -w",
         "demo.android": "npm i && npm run tsc && cd demo && tns run android --syncAllFiles",
         "demo.reset": "cd ../demo && rimraf platforms",
         "demo.ng.android": "npm i && npm run tsc && cd demo-angular && tns run android --syncAllFiles",
