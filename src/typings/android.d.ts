@@ -125,11 +125,7 @@ declare namespace bolts {
         public static forResult(param0: any): Task<any>;
         public static call(param0: java.util.concurrent.Callable<any>, param1: java.util.concurrent.Executor, param2: CancellationToken): Task<any>;
         public static call(param0: java.util.concurrent.Callable<any>): Task<any>;
-        public continueWhile(
-            param0: java.util.concurrent.Callable<java.lang.Boolean>,
-            param1: Continuation<java.lang.Void, Task<java.lang.Void>>,
-            param2: CancellationToken
-        ): Task<java.lang.Void>;
+        public continueWhile(param0: java.util.concurrent.Callable<java.lang.Boolean>, param1: Continuation<java.lang.Void, Task<java.lang.Void>>, param2: CancellationToken): Task<java.lang.Void>;
         public continueWithTask(param0: Continuation<any, any>, param1: java.util.concurrent.Executor, param2: CancellationToken): Task<any>;
         public static delay(param0: number): Task<java.lang.Void>;
         public static delay(param0: number, param1: CancellationToken): Task<java.lang.Void>;
@@ -393,9 +389,7 @@ declare namespace com {
                     /**
                      * Constructs a new instance of the com.facebook.cache.common.CacheErrorLogger interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
                      */
-                    public constructor(implementation: {
-                        logError(param0: CacheErrorLogger.CacheErrorCategory, param1: java.lang.Class<any>, param2: string, param3: java.lang.Throwable): void;
-                    });
+                    public constructor(implementation: { logError(param0: CacheErrorLogger.CacheErrorCategory, param1: java.lang.Class<any>, param2: string, param3: java.lang.Throwable): void });
                     public constructor();
                     public logError(param0: CacheErrorLogger.CacheErrorCategory, param1: java.lang.Class<any>, param2: string, param3: java.lang.Throwable): void;
                 }
@@ -894,11 +888,7 @@ declare namespace com {
                         /**
                          * Constructs a new instance of the com.facebook.cache.disk.DiskStorage$Inserter interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
                          */
-                        public constructor(implementation: {
-                            writeData(param0: common.WriterCallback, param1: any): void;
-                            commit(param0: any): binaryresource.BinaryResource;
-                            cleanUp(): boolean;
-                        });
+                        public constructor(implementation: { writeData(param0: common.WriterCallback, param1: any): void; commit(param0: any): binaryresource.BinaryResource; cleanUp(): boolean });
                         public constructor();
                         public commit(param0: any): binaryresource.BinaryResource;
                         public writeData(param0: common.WriterCallback, param1: any): void;
@@ -1217,10 +1207,7 @@ declare namespace com {
                     /**
                      * Constructs a new instance of the com.facebook.common.activitylistener.ListenableActivity interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
                      */
-                    public constructor(implementation: {
-                        addActivityListener(param0: ActivityListener): void;
-                        removeActivityListener(param0: ActivityListener): void;
-                    });
+                    public constructor(implementation: { addActivityListener(param0: ActivityListener): void; removeActivityListener(param0: ActivityListener): void });
                     public constructor();
                     public addActivityListener(param0: ActivityListener): void;
                     public removeActivityListener(param0: ActivityListener): void;
@@ -1258,10 +1245,7 @@ declare namespace com {
                     /**
                      * Constructs a new instance of the com.facebook.common.disk.DiskTrimmableRegistry interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
                      */
-                    public constructor(implementation: {
-                        registerDiskTrimmable(param0: DiskTrimmable): void;
-                        unregisterDiskTrimmable(param0: DiskTrimmable): void;
-                    });
+                    public constructor(implementation: { registerDiskTrimmable(param0: DiskTrimmable): void; unregisterDiskTrimmable(param0: DiskTrimmable): void });
                     public constructor();
                     public unregisterDiskTrimmable(param0: DiskTrimmable): void;
                     public registerDiskTrimmable(param0: DiskTrimmable): void;
@@ -1330,12 +1314,7 @@ declare namespace com {
                     public shutdown(): void;
                     public awaitTermination(param0: number, param1: java.util.concurrent.TimeUnit): boolean;
                     public constructor();
-                    public static newConstrainedExecutor(
-                        param0: string,
-                        param1: number,
-                        param2: number,
-                        param3: java.util.concurrent.Executor
-                    ): ConstrainedExecutorService;
+                    public static newConstrainedExecutor(param0: string, param1: number, param2: number, param3: java.util.concurrent.Executor): ConstrainedExecutorService;
                     public isIdle(): boolean;
                     public invokeAny(param0: java.util.Collection<any>, param1: number, param2: java.util.concurrent.TimeUnit): any;
                     public submit(param0: java.lang.Runnable, param1: any): java.util.concurrent.Future<any>;
@@ -2299,12 +2278,7 @@ declare namespace com {
                     /**
                      * Constructs a new instance of the com.facebook.common.memory.ByteArrayPool interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
                      */
-                    public constructor(implementation: {
-                        get(param0: number): any;
-                        release(param0: any): void;
-                        release(param0: any): void;
-                        trim(param0: MemoryTrimType): void;
-                    });
+                    public constructor(implementation: { get(param0: number): any; release(param0: any): void; release(param0: any): void; trim(param0: MemoryTrimType): void });
                     public constructor();
                     public release(param0: any): void;
                     public trim(param0: MemoryTrimType): void;
@@ -2362,10 +2336,7 @@ declare namespace com {
                     /**
                      * Constructs a new instance of the com.facebook.common.memory.MemoryTrimmableRegistry interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
                      */
-                    public constructor(implementation: {
-                        registerMemoryTrimmable(param0: MemoryTrimmable): void;
-                        unregisterMemoryTrimmable(param0: MemoryTrimmable): void;
-                    });
+                    public constructor(implementation: { registerMemoryTrimmable(param0: MemoryTrimmable): void; unregisterMemoryTrimmable(param0: MemoryTrimmable): void });
                     public constructor();
                     public unregisterMemoryTrimmable(param0: MemoryTrimmable): void;
                     public registerMemoryTrimmable(param0: MemoryTrimmable): void;
@@ -3451,9 +3422,7 @@ declare namespace com {
                             public build(): DraweeConfig;
                             public setDebugOverlayEnabledSupplier(param0: common.internal.Supplier<java.lang.Boolean>): Builder;
                             public addCustomDrawableFactory(param0: imagepipeline.drawable.DrawableFactory): Builder;
-                            public setPipelineDraweeControllerFactory(
-                                param0: PipelineDraweeControllerFactory
-                            ): Builder;
+                            public setPipelineDraweeControllerFactory(param0: PipelineDraweeControllerFactory): Builder;
                         }
                     }
                 }
@@ -3472,11 +3441,7 @@ declare namespace com {
                         public static newDraweeControllerBuilder(): PipelineDraweeControllerBuilder;
                         public static getImagePipelineFactory(): imagepipeline.core.ImagePipelineFactory;
                         public static initialize(param0: globalAndroid.content.Context, param1: imagepipeline.core.ImagePipelineConfig): void;
-                        public static initialize(
-                            param0: globalAndroid.content.Context,
-                            param1: imagepipeline.core.ImagePipelineConfig,
-                            param2: DraweeConfig
-                        ): void;
+                        public static initialize(param0: globalAndroid.content.Context, param1: imagepipeline.core.ImagePipelineConfig, param2: DraweeConfig): void;
                         public static shutDown(): void;
                         public static initialize(param0: globalAndroid.content.Context): void;
                         public static hasBeenInitialized(): boolean;
@@ -3508,9 +3473,7 @@ declare namespace com {
                             param2: imagepipeline.drawable.DrawableFactory,
                             param3: java.util.concurrent.Executor,
                             param4: imagepipeline.cache.MemoryCache<cache.common.CacheKey, imagepipeline.image.CloseableImage>,
-                            param5: common.internal.Supplier<
-                                datasource.DataSource<common.references.CloseableReference<imagepipeline.image.CloseableImage>>
-                            >,
+                            param5: common.internal.Supplier<datasource.DataSource<common.references.CloseableReference<imagepipeline.image.CloseableImage>>>,
                             param6: string,
                             param7: cache.common.CacheKey,
                             param8: any
@@ -3521,9 +3484,7 @@ declare namespace com {
                         public setImageOriginListener(param0: info.ImageOriginListener): void;
                         public releaseImage(param0: any): void;
                         public initialize(
-                            param0: common.internal.Supplier<
-                                datasource.DataSource<common.references.CloseableReference<imagepipeline.image.CloseableImage>>
-                            >,
+                            param0: common.internal.Supplier<datasource.DataSource<common.references.CloseableReference<imagepipeline.image.CloseableImage>>>,
                             param1: string,
                             param2: cache.common.CacheKey,
                             param3: any,
@@ -3561,9 +3522,7 @@ declare namespace com {
                             param2: imagepipeline.drawable.DrawableFactory,
                             param3: java.util.concurrent.Executor,
                             param4: imagepipeline.cache.MemoryCache<cache.common.CacheKey, imagepipeline.image.CloseableImage>,
-                            param5: common.internal.Supplier<
-                                datasource.DataSource<common.references.CloseableReference<imagepipeline.image.CloseableImage>>
-                            >,
+                            param5: common.internal.Supplier<datasource.DataSource<common.references.CloseableReference<imagepipeline.image.CloseableImage>>>,
                             param6: string,
                             param7: cache.common.CacheKey,
                             param8: any,
@@ -3592,9 +3551,7 @@ declare namespace com {
                         public static class: java.lang.Class<PipelineDraweeControllerBuilder>;
                         public setCustomDrawableFactory(param0: imagepipeline.drawable.DrawableFactory): PipelineDraweeControllerBuilder;
                         public setCallerContext(param0: any): interfaces.SimpleDraweeControllerBuilder;
-                        public setCustomDrawableFactories(
-                            param0: native.Array<imagepipeline.drawable.DrawableFactory>
-                        ): PipelineDraweeControllerBuilder;
+                        public setCustomDrawableFactories(param0: native.Array<imagepipeline.drawable.DrawableFactory>): PipelineDraweeControllerBuilder;
                         public setUri(param0: globalAndroid.net.Uri): interfaces.SimpleDraweeControllerBuilder;
                         public setUri(param0: string): interfaces.SimpleDraweeControllerBuilder;
                         public obtainController(): PipelineDraweeController;
@@ -3606,14 +3563,10 @@ declare namespace com {
                         ): datasource.DataSource<common.references.CloseableReference<imagepipeline.image.CloseableImage>>;
                         public constructor(param0: globalAndroid.content.Context, param1: java.util.Set<controller.ControllerListener<any>>);
                         public build(): controller.AbstractDraweeController<any, any>;
-                        public static convertCacheLevelToRequestLevel(
-                            param0: controller.AbstractDraweeControllerBuilder.CacheLevel
-                        ): imagepipeline.request.ImageRequest.RequestLevel;
+                        public static convertCacheLevelToRequestLevel(param0: controller.AbstractDraweeControllerBuilder.CacheLevel): imagepipeline.request.ImageRequest.RequestLevel;
                         public setCallerContext(param0: any): any;
                         public setImageOriginListener(param0: info.ImageOriginListener): PipelineDraweeControllerBuilder;
-                        public setCustomDrawableFactories(
-                            param0: common.internal.ImmutableList<imagepipeline.drawable.DrawableFactory>
-                        ): PipelineDraweeControllerBuilder;
+                        public setCustomDrawableFactories(param0: common.internal.ImmutableList<imagepipeline.drawable.DrawableFactory>): PipelineDraweeControllerBuilder;
                         public setUri(param0: globalAndroid.net.Uri): PipelineDraweeControllerBuilder;
                         public constructor(
                             param0: globalAndroid.content.Context,
@@ -3622,11 +3575,7 @@ declare namespace com {
                             param3: java.util.Set<controller.ControllerListener<any>>
                         );
                         public obtainController(): controller.AbstractDraweeController<any, any>;
-                        public getDataSourceForRequest(
-                            param0: any,
-                            param1: any,
-                            param2: controller.AbstractDraweeControllerBuilder.CacheLevel
-                        ): datasource.DataSource<any>;
+                        public getDataSourceForRequest(param0: any, param1: any, param2: controller.AbstractDraweeControllerBuilder.CacheLevel): datasource.DataSource<any>;
                         public setOldController(param0: interfaces.DraweeController): interfaces.SimpleDraweeControllerBuilder;
                         public setOldController(param0: interfaces.DraweeController): any;
                         public setUri(param0: string): PipelineDraweeControllerBuilder;
@@ -3653,11 +3602,7 @@ declare namespace com {
                             param3: DraweeConfig
                         );
                         public get(): PipelineDraweeControllerBuilder;
-                        public constructor(
-                            param0: globalAndroid.content.Context,
-                            param1: imagepipeline.core.ImagePipelineFactory,
-                            param2: DraweeConfig
-                        );
+                        public constructor(param0: globalAndroid.content.Context, param1: imagepipeline.core.ImagePipelineFactory, param2: DraweeConfig);
                         public get(): any;
                     }
                 }
@@ -3675,9 +3620,7 @@ declare namespace com {
                         public static class: java.lang.Class<PipelineDraweeControllerFactory>;
                         public constructor();
                         public newController(
-                            param0: common.internal.Supplier<
-                                datasource.DataSource<common.references.CloseableReference<imagepipeline.image.CloseableImage>>
-                            >,
+                            param0: common.internal.Supplier<datasource.DataSource<common.references.CloseableReference<imagepipeline.image.CloseableImage>>>,
                             param1: string,
                             param2: cache.common.CacheKey,
                             param3: any
@@ -3690,17 +3633,13 @@ declare namespace com {
                             param4: imagepipeline.cache.MemoryCache<cache.common.CacheKey, imagepipeline.image.CloseableImage>,
                             param5: common.internal.ImmutableList<imagepipeline.drawable.DrawableFactory>,
                             param6: common.internal.ImmutableList<imagepipeline.drawable.DrawableFactory>,
-                            param7: common.internal.Supplier<
-                                datasource.DataSource<common.references.CloseableReference<imagepipeline.image.CloseableImage>>
-                            >,
+                            param7: common.internal.Supplier<datasource.DataSource<common.references.CloseableReference<imagepipeline.image.CloseableImage>>>,
                             param8: string,
                             param9: cache.common.CacheKey,
                             param10: any
                         ): PipelineDraweeController;
                         public newController(
-                            param0: common.internal.Supplier<
-                                datasource.DataSource<common.references.CloseableReference<imagepipeline.image.CloseableImage>>
-                            >,
+                            param0: common.internal.Supplier<datasource.DataSource<common.references.CloseableReference<imagepipeline.image.CloseableImage>>>,
                             param1: string,
                             param2: cache.common.CacheKey,
                             param3: any,
@@ -3924,10 +3863,7 @@ declare namespace com {
                         public onIntermediateImageSet(param0: string, param1: any): void;
                         public onIntermediateImageFailed(param0: string, param1: java.lang.Throwable): void;
                         public onFailure(param0: string, param1: java.lang.Throwable): void;
-                        public static createInternal(
-                            param0: ControllerListener<any>,
-                            param1: ControllerListener<any>
-                        ): InternalForwardingListener<any>;
+                        public static createInternal(param0: ControllerListener<any>, param1: ControllerListener<any>): InternalForwardingListener<any>;
                         public onSubmit(param0: string, param1: any): void;
                     }
                 }
@@ -3955,10 +3891,7 @@ declare namespace com {
                     public maybeBuildAndSetRetryManager(param0: AbstractDraweeController<any, any>): void;
                     public getContentDescription(): string;
                     public getImageRequest(): any;
-                    public getDataSourceSupplierForRequest(
-                        param0: any,
-                        param1: AbstractDraweeControllerBuilder.CacheLevel
-                    ): common.internal.Supplier<datasource.DataSource<any>>;
+                    public getDataSourceSupplierForRequest(param0: any, param1: AbstractDraweeControllerBuilder.CacheLevel): common.internal.Supplier<datasource.DataSource<any>>;
                     public setControllerViewportVisibilityListener(param0: ControllerViewportVisibilityListener): any;
                     public build(): AbstractDraweeController<any, any>;
                     public getControllerListener(): ControllerListener<any>;
@@ -3977,11 +3910,7 @@ declare namespace com {
                     public setTapToRetryEnabled(param0: boolean): any;
                     public getOldController(): interfaces.DraweeController;
                     public getLowResImageRequest(): any;
-                    public getDataSourceForRequest(
-                        param0: any,
-                        param1: any,
-                        param2: AbstractDraweeControllerBuilder.CacheLevel
-                    ): datasource.DataSource<any>;
+                    public getDataSourceForRequest(param0: any, param1: any, param2: AbstractDraweeControllerBuilder.CacheLevel): datasource.DataSource<any>;
                     public setFirstAvailableImageRequests(param0: native.Array<any>): any;
                     public setRetainImageOnFailure(param0: boolean): any;
                     public obtainDataSourceSupplier(): common.internal.Supplier<datasource.DataSource<any>>;
@@ -4095,10 +4024,7 @@ declare namespace com {
                     public static create(): ForwardingControllerListener<any>;
                     public addListener(param0: ControllerListener<any>): void;
                     public onFailure(param0: string, param1: java.lang.Throwable): void;
-                    public static of(
-                        param0: ControllerListener<any>,
-                        param1: ControllerListener<any>
-                    ): ForwardingControllerListener<any>;
+                    public static of(param0: ControllerListener<any>, param1: ControllerListener<any>): ForwardingControllerListener<any>;
                     public onSubmit(param0: string, param1: any): void;
                     public constructor();
                     public onIntermediateImageFailed(param0: string, param1: java.lang.Throwable): void;
@@ -4186,8 +4112,7 @@ declare namespace com {
     export namespace facebook {
         export namespace drawee {
             export namespace drawable {
-                export class ArrayDrawable extends globalAndroid.graphics.drawable.Drawable
-                    implements globalAndroid.graphics.drawable.Drawable.Callback, TransformCallback, TransformAwareDrawable {
+                export class ArrayDrawable extends globalAndroid.graphics.drawable.Drawable implements globalAndroid.graphics.drawable.Drawable.Callback, TransformCallback, TransformAwareDrawable {
                     public static class: java.lang.Class<ArrayDrawable>;
                     public getDrawable(param0: number): globalAndroid.graphics.drawable.Drawable;
                     public getRootBounds(param0: globalAndroid.graphics.RectF): void;
@@ -4323,11 +4248,7 @@ declare namespace com {
                     public static copyProperties(param0: globalAndroid.graphics.drawable.Drawable, param1: globalAndroid.graphics.drawable.Drawable): void;
                     public static multiplyColorAlpha(param0: number, param1: number): number;
                     public static setDrawableProperties(param0: globalAndroid.graphics.drawable.Drawable, param1: DrawableProperties): void;
-                    public static setCallbacks(
-                        param0: globalAndroid.graphics.drawable.Drawable,
-                        param1: globalAndroid.graphics.drawable.Drawable.Callback,
-                        param2: TransformCallback
-                    ): void;
+                    public static setCallbacks(param0: globalAndroid.graphics.drawable.Drawable, param1: globalAndroid.graphics.drawable.Drawable.Callback, param2: TransformCallback): void;
                     public static getOpacityFromColor(param0: number): number;
                 }
             }
@@ -4382,11 +4303,7 @@ declare namespace com {
         export namespace drawee {
             export namespace drawable {
                 export class ForwardingDrawable extends globalAndroid.graphics.drawable.Drawable
-                    implements
-                        globalAndroid.graphics.drawable.Drawable.Callback,
-                        TransformCallback,
-                        TransformAwareDrawable,
-                        DrawableParent {
+                    implements globalAndroid.graphics.drawable.Drawable.Callback, TransformCallback, TransformAwareDrawable, DrawableParent {
                     public static class: java.lang.Class<ForwardingDrawable>;
                     public mTransformCallback: TransformCallback;
                     public getRootBounds(param0: globalAndroid.graphics.RectF): void;
@@ -4564,8 +4481,7 @@ declare namespace com {
     export namespace facebook {
         export namespace drawee {
             export namespace drawable {
-                export class RoundedBitmapDrawable extends globalAndroid.graphics.drawable.BitmapDrawable
-                    implements TransformAwareDrawable, Rounded {
+                export class RoundedBitmapDrawable extends globalAndroid.graphics.drawable.BitmapDrawable implements TransformAwareDrawable, Rounded {
                     public static class: java.lang.Class<RoundedBitmapDrawable>;
                     public constructor(param0: string);
                     public getBorderColor(): number;
@@ -4586,10 +4502,7 @@ declare namespace com {
                     public constructor(param0: globalAndroid.content.res.Resources, param1: string);
                     public getRadii(): native.Array<number>;
                     public setAlpha(param0: number): void;
-                    public static fromBitmapDrawable(
-                        param0: globalAndroid.content.res.Resources,
-                        param1: globalAndroid.graphics.drawable.BitmapDrawable
-                    ): RoundedBitmapDrawable;
+                    public static fromBitmapDrawable(param0: globalAndroid.content.res.Resources, param1: globalAndroid.graphics.drawable.BitmapDrawable): RoundedBitmapDrawable;
                     public isCircle(): boolean;
                     public getPadding(): number;
                     public setPadding(param0: number): void;
@@ -4755,8 +4668,7 @@ declare namespace com {
                             param7: number
                         ): void;
                     }
-                    export class InterpolatingScaleType extends java.lang.Object
-                        implements ScaleType, StatefulScaleType {
+                    export class InterpolatingScaleType extends java.lang.Object implements ScaleType, StatefulScaleType {
                         public static class: java.lang.Class<InterpolatingScaleType>;
                         public constructor(param0: ScaleType, param1: ScaleType);
                         public getScaleTypeFrom(): ScaleType;
@@ -4782,12 +4694,7 @@ declare namespace com {
                             param4: globalAndroid.graphics.PointF,
                             param5: globalAndroid.graphics.PointF
                         );
-                        public constructor(
-                            param0: ScaleType,
-                            param1: ScaleType,
-                            param2: globalAndroid.graphics.Rect,
-                            param3: globalAndroid.graphics.Rect
-                        );
+                        public constructor(param0: ScaleType, param1: ScaleType, param2: globalAndroid.graphics.Rect, param3: globalAndroid.graphics.Rect);
                         public setValue(param0: number): void;
                         public getState(): any;
                         public getValue(): number;
@@ -5192,10 +5099,7 @@ declare namespace com {
                     public setPressedStateOverlay(param0: globalAndroid.graphics.drawable.Drawable): GenericDraweeHierarchyBuilder;
                     public setRetryImage(param0: number): GenericDraweeHierarchyBuilder;
                     public getPressedStateOverlay(): globalAndroid.graphics.drawable.Drawable;
-                    public setPlaceholderImage(
-                        param0: globalAndroid.graphics.drawable.Drawable,
-                        param1: drawable.ScalingUtils.ScaleType
-                    ): GenericDraweeHierarchyBuilder;
+                    public setPlaceholderImage(param0: globalAndroid.graphics.drawable.Drawable, param1: drawable.ScalingUtils.ScaleType): GenericDraweeHierarchyBuilder;
                     public getActualImageScaleType(): drawable.ScalingUtils.ScaleType;
                     public getActualImageFocusPoint(): globalAndroid.graphics.PointF;
                     public setActualImageColorFilter(param0: globalAndroid.graphics.ColorFilter): GenericDraweeHierarchyBuilder;
@@ -5207,16 +5111,10 @@ declare namespace com {
                     public getProgressBarImage(): globalAndroid.graphics.drawable.Drawable;
                     public setOverlay(param0: globalAndroid.graphics.drawable.Drawable): GenericDraweeHierarchyBuilder;
                     public getBackground(): globalAndroid.graphics.drawable.Drawable;
-                    public setProgressBarImage(
-                        param0: globalAndroid.graphics.drawable.Drawable,
-                        param1: drawable.ScalingUtils.ScaleType
-                    ): GenericDraweeHierarchyBuilder;
+                    public setProgressBarImage(param0: globalAndroid.graphics.drawable.Drawable, param1: drawable.ScalingUtils.ScaleType): GenericDraweeHierarchyBuilder;
                     public constructor(param0: globalAndroid.content.res.Resources);
                     public static newInstance(param0: globalAndroid.content.res.Resources): GenericDraweeHierarchyBuilder;
-                    public setRetryImage(
-                        param0: globalAndroid.graphics.drawable.Drawable,
-                        param1: drawable.ScalingUtils.ScaleType
-                    ): GenericDraweeHierarchyBuilder;
+                    public setRetryImage(param0: globalAndroid.graphics.drawable.Drawable, param1: drawable.ScalingUtils.ScaleType): GenericDraweeHierarchyBuilder;
                     public setBackground(param0: globalAndroid.graphics.drawable.Drawable): GenericDraweeHierarchyBuilder;
                     public getFailureImage(): globalAndroid.graphics.drawable.Drawable;
                     public setRoundingParams(param0: RoundingParams): GenericDraweeHierarchyBuilder;
@@ -5231,10 +5129,7 @@ declare namespace com {
                     public getPlaceholderImageScaleType(): drawable.ScalingUtils.ScaleType;
                     public getRetryImage(): globalAndroid.graphics.drawable.Drawable;
                     public getFadeDuration(): number;
-                    public setFailureImage(
-                        param0: globalAndroid.graphics.drawable.Drawable,
-                        param1: drawable.ScalingUtils.ScaleType
-                    ): GenericDraweeHierarchyBuilder;
+                    public setFailureImage(param0: globalAndroid.graphics.drawable.Drawable, param1: drawable.ScalingUtils.ScaleType): GenericDraweeHierarchyBuilder;
                     public setProgressBarImageScaleType(param0: drawable.ScalingUtils.ScaleType): GenericDraweeHierarchyBuilder;
                     public setFailureImage(param0: globalAndroid.graphics.drawable.Drawable): GenericDraweeHierarchyBuilder;
                     public reset(): GenericDraweeHierarchyBuilder;
@@ -5257,11 +5152,7 @@ declare namespace com {
             export namespace generic {
                 export class GenericDraweeHierarchyInflater extends java.lang.Object {
                     public static class: java.lang.Class<GenericDraweeHierarchyInflater>;
-                    public static updateBuilder(
-                        param0: GenericDraweeHierarchyBuilder,
-                        param1: globalAndroid.content.Context,
-                        param2: globalAndroid.util.AttributeSet
-                    ): GenericDraweeHierarchyBuilder;
+                    public static updateBuilder(param0: GenericDraweeHierarchyBuilder, param1: globalAndroid.content.Context, param2: globalAndroid.util.AttributeSet): GenericDraweeHierarchyBuilder;
                     public static inflateBuilder(param0: globalAndroid.content.Context, param1: globalAndroid.util.AttributeSet): GenericDraweeHierarchyBuilder;
                     public constructor();
                     public static inflateHierarchy(param0: globalAndroid.content.Context, param1: globalAndroid.util.AttributeSet): GenericDraweeHierarchy;
@@ -5513,13 +5404,7 @@ declare namespace com {
                 export class AspectRatioMeasure extends java.lang.Object {
                     public static class: java.lang.Class<AspectRatioMeasure>;
                     public constructor();
-                    public static updateMeasureSpec(
-                        param0: AspectRatioMeasure.Spec,
-                        param1: number,
-                        param2: globalAndroid.view.ViewGroup.LayoutParams,
-                        param3: number,
-                        param4: number
-                    ): void;
+                    public static updateMeasureSpec(param0: AspectRatioMeasure.Spec, param1: number, param2: globalAndroid.view.ViewGroup.LayoutParams, param3: number, param4: number): void;
                 }
                 export namespace AspectRatioMeasure {
                     export class Spec extends java.lang.Object {
@@ -5576,17 +5461,9 @@ declare namespace com {
                         param1: globalAndroid.transition.TransitionValues,
                         param2: globalAndroid.transition.TransitionValues
                     ): globalAndroid.animation.Animator;
-                    public constructor(
-                        param0: drawable.ScalingUtils.ScaleType,
-                        param1: drawable.ScalingUtils.ScaleType,
-                        param2: globalAndroid.graphics.PointF,
-                        param3: globalAndroid.graphics.PointF
-                    );
+                    public constructor(param0: drawable.ScalingUtils.ScaleType, param1: drawable.ScalingUtils.ScaleType, param2: globalAndroid.graphics.PointF, param3: globalAndroid.graphics.PointF);
                     public captureEndValues(param0: globalAndroid.transition.TransitionValues): void;
-                    public static createTransitionSet(
-                        param0: drawable.ScalingUtils.ScaleType,
-                        param1: drawable.ScalingUtils.ScaleType
-                    ): globalAndroid.transition.TransitionSet;
+                    public static createTransitionSet(param0: drawable.ScalingUtils.ScaleType, param1: drawable.ScalingUtils.ScaleType): globalAndroid.transition.TransitionSet;
                     public static createTransitionSet(
                         param0: drawable.ScalingUtils.ScaleType,
                         param1: drawable.ScalingUtils.ScaleType,
@@ -5908,8 +5785,7 @@ declare namespace com {
         export namespace fresco {
             export namespace animation {
                 export namespace bitmap {
-                    export class BitmapAnimationBackend extends java.lang.Object
-                        implements backend.AnimationBackend, backend.AnimationBackendDelegateWithInactivityCheck.InactivityListener {
+                    export class BitmapAnimationBackend extends java.lang.Object implements backend.AnimationBackend, backend.AnimationBackendDelegateWithInactivityCheck.InactivityListener {
                         public static class: java.lang.Class<BitmapAnimationBackend>;
                         public static FRAME_TYPE_UNKNOWN: number;
                         public static FRAME_TYPE_CACHED: number;
@@ -6012,10 +5888,7 @@ declare namespace com {
                             /**
                              * Constructs a new instance of the com.facebook.fresco.animation.bitmap.BitmapFrameCache$FrameCacheListener interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
                              */
-                            public constructor(implementation: {
-                                onFrameCached(param0: BitmapFrameCache, param1: number): void;
-                                onFrameEvicted(param0: BitmapFrameCache, param1: number): void;
-                            });
+                            public constructor(implementation: { onFrameCached(param0: BitmapFrameCache, param1: number): void; onFrameEvicted(param0: BitmapFrameCache, param1: number): void });
                             public constructor();
                             public onFrameCached(param0: BitmapFrameCache, param1: number): void;
                             public onFrameEvicted(param0: BitmapFrameCache, param1: number): void;
@@ -6144,21 +6017,9 @@ declare namespace com {
                             /**
                              * Constructs a new instance of the com.facebook.fresco.animation.bitmap.preparation.BitmapFramePreparationStrategy interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
                              */
-                            public constructor(implementation: {
-                                prepareFrames(
-                                    param0: BitmapFramePreparer,
-                                    param1: BitmapFrameCache,
-                                    param2: backend.AnimationBackend,
-                                    param3: number
-                                ): void;
-                            });
+                            public constructor(implementation: { prepareFrames(param0: BitmapFramePreparer, param1: BitmapFrameCache, param2: backend.AnimationBackend, param3: number): void });
                             public constructor();
-                            public prepareFrames(
-                                param0: BitmapFramePreparer,
-                                param1: BitmapFrameCache,
-                                param2: backend.AnimationBackend,
-                                param3: number
-                            ): void;
+                            public prepareFrames(param0: BitmapFramePreparer, param1: BitmapFrameCache, param2: backend.AnimationBackend, param3: number): void;
                         }
                     }
                 }
@@ -6178,9 +6039,7 @@ declare namespace com {
                             /**
                              * Constructs a new instance of the com.facebook.fresco.animation.bitmap.preparation.BitmapFramePreparer interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
                              */
-                            public constructor(implementation: {
-                                prepareFrame(param0: BitmapFrameCache, param1: backend.AnimationBackend, param2: number): boolean;
-                            });
+                            public constructor(implementation: { prepareFrame(param0: BitmapFrameCache, param1: backend.AnimationBackend, param2: number): boolean });
                             public constructor();
                             public prepareFrame(param0: BitmapFrameCache, param1: backend.AnimationBackend, param2: number): boolean;
                         }
@@ -6210,13 +6069,7 @@ declare namespace com {
                         export namespace DefaultBitmapFramePreparer {
                             export class FrameDecodeRunnable extends java.lang.Object implements java.lang.Runnable {
                                 public static class: java.lang.Class<FrameDecodeRunnable>;
-                                public constructor(
-                                    param0: DefaultBitmapFramePreparer,
-                                    param1: backend.AnimationBackend,
-                                    param2: BitmapFrameCache,
-                                    param3: number,
-                                    param4: number
-                                );
+                                public constructor(param0: DefaultBitmapFramePreparer, param1: backend.AnimationBackend, param2: BitmapFrameCache, param3: number, param4: number);
                                 public run(): void;
                             }
                         }
@@ -6236,12 +6089,7 @@ declare namespace com {
                         export class FixedNumberBitmapFramePreparationStrategy extends java.lang.Object implements BitmapFramePreparationStrategy {
                             public static class: java.lang.Class<FixedNumberBitmapFramePreparationStrategy>;
                             public constructor();
-                            public prepareFrames(
-                                param0: BitmapFramePreparer,
-                                param1: BitmapFrameCache,
-                                param2: backend.AnimationBackend,
-                                param3: number
-                            ): void;
+                            public prepareFrames(param0: BitmapFramePreparer, param1: BitmapFrameCache, param2: backend.AnimationBackend, param3: number): void;
                             public constructor(param0: number);
                         }
                     }
@@ -6297,8 +6145,7 @@ declare namespace com {
         export namespace fresco {
             export namespace animation {
                 export namespace drawable {
-                    export class AnimatedDrawable2 extends globalAndroid.graphics.drawable.Drawable
-                        implements globalAndroid.graphics.drawable.Animatable, facebook.drawable.base.DrawableWithCaches {
+                    export class AnimatedDrawable2 extends globalAndroid.graphics.drawable.Drawable implements globalAndroid.graphics.drawable.Animatable, facebook.drawable.base.DrawableWithCaches {
                         public static class: java.lang.Class<AnimatedDrawable2>;
                         public onLevelChange(param0: number): boolean;
                         public setColorFilter(param0: number, param1: globalAndroid.graphics.PorterDuff.Mode): void;
@@ -6992,13 +6839,9 @@ declare namespace com {
                 export namespace base {
                     export class AnimatedImageResultBuilder extends java.lang.Object {
                         public static class: java.lang.Class<AnimatedImageResultBuilder>;
-                        public setDecodedFrames(
-                            param0: java.util.List<facebook.common.references.CloseableReference<globalAndroid.graphics.Bitmap>>
-                        ): AnimatedImageResultBuilder;
+                        public setDecodedFrames(param0: java.util.List<facebook.common.references.CloseableReference<globalAndroid.graphics.Bitmap>>): AnimatedImageResultBuilder;
                         public getFrameForPreview(): number;
-                        public setPreviewBitmap(
-                            param0: facebook.common.references.CloseableReference<globalAndroid.graphics.Bitmap>
-                        ): AnimatedImageResultBuilder;
+                        public setPreviewBitmap(param0: facebook.common.references.CloseableReference<globalAndroid.graphics.Bitmap>): AnimatedImageResultBuilder;
                         public getImage(): AnimatedImage;
                         public build(): AnimatedImageResult;
                         public getDecodedFrames(): java.util.List<facebook.common.references.CloseableReference<globalAndroid.graphics.Bitmap>>;
@@ -7123,28 +6966,12 @@ declare namespace com {
                          * Constructs a new instance of the com.facebook.imagepipeline.animated.factory.AnimatedImageFactory interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
                          */
                         public constructor(implementation: {
-                            decodeGif(
-                                param0: image.EncodedImage,
-                                param1: common.ImageDecodeOptions,
-                                param2: globalAndroid.graphics.Bitmap.Config
-                            ): image.CloseableImage;
-                            decodeWebP(
-                                param0: image.EncodedImage,
-                                param1: common.ImageDecodeOptions,
-                                param2: globalAndroid.graphics.Bitmap.Config
-                            ): image.CloseableImage;
+                            decodeGif(param0: image.EncodedImage, param1: common.ImageDecodeOptions, param2: globalAndroid.graphics.Bitmap.Config): image.CloseableImage;
+                            decodeWebP(param0: image.EncodedImage, param1: common.ImageDecodeOptions, param2: globalAndroid.graphics.Bitmap.Config): image.CloseableImage;
                         });
                         public constructor();
-                        public decodeGif(
-                            param0: image.EncodedImage,
-                            param1: common.ImageDecodeOptions,
-                            param2: globalAndroid.graphics.Bitmap.Config
-                        ): image.CloseableImage;
-                        public decodeWebP(
-                            param0: image.EncodedImage,
-                            param1: common.ImageDecodeOptions,
-                            param2: globalAndroid.graphics.Bitmap.Config
-                        ): image.CloseableImage;
+                        public decodeGif(param0: image.EncodedImage, param1: common.ImageDecodeOptions, param2: globalAndroid.graphics.Bitmap.Config): image.CloseableImage;
+                        public decodeWebP(param0: image.EncodedImage, param1: common.ImageDecodeOptions, param2: globalAndroid.graphics.Bitmap.Config): image.CloseableImage;
                     }
                 }
             }
@@ -7159,17 +6986,9 @@ declare namespace com {
                 export namespace factory {
                     export class AnimatedImageFactoryImpl extends java.lang.Object implements AnimatedImageFactory {
                         public static class: java.lang.Class<AnimatedImageFactoryImpl>;
-                        public decodeGif(
-                            param0: image.EncodedImage,
-                            param1: common.ImageDecodeOptions,
-                            param2: globalAndroid.graphics.Bitmap.Config
-                        ): image.CloseableImage;
+                        public decodeGif(param0: image.EncodedImage, param1: common.ImageDecodeOptions, param2: globalAndroid.graphics.Bitmap.Config): image.CloseableImage;
                         public constructor(param0: impl.AnimatedDrawableBackendProvider, param1: bitmaps.PlatformBitmapFactory);
-                        public decodeWebP(
-                            param0: image.EncodedImage,
-                            param1: common.ImageDecodeOptions,
-                            param2: globalAndroid.graphics.Bitmap.Config
-                        ): image.CloseableImage;
+                        public decodeWebP(param0: image.EncodedImage, param1: common.ImageDecodeOptions, param2: globalAndroid.graphics.Bitmap.Config): image.CloseableImage;
                     }
                 }
             }
@@ -7190,11 +7009,7 @@ declare namespace com {
                         public getHeight(): number;
                         public getMemoryUsage(): number;
                         public hasPreDecodedFrame(param0: number): boolean;
-                        public constructor(
-                            param0: util.AnimatedDrawableUtil,
-                            param1: base.AnimatedImageResult,
-                            param2: globalAndroid.graphics.Rect
-                        );
+                        public constructor(param0: util.AnimatedDrawableUtil, param1: base.AnimatedImageResult, param2: globalAndroid.graphics.Rect);
                         public getDurationMs(): number;
                         public getFrameInfo(param0: number): base.AnimatedDrawableFrameInfo;
                         public getFrameForTimestampMs(param0: number): number;
@@ -7225,17 +7040,9 @@ declare namespace com {
                         /**
                          * Constructs a new instance of the com.facebook.imagepipeline.animated.impl.AnimatedDrawableBackendProvider interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
                          */
-                        public constructor(implementation: {
-                            get(
-                                param0: base.AnimatedImageResult,
-                                param1: globalAndroid.graphics.Rect
-                            ): base.AnimatedDrawableBackend;
-                        });
+                        public constructor(implementation: { get(param0: base.AnimatedImageResult, param1: globalAndroid.graphics.Rect): base.AnimatedDrawableBackend });
                         public constructor();
-                        public get(
-                            param0: base.AnimatedImageResult,
-                            param1: globalAndroid.graphics.Rect
-                        ): base.AnimatedDrawableBackend;
+                        public get(param0: base.AnimatedImageResult, param1: globalAndroid.graphics.Rect): base.AnimatedDrawableBackend;
                     }
                 }
             }
@@ -7250,18 +7057,12 @@ declare namespace com {
                 export namespace impl {
                     export class AnimatedFrameCache extends java.lang.Object {
                         public static class: java.lang.Class<AnimatedFrameCache>;
-                        public cache(
-                            param0: number,
-                            param1: facebook.common.references.CloseableReference<image.CloseableImage>
-                        ): facebook.common.references.CloseableReference<image.CloseableImage>;
+                        public cache(param0: number, param1: facebook.common.references.CloseableReference<image.CloseableImage>): facebook.common.references.CloseableReference<image.CloseableImage>;
                         public contains(param0: number): boolean;
                         public getForReuse(): facebook.common.references.CloseableReference<image.CloseableImage>;
                         public onReusabilityChange(param0: facebook.cache.common.CacheKey, param1: boolean): void;
                         public get(param0: number): facebook.common.references.CloseableReference<image.CloseableImage>;
-                        public constructor(
-                            param0: facebook.cache.common.CacheKey,
-                            param1: cache.CountingMemoryCache<facebook.cache.common.CacheKey, image.CloseableImage>
-                        );
+                        public constructor(param0: facebook.cache.common.CacheKey, param1: cache.CountingMemoryCache<facebook.cache.common.CacheKey, image.CloseableImage>);
                     }
                     export namespace AnimatedFrameCache {
                         export class FrameKey extends java.lang.Object implements facebook.cache.common.CacheKey {
@@ -7975,21 +7776,11 @@ declare namespace com {
                      */
                     public constructor(implementation: {
                         getCachedVariants(param0: string, param1: request.MediaVariations.Builder): bolts.Task<request.MediaVariations>;
-                        saveCachedVariant(
-                            param0: string,
-                            param1: request.ImageRequest.CacheChoice,
-                            param2: facebook.cache.common.CacheKey,
-                            param3: image.EncodedImage
-                        ): void;
+                        saveCachedVariant(param0: string, param1: request.ImageRequest.CacheChoice, param2: facebook.cache.common.CacheKey, param3: image.EncodedImage): void;
                     });
                     public constructor();
                     public getCachedVariants(param0: string, param1: request.MediaVariations.Builder): bolts.Task<request.MediaVariations>;
-                    public saveCachedVariant(
-                        param0: string,
-                        param1: request.ImageRequest.CacheChoice,
-                        param2: facebook.cache.common.CacheKey,
-                        param3: image.EncodedImage
-                    ): void;
+                    public saveCachedVariant(param0: string, param1: request.ImageRequest.CacheChoice, param2: facebook.cache.common.CacheKey, param3: image.EncodedImage): void;
                 }
             }
         }
@@ -8004,18 +7795,8 @@ declare namespace com {
                     public static class: java.lang.Class<MediaVariationsIndexDatabase>;
                     public getCachedVariantsSync(param0: string, param1: request.MediaVariations.Builder): request.MediaVariations;
                     public getCachedVariants(param0: string, param1: request.MediaVariations.Builder): bolts.Task<request.MediaVariations>;
-                    public saveCachedVariant(
-                        param0: string,
-                        param1: request.ImageRequest.CacheChoice,
-                        param2: facebook.cache.common.CacheKey,
-                        param3: image.EncodedImage
-                    ): void;
-                    public saveCachedVariantSync(
-                        param0: string,
-                        param1: request.ImageRequest.CacheChoice,
-                        param2: facebook.cache.common.CacheKey,
-                        param3: image.EncodedImage
-                    ): void;
+                    public saveCachedVariant(param0: string, param1: request.ImageRequest.CacheChoice, param2: facebook.cache.common.CacheKey, param3: image.EncodedImage): void;
+                    public saveCachedVariantSync(param0: string, param1: request.ImageRequest.CacheChoice, param2: facebook.cache.common.CacheKey, param3: image.EncodedImage): void;
                     public constructor(param0: globalAndroid.content.Context, param1: java.util.concurrent.Executor, param2: java.util.concurrent.Executor, param3: facebook.common.time.Clock);
                 }
                 export namespace MediaVariationsIndexDatabase {
@@ -8169,12 +7950,7 @@ declare namespace com {
                     public static class: java.lang.Class<NoOpMediaVariationsIndex>;
                     public constructor();
                     public getCachedVariants(param0: string, param1: request.MediaVariations.Builder): bolts.Task<request.MediaVariations>;
-                    public saveCachedVariant(
-                        param0: string,
-                        param1: request.ImageRequest.CacheChoice,
-                        param2: facebook.cache.common.CacheKey,
-                        param3: image.EncodedImage
-                    ): void;
+                    public saveCachedVariant(param0: string, param1: request.ImageRequest.CacheChoice, param2: facebook.cache.common.CacheKey, param3: image.EncodedImage): void;
                 }
             }
         }
@@ -8550,27 +8326,17 @@ declare namespace com {
                 export class ImagePipeline extends java.lang.Object {
                     public static class: java.lang.Class<ImagePipeline>;
                     public isInDiskCache(param0: globalAndroid.net.Uri): facebook.datasource.DataSource<java.lang.Boolean>;
-                    public fetchDecodedImage(
-                        param0: request.ImageRequest,
-                        param1: any
-                    ): facebook.datasource.DataSource<facebook.common.references.CloseableReference<image.CloseableImage>>;
+                    public fetchDecodedImage(param0: request.ImageRequest, param1: any): facebook.datasource.DataSource<facebook.common.references.CloseableReference<image.CloseableImage>>;
                     public evictFromDiskCache(param0: request.ImageRequest): void;
                     public isInBitmapMemoryCache(param0: request.ImageRequest): boolean;
                     public evictFromMemoryCache(param0: globalAndroid.net.Uri): void;
                     public isPaused(): boolean;
                     public getCacheKeyFactory(): cache.CacheKeyFactory;
-                    public fetchImageFromBitmapCache(
-                        param0: request.ImageRequest,
-                        param1: any
-                    ): facebook.datasource.DataSource<facebook.common.references.CloseableReference<image.CloseableImage>>;
+                    public fetchImageFromBitmapCache(param0: request.ImageRequest, param1: any): facebook.datasource.DataSource<facebook.common.references.CloseableReference<image.CloseableImage>>;
                     public prefetchToDiskCache(param0: request.ImageRequest, param1: any): facebook.datasource.DataSource<java.lang.Void>;
                     public pause(): void;
                     public clearDiskCaches(): void;
-                    public prefetchToDiskCache(
-                        param0: request.ImageRequest,
-                        param1: any,
-                        param2: common.Priority
-                    ): facebook.datasource.DataSource<java.lang.Void>;
+                    public prefetchToDiskCache(param0: request.ImageRequest, param1: any, param2: common.Priority): facebook.datasource.DataSource<java.lang.Void>;
                     public isInDiskCacheSync(param0: request.ImageRequest): boolean;
                     public fetchDecodedImage(
                         param0: request.ImageRequest,
@@ -8654,9 +8420,7 @@ declare namespace com {
                 export namespace ImagePipelineConfig {
                     export class Builder extends java.lang.Object {
                         public static class: java.lang.Class<Builder>;
-                        public setBitmapMemoryCacheTrimStrategy(
-                            param0: cache.CountingMemoryCache.CacheTrimStrategy
-                        ): Builder;
+                        public setBitmapMemoryCacheTrimStrategy(param0: cache.CountingMemoryCache.CacheTrimStrategy): Builder;
                         public setHttpConnectionTimeout(param0: number): Builder;
                         public setNetworkFetcher(param0: producers.NetworkFetcher<any>): Builder;
                         public setPoolFactory(param0: memory.PoolFactory): Builder;
@@ -8664,15 +8428,11 @@ declare namespace com {
                         public setDownsampleEnabled(param0: boolean): Builder;
                         public setMemoryTrimmableRegistry(param0: facebook.common.memory.MemoryTrimmableRegistry): Builder;
                         public setExecutorSupplier(param0: ExecutorSupplier): Builder;
-                        public setEncodedMemoryCacheParamsSupplier(
-                            param0: facebook.common.internal.Supplier<cache.MemoryCacheParams>
-                        ): Builder;
+                        public setEncodedMemoryCacheParamsSupplier(param0: facebook.common.internal.Supplier<cache.MemoryCacheParams>): Builder;
                         public setRequestListeners(param0: java.util.Set<listener.RequestListener>): Builder;
                         public setImageDecoder(param0: decoder.ImageDecoder): Builder;
                         public setMainDiskCacheConfig(param0: facebook.cache.disk.DiskCacheConfig): Builder;
-                        public setBitmapMemoryCacheParamsSupplier(
-                            param0: facebook.common.internal.Supplier<cache.MemoryCacheParams>
-                        ): Builder;
+                        public setBitmapMemoryCacheParamsSupplier(param0: facebook.common.internal.Supplier<cache.MemoryCacheParams>): Builder;
                         public setBitmapsConfig(param0: globalAndroid.graphics.Bitmap.Config): Builder;
                         public setCacheKeyFactory(param0: cache.CacheKeyFactory): Builder;
                         public setImageCacheStatsTracker(param0: cache.ImageCacheStatsTracker): Builder;
@@ -8724,9 +8484,7 @@ declare namespace com {
                         public static class: java.lang.Class<Builder>;
                         public mBitmapPrepareToDrawForPrefetch: boolean;
                         public constructor(param0: ImagePipelineConfig.Builder);
-                        public setProducerFactoryMethod(
-                            param0: ProducerFactoryMethod
-                        ): ImagePipelineConfig.Builder;
+                        public setProducerFactoryMethod(param0: ProducerFactoryMethod): ImagePipelineConfig.Builder;
                         public setSuppressBitmapPrefetching(param0: boolean): ImagePipelineConfig.Builder;
                         public setBitmapPrepareToDraw(param0: boolean, param1: number, param2: number, param3: boolean): ImagePipelineConfig.Builder;
                         public setExternalCreatedBitmapLogEnabled(param0: boolean): ImagePipelineConfig.Builder;
@@ -8849,10 +8607,7 @@ declare namespace com {
                     public getPlatformDecoder(): platform.PlatformDecoder;
                     public getMediaVariationsIndex(): cache.MediaVariationsIndex;
                     public getBitmapCountingMemoryCache(): cache.CountingMemoryCache<facebook.cache.common.CacheKey, image.CloseableImage>;
-                    public static buildPlatformBitmapFactory(
-                        param0: memory.PoolFactory,
-                        param1: platform.PlatformDecoder
-                    ): bitmaps.PlatformBitmapFactory;
+                    public static buildPlatformBitmapFactory(param0: memory.PoolFactory, param1: platform.PlatformDecoder): bitmaps.PlatformBitmapFactory;
                     public getPlatformBitmapFactory(): bitmaps.PlatformBitmapFactory;
                 }
             }
@@ -8881,45 +8636,27 @@ declare namespace com {
             export namespace core {
                 export class ProducerFactory extends java.lang.Object {
                     public static class: java.lang.Class<ProducerFactory>;
-                    public newBitmapPrepareProducer(
-                        param0: producers.Producer<facebook.common.references.CloseableReference<image.CloseableImage>>
-                    ): producers.BitmapPrepareProducer;
-                    public newDiskCacheWriteProducer(
-                        param0: producers.Producer<image.EncodedImage>
-                    ): producers.DiskCacheWriteProducer;
+                    public newBitmapPrepareProducer(param0: producers.Producer<facebook.common.references.CloseableReference<image.CloseableImage>>): producers.BitmapPrepareProducer;
+                    public newDiskCacheWriteProducer(param0: producers.Producer<image.EncodedImage>): producers.DiskCacheWriteProducer;
                     public newNetworkFetchProducer(param0: producers.NetworkFetcher<any>): producers.NetworkFetchProducer;
                     public static newSwallowResultProducer(param0: producers.Producer<any>): producers.SwallowResultProducer<any>;
-                    public newEncodedCacheKeyMultiplexProducer(
-                        param0: producers.Producer<image.EncodedImage>
-                    ): producers.EncodedCacheKeyMultiplexProducer;
+                    public newEncodedCacheKeyMultiplexProducer(param0: producers.Producer<image.EncodedImage>): producers.EncodedCacheKeyMultiplexProducer;
                     public newLocalVideoThumbnailProducer(): producers.LocalVideoThumbnailProducer;
                     public newBitmapMemoryCacheKeyMultiplexProducer(
                         param0: producers.Producer<facebook.common.references.CloseableReference<image.CloseableImage>>
                     ): producers.BitmapMemoryCacheKeyMultiplexProducer;
-                    public newThumbnailBranchProducer(
-                        param0: native.Array<producers.ThumbnailProducer<image.EncodedImage>>
-                    ): producers.ThumbnailBranchProducer;
+                    public newThumbnailBranchProducer(param0: native.Array<producers.ThumbnailProducer<image.EncodedImage>>): producers.ThumbnailBranchProducer;
                     public newDecodeProducer(param0: producers.Producer<image.EncodedImage>): producers.DecodeProducer;
-                    public newWebpTranscodeProducer(
-                        param0: producers.Producer<image.EncodedImage>
-                    ): producers.WebpTranscodeProducer;
+                    public newWebpTranscodeProducer(param0: producers.Producer<image.EncodedImage>): producers.WebpTranscodeProducer;
                     public newLocalResourceFetchProducer(): producers.LocalResourceFetchProducer;
                     public newThrottlingProducer(param0: producers.Producer<any>): producers.ThrottlingProducer<any>;
-                    public newPostprocessorProducer(
-                        param0: producers.Producer<facebook.common.references.CloseableReference<image.CloseableImage>>
-                    ): producers.PostprocessorProducer;
+                    public newPostprocessorProducer(param0: producers.Producer<facebook.common.references.CloseableReference<image.CloseableImage>>): producers.PostprocessorProducer;
                     public static newBranchOnSeparateImagesProducer(
                         param0: producers.Producer<image.EncodedImage>,
                         param1: producers.Producer<image.EncodedImage>
                     ): producers.BranchOnSeparateImagesProducer;
-                    public newResizeAndRotateProducer(
-                        param0: producers.Producer<image.EncodedImage>,
-                        param1: boolean,
-                        param2: boolean
-                    ): producers.ResizeAndRotateProducer;
-                    public static newAddImageTransformMetaDataProducer(
-                        param0: producers.Producer<image.EncodedImage>
-                    ): producers.AddImageTransformMetaDataProducer;
+                    public newResizeAndRotateProducer(param0: producers.Producer<image.EncodedImage>, param1: boolean, param2: boolean): producers.ResizeAndRotateProducer;
+                    public static newAddImageTransformMetaDataProducer(param0: producers.Producer<image.EncodedImage>): producers.AddImageTransformMetaDataProducer;
                     public newLocalContentUriFetchProducer(): producers.LocalContentUriFetchProducer;
                     public constructor(
                         param0: globalAndroid.content.Context,
@@ -8945,34 +8682,19 @@ declare namespace com {
                     );
                     public newLocalFileFetchProducer(): producers.LocalFileFetchProducer;
                     public newQualifiedResourceFetchProducer(): producers.QualifiedResourceFetchProducer;
-                    public newBackgroundThreadHandoffProducer(
-                        param0: producers.Producer<any>,
-                        param1: producers.ThreadHandoffProducerQueue
-                    ): producers.ThreadHandoffProducer<any>;
-                    public newBitmapMemoryCacheGetProducer(
-                        param0: producers.Producer<facebook.common.references.CloseableReference<image.CloseableImage>>
-                    ): producers.BitmapMemoryCacheGetProducer;
-                    public newDiskCacheReadProducer(
-                        param0: producers.Producer<image.EncodedImage>
-                    ): producers.DiskCacheReadProducer;
+                    public newBackgroundThreadHandoffProducer(param0: producers.Producer<any>, param1: producers.ThreadHandoffProducerQueue): producers.ThreadHandoffProducer<any>;
+                    public newBitmapMemoryCacheGetProducer(param0: producers.Producer<facebook.common.references.CloseableReference<image.CloseableImage>>): producers.BitmapMemoryCacheGetProducer;
+                    public newDiskCacheReadProducer(param0: producers.Producer<image.EncodedImage>): producers.DiskCacheReadProducer;
                     public newPostprocessorBitmapMemoryCacheProducer(
                         param0: producers.Producer<facebook.common.references.CloseableReference<image.CloseableImage>>
                     ): producers.PostprocessedBitmapMemoryCacheProducer;
-                    public newPartialDiskCacheProducer(
-                        param0: producers.Producer<image.EncodedImage>
-                    ): producers.PartialDiskCacheProducer;
+                    public newPartialDiskCacheProducer(param0: producers.Producer<image.EncodedImage>): producers.PartialDiskCacheProducer;
                     public newLocalContentUriThumbnailFetchProducer(): producers.LocalContentUriThumbnailFetchProducer;
-                    public newMediaVariationsProducer(
-                        param0: producers.Producer<image.EncodedImage>
-                    ): producers.MediaVariationsFallbackProducer;
-                    public newBitmapMemoryCacheProducer(
-                        param0: producers.Producer<facebook.common.references.CloseableReference<image.CloseableImage>>
-                    ): producers.BitmapMemoryCacheProducer;
+                    public newMediaVariationsProducer(param0: producers.Producer<image.EncodedImage>): producers.MediaVariationsFallbackProducer;
+                    public newBitmapMemoryCacheProducer(param0: producers.Producer<facebook.common.references.CloseableReference<image.CloseableImage>>): producers.BitmapMemoryCacheProducer;
                     public newDataFetchProducer(): producers.DataFetchProducer;
                     public newLocalExifThumbnailProducer(): producers.LocalExifThumbnailProducer;
-                    public newEncodedMemoryCacheProducer(
-                        param0: producers.Producer<image.EncodedImage>
-                    ): producers.EncodedMemoryCacheProducer;
+                    public newEncodedMemoryCacheProducer(param0: producers.Producer<image.EncodedImage>): producers.EncodedMemoryCacheProducer;
                     public static newNullProducer(): producers.NullProducer<any>;
                     public newLocalAssetFetchProducer(): producers.LocalAssetFetchProducer;
                 }
@@ -8999,18 +8721,10 @@ declare namespace com {
                         param7: boolean,
                         param8: boolean
                     );
-                    public getLocalFileFetchEncodedImageProducerSequence(): producers.Producer<
-                        facebook.common.references.CloseableReference<facebook.common.memory.PooledByteBuffer>
-                    >;
-                    public getDecodedImageProducerSequence(
-                        param0: request.ImageRequest
-                    ): producers.Producer<facebook.common.references.CloseableReference<image.CloseableImage>>;
-                    public getNetworkFetchEncodedImageProducerSequence(): producers.Producer<
-                        facebook.common.references.CloseableReference<facebook.common.memory.PooledByteBuffer>
-                    >;
-                    public getEncodedImageProducerSequence(
-                        param0: request.ImageRequest
-                    ): producers.Producer<facebook.common.references.CloseableReference<facebook.common.memory.PooledByteBuffer>>;
+                    public getLocalFileFetchEncodedImageProducerSequence(): producers.Producer<facebook.common.references.CloseableReference<facebook.common.memory.PooledByteBuffer>>;
+                    public getDecodedImageProducerSequence(param0: request.ImageRequest): producers.Producer<facebook.common.references.CloseableReference<image.CloseableImage>>;
+                    public getNetworkFetchEncodedImageProducerSequence(): producers.Producer<facebook.common.references.CloseableReference<facebook.common.memory.PooledByteBuffer>>;
+                    public getEncodedImageProducerSequence(param0: request.ImageRequest): producers.Producer<facebook.common.references.CloseableReference<facebook.common.memory.PooledByteBuffer>>;
                     public getEncodedImagePrefetchProducerSequence(param0: request.ImageRequest): producers.Producer<java.lang.Void>;
                 }
             }
@@ -9024,11 +8738,7 @@ declare namespace com {
             export namespace datasource {
                 export abstract class AbstractProducerToDataSourceAdapter<T> extends facebook.datasource.AbstractDataSource<any> implements request.HasImageRequest {
                     public static class: java.lang.Class<AbstractProducerToDataSourceAdapter<any>>;
-                    public constructor(
-                        param0: producers.Producer<any>,
-                        param1: producers.SettableProducerContext,
-                        param2: listener.RequestListener
-                    );
+                    public constructor(param0: producers.Producer<any>, param1: producers.SettableProducerContext, param2: listener.RequestListener);
                     public isFinished(): boolean;
                     public close(): boolean;
                     public hasFailed(): boolean;
@@ -9051,9 +8761,7 @@ declare namespace com {
     export namespace facebook {
         export namespace imagepipeline {
             export namespace datasource {
-                export abstract class BaseBitmapDataSubscriber extends facebook.datasource.BaseDataSubscriber<
-                    facebook.common.references.CloseableReference<image.CloseableImage>
-                > {
+                export abstract class BaseBitmapDataSubscriber extends facebook.datasource.BaseDataSubscriber<facebook.common.references.CloseableReference<image.CloseableImage>> {
                     public static class: java.lang.Class<BaseBitmapDataSubscriber>;
                     public constructor();
                     public onCancellation(param0: facebook.datasource.DataSource<any>): void;
@@ -9073,18 +8781,14 @@ declare namespace com {
     export namespace facebook {
         export namespace imagepipeline {
             export namespace datasource {
-                export abstract class BaseListBitmapDataSubscriber extends facebook.datasource.BaseDataSubscriber<
-                    java.util.List<facebook.common.references.CloseableReference<image.CloseableImage>>
-                > {
+                export abstract class BaseListBitmapDataSubscriber extends facebook.datasource.BaseDataSubscriber<java.util.List<facebook.common.references.CloseableReference<image.CloseableImage>>> {
                     public static class: java.lang.Class<BaseListBitmapDataSubscriber>;
                     public constructor();
                     public onCancellation(param0: facebook.datasource.DataSource<any>): void;
                     public onProgressUpdate(param0: facebook.datasource.DataSource<any>): void;
                     public onNewResultListImpl(param0: java.util.List<globalAndroid.graphics.Bitmap>): void;
                     public onFailure(param0: facebook.datasource.DataSource<any>): void;
-                    public onNewResultImpl(
-                        param0: facebook.datasource.DataSource<java.util.List<facebook.common.references.CloseableReference<image.CloseableImage>>>
-                    ): void;
+                    public onNewResultImpl(param0: facebook.datasource.DataSource<java.util.List<facebook.common.references.CloseableReference<image.CloseableImage>>>): void;
                     public onNewResultImpl(param0: facebook.datasource.DataSource<any>): void;
                     public onNewResult(param0: facebook.datasource.DataSource<any>): void;
                 }
@@ -9097,9 +8801,7 @@ declare namespace com {
     export namespace facebook {
         export namespace imagepipeline {
             export namespace datasource {
-                export class CloseableProducerToDataSourceAdapter<T> extends AbstractProducerToDataSourceAdapter<
-                    facebook.common.references.CloseableReference<any>
-                > {
+                export class CloseableProducerToDataSourceAdapter<T> extends AbstractProducerToDataSourceAdapter<facebook.common.references.CloseableReference<any>> {
                     public static class: java.lang.Class<CloseableProducerToDataSourceAdapter<any>>;
                     public isFinished(): boolean;
                     public close(): boolean;
@@ -9108,11 +8810,7 @@ declare namespace com {
                     public closeResult(param0: any): void;
                     public getProgress(): number;
                     public closeResult(param0: facebook.common.references.CloseableReference<any>): void;
-                    public static create(
-                        param0: producers.Producer<any>,
-                        param1: producers.SettableProducerContext,
-                        param2: listener.RequestListener
-                    ): facebook.datasource.DataSource<any>;
+                    public static create(param0: producers.Producer<any>, param1: producers.SettableProducerContext, param2: listener.RequestListener): facebook.datasource.DataSource<any>;
                     public hasResult(): boolean;
                     public subscribe(param0: facebook.datasource.DataSubscriber<any>, param1: java.util.concurrent.Executor): void;
                     public getImageRequest(): request.ImageRequest;
@@ -9173,11 +8871,7 @@ declare namespace com {
                     public static class: java.lang.Class<ProducerToDataSourceAdapter<any>>;
                     public isFinished(): boolean;
                     public getProgress(): number;
-                    public static create(
-                        param0: producers.Producer<any>,
-                        param1: producers.SettableProducerContext,
-                        param2: listener.RequestListener
-                    ): facebook.datasource.DataSource<any>;
+                    public static create(param0: producers.Producer<any>, param1: producers.SettableProducerContext, param2: listener.RequestListener): facebook.datasource.DataSource<any>;
                     public hasResult(): boolean;
                     public close(): boolean;
                     public subscribe(param0: facebook.datasource.DataSubscriber<any>, param1: java.util.concurrent.Executor): void;
@@ -9245,45 +8939,13 @@ declare namespace com {
             export namespace decoder {
                 export class DefaultImageDecoder extends java.lang.Object implements ImageDecoder {
                     public static class: java.lang.Class<DefaultImageDecoder>;
-                    public constructor(
-                        param0: ImageDecoder,
-                        param1: ImageDecoder,
-                        param2: platform.PlatformDecoder,
-                        param3: java.util.Map<imageformat.ImageFormat, ImageDecoder>
-                    );
-                    public decodeGif(
-                        param0: image.EncodedImage,
-                        param1: number,
-                        param2: image.QualityInfo,
-                        param3: common.ImageDecodeOptions
-                    ): image.CloseableImage;
-                    public decodeStaticImage(
-                        param0: image.EncodedImage,
-                        param1: common.ImageDecodeOptions
-                    ): image.CloseableStaticBitmap;
-                    public decodeJpeg(
-                        param0: image.EncodedImage,
-                        param1: number,
-                        param2: image.QualityInfo,
-                        param3: common.ImageDecodeOptions
-                    ): image.CloseableStaticBitmap;
-                    public constructor(
-                        param0: ImageDecoder,
-                        param1: ImageDecoder,
-                        param2: platform.PlatformDecoder
-                    );
-                    public decode(
-                        param0: image.EncodedImage,
-                        param1: number,
-                        param2: image.QualityInfo,
-                        param3: common.ImageDecodeOptions
-                    ): image.CloseableImage;
-                    public decodeAnimatedWebp(
-                        param0: image.EncodedImage,
-                        param1: number,
-                        param2: image.QualityInfo,
-                        param3: common.ImageDecodeOptions
-                    ): image.CloseableImage;
+                    public constructor(param0: ImageDecoder, param1: ImageDecoder, param2: platform.PlatformDecoder, param3: java.util.Map<imageformat.ImageFormat, ImageDecoder>);
+                    public decodeGif(param0: image.EncodedImage, param1: number, param2: image.QualityInfo, param3: common.ImageDecodeOptions): image.CloseableImage;
+                    public decodeStaticImage(param0: image.EncodedImage, param1: common.ImageDecodeOptions): image.CloseableStaticBitmap;
+                    public decodeJpeg(param0: image.EncodedImage, param1: number, param2: image.QualityInfo, param3: common.ImageDecodeOptions): image.CloseableStaticBitmap;
+                    public constructor(param0: ImageDecoder, param1: ImageDecoder, param2: platform.PlatformDecoder);
+                    public decode(param0: image.EncodedImage, param1: number, param2: image.QualityInfo, param3: common.ImageDecodeOptions): image.CloseableImage;
+                    public decodeAnimatedWebp(param0: image.EncodedImage, param1: number, param2: image.QualityInfo, param3: common.ImageDecodeOptions): image.CloseableImage;
                 }
             }
         }
@@ -9299,21 +8961,9 @@ declare namespace com {
                     /**
                      * Constructs a new instance of the com.facebook.imagepipeline.decoder.ImageDecoder interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
                      */
-                    public constructor(implementation: {
-                        decode(
-                            param0: image.EncodedImage,
-                            param1: number,
-                            param2: image.QualityInfo,
-                            param3: common.ImageDecodeOptions
-                        ): image.CloseableImage;
-                    });
+                    public constructor(implementation: { decode(param0: image.EncodedImage, param1: number, param2: image.QualityInfo, param3: common.ImageDecodeOptions): image.CloseableImage });
                     public constructor();
-                    public decode(
-                        param0: image.EncodedImage,
-                        param1: number,
-                        param2: image.QualityInfo,
-                        param3: common.ImageDecodeOptions
-                    ): image.CloseableImage;
+                    public decode(param0: image.EncodedImage, param1: number, param2: image.QualityInfo, param3: common.ImageDecodeOptions): image.CloseableImage;
                 }
             }
         }
@@ -9335,15 +8985,8 @@ declare namespace com {
                         public static class: java.lang.Class<Builder>;
                         public constructor();
                         public build(): ImageDecoderConfig;
-                        public addDecodingCapability(
-                            param0: imageformat.ImageFormat,
-                            param1: imageformat.ImageFormat.FormatChecker,
-                            param2: ImageDecoder
-                        ): Builder;
-                        public overrideDecoder(
-                            param0: imageformat.ImageFormat,
-                            param1: ImageDecoder
-                        ): Builder;
+                        public addDecodingCapability(param0: imageformat.ImageFormat, param1: imageformat.ImageFormat.FormatChecker, param2: ImageDecoder): Builder;
+                        public overrideDecoder(param0: imageformat.ImageFormat, param1: ImageDecoder): Builder;
                     }
                 }
             }
@@ -9530,18 +9173,8 @@ declare namespace com {
                     public getRotationAngle(): number;
                     public close(): void;
                     public getQualityInfo(): QualityInfo;
-                    public constructor(
-                        param0: facebook.common.references.CloseableReference<globalAndroid.graphics.Bitmap>,
-                        param1: QualityInfo,
-                        param2: number,
-                        param3: number
-                    );
-                    public constructor(
-                        param0: globalAndroid.graphics.Bitmap,
-                        param1: facebook.common.references.ResourceReleaser<globalAndroid.graphics.Bitmap>,
-                        param2: QualityInfo,
-                        param3: number
-                    );
+                    public constructor(param0: facebook.common.references.CloseableReference<globalAndroid.graphics.Bitmap>, param1: QualityInfo, param2: number, param3: number);
+                    public constructor(param0: globalAndroid.graphics.Bitmap, param1: facebook.common.references.ResourceReleaser<globalAndroid.graphics.Bitmap>, param2: QualityInfo, param3: number);
                     public isClosed(): boolean;
                 }
             }
@@ -9788,11 +9421,7 @@ declare namespace com {
                     public trim(param0: facebook.common.memory.MemoryTrimType): void;
                     public get(param0: number): any;
                     public onParamsChanged(): void;
-                    public constructor(
-                        param0: facebook.common.memory.MemoryTrimmableRegistry,
-                        param1: PoolParams,
-                        param2: PoolStatsTracker
-                    );
+                    public constructor(param0: facebook.common.memory.MemoryTrimmableRegistry, param1: PoolParams, param2: PoolStatsTracker);
                     public initialize(): void;
                 }
                 export namespace BasePool {
@@ -9896,11 +9525,7 @@ declare namespace com {
                     public getBucketedSizeForValue(param0: any): number;
                     public get(param0: number): any;
                     public getBucketedSizeForValue(param0: globalAndroid.graphics.Bitmap): number;
-                    public constructor(
-                        param0: facebook.common.memory.MemoryTrimmableRegistry,
-                        param1: PoolParams,
-                        param2: PoolStatsTracker
-                    );
+                    public constructor(param0: facebook.common.memory.MemoryTrimmableRegistry, param1: PoolParams, param2: PoolStatsTracker);
                     public isReusable(param0: globalAndroid.graphics.Bitmap): boolean;
                 }
             }
@@ -10002,11 +9627,7 @@ declare namespace com {
                 export namespace FlexByteArrayPool {
                     export class SoftRefByteArrayPool extends GenericByteArrayPool {
                         public static class: java.lang.Class<SoftRefByteArrayPool>;
-                        public constructor(
-                            param0: facebook.common.memory.MemoryTrimmableRegistry,
-                            param1: PoolParams,
-                            param2: PoolStatsTracker
-                        );
+                        public constructor(param0: facebook.common.memory.MemoryTrimmableRegistry, param1: PoolParams, param2: PoolStatsTracker);
                         public get(param0: number): any;
                         public release(param0: any): void;
                     }
@@ -10034,11 +9655,7 @@ declare namespace com {
                     public get(param0: number): any;
                     public alloc(param0: number): native.Array<number>;
                     public free(param0: native.Array<number>): void;
-                    public constructor(
-                        param0: facebook.common.memory.MemoryTrimmableRegistry,
-                        param1: PoolParams,
-                        param2: PoolStatsTracker
-                    );
+                    public constructor(param0: facebook.common.memory.MemoryTrimmableRegistry, param1: PoolParams, param2: PoolStatsTracker);
                 }
             }
         }
@@ -10087,11 +9704,7 @@ declare namespace com {
                     public getBucketedSizeForValue(param0: any): number;
                     public get(param0: number): any;
                     public free(param0: NativeMemoryChunk): void;
-                    public constructor(
-                        param0: facebook.common.memory.MemoryTrimmableRegistry,
-                        param1: PoolParams,
-                        param2: PoolStatsTracker
-                    );
+                    public constructor(param0: facebook.common.memory.MemoryTrimmableRegistry, param1: PoolParams, param2: PoolStatsTracker);
                 }
             }
         }
@@ -10636,10 +10249,7 @@ declare namespace com {
             export namespace postprocessors {
                 export class IterativeBoxBlurPostProcessor extends request.BasePostprocessor {
                     public static class: java.lang.Class<IterativeBoxBlurPostProcessor>;
-                    public process(
-                        param0: globalAndroid.graphics.Bitmap,
-                        param1: bitmaps.PlatformBitmapFactory
-                    ): facebook.common.references.CloseableReference<globalAndroid.graphics.Bitmap>;
+                    public process(param0: globalAndroid.graphics.Bitmap, param1: bitmaps.PlatformBitmapFactory): facebook.common.references.CloseableReference<globalAndroid.graphics.Bitmap>;
                     public constructor();
                     public getName(): string;
                     public process(param0: globalAndroid.graphics.Bitmap): void;
@@ -10659,10 +10269,7 @@ declare namespace com {
             export namespace postprocessors {
                 export class RoundAsCirclePostprocessor extends request.BasePostprocessor {
                     public static class: java.lang.Class<RoundAsCirclePostprocessor>;
-                    public process(
-                        param0: globalAndroid.graphics.Bitmap,
-                        param1: bitmaps.PlatformBitmapFactory
-                    ): facebook.common.references.CloseableReference<globalAndroid.graphics.Bitmap>;
+                    public process(param0: globalAndroid.graphics.Bitmap, param1: bitmaps.PlatformBitmapFactory): facebook.common.references.CloseableReference<globalAndroid.graphics.Bitmap>;
                     public constructor();
                     public getName(): string;
                     public process(param0: globalAndroid.graphics.Bitmap): void;
@@ -10682,16 +10289,10 @@ declare namespace com {
                     public static class: java.lang.Class<AddImageTransformMetaDataProducer>;
                     public constructor(param0: Producer<image.EncodedImage>);
                     public produceResults(param0: Consumer<any>, param1: ProducerContext): void;
-                    public produceResults(
-                        param0: Consumer<image.EncodedImage>,
-                        param1: ProducerContext
-                    ): void;
+                    public produceResults(param0: Consumer<image.EncodedImage>, param1: ProducerContext): void;
                 }
                 export namespace AddImageTransformMetaDataProducer {
-                    export class AddImageTransformMetaDataConsumer extends DelegatingConsumer<
-                        image.EncodedImage,
-                        image.EncodedImage
-                    > {
+                    export class AddImageTransformMetaDataConsumer extends DelegatingConsumer<image.EncodedImage, image.EncodedImage> {
                         public static class: java.lang.Class<AddImageTransformMetaDataConsumer>;
                         public onNewResultImpl(param0: image.EncodedImage, param1: number): void;
                         public onFailure(param0: java.lang.Throwable): void;
@@ -10744,10 +10345,7 @@ declare namespace com {
                     public onFetchCompletion(param0: any, param1: number): void;
                     public getExtraMap(param0: any, param1: number): java.util.Map<string, string>;
                     public constructor();
-                    public createFetchState(
-                        param0: Consumer<image.EncodedImage>,
-                        param1: ProducerContext
-                    ): any;
+                    public createFetchState(param0: Consumer<image.EncodedImage>, param1: ProducerContext): any;
                     public shouldPropagate(param0: any): boolean;
                     public fetch(param0: any, param1: NetworkFetcher.Callback): void;
                 }
@@ -10830,10 +10428,7 @@ declare namespace com {
                         param0: Consumer<facebook.common.references.CloseableReference<image.CloseableImage>>,
                         param1: facebook.cache.common.CacheKey
                     ): Consumer<facebook.common.references.CloseableReference<image.CloseableImage>>;
-                    public produceResults(
-                        param0: Consumer<facebook.common.references.CloseableReference<image.CloseableImage>>,
-                        param1: ProducerContext
-                    ): void;
+                    public produceResults(param0: Consumer<facebook.common.references.CloseableReference<image.CloseableImage>>, param1: ProducerContext): void;
                     public produceResults(param0: Consumer<any>, param1: ProducerContext): void;
                     public getProducerName(): string;
                 }
@@ -10855,12 +10450,8 @@ declare namespace com {
                     public produceResults(param0: Consumer<any>, param1: ProducerContext): void;
                     public getKey(param0: ProducerContext): any;
                     public cloneOrNull(param0: any): any;
-                    public getKey(
-                        param0: ProducerContext
-                    ): globalAndroid.util.Pair<facebook.cache.common.CacheKey, request.ImageRequest.RequestLevel>;
-                    public cloneOrNull(
-                        param0: facebook.common.references.CloseableReference<image.CloseableImage>
-                    ): facebook.common.references.CloseableReference<image.CloseableImage>;
+                    public getKey(param0: ProducerContext): globalAndroid.util.Pair<facebook.cache.common.CacheKey, request.ImageRequest.RequestLevel>;
+                    public cloneOrNull(param0: facebook.common.references.CloseableReference<image.CloseableImage>): facebook.common.references.CloseableReference<image.CloseableImage>;
                     public constructor(param0: cache.CacheKeyFactory, param1: Producer<any>);
                 }
             }
@@ -10872,9 +10463,7 @@ declare namespace com {
     export namespace facebook {
         export namespace imagepipeline {
             export namespace producers {
-                export class BitmapMemoryCacheProducer extends Producer<
-                    facebook.common.references.CloseableReference<image.CloseableImage>
-                > {
+                export class BitmapMemoryCacheProducer extends Producer<facebook.common.references.CloseableReference<image.CloseableImage>> {
                     public static class: java.lang.Class<BitmapMemoryCacheProducer>;
                     public static PRODUCER_NAME: string;
                     public static EXTRA_CACHED_VALUE_FOUND: string;
@@ -10887,10 +10476,7 @@ declare namespace com {
                         param0: Consumer<facebook.common.references.CloseableReference<image.CloseableImage>>,
                         param1: facebook.cache.common.CacheKey
                     ): Consumer<facebook.common.references.CloseableReference<image.CloseableImage>>;
-                    public produceResults(
-                        param0: Consumer<facebook.common.references.CloseableReference<image.CloseableImage>>,
-                        param1: ProducerContext
-                    ): void;
+                    public produceResults(param0: Consumer<facebook.common.references.CloseableReference<image.CloseableImage>>, param1: ProducerContext): void;
                     public produceResults(param0: Consumer<any>, param1: ProducerContext): void;
                     public getProducerName(): string;
                 }
@@ -10903,22 +10489,12 @@ declare namespace com {
     export namespace facebook {
         export namespace imagepipeline {
             export namespace producers {
-                export class BitmapPrepareProducer extends Producer<
-                    facebook.common.references.CloseableReference<image.CloseableImage>
-                > {
+                export class BitmapPrepareProducer extends Producer<facebook.common.references.CloseableReference<image.CloseableImage>> {
                     public static class: java.lang.Class<BitmapPrepareProducer>;
                     public static PRODUCER_NAME: string;
-                    public produceResults(
-                        param0: Consumer<facebook.common.references.CloseableReference<image.CloseableImage>>,
-                        param1: ProducerContext
-                    ): void;
+                    public produceResults(param0: Consumer<facebook.common.references.CloseableReference<image.CloseableImage>>, param1: ProducerContext): void;
                     public produceResults(param0: Consumer<any>, param1: ProducerContext): void;
-                    public constructor(
-                        param0: Producer<facebook.common.references.CloseableReference<image.CloseableImage>>,
-                        param1: number,
-                        param2: number,
-                        param3: boolean
-                    );
+                    public constructor(param0: Producer<facebook.common.references.CloseableReference<image.CloseableImage>>, param1: number, param2: number, param3: boolean);
                 }
                 export namespace BitmapPrepareProducer {
                     export class BitmapPrepareConsumer extends DelegatingConsumer<
@@ -10946,20 +10522,11 @@ declare namespace com {
                 export class BranchOnSeparateImagesProducer extends Producer<image.EncodedImage> {
                     public static class: java.lang.Class<BranchOnSeparateImagesProducer>;
                     public produceResults(param0: Consumer<any>, param1: ProducerContext): void;
-                    public constructor(
-                        param0: Producer<image.EncodedImage>,
-                        param1: Producer<image.EncodedImage>
-                    );
-                    public produceResults(
-                        param0: Consumer<image.EncodedImage>,
-                        param1: ProducerContext
-                    ): void;
+                    public constructor(param0: Producer<image.EncodedImage>, param1: Producer<image.EncodedImage>);
+                    public produceResults(param0: Consumer<image.EncodedImage>, param1: ProducerContext): void;
                 }
                 export namespace BranchOnSeparateImagesProducer {
-                    export class OnFirstImageConsumer extends DelegatingConsumer<
-                        image.EncodedImage,
-                        image.EncodedImage
-                    > {
+                    export class OnFirstImageConsumer extends DelegatingConsumer<image.EncodedImage, image.EncodedImage> {
                         public static class: java.lang.Class<OnFirstImageConsumer>;
                         public onNewResultImpl(param0: image.EncodedImage, param1: number): void;
                         public onFailureImpl(param0: java.lang.Throwable): void;
@@ -11034,10 +10601,7 @@ declare namespace com {
                     public getEncodedImage(param0: java.io.InputStream, param1: number): image.EncodedImage;
                     public getEncodedImage(param0: request.ImageRequest): image.EncodedImage;
                     public getProducerName(): string;
-                    public produceResults(
-                        param0: Consumer<image.EncodedImage>,
-                        param1: ProducerContext
-                    ): void;
+                    public produceResults(param0: Consumer<image.EncodedImage>, param1: ProducerContext): void;
                 }
             }
         }
@@ -11069,10 +10633,7 @@ declare namespace com {
                         param7: Producer<image.EncodedImage>,
                         param8: facebook.common.internal.Supplier<java.lang.Boolean>
                     );
-                    public produceResults(
-                        param0: Consumer<facebook.common.references.CloseableReference<image.CloseableImage>>,
-                        param1: ProducerContext
-                    ): void;
+                    public produceResults(param0: Consumer<facebook.common.references.CloseableReference<image.CloseableImage>>, param1: ProducerContext): void;
                     public produceResults(param0: Consumer<any>, param1: ProducerContext): void;
                 }
                 export namespace DecodeProducer {
@@ -11087,11 +10648,7 @@ declare namespace com {
                         public onProgressUpdate(param0: number): void;
                         public onCancellation(): void;
                         public onNewResult(param0: any, param1: number): void;
-                        public constructor(
-                            param0: Consumer<facebook.common.references.CloseableReference<image.CloseableImage>>,
-                            param1: ProducerContext,
-                            param2: boolean
-                        );
+                        public constructor(param0: Consumer<facebook.common.references.CloseableReference<image.CloseableImage>>, param1: ProducerContext, param2: boolean);
                     }
                     export class NetworkImagesProgressiveDecoder extends ProgressiveDecoder {
                         public static class: java.lang.Class<NetworkImagesProgressiveDecoder>;
@@ -11111,16 +10668,9 @@ declare namespace com {
                         public onProgressUpdate(param0: number): void;
                         public onCancellation(): void;
                         public onNewResult(param0: any, param1: number): void;
-                        public constructor(
-                            param0: Consumer<facebook.common.references.CloseableReference<image.CloseableImage>>,
-                            param1: ProducerContext,
-                            param2: boolean
-                        );
+                        public constructor(param0: Consumer<facebook.common.references.CloseableReference<image.CloseableImage>>, param1: ProducerContext, param2: boolean);
                     }
-                    export abstract class ProgressiveDecoder extends DelegatingConsumer<
-                        image.EncodedImage,
-                        facebook.common.references.CloseableReference<image.CloseableImage>
-                    > {
+                    export abstract class ProgressiveDecoder extends DelegatingConsumer<image.EncodedImage, facebook.common.references.CloseableReference<image.CloseableImage>> {
                         public static class: java.lang.Class<ProgressiveDecoder>;
                         public constructor(param0: Consumer<any>);
                         public constructor();
@@ -11136,11 +10686,7 @@ declare namespace com {
                         public onNewResultImpl(param0: any, param1: number): void;
                         public getIntermediateImageEndOffset(param0: image.EncodedImage): number;
                         public onCancellation(): void;
-                        public constructor(
-                            param0: Consumer<facebook.common.references.CloseableReference<image.CloseableImage>>,
-                            param1: ProducerContext,
-                            param2: boolean
-                        );
+                        public constructor(param0: Consumer<facebook.common.references.CloseableReference<image.CloseableImage>>, param1: ProducerContext, param2: boolean);
                     }
                 }
             }
@@ -11180,16 +10726,8 @@ declare namespace com {
                     public static EXTRA_CACHED_VALUE_FOUND: string;
                     public static ENCODED_IMAGE_SIZE: string;
                     public produceResults(param0: Consumer<any>, param1: ProducerContext): void;
-                    public constructor(
-                        param0: cache.BufferedDiskCache,
-                        param1: cache.BufferedDiskCache,
-                        param2: cache.CacheKeyFactory,
-                        param3: Producer<image.EncodedImage>
-                    );
-                    public produceResults(
-                        param0: Consumer<image.EncodedImage>,
-                        param1: ProducerContext
-                    ): void;
+                    public constructor(param0: cache.BufferedDiskCache, param1: cache.BufferedDiskCache, param2: cache.CacheKeyFactory, param3: Producer<image.EncodedImage>);
+                    public produceResults(param0: Consumer<image.EncodedImage>, param1: ProducerContext): void;
                 }
             }
         }
@@ -11203,22 +10741,11 @@ declare namespace com {
                 export class DiskCacheWriteProducer extends Producer<image.EncodedImage> {
                     public static class: java.lang.Class<DiskCacheWriteProducer>;
                     public produceResults(param0: Consumer<any>, param1: ProducerContext): void;
-                    public constructor(
-                        param0: cache.BufferedDiskCache,
-                        param1: cache.BufferedDiskCache,
-                        param2: cache.CacheKeyFactory,
-                        param3: Producer<image.EncodedImage>
-                    );
-                    public produceResults(
-                        param0: Consumer<image.EncodedImage>,
-                        param1: ProducerContext
-                    ): void;
+                    public constructor(param0: cache.BufferedDiskCache, param1: cache.BufferedDiskCache, param2: cache.CacheKeyFactory, param3: Producer<image.EncodedImage>);
+                    public produceResults(param0: Consumer<image.EncodedImage>, param1: ProducerContext): void;
                 }
                 export namespace DiskCacheWriteProducer {
-                    export class DiskCacheWriteConsumer extends DelegatingConsumer<
-                        image.EncodedImage,
-                        image.EncodedImage
-                    > {
+                    export class DiskCacheWriteConsumer extends DelegatingConsumer<image.EncodedImage, image.EncodedImage> {
                         public static class: java.lang.Class<DiskCacheWriteConsumer>;
                         public onNewResultImpl(param0: image.EncodedImage, param1: number): void;
                         public onFailure(param0: java.lang.Throwable): void;
@@ -11261,9 +10788,7 @@ declare namespace com {
                     public getKey(param0: ProducerContext): any;
                     public cloneOrNull(param0: any): any;
                     public cloneOrNull(param0: image.EncodedImage): image.EncodedImage;
-                    public getKey(
-                        param0: ProducerContext
-                    ): globalAndroid.util.Pair<facebook.cache.common.CacheKey, request.ImageRequest.RequestLevel>;
+                    public getKey(param0: ProducerContext): globalAndroid.util.Pair<facebook.cache.common.CacheKey, request.ImageRequest.RequestLevel>;
                     public constructor(param0: cache.CacheKeyFactory, param1: Producer<any>);
                 }
             }
@@ -11285,16 +10810,10 @@ declare namespace com {
                         param2: Producer<image.EncodedImage>
                     );
                     public produceResults(param0: Consumer<any>, param1: ProducerContext): void;
-                    public produceResults(
-                        param0: Consumer<image.EncodedImage>,
-                        param1: ProducerContext
-                    ): void;
+                    public produceResults(param0: Consumer<image.EncodedImage>, param1: ProducerContext): void;
                 }
                 export namespace EncodedMemoryCacheProducer {
-                    export class EncodedMemoryCacheConsumer extends DelegatingConsumer<
-                        image.EncodedImage,
-                        image.EncodedImage
-                    > {
+                    export class EncodedMemoryCacheConsumer extends DelegatingConsumer<image.EncodedImage, image.EncodedImage> {
                         public static class: java.lang.Class<EncodedMemoryCacheConsumer>;
                         public constructor(param0: Consumer<any>);
                         public constructor();
@@ -11332,10 +10851,7 @@ declare namespace com {
                     public getContext(): ProducerContext;
                     public getUri(): globalAndroid.net.Uri;
                     public setOnNewResultStatusFlags(param0: number): void;
-                    public constructor(
-                        param0: Consumer<image.EncodedImage>,
-                        param1: ProducerContext
-                    );
+                    public constructor(param0: Consumer<image.EncodedImage>, param1: ProducerContext);
                     public setResponseBytesRange(param0: common.BytesRange): void;
                 }
             }
@@ -11355,17 +10871,11 @@ declare namespace com {
                     public onFetchCompletion(param0: any, param1: number): void;
                     public getExtraMap(param0: any, param1: number): java.util.Map<string, string>;
                     public constructor();
-                    public createFetchState(
-                        param0: Consumer<image.EncodedImage>,
-                        param1: ProducerContext
-                    ): any;
+                    public createFetchState(param0: Consumer<image.EncodedImage>, param1: ProducerContext): any;
                     public shouldPropagate(param0: any): boolean;
                     public fetch(param0: any, param1: NetworkFetcher.Callback): void;
                     public constructor(param0: number);
-                    public createFetchState(
-                        param0: Consumer<image.EncodedImage>,
-                        param1: ProducerContext
-                    ): FetchState;
+                    public createFetchState(param0: Consumer<image.EncodedImage>, param1: ProducerContext): FetchState;
                     public fetch(param0: FetchState, param1: NetworkFetcher.Callback): void;
                 }
             }
@@ -11427,10 +10937,7 @@ declare namespace com {
                     public constructor(param0: java.util.concurrent.Executor, param1: facebook.common.memory.PooledByteBufferFactory, param2: globalAndroid.content.res.AssetManager);
                     public getEncodedImage(param0: request.ImageRequest): image.EncodedImage;
                     public getProducerName(): string;
-                    public produceResults(
-                        param0: Consumer<image.EncodedImage>,
-                        param1: ProducerContext
-                    ): void;
+                    public produceResults(param0: Consumer<image.EncodedImage>, param1: ProducerContext): void;
                 }
             }
         }
@@ -11450,10 +10957,7 @@ declare namespace com {
                     public getEncodedImage(param0: java.io.InputStream, param1: number): image.EncodedImage;
                     public getEncodedImage(param0: request.ImageRequest): image.EncodedImage;
                     public getProducerName(): string;
-                    public produceResults(
-                        param0: Consumer<image.EncodedImage>,
-                        param1: ProducerContext
-                    ): void;
+                    public produceResults(param0: Consumer<image.EncodedImage>, param1: ProducerContext): void;
                 }
             }
         }
@@ -11464,8 +10968,7 @@ declare namespace com {
     export namespace facebook {
         export namespace imagepipeline {
             export namespace producers {
-                export class LocalContentUriThumbnailFetchProducer extends LocalFetchProducer
-                    implements ThumbnailProducer<image.EncodedImage> {
+                export class LocalContentUriThumbnailFetchProducer extends LocalFetchProducer implements ThumbnailProducer<image.EncodedImage> {
                     public static class: java.lang.Class<LocalContentUriThumbnailFetchProducer>;
                     public static PRODUCER_NAME: string;
                     public constructor(param0: java.util.concurrent.Executor, param1: facebook.common.memory.PooledByteBufferFactory);
@@ -11474,10 +10977,7 @@ declare namespace com {
                     public getEncodedImage(param0: java.io.InputStream, param1: number): image.EncodedImage;
                     public getEncodedImage(param0: request.ImageRequest): image.EncodedImage;
                     public getProducerName(): string;
-                    public produceResults(
-                        param0: Consumer<image.EncodedImage>,
-                        param1: ProducerContext
-                    ): void;
+                    public produceResults(param0: Consumer<image.EncodedImage>, param1: ProducerContext): void;
                     public canProvideImageForSize(param0: common.ResizeOptions): boolean;
                 }
             }
@@ -11494,10 +10994,7 @@ declare namespace com {
                     public static PRODUCER_NAME: string;
                     public constructor(param0: java.util.concurrent.Executor, param1: facebook.common.memory.PooledByteBufferFactory, param2: globalAndroid.content.ContentResolver);
                     public produceResults(param0: Consumer<any>, param1: ProducerContext): void;
-                    public produceResults(
-                        param0: Consumer<image.EncodedImage>,
-                        param1: ProducerContext
-                    ): void;
+                    public produceResults(param0: Consumer<image.EncodedImage>, param1: ProducerContext): void;
                     public canProvideImageForSize(param0: common.ResizeOptions): boolean;
                 }
             }
@@ -11516,10 +11013,7 @@ declare namespace com {
                     public produceResults(param0: Consumer<any>, param1: ProducerContext): void;
                     public getEncodedImage(param0: java.io.InputStream, param1: number): image.EncodedImage;
                     public getEncodedImage(param0: request.ImageRequest): image.EncodedImage;
-                    public produceResults(
-                        param0: Consumer<image.EncodedImage>,
-                        param1: ProducerContext
-                    ): void;
+                    public produceResults(param0: Consumer<image.EncodedImage>, param1: ProducerContext): void;
                     public getProducerName(): string;
                 }
             }
@@ -11539,10 +11033,7 @@ declare namespace com {
                     public getEncodedImage(param0: java.io.InputStream, param1: number): image.EncodedImage;
                     public getEncodedImage(param0: request.ImageRequest): image.EncodedImage;
                     public getProducerName(): string;
-                    public produceResults(
-                        param0: Consumer<image.EncodedImage>,
-                        param1: ProducerContext
-                    ): void;
+                    public produceResults(param0: Consumer<image.EncodedImage>, param1: ProducerContext): void;
                 }
             }
         }
@@ -11561,10 +11052,7 @@ declare namespace com {
                     public getEncodedImage(param0: java.io.InputStream, param1: number): image.EncodedImage;
                     public getEncodedImage(param0: request.ImageRequest): image.EncodedImage;
                     public getProducerName(): string;
-                    public produceResults(
-                        param0: Consumer<image.EncodedImage>,
-                        param1: ProducerContext
-                    ): void;
+                    public produceResults(param0: Consumer<image.EncodedImage>, param1: ProducerContext): void;
                     public constructor(param0: java.util.concurrent.Executor, param1: facebook.common.memory.PooledByteBufferFactory, param2: globalAndroid.content.res.Resources);
                 }
             }
@@ -11576,15 +11064,10 @@ declare namespace com {
     export namespace facebook {
         export namespace imagepipeline {
             export namespace producers {
-                export class LocalVideoThumbnailProducer extends Producer<
-                    facebook.common.references.CloseableReference<image.CloseableImage>
-                > {
+                export class LocalVideoThumbnailProducer extends Producer<facebook.common.references.CloseableReference<image.CloseableImage>> {
                     public static class: java.lang.Class<LocalVideoThumbnailProducer>;
                     public static PRODUCER_NAME: string;
-                    public produceResults(
-                        param0: Consumer<facebook.common.references.CloseableReference<image.CloseableImage>>,
-                        param1: ProducerContext
-                    ): void;
+                    public produceResults(param0: Consumer<facebook.common.references.CloseableReference<image.CloseableImage>>, param1: ProducerContext): void;
                     public produceResults(param0: Consumer<any>, param1: ProducerContext): void;
                     public constructor(param0: java.util.concurrent.Executor, param1: globalAndroid.content.ContentResolver);
                 }
@@ -11605,10 +11088,7 @@ declare namespace com {
                     public static EXTRA_VARIANTS_COUNT: string;
                     public static EXTRA_VARIANTS_SOURCE: string;
                     public produceResults(param0: Consumer<any>, param1: ProducerContext): void;
-                    public produceResults(
-                        param0: Consumer<image.EncodedImage>,
-                        param1: ProducerContext
-                    ): void;
+                    public produceResults(param0: Consumer<image.EncodedImage>, param1: ProducerContext): void;
                     public constructor(
                         param0: cache.BufferedDiskCache,
                         param1: cache.BufferedDiskCache,
@@ -11618,10 +11098,7 @@ declare namespace com {
                     );
                 }
                 export namespace MediaVariationsFallbackProducer {
-                    export class MediaVariationsConsumer extends DelegatingConsumer<
-                        image.EncodedImage,
-                        image.EncodedImage
-                    > {
+                    export class MediaVariationsConsumer extends DelegatingConsumer<image.EncodedImage, image.EncodedImage> {
                         public static class: java.lang.Class<MediaVariationsConsumer>;
                         public constructor(param0: Consumer<any>);
                         public constructor();
@@ -11631,11 +11108,7 @@ declare namespace com {
                         public onProgressUpdate(param0: number): void;
                         public onCancellation(): void;
                         public onNewResult(param0: any, param1: number): void;
-                        public constructor(
-                            param0: Consumer<image.EncodedImage>,
-                            param1: ProducerContext,
-                            param2: string
-                        );
+                        public constructor(param0: Consumer<image.EncodedImage>, param1: ProducerContext, param2: string);
                     }
                     export class VariantComparator extends java.util.Comparator<request.MediaVariations.Variant> {
                         public static class: java.lang.Class<VariantComparator>;
@@ -11697,18 +11170,11 @@ declare namespace com {
                     public static class: java.lang.Class<NetworkFetchProducer>;
                     public static PRODUCER_NAME: string;
                     public static INTERMEDIATE_RESULT_PRODUCER_EVENT: string;
-                    public constructor(
-                        param0: facebook.common.memory.PooledByteBufferFactory,
-                        param1: facebook.common.memory.ByteArrayPool,
-                        param2: NetworkFetcher<any>
-                    );
+                    public constructor(param0: facebook.common.memory.PooledByteBufferFactory, param1: facebook.common.memory.ByteArrayPool, param2: NetworkFetcher<any>);
                     public onResponse(param0: FetchState, param1: java.io.InputStream, param2: number): void;
                     public produceResults(param0: Consumer<any>, param1: ProducerContext): void;
                     public handleFinalResult(param0: facebook.common.memory.PooledByteBufferOutputStream, param1: FetchState): void;
-                    public produceResults(
-                        param0: Consumer<image.EncodedImage>,
-                        param1: ProducerContext
-                    ): void;
+                    public produceResults(param0: Consumer<image.EncodedImage>, param1: ProducerContext): void;
                     public static calculateProgress(param0: number, param1: number): number;
                     public maybeHandleIntermediateResult(param0: facebook.common.memory.PooledByteBufferOutputStream, param1: FetchState): void;
                 }
@@ -11727,20 +11193,14 @@ declare namespace com {
                      * Constructs a new instance of the com.facebook.imagepipeline.producers.NetworkFetcher<any> interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
                      */
                     public constructor(implementation: {
-                        createFetchState(
-                            param0: Consumer<image.EncodedImage>,
-                            param1: ProducerContext
-                        ): FETCH_STATE;
+                        createFetchState(param0: Consumer<image.EncodedImage>, param1: ProducerContext): FETCH_STATE;
                         fetch(param0: FETCH_STATE, param1: NetworkFetcher.Callback): void;
                         shouldPropagate(param0: FETCH_STATE): boolean;
                         onFetchCompletion(param0: FETCH_STATE, param1: number): void;
                         getExtraMap(param0: FETCH_STATE, param1: number): java.util.Map<string, string>;
                     });
                     public constructor();
-                    public createFetchState(
-                        param0: Consumer<image.EncodedImage>,
-                        param1: ProducerContext
-                    ): FETCH_STATE;
+                    public createFetchState(param0: Consumer<image.EncodedImage>, param1: ProducerContext): FETCH_STATE;
                     public getExtraMap(param0: FETCH_STATE, param1: number): java.util.Map<string, string>;
                     public fetch(param0: FETCH_STATE, param1: NetworkFetcher.Callback): void;
                     public shouldPropagate(param0: FETCH_STATE): boolean;
@@ -11795,16 +11255,10 @@ declare namespace com {
                         param4: Producer<image.EncodedImage>
                     );
                     public produceResults(param0: Consumer<any>, param1: ProducerContext): void;
-                    public produceResults(
-                        param0: Consumer<image.EncodedImage>,
-                        param1: ProducerContext
-                    ): void;
+                    public produceResults(param0: Consumer<image.EncodedImage>, param1: ProducerContext): void;
                 }
                 export namespace PartialDiskCacheProducer {
-                    export class PartialDiskCacheConsumer extends DelegatingConsumer<
-                        image.EncodedImage,
-                        image.EncodedImage
-                    > {
+                    export class PartialDiskCacheConsumer extends DelegatingConsumer<image.EncodedImage, image.EncodedImage> {
                         public static class: java.lang.Class<PartialDiskCacheConsumer>;
                         public onNewResultImpl(param0: image.EncodedImage, param1: number): void;
                         public onFailure(param0: java.lang.Throwable): void;
@@ -11823,9 +11277,7 @@ declare namespace com {
     export namespace facebook {
         export namespace imagepipeline {
             export namespace producers {
-                export class PostprocessedBitmapMemoryCacheProducer extends Producer<
-                    facebook.common.references.CloseableReference<image.CloseableImage>
-                > {
+                export class PostprocessedBitmapMemoryCacheProducer extends Producer<facebook.common.references.CloseableReference<image.CloseableImage>> {
                     public static class: java.lang.Class<PostprocessedBitmapMemoryCacheProducer>;
                     public static PRODUCER_NAME: string;
                     public constructor(
@@ -11833,10 +11285,7 @@ declare namespace com {
                         param1: cache.CacheKeyFactory,
                         param2: Producer<facebook.common.references.CloseableReference<image.CloseableImage>>
                     );
-                    public produceResults(
-                        param0: Consumer<facebook.common.references.CloseableReference<image.CloseableImage>>,
-                        param1: ProducerContext
-                    ): void;
+                    public produceResults(param0: Consumer<facebook.common.references.CloseableReference<image.CloseableImage>>, param1: ProducerContext): void;
                     public produceResults(param0: Consumer<any>, param1: ProducerContext): void;
                     public getProducerName(): string;
                 }
@@ -11871,15 +11320,10 @@ declare namespace com {
     export namespace facebook {
         export namespace imagepipeline {
             export namespace producers {
-                export class PostprocessorProducer extends Producer<
-                    facebook.common.references.CloseableReference<image.CloseableImage>
-                > {
+                export class PostprocessorProducer extends Producer<facebook.common.references.CloseableReference<image.CloseableImage>> {
                     public static class: java.lang.Class<PostprocessorProducer>;
                     public static NAME: string;
-                    public produceResults(
-                        param0: Consumer<facebook.common.references.CloseableReference<image.CloseableImage>>,
-                        param1: ProducerContext
-                    ): void;
+                    public produceResults(param0: Consumer<facebook.common.references.CloseableReference<image.CloseableImage>>, param1: ProducerContext): void;
                     public produceResults(param0: Consumer<any>, param1: ProducerContext): void;
                     public constructor(
                         param0: Producer<facebook.common.references.CloseableReference<image.CloseableImage>>,
@@ -11912,10 +11356,7 @@ declare namespace com {
                         public onNewResultImpl(param0: facebook.common.references.CloseableReference<image.CloseableImage>, param1: number): void;
                     }
                     export class RepeatedPostprocessorConsumer
-                        extends DelegatingConsumer<
-                            facebook.common.references.CloseableReference<image.CloseableImage>,
-                            facebook.common.references.CloseableReference<image.CloseableImage>
-                        >
+                        extends DelegatingConsumer<facebook.common.references.CloseableReference<image.CloseableImage>, facebook.common.references.CloseableReference<image.CloseableImage>>
                         implements request.RepeatedPostprocessorRunner {
                         public static class: java.lang.Class<RepeatedPostprocessorConsumer>;
                         public onFailureImpl(param0: java.lang.Throwable): void;
@@ -11955,9 +11396,7 @@ declare namespace com {
                     /**
                      * Constructs a new instance of the com.facebook.imagepipeline.producers.Producer<any> interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
                      */
-                    public constructor(implementation: {
-                        produceResults(param0: Consumer<T>, param1: ProducerContext): void;
-                    });
+                    public constructor(implementation: { produceResults(param0: Consumer<T>, param1: ProducerContext): void });
                     public constructor();
                     public produceResults(param0: Consumer<T>, param1: ProducerContext): void;
                 }
@@ -12080,10 +11519,7 @@ declare namespace com {
                     public getEncodedImage(param0: java.io.InputStream, param1: number): image.EncodedImage;
                     public getEncodedImage(param0: request.ImageRequest): image.EncodedImage;
                     public getProducerName(): string;
-                    public produceResults(
-                        param0: Consumer<image.EncodedImage>,
-                        param1: ProducerContext
-                    ): void;
+                    public produceResults(param0: Consumer<image.EncodedImage>, param1: ProducerContext): void;
                 }
             }
         }
@@ -12094,14 +11530,9 @@ declare namespace com {
     export namespace facebook {
         export namespace imagepipeline {
             export namespace producers {
-                export class RemoveImageTransformMetaDataProducer extends Producer<
-                    facebook.common.references.CloseableReference<facebook.common.memory.PooledByteBuffer>
-                > {
+                export class RemoveImageTransformMetaDataProducer extends Producer<facebook.common.references.CloseableReference<facebook.common.memory.PooledByteBuffer>> {
                     public static class: java.lang.Class<RemoveImageTransformMetaDataProducer>;
-                    public produceResults(
-                        param0: Consumer<facebook.common.references.CloseableReference<facebook.common.memory.PooledByteBuffer>>,
-                        param1: ProducerContext
-                    ): void;
+                    public produceResults(param0: Consumer<facebook.common.references.CloseableReference<facebook.common.memory.PooledByteBuffer>>, param1: ProducerContext): void;
                     public constructor(param0: Producer<image.EncodedImage>);
                     public produceResults(param0: Consumer<any>, param1: ProducerContext): void;
                 }
@@ -12139,23 +11570,14 @@ declare namespace com {
                         param4: boolean
                     );
                     public produceResults(param0: Consumer<any>, param1: ProducerContext): void;
-                    public produceResults(
-                        param0: Consumer<image.EncodedImage>,
-                        param1: ProducerContext
-                    ): void;
+                    public produceResults(param0: Consumer<image.EncodedImage>, param1: ProducerContext): void;
                 }
                 export namespace ResizeAndRotateProducer {
-                    export class TransformingConsumer extends DelegatingConsumer<
-                        image.EncodedImage,
-                        image.EncodedImage
-                    > {
+                    export class TransformingConsumer extends DelegatingConsumer<image.EncodedImage, image.EncodedImage> {
                         public static class: java.lang.Class<TransformingConsumer>;
                         public constructor(param0: Consumer<any>);
                         public constructor();
-                        public constructor(
-                            param0: Consumer<image.EncodedImage>,
-                            param1: ProducerContext
-                        );
+                        public constructor(param0: Consumer<image.EncodedImage>, param1: ProducerContext);
                         public onNewResultImpl(param0: image.EncodedImage, param1: number): void;
                         public onFailure(param0: java.lang.Throwable): void;
                         public onNewResultImpl(param0: any, param1: number): void;
@@ -12309,27 +11731,17 @@ declare namespace com {
                 export class ThumbnailBranchProducer extends Producer<image.EncodedImage> {
                     public static class: java.lang.Class<ThumbnailBranchProducer>;
                     public produceResults(param0: Consumer<any>, param1: ProducerContext): void;
-                    public produceResults(
-                        param0: Consumer<image.EncodedImage>,
-                        param1: ProducerContext
-                    ): void;
+                    public produceResults(param0: Consumer<image.EncodedImage>, param1: ProducerContext): void;
                     public constructor(param0: native.Array<ThumbnailProducer<image.EncodedImage>>);
                 }
                 export namespace ThumbnailBranchProducer {
-                    export class ThumbnailConsumer extends DelegatingConsumer<
-                        image.EncodedImage,
-                        image.EncodedImage
-                    > {
+                    export class ThumbnailConsumer extends DelegatingConsumer<image.EncodedImage, image.EncodedImage> {
                         public static class: java.lang.Class<ThumbnailConsumer>;
                         public constructor(param0: Consumer<any>);
                         public constructor();
                         public onNewResultImpl(param0: image.EncodedImage, param1: number): void;
                         public onFailureImpl(param0: java.lang.Throwable): void;
-                        public constructor(
-                            param0: Consumer<image.EncodedImage>,
-                            param1: ProducerContext,
-                            param2: number
-                        );
+                        public constructor(param0: Consumer<image.EncodedImage>, param1: ProducerContext, param2: number);
                         public onFailure(param0: java.lang.Throwable): void;
                         public onNewResultImpl(param0: any, param1: number): void;
                         public onProgressUpdate(param0: number): void;
@@ -12351,10 +11763,7 @@ declare namespace com {
                     /**
                      * Constructs a new instance of the com.facebook.imagepipeline.producers.ThumbnailProducer<any> interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
                      */
-                    public constructor(implementation: {
-                        canProvideImageForSize(param0: common.ResizeOptions): boolean;
-                        produceResults(param0: Consumer<any>, param1: ProducerContext): void;
-                    });
+                    public constructor(implementation: { canProvideImageForSize(param0: common.ResizeOptions): boolean; produceResults(param0: Consumer<any>, param1: ProducerContext): void });
                     public constructor();
                     public produceResults(param0: Consumer<any>, param1: ProducerContext): void;
                     public canProvideImageForSize(param0: common.ResizeOptions): boolean;
@@ -12389,28 +11798,15 @@ declare namespace com {
                     public static class: java.lang.Class<WebpTranscodeProducer>;
                     public static PRODUCER_NAME: string;
                     public produceResults(param0: Consumer<any>, param1: ProducerContext): void;
-                    public constructor(
-                        param0: java.util.concurrent.Executor,
-                        param1: facebook.common.memory.PooledByteBufferFactory,
-                        param2: Producer<image.EncodedImage>
-                    );
-                    public produceResults(
-                        param0: Consumer<image.EncodedImage>,
-                        param1: ProducerContext
-                    ): void;
+                    public constructor(param0: java.util.concurrent.Executor, param1: facebook.common.memory.PooledByteBufferFactory, param2: Producer<image.EncodedImage>);
+                    public produceResults(param0: Consumer<image.EncodedImage>, param1: ProducerContext): void;
                 }
                 export namespace WebpTranscodeProducer {
-                    export class WebpTranscodeConsumer extends DelegatingConsumer<
-                        image.EncodedImage,
-                        image.EncodedImage
-                    > {
+                    export class WebpTranscodeConsumer extends DelegatingConsumer<image.EncodedImage, image.EncodedImage> {
                         public static class: java.lang.Class<WebpTranscodeConsumer>;
                         public constructor(param0: Consumer<any>);
                         public constructor();
-                        public constructor(
-                            param0: Consumer<image.EncodedImage>,
-                            param1: ProducerContext
-                        );
+                        public constructor(param0: Consumer<image.EncodedImage>, param1: ProducerContext);
                         public onNewResultImpl(param0: image.EncodedImage, param1: number): void;
                         public onFailure(param0: java.lang.Throwable): void;
                         public onNewResultImpl(param0: any, param1: number): void;
@@ -12431,10 +11827,7 @@ declare namespace com {
                 export abstract class BasePostprocessor extends java.lang.Object implements Postprocessor {
                     public static class: java.lang.Class<BasePostprocessor>;
                     public static FALLBACK_BITMAP_CONFIGURATION: globalAndroid.graphics.Bitmap.Config;
-                    public process(
-                        param0: globalAndroid.graphics.Bitmap,
-                        param1: bitmaps.PlatformBitmapFactory
-                    ): facebook.common.references.CloseableReference<globalAndroid.graphics.Bitmap>;
+                    public process(param0: globalAndroid.graphics.Bitmap, param1: bitmaps.PlatformBitmapFactory): facebook.common.references.CloseableReference<globalAndroid.graphics.Bitmap>;
                     public constructor();
                     public getName(): string;
                     public process(param0: globalAndroid.graphics.Bitmap): void;
@@ -12452,10 +11845,7 @@ declare namespace com {
             export namespace request {
                 export abstract class BaseRepeatedPostProcessor extends BasePostprocessor implements RepeatedPostprocessor {
                     public static class: java.lang.Class<BaseRepeatedPostProcessor>;
-                    public process(
-                        param0: globalAndroid.graphics.Bitmap,
-                        param1: bitmaps.PlatformBitmapFactory
-                    ): facebook.common.references.CloseableReference<globalAndroid.graphics.Bitmap>;
+                    public process(param0: globalAndroid.graphics.Bitmap, param1: bitmaps.PlatformBitmapFactory): facebook.common.references.CloseableReference<globalAndroid.graphics.Bitmap>;
                     public constructor();
                     public getName(): string;
                     public update(): void;
@@ -12539,10 +11929,7 @@ declare namespace com {
                         public static valueOf(param0: java.lang.Class<any>, param1: string): java.lang.Enum<any>;
                         public static valueOf(param0: string): RequestLevel;
                         public getValue(): number;
-                        public static getMax(
-                            param0: RequestLevel,
-                            param1: RequestLevel
-                        ): RequestLevel;
+                        public static getMax(param0: RequestLevel, param1: RequestLevel): RequestLevel;
                     }
                 }
             }
@@ -12618,9 +12005,7 @@ declare namespace com {
                     public equals(param0: any): boolean;
                     public toString(): string;
                     public getSource(): string;
-                    public getSortedVariants(
-                        param0: java.util.Comparator<MediaVariations.Variant>
-                    ): java.util.List<MediaVariations.Variant>;
+                    public getSortedVariants(param0: java.util.Comparator<MediaVariations.Variant>): java.util.List<MediaVariations.Variant>;
                     public static newBuilderForMediaId(param0: string): MediaVariations.Builder;
                     public shouldForceRequestForSpecifiedUri(): boolean;
                     public static forMediaId(param0: string): MediaVariations;
@@ -12633,12 +12018,7 @@ declare namespace com {
                     export class Builder extends java.lang.Object {
                         public static class: java.lang.Class<Builder>;
                         public addVariant(param0: globalAndroid.net.Uri, param1: number, param2: number): Builder;
-                        public addVariant(
-                            param0: globalAndroid.net.Uri,
-                            param1: number,
-                            param2: number,
-                            param3: ImageRequest.CacheChoice
-                        ): Builder;
+                        public addVariant(param0: globalAndroid.net.Uri, param1: number, param2: number, param3: ImageRequest.CacheChoice): Builder;
                         public build(): MediaVariations;
                         public setForceRequestForSpecifiedUri(param0: boolean): Builder;
                         public setSource(param0: string): Builder;
@@ -12683,18 +12063,12 @@ declare namespace com {
                      * Constructs a new instance of the com.facebook.imagepipeline.request.Postprocessor interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
                      */
                     public constructor(implementation: {
-                        process(
-                            param0: globalAndroid.graphics.Bitmap,
-                            param1: bitmaps.PlatformBitmapFactory
-                        ): facebook.common.references.CloseableReference<globalAndroid.graphics.Bitmap>;
+                        process(param0: globalAndroid.graphics.Bitmap, param1: bitmaps.PlatformBitmapFactory): facebook.common.references.CloseableReference<globalAndroid.graphics.Bitmap>;
                         getName(): string;
                         getPostprocessorCacheKey(): facebook.cache.common.CacheKey;
                     });
                     public constructor();
-                    public process(
-                        param0: globalAndroid.graphics.Bitmap,
-                        param1: bitmaps.PlatformBitmapFactory
-                    ): facebook.common.references.CloseableReference<globalAndroid.graphics.Bitmap>;
+                    public process(param0: globalAndroid.graphics.Bitmap, param1: bitmaps.PlatformBitmapFactory): facebook.common.references.CloseableReference<globalAndroid.graphics.Bitmap>;
                     public getName(): string;
                     public getPostprocessorCacheKey(): facebook.cache.common.CacheKey;
                 }
@@ -12714,18 +12088,12 @@ declare namespace com {
                      */
                     public constructor(implementation: {
                         setCallback(param0: RepeatedPostprocessorRunner): void;
-                        process(
-                            param0: globalAndroid.graphics.Bitmap,
-                            param1: bitmaps.PlatformBitmapFactory
-                        ): facebook.common.references.CloseableReference<globalAndroid.graphics.Bitmap>;
+                        process(param0: globalAndroid.graphics.Bitmap, param1: bitmaps.PlatformBitmapFactory): facebook.common.references.CloseableReference<globalAndroid.graphics.Bitmap>;
                         getName(): string;
                         getPostprocessorCacheKey(): facebook.cache.common.CacheKey;
                     });
                     public constructor();
-                    public process(
-                        param0: globalAndroid.graphics.Bitmap,
-                        param1: bitmaps.PlatformBitmapFactory
-                    ): facebook.common.references.CloseableReference<globalAndroid.graphics.Bitmap>;
+                    public process(param0: globalAndroid.graphics.Bitmap, param1: bitmaps.PlatformBitmapFactory): facebook.common.references.CloseableReference<globalAndroid.graphics.Bitmap>;
                     public getName(): string;
                     public setCallback(param0: RepeatedPostprocessorRunner): void;
                     public getPostprocessorCacheKey(): facebook.cache.common.CacheKey;
