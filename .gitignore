@@ -70,3 +70,4 @@ Pods
 *.xcworkspace
 plugin/**/*.d.ts
 plugin**/*.json
+/plugin/README.md
