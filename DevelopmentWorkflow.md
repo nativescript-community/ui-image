@@ -15,9 +15,8 @@
 
 ## Develop locally
 
-For local development we recommend using the npm commands provided in the plugin's package.json
+For local development we recommend using the npm commands provided in the package.json
 
-Basically executing a bunch of commands will be enough for you to start making changes to the plugin and see them live synced in the demo. It's up to you to decide which demo to use for development - TypeScript or TypeScript + Angular.
 
 To run and develop using TypeScript demo:
 
@@ -26,6 +25,15 @@ $ cd nativescript-image
 $ npm run demo.ng.android
 ```
 
+Now using that method you won't see live changes to ```src``` folder.
+
+To see live changes, run this command instead
+
+```bash
+$ cd nativescript-image
+$ npm run demo.ng.android.watch
+```
+
 After all the changes are done make sure to test them in all the demo apps.
 
-For details on plugins development workflow, read [NativeScript plugins documentation](https://docs.nativescript.org/plugins/building-plugins#step-2-set-up-a-development-workflow) covering that topic.
+Be careful this is derived workflow from the one in [NativeScript plugins documentation](https://docs.nativescript.org/plugins/building-plugins#step-2-set-up-a-development-workflow).
