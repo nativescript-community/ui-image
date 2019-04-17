@@ -547,7 +547,7 @@ export class Img extends ImageBase {
                 }
                 if (this.roundAsCircle) {
                     transformers.push(SDImageRoundAsCircleTransformer.new());
-                    transformers.push(SDImageFlippingTransformer.transformerWithHorizontalVertical(false, true));
+                    // transformers.push(SDImageFlippingTransformer.transformerWithHorizontalVertical(false, true));
                 }
                 if (this.roundBottomLeft || this.roundBottomRight || this.roundTopLeft || this.roundTopRight) {
                     let corners = 0;
@@ -564,7 +564,7 @@ export class Img extends ImageBase {
                         corners = corners | UIRectCorner.TopLeft;
                     }
                     transformers.push(SDImageRoundCornerTransformer.transformerWithRadiusCornersBorderWidthBorderColor(this.roundedCornerRadius, corners, 0, null));
-                    transformers.push(SDImageFlippingTransformer.transformerWithHorizontalVertical(false, true));
+                    // transformers.push(SDImageFlippingTransformer.transformerWithHorizontalVertical(false, true));
                 }
                 if (transformers.length > 0) {
                     context.setValueForKey(SDImagePipelineTransformer.transformerWithTransformers(transformers), SDWebImageContextImageTransformer);
