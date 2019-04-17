@@ -37,3 +37,8 @@ $ npm run demo.ng.android.watch
 After all the changes are done make sure to test them in all the demo apps.
 
 Be careful this is derived workflow from the one in [NativeScript plugins documentation](https://docs.nativescript.org/plugins/building-plugins#step-2-set-up-a-development-workflow).
+I had issues with the default workflow:
+* sources files (ts) and product files end up in the same place which is never good. When you npm link or use file:/../src you end up with a webpack installation which does not know what file to use. Already took me days to find bugs because of that.
+* src folder contains a package.json which has dev dependencies which can create bad consequences when used with npm link or file:/../src
+* it is easier to clean when sources are separated from product.
+
