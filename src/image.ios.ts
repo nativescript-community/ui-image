@@ -200,6 +200,30 @@ export class ImagePipeline {
     clearDiskCaches() {
         this._ios.clearDiskOnCompletion(null);
     }
+
+    prefetchToDiskCache(uri: string): Promise<void> {
+        return this.prefetchToCacheType(uri, SDImageCacheType.Disk);
+    }
+
+    prefetchToMemoryCache(uri: string): Promise<void> {
+        return this.prefetchToCacheType(uri, SDImageCacheType.Memory);
+    }
+
+    private prefetchToCacheType(uri: string, cacheType: SDImageCacheType): Promise<void> {
+        return new Promise((resolve, reject) => {
+            const context = NSMutableDictionary.alloc<string, any>().initWithCapacity(1);
+            context.setObjectForKey(cacheType, SDWebImageContextStoreCacheType);
+            SDWebImagePrefetcher.sharedImagePrefetcher.context = context;
+            SDWebImagePrefetcher.sharedImagePrefetcher.prefetchURLsProgressCompleted([getUri(uri)], null, (finished, skipped) => {
+                if (finished && !skipped) {
+                    resolve();
+                } else {
+                    reject(`prefetch failed for URI: ${uri}`);
+                }
+            });
+        });
+    }
+
     get ios() {
         return this._ios;
     }

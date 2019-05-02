@@ -7,6 +7,38 @@ import * as imageSource from 'tns-core-modules/image-source';
 import * as fs from 'tns-core-modules/file-system';
 import { Color } from 'tns-core-modules/color/color';
 
+let BaseDataSubscriber: new (onNewResult: () => void, onFailure: () => void) => com.facebook.datasource.BaseDataSubscriber<any>;
+
+function initializeBaseDataSubscriber() {
+    if (BaseDataSubscriber) {
+        return;
+    }
+    class BaseDataSubscriberImpl extends com.facebook.datasource.BaseDataSubscriber<any> {
+        private _onNewResult: () => void;
+        private _onFailure: () => void;
+        constructor(onNewResult: () => void, onFailure: () => void) {
+            super();
+            this._onNewResult = onNewResult;
+            this._onFailure = onFailure;
+            return global.__native(this);
+        }
+        public onNewResultImpl(_dataSource: com.facebook.datasource.DataSource<any>): void {
+            // Store image ref to be released later.
+            //const mCloseableImageRef = _dataSource.getResult();
+            if (this._onNewResult) {
+                this._onNewResult();
+            }
+        }
+
+        public onFailureImpl(_dataSource: com.facebook.datasource.DataSource<any>): void {
+            if (this._onFailure) {
+                this._onFailure();
+            }
+        }
+    };
+    BaseDataSubscriber = BaseDataSubscriberImpl;
+}
+
 export function initialize(config?: ImagePipelineConfigSetting): void {
     if (application.android) {
         if (config && config.isDownsampleEnabled) {
@@ -17,6 +49,7 @@ export function initialize(config?: ImagePipelineConfigSetting): void {
         } else {
             com.facebook.drawee.backends.pipeline.Fresco.initialize(application.android.context);
         }
+        initializeBaseDataSubscriber();
     }
 }
 
@@ -99,6 +132,35 @@ export class ImagePipeline {
 
     clearDiskCaches() {
         this._android.clearDiskCaches();
+    }
+
+    prefetchToDiskCache(uri: string): Promise<void> {
+        return this.prefetchToCache(uri, true);
+    }
+
+    prefetchToMemoryCache(uri: string): Promise<void> {
+        return this.prefetchToCache(uri, false);
+    }
+
+    private prefetchToCache(uri: string, toDiskCache: boolean): Promise<void> {
+        return new Promise((resolve, reject) => {
+            try {
+                const nativeUri = android.net.Uri.parse(uri);
+                const request = com.facebook.imagepipeline.request.ImageRequestBuilder.newBuilderWithSource(nativeUri).build();
+                let datasource: com.facebook.datasource.DataSource<java.lang.Void>;
+                if (toDiskCache) {
+                    datasource = this._android.prefetchToDiskCache(request, null);
+                } else {
+                    datasource = this._android.prefetchToBitmapCache(request, null);
+                }
+                datasource.subscribe(
+                    new BaseDataSubscriber(resolve, reject),
+                    com.facebook.common.executors.CallerThreadExecutor.getInstance()
+                );
+            } catch (error) {
+                reject(error);
+            }
+        });
     }
 
     get android(): any {

@@ -387,6 +387,16 @@ export class ImagePipeline {
      * Clear disk caches.
      */
     clearDiskCaches(): void;
+
+    /**
+     * Prefetch to disk cache.
+     */
+    prefetchToDiskCache(uri: string): Promise<void>;
+
+    /**
+     * Prefetch to memory cache.
+     */
+    prefetchToMemoryCache(uri: string): Promise<void>;
 }
 
 /**
