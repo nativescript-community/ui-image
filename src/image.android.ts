@@ -9,36 +9,6 @@ import { Color } from 'tns-core-modules/color/color';
 
 let BaseDataSubscriber: new (onNewResult: () => void, onFailure: () => void) => com.facebook.datasource.BaseDataSubscriber<any>;
 
-function initializeBaseDataSubscriber() {
-    if (BaseDataSubscriber) {
-        return;
-    }
-    class BaseDataSubscriberImpl extends com.facebook.datasource.BaseDataSubscriber<any> {
-        private _onNewResult: () => void;
-        private _onFailure: () => void;
-        constructor(onNewResult: () => void, onFailure: () => void) {
-            super();
-            this._onNewResult = onNewResult;
-            this._onFailure = onFailure;
-            return global.__native(this);
-        }
-        public onNewResultImpl(_dataSource: com.facebook.datasource.DataSource<any>): void {
-            // Store image ref to be released later.
-            //const mCloseableImageRef = _dataSource.getResult();
-            if (this._onNewResult) {
-                this._onNewResult();
-            }
-        }
-
-        public onFailureImpl(_dataSource: com.facebook.datasource.DataSource<any>): void {
-            if (this._onFailure) {
-                this._onFailure();
-            }
-        }
-    };
-    BaseDataSubscriber = BaseDataSubscriberImpl;
-}
-
 export function initialize(config?: ImagePipelineConfigSetting): void {
     if (application.android) {
         if (config && config.isDownsampleEnabled) {
@@ -71,12 +41,42 @@ export function shutDown(): void {
     com.facebook.drawee.backends.pipeline.Fresco.shutDown();
 }
 
+function initializeBaseDataSubscriber() {
+    if (BaseDataSubscriber) {
+        return;
+    }
+    class BaseDataSubscriberImpl extends com.facebook.datasource.BaseDataSubscriber<any> {
+        private _onNewResult: () => void;
+        private _onFailure: () => void;
+        constructor(onNewResult: () => void, onFailure: () => void) {
+            super();
+            this._onNewResult = onNewResult;
+            this._onFailure = onFailure;
+            return global.__native(this);
+        }
+        public onNewResultImpl(_dataSource: com.facebook.datasource.DataSource<any>): void {
+            // Store image ref to be released later.
+            //const mCloseableImageRef = _dataSource.getResult();
+            if (this._onNewResult) {
+                this._onNewResult();
+            }
+        }
+
+        public onFailureImpl(_dataSource: com.facebook.datasource.DataSource<any>): void {
+            if (this._onFailure) {
+                this._onFailure();
+            }
+        }
+    };
+    BaseDataSubscriber = BaseDataSubscriberImpl;
+}
+
 function getUri(src: string) {
-    let uri;
+    let uri: android.net.Uri;
     if (utils.isFileOrResourcePath(src)) {
         const res = utils.ad.getApplicationContext().getResources();
         if (!res) {
-            return;
+            return null;
         }
 
         if (src.indexOf(utils.RESOURCE_PREFIX) === 0) {
@@ -216,9 +216,9 @@ export class ImagePipeline {
 }
 
 export class ImageError implements ImageErrorBase {
-    private _stringValue;
-    private _message;
-    private _errorType;
+    private _stringValue: string;
+    private _message: string;
+    private _errorType: string;
 
     constructor(throwable: java.lang.Throwable) {
         this._message = throwable.getMessage();
