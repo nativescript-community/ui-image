@@ -167,8 +167,7 @@ export class ImagePipeline {
         this._ios = SDImageCache.sharedImageCache;
     }
 
-    // Currently not available in 0.9.0+
-    isInDiskCacheSync(uri: string) {
+    isInDiskCache(uri: string): boolean {
         return this._ios.diskImageDataExistsWithKey(uri);
     }
 

@@ -102,7 +102,7 @@ function getUri(src: string) {
 export class ImagePipeline {
     private _android: com.facebook.imagepipeline.core.ImagePipeline;
 
-    isInDiskCacheSync(uri: string) {
+    isInDiskCache(uri: string): boolean {
         return this._android.isInDiskCacheSync(android.net.Uri.parse(uri));
     }
 

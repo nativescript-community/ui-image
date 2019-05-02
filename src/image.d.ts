@@ -356,7 +356,7 @@ export class ImagePipeline {
     /**
      * Returns whether the image is stored in the disk cache.
      */
-    private isInDiskCacheSync(uri: string): boolean;
+    isInDiskCache(uri: string): boolean;
 
     /**
      * Removes all images with the specified Uri from memory cache.
