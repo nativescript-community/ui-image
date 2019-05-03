@@ -15,20 +15,26 @@
         "demo.ng.android": "npm run build && cd demo-angular && tns run android --syncAllFiles",
         "demo.ng.android.watch": "pm run build && npm run plugin.tscwatch && cd demo-angular && tns run android --syncAllFiles",
         "demo.ng.reset": "cd ../demo-angular && rimraf platforms",
-        "plugin.prepare": "npm run build && cd demo-angular && tns plugin remove nativescript-image && tns plugin add ../plugin && cd ../demo && tns plugin remove nativescript-image && tns plugin add ../plugin"
+        "plugin.prepare": "npm run build && cd demo-angular && tns plugin remove nativescript-image && tns plugin add ../plugin && cd ../demo && tns plugin remove nativescript-image && tns plugin add ../plugin",
+        "publish": "npm run build && lerna publish",
+        "commitmsg": "commitlint -e $GIT_PARAMS"
     },
     "devDependencies": {
-        "@angular/compiler": "~7.2.11",
-        "@angular/compiler-cli": "~7.2.11",
-        "@angular/core": "~7.2.11",
+        "@angular/compiler": "~7.2.14",
+        "@angular/compiler-cli": "~7.2.14",
+        "@commitlint/cli": "^7.5.2",
+        "@commitlint/config-conventional": "^7.5.0",
+        "@angular/core": "~7.2.14",
         "cpy-cli": "^2.0.0",
+        "husky": "^2.2.0",
+        "lerna": "^3.13.4",
         "nativescript-angular": "^7.2.3",
         "prompt": "^1.0.0",
         "rimraf": "^2.6.3",
-        "rxjs": "6.4.0",
+        "rxjs": "6.5.1",
         "tns-core-modules": "^5.3.1",
         "tns-platform-declarations": "^5.3.1",
-        "tslint": "^5.14.0",
+        "tslint": "^5.16.0",
         "tslint-config-prettier": "^1.18.0",
         "tslint-config-standard": "^8.0.1",
         "typescript": "~3.2.4"
@@ -42,5 +48,10 @@
     "bugs": {
         "url": "https://github.com/Akylas/nativescript-image/issues"
     },
-    "homepage": "https://github.com/Akylas/nativescript-image#readme"
+    "homepage": "https://github.com/Akylas/nativescript-image#readme",
+    "commitlint": {
+        "extends": [
+            "@commitlint/config-conventional"
+        ]
+    }
 }
