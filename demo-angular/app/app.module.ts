@@ -10,7 +10,8 @@ import * as imageModule from 'nativescript-image';
 import * as applicationModule from 'tns-core-modules/application';
 
 if (applicationModule.android) {
-    applicationModule.on('launch', () => {
+    applicationModule.on(applicationModule.launchEvent, () => {
+        console.log('initialize pipeline');
         imageModule.initialize();
     });
 }

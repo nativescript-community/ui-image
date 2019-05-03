@@ -356,7 +356,7 @@ export class ImagePipeline {
     /**
      * Returns whether the image is stored in the disk cache.
      */
-    private isInDiskCacheSync(uri: string): boolean;
+    isInDiskCache(uri: string): boolean;
 
     /**
      * Removes all images with the specified Uri from memory cache.
@@ -387,6 +387,16 @@ export class ImagePipeline {
      * Clear disk caches.
      */
     clearDiskCaches(): void;
+
+    /**
+     * Prefetch to disk cache.
+     */
+    prefetchToDiskCache(uri: string): Promise<void>;
+
+    /**
+     * Prefetch to memory cache.
+     */
+    prefetchToMemoryCache(uri: string): Promise<void>;
 }
 
 /**
