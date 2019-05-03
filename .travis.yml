@@ -32,7 +32,7 @@ matrix:
               - BuildiOS="12"
               - Type="TypeScript"
           osx_image: xcode10.0
-          jdk: oraclejdk10
+          jdk: openjdk10
           node_js: '8'
           before_install: nvm install 8
           before_script: pod repo update
@@ -43,7 +43,7 @@ matrix:
               - BuildiOS="12"
               - Type="Vue.js"
           osx_image: xcode10.0
-          jdk: oraclejdk10
+          jdk: openjdk10
           node_js: '8'
           before_install: nvm install 8
           before_script: pod repo update
