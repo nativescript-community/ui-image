@@ -1,6 +1,6 @@
 {
     "name": "nativescript-image",
-    "version": "2.1.3",
+    "version": "2.1.4",
     "description": "Nativescript Image plugin using cache.",
     "main": "./image",
     "typings": "./image.d.ts",
@@ -25,6 +25,5 @@
     },
     "license": "Apache-2.0",
     "homepage": "https://github.com/Akylas/nativescript-image",
-    "readmeFilename": "README.md",
-    "dependencies": {}
+    "readmeFilename": "README.md"
 }
