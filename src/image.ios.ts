@@ -2,11 +2,12 @@ export * from './image-common';
 import { EventData, ImageBase, ImageInfo as ImageInfoBase, ImagePipelineConfigSetting, ScaleType, Stretch } from './image-common';
 import * as utils from 'tns-core-modules/utils/utils';
 import * as types from 'tns-core-modules/utils/types';
-import * as imageSource from 'tns-core-modules/image-source';
+import { fromFile, fromFileOrResource, fromResource, ImageSource } from 'tns-core-modules/image-source';
 import * as fs from 'tns-core-modules/file-system';
 
 import { layout } from 'tns-core-modules/ui/core/view';
 import { screen } from 'tns-core-modules/platform/platform';
+import { ImageAsset } from 'tns-core-modules/image-asset/image-asset';
 
 class SDImageRoundAsCircleTransformer extends NSObject implements SDImageTransformer {
     public static ObjCProtocols = [SDImageTransformer];
@@ -233,11 +234,13 @@ export function getImagePipeline(): ImagePipeline {
     return imagePineLine;
 }
 
-function getUri(src: string) {
+function getUri(src: string | ImageAsset) {
     let uri: any = src;
-
-    if (src.indexOf(utils.RESOURCE_PREFIX) === 0) {
-        const resName = src.substr(utils.RESOURCE_PREFIX.length);
+    if (src instanceof ImageAsset) {
+        uri = src.ios;
+    }
+    if (uri.indexOf(utils.RESOURCE_PREFIX) === 0) {
+        const resName = uri.substr(utils.RESOURCE_PREFIX.length);
         if (screenScale === -1) {
             screenScale = screen.mainScreen.scale;
         }
@@ -250,8 +253,8 @@ function getUri(src: string) {
             }
             return false;
         });
-    } else if (src.indexOf('~/') === 0) {
-        uri = NSURL.alloc().initFileURLWithPath(`${fs.path.join(fs.knownFolders.currentApp().path, src.replace('~/', ''))}`);
+    } else if (uri.indexOf('~/') === 0) {
+        uri = NSURL.alloc().initFileURLWithPath(`${fs.path.join(fs.knownFolders.currentApp().path, uri.replace('~/', ''))}`);
     }
     return uri;
 }
@@ -302,7 +305,7 @@ export class Img extends ImageBase {
         this._imageSourceAffectsLayout = widthMode !== layout.EXACTLY || heightMode !== layout.EXACTLY;
 
         if (image || this.aspectRatio > 0) {
-        // if (!image) {
+            // if (!image) {
             // if (this.aspectRatio > 0) {
             const scale = this.computeScaleFactor(width, height, finiteWidth, finiteHeight, nativeWidth, nativeHeight);
 
@@ -314,13 +317,13 @@ export class Img extends ImageBase {
             // console.log('scale', scale, width, height, finiteWidth, finiteHeight, nativeWidth, nativeHeight, measureWidth, measureHeight);
         }
         // } else {
-            // const scale = this.computeScaleFactor(width, height, finiteWidth, finiteHeight, nativeWidth, nativeHeight);
+        // const scale = this.computeScaleFactor(width, height, finiteWidth, finiteHeight, nativeWidth, nativeHeight);
 
-            // measureWidth = finiteWidth ? width : height;
-            // measureHeight = finiteHeight ? height : width;
+        // measureWidth = finiteWidth ? width : height;
+        // measureHeight = finiteHeight ? height : width;
 
-            // measureWidth = Math.round(measureWidth * scale.width);
-            // measureHeight = Math.round(measureHeight * scale.height);
+        // measureWidth = Math.round(measureWidth * scale.width);
+        // measureHeight = Math.round(measureHeight * scale.height);
         // }
 
         const widthAndState = Img.resolveSizeAndState(measureWidth, width, widthMode, 0);
@@ -433,13 +436,16 @@ export class Img extends ImageBase {
 
     public updateImageUri() {
         const imagePipeLine = getImagePipeline();
-        const isInCache = imagePipeLine.isInBitmapMemoryCache(this.src);
-        if (isInCache) {
-            imagePipeLine.evictFromCache(this.src);
-            const src = this.src;
-            this.src = null;
-            this.src = src;
+        const src = this.src;
+        if (!(src instanceof ImageSource)) {
+            const uri = getUri(src);
+            const isInCache = imagePipeLine.isInBitmapMemoryCache(uri);
+            if (isInCache) {
+                imagePipeLine.evictFromCache(uri);
+            }
         }
+        this.src = null;
+        this.src = src;
     }
 
     public _setNativeImage(nativeImage: UIImage) {
@@ -452,7 +458,7 @@ export class Img extends ImageBase {
     }
 
     private handleImageLoaded = (image: UIImage, error: NSError, cacheType: number) => {
-        // console.log('handleImageLoaded', this.src, error, cacheType);
+        console.log('handleImageLoaded', this.src, error, cacheType);
         if (error) {
             const args = {
                 eventName: Img.failureEvent,
@@ -492,23 +498,23 @@ export class Img extends ImageBase {
             UIView.animateWithDurationAnimations(this.fadeDuration / 1000, () => {
                 this.nativeViewProtected.alpha = this.opacity;
             });
-                //     break;
-                // case 'curlUp':
-                //     UIView.transitionWithViewDurationOptionsAnimationsCompletion(
-                //         this.nativeViewProtected,
-                //         0.3,
-                //         UIViewAnimationOptions.TransitionCrossDissolve,
-                //         () => {
-                //             this._setNativeImage(image);
-                //         },
-                //         null
-                //     );
-                //     break;
-                // default:
-                //     this._setNativeImage(image);
+            //     break;
+            // case 'curlUp':
+            //     UIView.transitionWithViewDurationOptionsAnimationsCompletion(
+            //         this.nativeViewProtected,
+            //         0.3,
+            //         UIViewAnimationOptions.TransitionCrossDissolve,
+            //         () => {
+            //             this._setNativeImage(image);
+            //         },
+            //         null
+            //     );
+            //     break;
+            // default:
+            //     this._setNativeImage(image);
             // }
         } else {
-        // console.log("setting image", !!image, !!image && image.size);
+            // console.log("setting image", !!image, !!image && image.size);
             this._setNativeImage(image);
         }
         if (!this.autoPlayAnimations) {
@@ -521,10 +527,10 @@ export class Img extends ImageBase {
         //         this.nativeView.alpha = this.opacity;
         //     });
         // }
-    }
+    };
     private onLoadProgress = (currentSize: number, totalSize: number) => {
         this.handleImageProgress(totalSize > 0 ? currentSize / totalSize : -1, totalSize);
-    }
+    };
 
     private getUIImage(path: string) {
         if (!path) {
@@ -535,7 +541,7 @@ export class Img extends ImageBase {
             // if (path.indexOf(utils.RESOURCE_PREFIX) === 0) {
             //     image = imageSource.fromFileOrResource(path);
             // } else {
-            image = imageSource.fromFileOrResource(path);
+            image = fromFileOrResource(path);
             // }
         }
         // console.log("getUIImage", path, !!image, !!image && !!image.ios);
@@ -548,7 +554,12 @@ export class Img extends ImageBase {
 
     private initImage() {
         if (this.nativeViewProtected) {
-            if (this.src) {
+            const src = this.src;
+            if (src) {
+                if (src instanceof ImageSource) {
+                    this._setNativeImage(src.ios);
+                    return;
+                }
                 this.isLoading = true;
                 let options = SDWebImageOptions.ScaleDownLargeImages | SDWebImageOptions.AvoidAutoSetImage;
                 if (this.alwaysFade === true) {
@@ -595,7 +606,7 @@ export class Img extends ImageBase {
 
                 // console.log('about to load', this.src, options);
                 this.nativeViewProtected.sd_setImageWithURLPlaceholderImageOptionsContextProgressCompleted(
-                    getUri(this.src),
+                    getUri(src),
                     this.getUIImage(this.placeholderImageUri),
                     options,
                     context,
@@ -605,7 +616,8 @@ export class Img extends ImageBase {
             }
         }
     }
-    [ImageBase.srcProperty.setNative]() {
+    [ImageBase.srcProperty.setNative](value) {
+        console.log('srcProperty', value);
         this.initImage();
     }
     [ImageBase.placeholderImageUriProperty.setNative]() {

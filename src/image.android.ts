@@ -3,9 +3,10 @@ import { AnimatedImage, EventData, ImageBase, ImageError as ImageErrorBase, Imag
 import * as utils from 'tns-core-modules/utils/utils';
 import * as types from 'tns-core-modules/utils/types';
 import * as application from 'tns-core-modules/application';
-import * as imageSource from 'tns-core-modules/image-source';
+import { fromFile, fromResource, ImageSource } from 'tns-core-modules/image-source';
 import * as fs from 'tns-core-modules/file-system';
 import { Color } from 'tns-core-modules/color/color';
+import { ImageAsset } from 'tns-core-modules/image-asset/image-asset';
 
 let BaseDataSubscriber: new (onNewResult: () => void, onFailure: () => void) => com.facebook.datasource.BaseDataSubscriber<any>;
 
@@ -34,7 +35,6 @@ export function getImagePipeline(): ImagePipeline {
 
     return null;
 }
-
 
 export function shutDown(): void {
     com.facebook.drawee.view.SimpleDraweeView.shutDown();
@@ -67,20 +67,26 @@ function initializeBaseDataSubscriber() {
                 this._onFailure();
             }
         }
-    };
+    }
     BaseDataSubscriber = BaseDataSubscriberImpl;
 }
 
-function getUri(src: string) {
+function getUri(src: string | ImageAsset) {
     let uri: android.net.Uri;
-    if (utils.isFileOrResourcePath(src)) {
+    let imagePath: string;
+    if (src instanceof ImageAsset) {
+        imagePath = src.android;
+    } else {
+        imagePath = src;
+    }
+    if (utils.isFileOrResourcePath(imagePath)) {
         const res = utils.ad.getApplicationContext().getResources();
         if (!res) {
             return null;
         }
 
-        if (src.indexOf(utils.RESOURCE_PREFIX) === 0) {
-            const resName = src.substr(utils.RESOURCE_PREFIX.length);
+        if (imagePath.indexOf(utils.RESOURCE_PREFIX) === 0) {
+            const resName = imagePath.substr(utils.RESOURCE_PREFIX.length);
             const identifier = res.getIdentifier(resName, 'drawable', utils.ad.getApplication().getPackageName());
             if (0 < identifier) {
                 uri = new android.net.Uri.Builder()
@@ -88,13 +94,13 @@ function getUri(src: string) {
                     .path(java.lang.String.valueOf(identifier))
                     .build();
             }
-        } else if (src.indexOf('~/') === 0) {
-            uri = android.net.Uri.parse(`file:${fs.path.join(fs.knownFolders.currentApp().path, src.replace('~/', ''))}`);
-        } else if (src.indexOf('/') === 0) {
-            uri = android.net.Uri.parse(`file:${src}`);
+        } else if (imagePath.indexOf('~/') === 0) {
+            uri = android.net.Uri.parse(`file:${fs.path.join(fs.knownFolders.currentApp().path, imagePath.replace('~/', ''))}`);
+        } else if (imagePath.indexOf('/') === 0) {
+            uri = android.net.Uri.parse(`file:${imagePath}`);
         }
     } else {
-        uri = android.net.Uri.parse(src);
+        uri = android.net.Uri.parse(imagePath);
     }
     return uri;
 }
@@ -102,24 +108,31 @@ function getUri(src: string) {
 export class ImagePipeline {
     private _android: com.facebook.imagepipeline.core.ImagePipeline;
 
-    isInDiskCache(uri: string): boolean {
-        return this._android.isInDiskCacheSync(android.net.Uri.parse(uri));
+    toUri(value: string | android.net.Uri) {
+        if (value instanceof android.net.Uri) {
+            return value;
+        }
+        return android.net.Uri.parse(value);
     }
 
-    isInBitmapMemoryCache(uri: string): boolean {
-        return this._android.isInBitmapMemoryCache(android.net.Uri.parse(uri));
+    isInDiskCache(uri: string | android.net.Uri): boolean {
+        return this._android.isInDiskCacheSync(this.toUri(uri));
     }
 
-    evictFromMemoryCache(uri: string): void {
-        this._android.evictFromMemoryCache(android.net.Uri.parse(uri));
+    isInBitmapMemoryCache(uri: string | android.net.Uri): boolean {
+        return this._android.isInBitmapMemoryCache(this.toUri(uri));
     }
 
-    evictFromDiskCache(uri: string): void {
-        this._android.evictFromDiskCache(android.net.Uri.parse(uri));
+    evictFromMemoryCache(uri: string | android.net.Uri): void {
+        this._android.evictFromMemoryCache(this.toUri(uri));
     }
 
-    evictFromCache(uri: string): void {
-        this._android.evictFromCache(android.net.Uri.parse(uri));
+    evictFromDiskCache(uri: string | android.net.Uri): void {
+        this._android.evictFromDiskCache(this.toUri(uri));
+    }
+
+    evictFromCache(uri: string | android.net.Uri): void {
+        this._android.evictFromCache(this.toUri(uri));
     }
 
     clearCaches() {
@@ -153,10 +166,7 @@ export class ImagePipeline {
                 } else {
                     datasource = this._android.prefetchToBitmapCache(request, null);
                 }
-                datasource.subscribe(
-                    new BaseDataSubscriber(resolve, reject),
-                    com.facebook.common.executors.CallerThreadExecutor.getInstance()
-                );
+                datasource.subscribe(new BaseDataSubscriber(resolve, reject), com.facebook.common.executors.CallerThreadExecutor.getInstance());
             } catch (error) {
                 reject(error);
             }
@@ -171,47 +181,43 @@ export class ImagePipeline {
         this._android = value;
     }
 
-    fetchImage () {
-//         ImagePipeline imagePipeline = Fresco.getImagePipeline();
-
-// ImageRequest imageRequest = ImageRequestBuilder
-//        .newBuilderWithSource(imageUri)
-//        .setRequestPriority(Priority.HIGH)
-//        .setLowestPermittedRequestLevel(ImageRequest.RequestLevel.FULL_FETCH)
-//        .build();
-
-// DataSource<CloseableReference<CloseableImage>> dataSource =
-//        imagePipeline.fetchDecodedImage(imageRequest, mContext);
-
-// try {
-//    dataSource.subscribe(new BaseBitmapDataSubscriber() {
-//        @Override
-//        public void onNewResultImpl(@Nullable Bitmap bitmap) {
-//            if (bitmap == null) {
-//                Log.d(TAG, "Bitmap data source returned success, but bitmap null.");
-//                return;
-//            }
-//            // The bitmap provided to this method is only guaranteed to be around
-//            // for the lifespan of this method. The image pipeline frees the
-//            // bitmap's memory after this method has completed.
-//            //
-//            // This is fine when passing the bitmap to a system process as
-//            // Android automatically creates a copy.
-//            //
-//            // If you need to keep the bitmap around, look into using a
-//            // BaseDataSubscriber instead of a BaseBitmapDataSubscriber.
-//        }
-
-//        @Override
-//        public void onFailureImpl(DataSource dataSource) {
-//            // No cleanup required here
-//        }
-//    }, CallerThreadExecutor.getInstance());
-// } finally {
-//    if (dataSource != null) {
-//        dataSource.close();
-//    }
-// }
+    fetchImage() {
+        //         ImagePipeline imagePipeline = Fresco.getImagePipeline();
+        // ImageRequest imageRequest = ImageRequestBuilder
+        //        .newBuilderWithSource(imageUri)
+        //        .setRequestPriority(Priority.HIGH)
+        //        .setLowestPermittedRequestLevel(ImageRequest.RequestLevel.FULL_FETCH)
+        //        .build();
+        // DataSource<CloseableReference<CloseableImage>> dataSource =
+        //        imagePipeline.fetchDecodedImage(imageRequest, mContext);
+        // try {
+        //    dataSource.subscribe(new BaseBitmapDataSubscriber() {
+        //        @Override
+        //        public void onNewResultImpl(@Nullable Bitmap bitmap) {
+        //            if (bitmap == null) {
+        //                Log.d(TAG, "Bitmap data source returned success, but bitmap null.");
+        //                return;
+        //            }
+        //            // The bitmap provided to this method is only guaranteed to be around
+        //            // for the lifespan of this method. The image pipeline frees the
+        //            // bitmap's memory after this method has completed.
+        //            //
+        //            // This is fine when passing the bitmap to a system process as
+        //            // Android automatically creates a copy.
+        //            //
+        //            // If you need to keep the bitmap around, look into using a
+        //            // BaseDataSubscriber instead of a BaseBitmapDataSubscriber.
+        //        }
+        //        @Override
+        //        public void onFailureImpl(DataSource dataSource) {
+        //            // No cleanup required here
+        //        }
+        //    }, CallerThreadExecutor.getInstance());
+        // } finally {
+        //    if (dataSource != null) {
+        //        dataSource.close();
+        //    }
+        // }
     }
 }
 
@@ -342,13 +348,16 @@ export class Img extends ImageBase {
 
     public updateImageUri() {
         const imagePipeLine = getImagePipeline();
-        const isInCache = imagePipeLine.isInBitmapMemoryCache(this.src);
-        if (isInCache) {
-            imagePipeLine.evictFromCache(this.src);
-            const src = this.src;
-            this.src = null;
-            this.src = src;
+        const src = this.src;
+        if (!(src instanceof ImageSource)) {
+            const uri = getUri(src);
+            const isInCache = imagePipeLine.isInBitmapMemoryCache(uri);
+            if (isInCache) {
+                imagePipeLine.evictFromCache(uri);
+            }
         }
+        this.src = null;
+        this.src = src;
     }
 
     [ImageBase.srcProperty.setNative]() {
@@ -429,11 +438,16 @@ export class Img extends ImageBase {
     private initImage() {
         if (this.nativeViewProtected) {
             // this.nativeViewProtected.setImageURI(null);
-            if (this.src) {
+            const src = this.src;
+            if (src) {
+                if (src instanceof ImageSource) {
+                    this.nativeViewProtected.setImageBitmap(src.android);
+                    return;
+                }
                 this.isLoading = true;
-                const uri = getUri(this.src);
+                const uri = getUri(src);
                 if (!uri) {
-                    console.log(`Error: 'src' not valid: ${this.src}`);
+                    console.log(`Error: 'src' not valid: ${src}`);
                     return;
                 }
 
@@ -658,7 +672,7 @@ export class Img extends ImageBase {
     }
 
     private getDrawableFromLocalFile(localFilePath: string) {
-        const img = imageSource.fromFile(localFilePath);
+        const img = fromFile(localFilePath);
         let drawable: android.graphics.drawable.BitmapDrawable = null;
         if (img) {
             drawable = new android.graphics.drawable.BitmapDrawable(utils.ad.getApplicationContext().getResources(), img.android);
@@ -668,7 +682,7 @@ export class Img extends ImageBase {
     }
 
     private getDrawableFromResource(resourceName: string) {
-        const img = imageSource.fromResource(resourceName.substr(utils.RESOURCE_PREFIX.length));
+        const img = fromResource(resourceName.substr(utils.RESOURCE_PREFIX.length));
         let drawable: android.graphics.drawable.BitmapDrawable = null;
         if (img) {
             drawable = new android.graphics.drawable.BitmapDrawable(utils.ad.getApplicationContext().getResources(), img.android);

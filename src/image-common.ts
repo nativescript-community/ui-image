@@ -1,6 +1,8 @@
 import { booleanConverter, Color, Property, View } from 'tns-core-modules/ui/core/view';
 import * as observableModule from 'tns-core-modules/data/observable';
 import { isAndroid, isIOS } from 'tns-core-modules/platform';
+import { ImageSource } from 'tns-core-modules/image-source/image-source';
+import { ImageAsset } from 'tns-core-modules/image-asset/image-asset';
 
 export type Transition = 'fade' | 'curlUp';
 
@@ -70,7 +72,7 @@ export class ImageBase extends View {
     public static releaseEvent: string = 'release';
     public static submitEvent: string = 'submit';
 
-    public src: string;
+    public src: string | ImageSource | ImageAsset;
     public lowerResSrc: string;
     public placeholderImageUri: string;
     public failureImageUri: string;
@@ -101,7 +103,7 @@ export class ImageBase extends View {
 
     public readonly isLoading: boolean;
 
-    public static srcProperty = new Property<ImageBase, string>({ name: 'src' });
+    public static srcProperty = new Property<ImageBase, string | ImageSource | ImageAsset>({ name: 'src' });
     public static lowerResSrcProperty = new Property<ImageBase, string>({ name: 'lowerResSrc' });
     public static placeholderImageUriProperty = new Property<ImageBase, string>({ name: 'placeholderImageUri' });
     public static failureImageUriProperty = new Property<ImageBase, string>({ name: 'failureImageUri' });
