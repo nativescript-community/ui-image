@@ -3,6 +3,7 @@
                         verticalAlignment="center"
                         placeholderImageUri="res://ns_logo"
                         progressiveRenderingEnabled="true"
+                        aspectRatio="0.754"
                         showProgressBar="true"
                         progressBarColor="blue"
                         src="http://pooyak.com/p/progjpeg/jpegload.cgi?o=1"/>

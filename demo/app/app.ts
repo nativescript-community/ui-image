@@ -3,6 +3,8 @@ import * as app from 'tns-core-modules/application';
 
 import * as imageModule from 'nativescript-image';
 
+imageModule.setDebug(true);
+
 if (app.android) {
     app.on(app.launchEvent, () => {
         imageModule.initialize({ isDownsampleEnabled: true });
