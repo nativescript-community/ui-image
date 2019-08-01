@@ -1,6 +1,7 @@
 import * as viewModule from 'tns-core-modules/ui/core/view';
 
-export let debug: boolean;
+export const debug: boolean;
+declare function setDebug(value: boolean)
 
 /**
  * When called, initializes the android Image library. Calling this method is required.
