@@ -73,3 +73,4 @@ plugin**/*.json
 /plugin/README.md
 package-lock.json
 /.vscode
+/pnpm-lock.yaml
