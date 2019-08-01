@@ -567,7 +567,7 @@ export class Img extends ImageBase {
                 }
                 const context: NSDictionary<string, any> = NSMutableDictionary.dictionary();
                 const transformers = [];
-                if (!!this.progressiveRenderingEnabled) {
+                if (this.progressiveRenderingEnabled === true) {
                     options = options | SDWebImageOptions.ProgressiveLoad;
                 }
                 if (this.decodeWidth && this.decodeHeight) {
@@ -579,7 +579,7 @@ export class Img extends ImageBase {
                 if (this.blurRadius) {
                     transformers.push(SDImageBlurTransformer.transformerWithRadius(this.blurRadius));
                 }
-                if (this.roundAsCircle) {
+                if (this.roundAsCircle === true) {
                     transformers.push(SDImageRoundAsCircleTransformer.new());
                     // transformers.push(SDImageFlippingTransformer.transformerWithHorizontalVertical(false, true));
                 }

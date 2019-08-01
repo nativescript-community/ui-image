@@ -455,11 +455,10 @@ export class Img extends ImageBase {
                 let requestBuilder = com.facebook.imagepipeline.request.ImageRequestBuilder.newBuilderWithSource(uri).setRotationOptions(
                     com.facebook.imagepipeline.common.RotationOptions.autoRotate()
                 );
-
-                if (this.progressiveRenderingEnabled !== undefined) {
+                if (this.progressiveRenderingEnabled === true) {
                     requestBuilder = requestBuilder.setProgressiveRenderingEnabled(this.progressiveRenderingEnabled);
                 }
-                if (this.localThumbnailPreviewsEnabled !== undefined) {
+                if (this.localThumbnailPreviewsEnabled === true) {
                     requestBuilder = requestBuilder.setLocalThumbnailPreviewsEnabled(this.localThumbnailPreviewsEnabled);
                 }
 
