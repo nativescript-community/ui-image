@@ -20,8 +20,8 @@
         "commitmsg": "commitlint -e $GIT_PARAMS"
     },
     "devDependencies": {
-        "@angular/compiler": "~8.2.0",
-        "@angular/compiler-cli": "~8.2.0",
+        "@angular/compiler": "~8.1.2",
+        "@angular/compiler-cli": "~8.1.2",
         "@commitlint/cli": "^8.1.0",
         "@commitlint/config-conventional": "^8.1.0",
         "@angular/core": "~8.2.0",
@@ -37,7 +37,7 @@
         "tslint": "^5.18.0",
         "tslint-config-prettier": "^1.18.0",
         "tslint-config-standard": "^8.0.1",
-        "typescript": "~3.5.3"
+        "typescript": "~3.4.5"
     },
     "repository": {
         "type": "git",
