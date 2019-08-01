@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.2.2](https://github.com/Akylas/nativescript-image/compare/v2.2.1...v2.2.2) (2019-08-01)
+
+
+### Bug Fixes
+
+* clear image if src is null ([5430c13](https://github.com/Akylas/nativescript-image/commit/5430c13))
+
+
+
+
+
 ## [2.2.1](https://github.com/Akylas/nativescript-image/compare/v2.2.0...v2.2.1) (2019-08-01)
 
 
