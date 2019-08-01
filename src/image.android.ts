@@ -1,5 +1,5 @@
 export * from './image-common';
-import { AnimatedImage, EventData, ImageBase, ImageError as ImageErrorBase, ImageInfo as ImageInfoBase, ImagePipelineConfigSetting, ScaleType, Stretch } from './image-common';
+import { AnimatedImage, CLog, CLogTypes, debug, EventData, ImageBase, ImageError as ImageErrorBase, ImageInfo as ImageInfoBase, ImagePipelineConfigSetting, ScaleType, Stretch } from './image-common';
 import * as utils from 'tns-core-modules/utils/utils';
 import * as types from 'tns-core-modules/utils/types';
 import * as application from 'tns-core-modules/application';
@@ -469,11 +469,13 @@ export class Img extends ImageBase {
                     const postProcessor: any = new jp.wasabeef.fresco.processors.BlurPostprocessor(this._context, this.blurRadius, this.blurDownSampling || 1);
                     requestBuilder = requestBuilder.setPostprocessor(postProcessor);
                 }
+
                 const request = requestBuilder.build();
 
                 const that: WeakRef<Img> = new WeakRef(this);
                 const listener = new com.facebook.drawee.controller.ControllerListener<com.facebook.imagepipeline.image.ImageInfo>({
                     onFinalImageSet(id, imageInfo, animatable) {
+                        CLog(CLogTypes.info, 'onFinalImageSet', id, imageInfo, animatable);
                         const nativeView = that && that.get();
                         if (nativeView) {
                             nativeView.isLoading = false;
@@ -493,6 +495,7 @@ export class Img extends ImageBase {
                         }
                     },
                     onFailure(id, throwable) {
+                        CLog(CLogTypes.info, 'onFailure', id, throwable);
                         const nativeView = that && that.get();
                         if (nativeView) {
                             nativeView.isLoading = false;
@@ -509,6 +512,7 @@ export class Img extends ImageBase {
                         }
                     },
                     onIntermediateImageFailed(id, throwable) {
+                        CLog(CLogTypes.info, 'onIntermediateImageFailed', id, throwable);
                         const nativeView = that && that.get();
                         if (nativeView) {
                             const imageError = new ImageError(throwable);
@@ -524,6 +528,7 @@ export class Img extends ImageBase {
                         }
                     },
                     onIntermediateImageSet(id, imageInfo) {
+                        CLog(CLogTypes.info, 'onIntermediateImageSet', id, imageInfo);
                         const nativeView = that && that.get();
                         if (nativeView) {
                             const info = new ImageInfo(imageInfo);
@@ -539,6 +544,7 @@ export class Img extends ImageBase {
                         }
                     },
                     onRelease(id) {
+                        CLog(CLogTypes.info, 'onRelease', id);
                         const nativeView = that && that.get();
                         if (nativeView) {
                             const args: EventData = {
@@ -552,6 +558,7 @@ export class Img extends ImageBase {
                         }
                     },
                     onSubmit(id, callerContext) {
+                        CLog(CLogTypes.info, 'onSubmit', id, callerContext);
                         const nativeView = that && that.get();
                         if (nativeView) {
                             const args: EventData = {
@@ -569,7 +576,18 @@ export class Img extends ImageBase {
                 builder.setImageRequest(request);
                 builder.setControllerListener(listener);
                 builder.setOldController(this.nativeViewProtected.getController());
-
+                if (debug) {
+                    builder.setPerfDataListener(
+                        new com.facebook.drawee.backends.pipeline.info.ImagePerfDataListener({
+                            onImageLoadStatusUpdated(param0: com.facebook.drawee.backends.pipeline.info.ImagePerfData, param1: number) {
+                                CLog(CLogTypes.info, 'onSuonImageLoadStatusUpdatedbmit', param0, param1);
+                            },
+                            onImageVisibilityUpdated(param0: com.facebook.drawee.backends.pipeline.info.ImagePerfData, param1: number) {
+                                CLog(CLogTypes.info, 'onImageVisibilityUpdated', param0, param1);
+                            }
+                        })
+                    );
+                }
                 if (this.lowerResSrc) {
                     builder.setLowResImageRequest(com.facebook.imagepipeline.request.ImageRequest.fromUri(getUri(this.lowerResSrc)));
                 }
@@ -637,7 +655,7 @@ export class Img extends ImageBase {
             }
 
             if (this.showProgressBar) {
-                builder.setProgressBarImage(this.progressBarColor);
+                builder.setProgressBarImage(this.progressBarColor, this.stretch);
             }
 
             if (this.roundAsCircle) {
@@ -809,7 +827,7 @@ class GenericDraweeHierarchyBuilder {
         return this;
     }
 
-    public setProgressBarImage(color: string): GenericDraweeHierarchyBuilder {
+    public setProgressBarImage(color: string, stretch): GenericDraweeHierarchyBuilder {
         if (!this.nativeBuilder) {
             return null;
         }
@@ -819,7 +837,7 @@ class GenericDraweeHierarchyBuilder {
             drawable.setColor(android.graphics.Color.parseColor(color));
         }
 
-        this.nativeBuilder.setProgressBarImage(drawable);
+        this.nativeBuilder.setProgressBarImage(drawable, getScaleType(stretch));
 
         return this;
     }

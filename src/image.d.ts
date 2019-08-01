@@ -1,5 +1,7 @@
 import * as viewModule from 'tns-core-modules/ui/core/view';
 
+export let debug: boolean;
+
 /**
  * When called, initializes the android Image library. Calling this method is required.
  * A good place to call it is at the application onLaunch() method.

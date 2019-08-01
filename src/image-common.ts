@@ -4,6 +4,31 @@ import { isAndroid, isIOS } from 'tns-core-modules/platform';
 import { ImageSource } from 'tns-core-modules/image-source/image-source';
 import { ImageAsset } from 'tns-core-modules/image-asset/image-asset';
 
+export enum CLogTypes {
+    info,
+    warning,
+    error
+}
+
+export let debug = false;
+export function setDebug(value: boolean) {
+    debug = value;
+}
+
+export const CLog = (type: CLogTypes = 0, ...args) => {
+    if (debug) {
+        if (type === 0) {
+            // Info
+            console.log('[nativescript-image]', ...args);
+        } else if (type === 1) {
+            // Warning
+            console.warn('[nativescript-image]', ...args);
+        } else if (type === 2) {
+            console.error('[nativescript-image]', ...args);
+        }
+    }
+};
+
 export type Transition = 'fade' | 'curlUp';
 
 export enum ScaleType {
