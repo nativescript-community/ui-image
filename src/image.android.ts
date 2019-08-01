@@ -606,6 +606,10 @@ export class Img extends ImageBase {
                 }
 
                 this.nativeViewProtected.setController(controller);
+            } else {
+                this.nativeViewProtected.setController(null);
+                this.nativeViewProtected.setController(null);
+                this.nativeViewProtected.setImageBitmap(null);
             }
         }
     }

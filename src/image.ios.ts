@@ -613,6 +613,8 @@ export class Img extends ImageBase {
                     this.onLoadProgress,
                     this.handleImageLoaded
                 );
+            } else {
+                this._setNativeImage(null);
             }
         }
     }
