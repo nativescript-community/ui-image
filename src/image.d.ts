@@ -1,4 +1,5 @@
 import * as viewModule from 'tns-core-modules/ui/core/view';
+import { ImageSource } from 'tns-core-modules/image-source/image-source';
 
 export const debug: boolean;
 declare function setDebug(value: boolean)
@@ -68,7 +69,7 @@ export class Img extends viewModule.View {
     /**
      * String value used for the image URI.
      */
-    src: string;
+    src: string | ImageSource;
 
     /**
      * String value used for the lower res image URI.
@@ -78,12 +79,12 @@ export class Img extends viewModule.View {
     /**
      * String value used for the placeholder image URI.
      */
-    placeholderImageUri: string;
+    placeholderImageUri: string | ImageSource;
 
     /**
      * String value used for the failure image URI.
      */
-    failureImageUri: string;
+    failureImageUri: string | ImageSource;
 
     /**
      * String value used by Image image scale type. This property can be set to:

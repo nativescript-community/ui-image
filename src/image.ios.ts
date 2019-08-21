@@ -532,18 +532,19 @@ export class Img extends ImageBase {
         this.handleImageProgress(totalSize > 0 ? currentSize / totalSize : -1, totalSize);
     };
 
-    private getUIImage(path: string) {
+    private getUIImage(path: string | ImageSource) {
         if (!path) {
             return null;
         }
         let image;
-        if (utils.isFileOrResourcePath(path)) {
-            // if (path.indexOf(utils.RESOURCE_PREFIX) === 0) {
-            //     image = imageSource.fromFileOrResource(path);
-            // } else {
-            image = fromFileOrResource(path);
-            // }
+        if (typeof path === 'string') {
+            if (utils.isFileOrResourcePath(path)) {
+                image = fromFileOrResource(path);
+            }
+        } else {
+            image = path;
         }
+
         // console.log("getUIImage", path, !!image, !!image && !!image.ios);
         if (image) {
             image = image.ios;

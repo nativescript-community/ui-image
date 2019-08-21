@@ -679,14 +679,18 @@ export class Img extends ImageBase {
         }
     }
 
-    private getDrawable(path: string) {
+    private getDrawable(path: string | ImageSource) {
         let drawable: android.graphics.drawable.BitmapDrawable;
-        if (utils.isFileOrResourcePath(path)) {
-            if (path.indexOf(utils.RESOURCE_PREFIX) === 0) {
-                drawable = this.getDrawableFromResource(path);
-            } else {
-                drawable = this.getDrawableFromLocalFile(path);
+        if (typeof path === 'string') {
+            if (utils.isFileOrResourcePath(path)) {
+                if (path.indexOf(utils.RESOURCE_PREFIX) === 0) {
+                    drawable = this.getDrawableFromResource(path);
+                } else {
+                    drawable = this.getDrawableFromLocalFile(path);
+                }
             }
+        } else {
+            drawable = new android.graphics.drawable.BitmapDrawable(path.android);
         }
 
         return drawable;
