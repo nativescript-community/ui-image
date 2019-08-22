@@ -4,6 +4,7 @@ import { getFrameById, topmost } from 'tns-core-modules/ui/frame/frame';
 import { ItemEventData } from 'tns-core-modules/ui/list-view';
 const examples = [
     'single',
+    'base64',
     'resizing',
     'multiple',
     'size',

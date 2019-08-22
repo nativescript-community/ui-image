@@ -43,9 +43,6 @@ export function onNavigatingTo(args) {
     let theModule;
     try {
         theModule = require(`./${context.example}-fragment`);
-        if (theModule && theModule.onNavigatingTo) {
-            theModule.onNavigatingTo(args);
-        }
     } catch (e) {
         // console.log('error', e);
     }
@@ -61,6 +58,10 @@ export function onNavigatingTo(args) {
     }
 
     container.addChild(innerComponent);
+    if (theModule && theModule.onNavigatingTo) {
+        args.object = innerComponent;
+        theModule.onNavigatingTo(args);
+    }
 }
 
 export function onBack(args) {

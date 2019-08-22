@@ -46,6 +46,7 @@ module.exports = env => {
         hmr, // --env.hmr,
         unitTesting, // --env.unitTesting,
         verbose, // --env.verbose
+        development, // --env.development
     } = env;
     const isAnySourceMapEnabled = !!sourceMap || !!hiddenSourceMap;
     const externals = nsWebpack.getConvertedExternals(env.externals);
@@ -70,6 +71,19 @@ module.exports = env => {
     if (platform === "android") {
         itemsToClean.push(`${join(projectRoot, "platforms", "android", "app", "src", "main", "assets", "snapshots")}`);
         itemsToClean.push(`${join(projectRoot, "platforms", "android", "app", "build", "configurations", "nativescript-android-snapshot")}`);
+    }
+
+    let aliases = {
+        '~': appFullPath
+    };
+    if (!!development) {
+        const srcFullPath = resolve(projectRoot, '..', 'src');
+        console.log('running webpack for live development', srcFullPath);
+        aliases = Object.assign(aliases, {
+            '#': srcFullPath,
+            'nativescript-image': '#/image.' + platform,
+            'nativescript-image$': '#/image.' + platform
+        });
     }
 
     nsWebpack.processAppComponents(appComponents, platform);
@@ -104,9 +118,7 @@ module.exports = env => {
                 "node_modules/tns-core-modules",
                 "node_modules",
             ],
-            alias: {
-                '~': appFullPath
-            },
+            alias: aliases,
             // resolve symlinks to symlinked modules
             symlinks: true
         },
