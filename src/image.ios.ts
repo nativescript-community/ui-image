@@ -458,7 +458,6 @@ export class Img extends ImageBase {
     }
 
     private handleImageLoaded = (image: UIImage, error: NSError, cacheType: number) => {
-        console.log('handleImageLoaded', this.src, error, cacheType);
         if (error) {
             const args = {
                 eventName: Img.failureEvent,
@@ -620,7 +619,6 @@ export class Img extends ImageBase {
         }
     }
     [ImageBase.srcProperty.setNative](value) {
-        console.log('srcProperty', value);
         this.initImage();
     }
     [ImageBase.placeholderImageUriProperty.setNative]() {
