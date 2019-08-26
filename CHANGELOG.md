@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.2.4](https://github.com/Akylas/nativescript-image/compare/v2.2.3...v2.2.4) (2019-08-26)
+
+
+### Bug Fixes
+
+* removed unwanted logs ([ba9bbb4](https://github.com/Akylas/nativescript-image/commit/ba9bbb4))
+
+
+
+
+
 ## [2.2.3](https://github.com/Akylas/nativescript-image/compare/v2.2.2...v2.2.3) (2019-08-21)
 
 
