@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.2.5](https://github.com/Akylas/nativescript-image/compare/v2.2.4...v2.2.5) (2019-08-27)
+
+
+### Bug Fixes
+
+* correct required ios version ([e5e6ceb](https://github.com/Akylas/nativescript-image/commit/e5e6ceb))
+
+
+
+
+
 ## [2.2.4](https://github.com/Akylas/nativescript-image/compare/v2.2.3...v2.2.4) (2019-08-26)
 
 **Note:** Version bump only for package nativescript-image
