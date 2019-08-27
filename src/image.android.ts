@@ -11,7 +11,7 @@ import { ImageAsset } from 'tns-core-modules/image-asset/image-asset';
 let BaseDataSubscriber: new (onNewResult: () => void, onFailure: () => void) => com.facebook.datasource.BaseDataSubscriber<any>;
 
 export function initialize(config?: ImagePipelineConfigSetting): void {
-    if (application.android) {
+    if (application.android && !com.facebook.drawee.backends.pipeline.Fresco.hasBeenInitialized()) {
         if (config && config.isDownsampleEnabled) {
             const imagePipelineConfig = com.facebook.imagepipeline.core.ImagePipelineConfig.newBuilder(application.android.context)
                 .setDownsampleEnabled(true)
