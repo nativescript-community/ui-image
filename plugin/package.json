@@ -7,7 +7,7 @@
     "nativescript": {
         "platforms": {
             "android": "6.0.0",
-            "ios": "60.0"
+            "ios": "6.0.0"
         }
     },
     "keywords": [
