@@ -13,7 +13,7 @@ const uri = 'https://www.dccomics.com/sites/default/files/BM_Cv44_A_gallery_5abd
 export class AppComponent implements OnInit {
     constructor() {}
 
-    @ViewChild('imageView') imageViewComponent: ElementRef;
+    @ViewChild('imageView', {static: false}) imageViewComponent: ElementRef;
 
     ngOnInit() {}
 

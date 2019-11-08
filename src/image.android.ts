@@ -3,7 +3,7 @@ import { AnimatedImage, CLog, CLogTypes, debug, EventData, ImageBase, ImageError
 import * as utils from 'tns-core-modules/utils/utils';
 import * as types from 'tns-core-modules/utils/types';
 import * as application from 'tns-core-modules/application';
-import { fromFile, fromResource, ImageSource } from 'tns-core-modules/image-source';
+import { fromFile, ImageSource } from 'tns-core-modules/image-source';
 import * as fs from 'tns-core-modules/file-system';
 import { Color } from 'tns-core-modules/color/color';
 import { ImageAsset } from 'tns-core-modules/image-asset/image-asset';
@@ -707,7 +707,7 @@ export class Img extends ImageBase {
     }
 
     private getDrawableFromResource(resourceName: string) {
-        const img = fromResource(resourceName.substr(utils.RESOURCE_PREFIX.length));
+        const img = ImageSource.fromResourceSync(resourceName.substr(utils.RESOURCE_PREFIX.length));
         let drawable: android.graphics.drawable.BitmapDrawable = null;
         if (img) {
             drawable = new android.graphics.drawable.BitmapDrawable(utils.ad.getApplicationContext().getResources(), img.android);

@@ -74,3 +74,6 @@ plugin**/*.json
 package-lock.json
 /.vscode
 /pnpm-lock.yaml
+
+.update_backup
+.migration_backup

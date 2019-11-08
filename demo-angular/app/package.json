@@ -4,7 +4,10 @@
     "version": "1.0.0",
     "android": {
         "v8Flags": "--expose_gc",
-        "requireModules": ["nativescript-image"]
+        "requireModules": [
+            "nativescript-image"
+        ],
+        "markingMode": "none"
     },
     "author": {
         "name": "Vladimir Amiorkov",
