@@ -1,6 +1,6 @@
 import { Img } from 'nativescript-image';
-import { GridLayout } from 'tns-core-modules/ui/layouts/grid-layout';
-import { Label } from 'tns-core-modules/ui/label';
+import { GridLayout } from '@nativescript/core/ui/layouts/grid-layout';
+import { Label } from '@nativescript/core/ui/label';
 
 export function writeToOutputLabel(imageView: Img, message: string) {
     const gridLayout = imageView.parent as GridLayout;

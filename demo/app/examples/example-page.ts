@@ -1,9 +1,8 @@
-import { NavigationButton } from 'tns-core-modules/ui/action-bar/action-bar';
-import { Frame } from 'tns-core-modules/ui/frame/frame';
-import { ObservableArray } from 'tns-core-modules/data/observable-array/observable-array';
+import { NavigationButton } from '@nativescript/core/ui/action-bar/action-bar';
+import { Frame } from '@nativescript/core/ui/frame/frame';
+import { ObservableArray } from '@nativescript/core/data/observable-array/observable-array';
 import { DataItem } from '~/home/dataItem';
-
-const builder = require('ui/builder');
+import { Builder } from '@nativescript/core/ui/builder';
 
 class PageModel {
     private _dataItems: ObservableArray<DataItem>;
@@ -52,9 +51,9 @@ export function onNavigatingTo(args) {
     if (global.TNS_WEBPACK) {
         // some-fragment.xml registered via bundle-config.ts, because it's postfixed with "fragment"
         // so it already exist in bundle.js as module
-        innerComponent = builder.parse(require(`./${exampleTitle}-fragment.xml`) as string, theModule);
+        innerComponent = Builder.parse(require(`./${exampleTitle}-fragment.xml`) as string, theModule);
     } else {
-        innerComponent = builder.load(`${__dirname}/${exampleTitle}-fragment.xml`, theModule);
+        innerComponent = Builder.load(`${__dirname}/${exampleTitle}-fragment.xml`, theModule);
     }
 
     container.addChild(innerComponent);

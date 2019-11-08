@@ -1,6 +1,6 @@
-import { EventData } from 'tns-core-modules/data/observable';
+import { EventData } from '@nativescript/core/data/observable';
 import { Img } from 'nativescript-image';
-import { View } from 'tns-core-modules/ui/page/page';
+import { View } from '@nativescript/core/ui/page/page';
 
 class ImageData {
     public uri: string;

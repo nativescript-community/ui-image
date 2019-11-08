@@ -1,6 +1,6 @@
-import { EventData } from 'tns-core-modules/data/observable';
-import { Button } from 'tns-core-modules/ui/button';
-import { StackLayout } from 'tns-core-modules/ui/layouts/stack-layout';
+import { EventData } from '@nativescript/core/data/observable';
+import { Button } from '@nativescript/core/ui/button';
+import { StackLayout } from '@nativescript/core/ui/layouts/stack-layout';
 import * as imageModel from 'nativescript-image';
 
 export function onSetTap(args: EventData) {

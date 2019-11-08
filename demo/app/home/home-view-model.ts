@@ -1,7 +1,6 @@
-import { ObservableArray } from 'tns-core-modules/data/observable-array';
-import { DataItem } from './dataItem';
-import { getFrameById, topmost } from 'tns-core-modules/ui/frame/frame';
-import { ItemEventData } from 'tns-core-modules/ui/list-view';
+import { Frame } from '@nativescript/core/ui/frame/frame';
+import { ItemEventData } from '@nativescript/core/ui/list-view';
+
 const examples = [
     'single',
     'base64',
@@ -33,8 +32,7 @@ export class ViewModel {
         };
     });
 
-    constructor() {
-    }
+    constructor() {}
     public onTap(args: ItemEventData) {
         const example = this.examples[args.index];
         console.log('onTap', args.index, example);
@@ -45,7 +43,7 @@ export class ViewModel {
             },
             animated: true
         };
-        const frame = getFrameById('firstFrame');
+        const frame = Frame.getFrameById('firstFrame');
         frame.navigate(navigationEntry);
     }
 }

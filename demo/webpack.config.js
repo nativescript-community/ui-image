@@ -3,6 +3,7 @@ const { join, relative, resolve, sep } = require("path");
 const webpack = require("webpack");
 const nsWebpack = require("nativescript-dev-webpack");
 const nativescriptTarget = require("nativescript-dev-webpack/nativescript-target");
+const { getNoEmitOnErrorFromTSConfig } = require("nativescript-dev-webpack/utils/tsconfig-utils");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
@@ -31,8 +32,7 @@ module.exports = env => {
 
     const {
         // The 'appPath' and 'appResourcesPath' values are fetched from
-        // the nsconfig.json configuration file
-        // when bundling with `tns run android|ios --bundle`.
+        // the nsconfig.json configuration file.
         appPath = "app",
         appResourcesPath = "app/App_Resources",
 
@@ -47,7 +47,12 @@ module.exports = env => {
         unitTesting, // --env.unitTesting,
         verbose, // --env.verbose
         development, // --env.development
+        snapshotInDocker, // --env.snapshotInDocker
+        skipSnapshotTools, // --env.skipSnapshotTools
+        compileSnapshot // --env.compileSnapshot
     } = env;
+
+    const useLibs = compileSnapshot;
     const isAnySourceMapEnabled = !!sourceMap || !!hiddenSourceMap;
     const externals = nsWebpack.getConvertedExternals(env.externals);
 
@@ -85,6 +90,7 @@ module.exports = env => {
             'nativescript-image$': '#/image.' + platform
         });
     }
+    const noEmitOnErrorFromTSConfig = getNoEmitOnErrorFromTSConfig(tsConfigPath);
 
     nsWebpack.processAppComponents(appComponents, platform);
     const config = {
@@ -137,6 +143,7 @@ module.exports = env => {
         devtool: hiddenSourceMap ? "hidden-source-map" : (sourceMap ? "inline-source-map" : "none"),
         optimization: {
             runtimeChunk: "single",
+            noEmitOnErrors: noEmitOnErrorFromTSConfig,
             splitChunks: {
                 cacheGroups: {
                     vendor: {
@@ -196,7 +203,7 @@ module.exports = env => {
                         },
                     ].filter(loader => !!loader)
                 },
-                
+
                 {
                     test: /\.(ts|css|scss|html|xml)$/,
                     use: "nativescript-dev-webpack/hmr/hot-loader"
@@ -206,13 +213,13 @@ module.exports = env => {
 
                 {
                     test: /\.css$/,
-                    use: { loader: "css-loader", options: { url: false } }
+                    use: "nativescript-dev-webpack/css2json-loader"
                 },
 
                 {
                     test: /\.scss$/,
                     use: [
-                        { loader: "css-loader", options: { url: false } },
+                        "nativescript-dev-webpack/css2json-loader",
                         "sass-loader"
                     ]
                 },
@@ -266,6 +273,7 @@ module.exports = env => {
                 tsconfig: tsConfigPath,
                 async: false,
                 useTypescriptIncrementalApi: true,
+                checkSyntacticErrors: true,
                 memoryLimit: 4096
             })
         ],
@@ -290,6 +298,9 @@ module.exports = env => {
             ],
             projectRoot,
             webpackConfig: config,
+            snapshotInDocker,
+            skipSnapshotTools,
+            useLibs
         }));
     }
 

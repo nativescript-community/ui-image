@@ -1,4 +1,4 @@
-import { EventData } from 'tns-core-modules/ui/page/page';
+import { EventData } from '@nativescript/core/ui/page/page';
 
 export function onImageTap(args: EventData) {
     console.log('onImageTap', args);

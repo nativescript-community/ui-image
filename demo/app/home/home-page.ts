@@ -1,5 +1,5 @@
 import { ViewModel } from './home-view-model';
-import { EventData } from 'tns-core-modules/data/observable';
+import { EventData } from '@nativescript/core/data/observable';
 import * as imageModel from 'nativescript-image';
 
 export function pageLoaded(args) {
