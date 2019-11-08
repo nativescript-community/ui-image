@@ -1,7 +1,7 @@
-import { EventData } from 'tns-core-modules/data/observable';
-import { Button } from 'tns-core-modules/ui/button';
-import { GridLayout } from 'tns-core-modules/ui/layouts/grid-layout';
-import { Label } from 'tns-core-modules/ui/label';
+import { EventData } from '@nativescript/core/data/observable';
+import { Button } from '@nativescript/core/ui/button';
+import { GridLayout } from '@nativescript/core/ui/layouts/grid-layout';
+import { Label } from '@nativescript/core/ui/label';
 import * as imageModel from 'nativescript-image';
 import { writeToOutputLabel } from './appLogger';
 

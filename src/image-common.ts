@@ -1,8 +1,8 @@
-import { booleanConverter, Color, Property, View } from 'tns-core-modules/ui/core/view';
-import * as observableModule from 'tns-core-modules/data/observable';
-import { isAndroid, isIOS } from 'tns-core-modules/platform';
-import { ImageSource } from 'tns-core-modules/image-source/image-source';
-import { ImageAsset } from 'tns-core-modules/image-asset/image-asset';
+import { booleanConverter, Color, Property, View } from '@nativescript/core/ui/core/view';
+import * as observableModule from '@nativescript/core/data/observable';
+import { isAndroid, isIOS } from '@nativescript/core/platform';
+import { ImageSource } from '@nativescript/core/image-source/image-source';
+import { ImageAsset } from '@nativescript/core/image-asset/image-asset';
 
 export enum CLogTypes {
     info,

@@ -1,5 +1,5 @@
-import * as viewModule from 'tns-core-modules/ui/core/view';
-import { ImageSource } from 'tns-core-modules/image-source/image-source';
+import * as viewModule from '@nativescript/core/ui/core/view';
+import { ImageSource } from '@nativescript/core/image-source/image-source';
 
 export const debug: boolean;
 declare function setDebug(value: boolean)

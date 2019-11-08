@@ -1,13 +1,13 @@
 export * from './image-common';
+import * as fs from '@nativescript/core/file-system';
+import { ImageAsset } from '@nativescript/core/image-asset/image-asset';
+import { ImageSource } from '@nativescript/core/image-source';
+import { screen } from '@nativescript/core/platform/platform';
+import { layout } from '@nativescript/core/ui/core/view';
+import * as types from '@nativescript/core/utils/types';
+import * as utils from '@nativescript/core/utils/utils';
 import { EventData, ImageBase, ImageInfo as ImageInfoBase, ImagePipelineConfigSetting, ScaleType, Stretch } from './image-common';
-import * as utils from 'tns-core-modules/utils/utils';
-import * as types from 'tns-core-modules/utils/types';
-import { fromFile, fromFileOrResource, fromResource, ImageSource } from 'tns-core-modules/image-source';
-import * as fs from 'tns-core-modules/file-system';
 
-import { layout } from 'tns-core-modules/ui/core/view';
-import { screen } from 'tns-core-modules/platform/platform';
-import { ImageAsset } from 'tns-core-modules/image-asset/image-asset';
 
 class SDImageRoundAsCircleTransformer extends NSObject implements SDImageTransformer {
     public static ObjCProtocols = [SDImageTransformer];
@@ -538,7 +538,7 @@ export class Img extends ImageBase {
         let image;
         if (typeof path === 'string') {
             if (utils.isFileOrResourcePath(path)) {
-                image = fromFileOrResource(path);
+                image = ImageSource.fromFileOrResourceSync(path);
             }
         } else {
             image = path;

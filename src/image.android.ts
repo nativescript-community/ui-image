@@ -1,12 +1,12 @@
 export * from './image-common';
 import { AnimatedImage, CLog, CLogTypes, debug, EventData, ImageBase, ImageError as ImageErrorBase, ImageInfo as ImageInfoBase, ImagePipelineConfigSetting, ScaleType, Stretch } from './image-common';
-import * as utils from 'tns-core-modules/utils/utils';
-import * as types from 'tns-core-modules/utils/types';
-import * as application from 'tns-core-modules/application';
-import { fromFile, ImageSource } from 'tns-core-modules/image-source';
-import * as fs from 'tns-core-modules/file-system';
-import { Color } from 'tns-core-modules/color/color';
-import { ImageAsset } from 'tns-core-modules/image-asset/image-asset';
+import * as utils from '@nativescript/core/utils/utils';
+import * as types from '@nativescript/core/utils/types';
+import * as application from '@nativescript/core/application';
+import { fromFile, ImageSource } from '@nativescript/core/image-source';
+import * as fs from '@nativescript/core/file-system';
+import { Color } from '@nativescript/core/color/color';
+import { ImageAsset } from '@nativescript/core/image-asset/image-asset';
 
 let BaseDataSubscriber: new (onNewResult: () => void, onFailure: () => void) => com.facebook.datasource.BaseDataSubscriber<any>;
 

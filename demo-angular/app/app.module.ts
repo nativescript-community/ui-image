@@ -1,13 +1,13 @@
 // this import should be first in order to load some required settings (like globals and reflect-metadata)
-import { NativeScriptModule } from 'nativescript-angular/nativescript.module';
-import { NativeScriptRouterModule } from 'nativescript-angular/router';
-import { NativeScriptFormsModule } from 'nativescript-angular/forms';
+import { NativeScriptModule } from '@nativescript/angular/nativescript.module';
+import { NativeScriptRouterModule } from '@nativescript/angular/router';
+import { NativeScriptFormsModule } from '@nativescript/angular/forms';
 import { NgModule, NO_ERRORS_SCHEMA, OnInit } from '@angular/core';
 import { AppComponent } from './components/app.component';
 
 import { TNSImageModule } from 'nativescript-image/angular';
 import * as imageModule from 'nativescript-image';
-import * as applicationModule from 'tns-core-modules/application';
+import * as applicationModule from '@nativescript/core/application';
 
 if (applicationModule.android) {
     applicationModule.on(applicationModule.launchEvent, () => {

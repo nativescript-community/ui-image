@@ -1,6 +1,6 @@
 import Vue from "nativescript-vue";
 import Home from "./components/Home";
-import * as app from 'tns-core-modules/application';
+import * as app from '@nativescript/core/application';
 import * as imageModule from 'nativescript-image';
 import ImagePlugin from 'nativescript-image/vue';
 

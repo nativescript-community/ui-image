@@ -1,7 +1,7 @@
 import { FailureEventData, FinalEventData, Img, IntermediateEventData } from 'nativescript-image';
-import { EventData } from 'tns-core-modules/data/observable';
-import { GridLayout } from 'tns-core-modules/ui/layouts/grid-layout';
-import { Label } from 'tns-core-modules/ui/label';
+import { EventData } from '@nativescript/core/data/observable';
+import { GridLayout } from '@nativescript/core/ui/layouts/grid-layout';
+import { Label } from '@nativescript/core/ui/label';
 import { writeToOutputLabel } from './appLogger';
 
 export function onFinalImageSet(args: FinalEventData) {
