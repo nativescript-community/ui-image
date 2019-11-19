@@ -3,7 +3,7 @@ import { AnimatedImage, CLog, CLogTypes, debug, EventData, ImageBase, ImageError
 import * as utils from '@nativescript/core/utils/utils';
 import * as types from '@nativescript/core/utils/types';
 import * as application from '@nativescript/core/application';
-import { fromFile, ImageSource } from '@nativescript/core/image-source';
+import { ImageSource } from '@nativescript/core/image-source';
 import * as fs from '@nativescript/core/file-system';
 import { Color } from '@nativescript/core/color/color';
 import { ImageAsset } from '@nativescript/core/image-asset/image-asset';
@@ -697,7 +697,7 @@ export class Img extends ImageBase {
     }
 
     private getDrawableFromLocalFile(localFilePath: string) {
-        const img = fromFile(localFilePath);
+        const img = ImageSource.fromFileSync(localFilePath);
         let drawable: android.graphics.drawable.BitmapDrawable = null;
         if (img) {
             drawable = new android.graphics.drawable.BitmapDrawable(utils.ad.getApplicationContext().getResources(), img.android);
