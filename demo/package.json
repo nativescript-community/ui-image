@@ -13,10 +13,10 @@
         }
     },
     "dependencies": {
+        "@nativescript/core": "~6.2.0",
         "nativescript-collectionview": "1.0.23",
         "nativescript-image": "../plugin",
-        "nativescript-theme-core": "^2.0.4",
-        "tns-core-modules": "^6.2.0"
+        "nativescript-theme-core": "^2.0.4"
     },
     "devDependencies": {
         "@babel/core": "~7.5.5",

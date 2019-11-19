@@ -17,8 +17,8 @@ const hashSalt = Date.now().toString();
 module.exports = env => {
     // Add your custom Activities, Services and other android app components here.
     const appComponents = [
-        "tns-core-modules/ui/frame",
-        "tns-core-modules/ui/frame/activity",
+        "@nativescript/core/ui/frame",
+        "@nativescript/core/ui/frame/activity",
     ];
 
     const platform = env && (env.android && "android" || env.ios && "ios");
@@ -64,9 +64,9 @@ module.exports = env => {
     const entryModule = nsWebpack.getEntryModule(appFullPath, platform);
     const entryPath = `.${sep}${entryModule}`;
     const entries = { bundle: entryPath };
-    const areCoreModulesExternal = Array.isArray(env.externals) && env.externals.some(e => e.indexOf("tns-core-modules") > -1);
+    const areCoreModulesExternal = Array.isArray(env.externals) && env.externals.some(e => e.indexOf("@nativescript/core") > -1);
     if (platform === "ios" && !areCoreModulesExternal) {
-        entries["tns_modules/tns-core-modules/inspector_modules"] = "inspector_modules";
+        entries["@nativescript/core/inspector_modules"] = "inspector_modules";
     };
     console.log(`Bundling application for entryPath ${entryPath}...`);
 
@@ -104,11 +104,8 @@ module.exports = env => {
         },
         resolve: {
             extensions: [".vue", ".ts", ".js", ".scss", ".css"],
-            // Resolve {N} system modules from tns-core-modules
             modules: [
-                resolve(__dirname, "node_modules/tns-core-modules"),
                 resolve(__dirname, "node_modules"),
-                "node_modules/tns-core-modules",
                 "node_modules",
             ],
             alias: {
@@ -320,7 +317,7 @@ module.exports = env => {
         config.plugins.push(new nsWebpack.NativeScriptSnapshotPlugin({
             chunk: "vendor",
             requireModules: [
-                "tns-core-modules/bundle-entry-points",
+                "@nativescript/core/bundle-entry-points",
             ],
             projectRoot,
             webpackConfig: config,

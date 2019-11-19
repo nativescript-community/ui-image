@@ -22,13 +22,13 @@
     "@angular/platform-browser": "~8.2.13",
     "@angular/platform-browser-dynamic": "~8.2.13",
     "@angular/router": "~8.2.13",
-    "nativescript-angular": "~8.20.0",
+    "@nativescript/angular": "~8.20.0",
+    "@nativescript/core": "~6.2.0",
     "nativescript-image": "../plugin",
     "nativescript-theme-core": "^1.0.4",
     "nativescript-ui-listview": "7.0.0",
     "reflect-metadata": "~0.1.8",
     "rxjs": "^6.5.3",
-    "tns-core-modules": "~6.2.0",
     "zone.js": "0.9.1"
   },
   "devDependencies": {

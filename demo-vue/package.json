@@ -11,10 +11,10 @@
     "description": "NativeScript Application",
     "repository": "https://github.com/Akylas/nativescript-image",
     "dependencies": {
+        "@nativescript/core": "~6.2.0",
         "nativescript-image": "../plugin",
         "nativescript-theme-core": "~1.0.4",
-        "nativescript-vue": "^2.4.0",
-        "tns-core-modules": "~6.2.0"
+        "nativescript-vue": "^2.4.0"
     },
     "devDependencies": {
         "@babel/core": "~7.1.0",
