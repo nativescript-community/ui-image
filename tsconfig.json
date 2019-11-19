@@ -22,7 +22,7 @@
         "outDir": "./plugin",
         "rootDir": "src",
         "paths": {
-            "*": ["./node_modules/tns-core-modules/*", "./node_modules/*"]
+            "*": ["./node_modules/*"]
         },
         "plugins": [
             {
