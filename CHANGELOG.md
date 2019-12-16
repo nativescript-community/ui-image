@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.1](https://github.com/Akylas/nativescript-image/compare/v3.0.0...v3.0.1) (2019-12-16)
+
+
+### Bug Fixes
+
+* **issue 22:** Scale placeholder image scale ([6320eb9](https://github.com/Akylas/nativescript-image/commit/6320eb92828a227837ae54e79ff712300abb6b6f))
+
+
+
+
+
 # [3.0.0](https://github.com/Akylas/nativescript-image/compare/v2.2.5...v3.0.0) (2019-11-19)
 
 **Note:** Version bump only for package nativescript-image

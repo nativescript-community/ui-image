@@ -1,6 +1,6 @@
 {
     "name": "nativescript-image",
-    "version": "3.0.0",
+    "version": "3.0.1",
     "description": "Nativescript Image plugin using cache.",
     "main": "./image",
     "typings": "./image.d.ts",
