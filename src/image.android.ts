@@ -641,7 +641,7 @@ export class Img extends ImageBase {
             }
 
             if (this.placeholderImageUri && placeholderImageDrawable) {
-                builder.setPlaceholderImage(placeholderImageDrawable);
+                builder.setPlaceholderImage(placeholderImageDrawable, this.stretch);
             }
 
             if (this.stretch) {
@@ -768,12 +768,16 @@ class GenericDraweeHierarchyBuilder {
         this.nativeBuilder = new com.facebook.drawee.generic.GenericDraweeHierarchyBuilder(res);
     }
 
-    public setPlaceholderImage(drawable): GenericDraweeHierarchyBuilder {
+    public setPlaceholderImage(drawable, scaleType: string): GenericDraweeHierarchyBuilder {
         if (!this.nativeBuilder) {
             return this;
         }
 
-        this.nativeBuilder.setPlaceholderImage(drawable);
+        if (scaleType) {
+            this.nativeBuilder.setPlaceholderImage(drawable, getScaleType(scaleType));
+        } else {
+            this.nativeBuilder.setPlaceholderImage(drawable);
+        }
 
         return this;
     }
