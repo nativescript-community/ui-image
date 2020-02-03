@@ -633,7 +633,7 @@ export class Img extends ImageBase {
 
             const builder: GenericDraweeHierarchyBuilder = new GenericDraweeHierarchyBuilder();
             if (this.failureImageUri && failureImageDrawable) {
-                builder.setFailureImage(failureImageDrawable);
+                builder.setFailureImage(failureImageDrawable, this.stretch);
             }
 
             if (this.tintColor) {
@@ -791,12 +791,16 @@ class GenericDraweeHierarchyBuilder {
         return this;
     }
 
-    public setFailureImage(drawable): GenericDraweeHierarchyBuilder {
+    public setFailureImage(drawable, scaleType: string): GenericDraweeHierarchyBuilder {
         if (!this.nativeBuilder) {
             return null;
         }
 
-        this.nativeBuilder.setFailureImage(drawable);
+        if (scaleType) {
+            this.nativeBuilder.setFailureImage(drawable, getScaleType(scaleType));
+        } else {
+            this.nativeBuilder.setFailureImage(drawable);
+        }
 
         return this;
     }
