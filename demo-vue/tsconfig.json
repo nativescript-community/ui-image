@@ -1,0 +1,21 @@
+{
+    "extends": "../tsconfig",
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es5",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "noEmitHelpers": true,
+        "noEmitOnError": true,
+        "lib": ["es6", "dom", "es2015.iterable"],
+        "baseUrl": ".",
+        "paths": {
+            "nativescript-vue": ["./node_modules/nativescript-akylas-vue"],
+            "tns-core-modules": ["./node_modules/@nativescript/core"],
+            "tns-core-modules/*": ["./node_modules/@nativescript/core/*"],
+            "~/*": ["app/*"]
+        }
+    },
+    "include": ["**/*"],
+    "exclude": ["../src/**/*.d.ts", "node_modules", "platforms"]
+}

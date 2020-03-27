@@ -7,6 +7,7 @@
         <GridLayout rows="*, auto, auto, auto, auto, auto">
             <NSImg ref="opacityImg"
                 verticalAlignment="center"
+                    blurRadius="25"
                 placeholderImageUri="res://ns_logo"
                 src="https://raw.githubusercontent.com/Akylas/nativescript-image/master/examples-data/breakfast1.jpg">
             </NSImg>
