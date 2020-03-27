@@ -466,7 +466,7 @@ export class Img extends ImageBase {
                     requestBuilder = requestBuilder.setResizeOptions(new com.facebook.imagepipeline.common.ResizeOptions(this.decodeWidth, this.decodeHeight));
                 }
                 if (this.blurRadius) {
-                    const postProcessor: any = new jp.wasabeef.fresco.processors.BlurPostprocessor(this._context, this.blurRadius, this.blurDownSampling || 1);
+                    const postProcessor: any = new com.nativescript.image.ScalingBlurPostprocessor(2, this.blurRadius, this.blurDownSampling || 1);
                     requestBuilder = requestBuilder.setPostprocessor(postProcessor);
                 }
 
@@ -580,7 +580,7 @@ export class Img extends ImageBase {
                     builder.setPerfDataListener(
                         new com.facebook.drawee.backends.pipeline.info.ImagePerfDataListener({
                             onImageLoadStatusUpdated(param0: com.facebook.drawee.backends.pipeline.info.ImagePerfData, param1: number) {
-                                CLog(CLogTypes.info, 'onSuonImageLoadStatusUpdatedbmit', param0, param1);
+                                CLog(CLogTypes.info, 'onImageLoadStatusUpdated', param0, param1);
                             },
                             onImageVisibilityUpdated(param0: com.facebook.drawee.backends.pipeline.info.ImagePerfData, param1: number) {
                                 CLog(CLogTypes.info, 'onImageVisibilityUpdated', param0, param1);
