@@ -10,17 +10,26 @@ import { ImageAsset } from '@nativescript/core/image-asset/image-asset';
 
 let BaseDataSubscriber: new (onNewResult: () => void, onFailure: () => void) => com.facebook.datasource.BaseDataSubscriber<any>;
 
+
+let initialized = false;
+let initializeConfig:ImagePipelineConfigSetting
 export function initialize(config?: ImagePipelineConfigSetting): void {
-    if (application.android && !com.facebook.drawee.backends.pipeline.Fresco.hasBeenInitialized()) {
+    if (!initialized) {
+        const context = application.android.context;
+        if (!context) {
+            initializeConfig = config;
+            return;
+        }
+        console.log('image initialize', context, config);
         if (config && config.isDownsampleEnabled) {
-            const imagePipelineConfig = com.facebook.imagepipeline.core.ImagePipelineConfig.newBuilder(application.android.context)
+            const imagePipelineConfig = com.facebook.imagepipeline.core.ImagePipelineConfig.newBuilder(context)
                 .setDownsampleEnabled(true)
                 .build();
-            com.facebook.drawee.backends.pipeline.Fresco.initialize(application.android.context, imagePipelineConfig);
+            com.facebook.drawee.backends.pipeline.Fresco.initialize(context, imagePipelineConfig);
         } else {
-            com.facebook.drawee.backends.pipeline.Fresco.initialize(application.android.context);
+            com.facebook.drawee.backends.pipeline.Fresco.initialize(context);
         }
-        initializeBaseDataSubscriber();
+        initialized = true;
     }
 }
 
@@ -37,6 +46,10 @@ export function getImagePipeline(): ImagePipeline {
 }
 
 export function shutDown(): void {
+    if (!initialized) {
+        return;
+    } 
+    initialized = false;
     com.facebook.drawee.view.SimpleDraweeView.shutDown();
     com.facebook.drawee.backends.pipeline.Fresco.shutDown();
 }
@@ -166,6 +179,7 @@ export class ImagePipeline {
                 } else {
                     datasource = this._android.prefetchToBitmapCache(request, null);
                 }
+                initializeBaseDataSubscriber();
                 datasource.subscribe(new BaseDataSubscriber(resolve, reject), com.facebook.common.executors.CallerThreadExecutor.getInstance());
             } catch (error) {
                 reject(error);
@@ -327,6 +341,9 @@ export class Img extends ImageBase {
     // stretch = ScaleType.FitCenter;
 
     public createNativeView() {
+        if (!initialized) {
+            initialize(initializeConfig);
+        }
         return new com.facebook.drawee.view.SimpleDraweeView(this._context);
     }
 

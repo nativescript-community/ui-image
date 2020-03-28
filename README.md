@@ -41,37 +41,12 @@
 1. Clone the repository and go to the root directory on your computer.
 2. Use `tsc` to transpile the `.ts` sources: `tsc -p`.
 3. Go to the root folder of your {N} application where you would like to install the plugin and type `tns plugin add <path-to-imageModule-repo-dir>`.
-4. Initialize `nativescript-image` in the `launch` event of your {N} application by using the following code:
-
-JavaScript:
+4. When working with "downsampling" you will need to initialize the image a configuration to the `initialize` function:
 
 ```javascript
-var application = require("application");
-var imageModule = require("nativescript-image");
-
-if (application.android) {
-    application.on("launch", function () {
-        imageModule.initialize();
-    });
-}
-```
-
-TypeScript:
-
-```typescript
-import application = require("application");
 import imageModule = require("nativescript-image");
 
-if (application.android) {
-    application.on("launch", () => {
-        imageModule.initialize();
-    });
-}
-```
-
-> When working with "downsampling" you will need to pass a configuration to the `initialize` function:
-
-```javascript
+//do this before creating any image view
 imageModule.initialize({ isDownsampleEnabled: true });
 ```
 
