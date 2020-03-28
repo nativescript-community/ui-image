@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.3](https://github.com/Akylas/nativescript-image/compare/v3.0.2...v3.0.3) (2020-03-28)
+
+
+### Bug Fixes
+
+* no need to call initialize in lauch event ([540945a](https://github.com/Akylas/nativescript-image/commit/540945a52c329baf7c11777cdc0fc8ed1658d1ae))
+
+
+
+
+
 ## [3.0.2](https://github.com/Akylas/nativescript-image/compare/v3.0.1...v3.0.2) (2020-03-27)
 
 
