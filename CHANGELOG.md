@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.5](https://github.com/Akylas/nativescript-image/compare/v3.0.4...v3.0.5) (2020-03-30)
+
+
+### Bug Fixes
+
+* removed logs ([f42926c](https://github.com/Akylas/nativescript-image/commit/f42926ce5d06d713cf744334e44f443cfcbb88f6))
+
+
+
+
+
 ## [3.0.4](https://github.com/Akylas/nativescript-image/compare/v3.0.3...v3.0.4) (2020-03-30)
 
 
