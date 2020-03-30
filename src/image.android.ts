@@ -20,7 +20,6 @@ export function initialize(config?: ImagePipelineConfigSetting): void {
             initializeConfig = config;
             return;
         }
-        console.log('image initialize', context, config);
         if (config && config.isDownsampleEnabled) {
             const imagePipelineConfig = com.facebook.imagepipeline.core.ImagePipelineConfig.newBuilder(context)
                 .setDownsampleEnabled(true)
@@ -335,9 +334,51 @@ export class FailureEventData extends EventData {
     }
 }
 
+export const needUpdateHierarchy = function(target: any, propertyKey: string | Symbol, descriptor: PropertyDescriptor) {
+    let originalMethod = descriptor.value;
+    descriptor.value = function(...args: any[]) {
+        if (!this._canUpdateHierarchy) {
+            this._needUpdateHierarchy = true;
+            return;
+        }
+        return originalMethod.apply(this, args);
+    };
+};
+export const needRequestImage = function(target: any, propertyKey: string | Symbol, descriptor: PropertyDescriptor) {
+    let originalMethod = descriptor.value;
+    descriptor.value = function(...args: any[]) {
+        if (!this._canRequestImage) {
+            this._needRequestImage = true;
+            return;
+        }
+        return originalMethod.apply(this, args);
+    };
+};
+
 export class Img extends ImageBase {
     nativeViewProtected: com.facebook.drawee.view.SimpleDraweeView;
     isLoading = false;
+
+    _canRequestImage = true;
+    _canUpdateHierarchy = true;
+    _needUpdateHierarchy = false;
+    _needRequestImage = false;
+    public onResumeNativeUpdates(): void {
+        // {N} suspends properties update on `_suspendNativeUpdates`. So we only need to do this in onResumeNativeUpdates
+        this._canRequestImage = false;
+        this._canUpdateHierarchy = false;
+        super.onResumeNativeUpdates();
+        this._canUpdateHierarchy = true;
+        this._canRequestImage = true;
+        if (this._needUpdateHierarchy) {
+            this._needUpdateHierarchy = false;
+            this.updateHierarchy();
+        }
+        if (this._needRequestImage) {
+            this._needRequestImage = false;
+            this.initImage();
+        }
+    }
     // stretch = ScaleType.FitCenter;
 
     public createNativeView() {
@@ -377,62 +418,74 @@ export class Img extends ImageBase {
         this.src = src;
     }
 
-    [ImageBase.srcProperty.setNative]() {
-        this.initImage();
-    }
-    [ImageBase.lowerResSrcProperty.setNative]() {
-        this.initImage();
-    }
 
+    @needUpdateHierarchy
     [ImageBase.placeholderImageUriProperty.setNative]() {
         this.updateHierarchy();
     }
 
+    @needUpdateHierarchy
     [ImageBase.failureImageUriProperty.setNative]() {
         this.updateHierarchy();
     }
 
+    @needUpdateHierarchy
     [ImageBase.stretchProperty.setNative]() {
         this.updateHierarchy();
     }
 
+    @needUpdateHierarchy
     [ImageBase.fadeDurationProperty.setNative]() {
         this.updateHierarchy();
     }
 
+    @needUpdateHierarchy
     [ImageBase.backgroundUriProperty.setNative]() {
         this.updateHierarchy();
     }
 
+    @needUpdateHierarchy
     [ImageBase.showProgressBarProperty.setNative]() {
         this.updateHierarchy();
     }
 
+    @needUpdateHierarchy
     [ImageBase.progressBarColorProperty.setNative]() {
         this.updateHierarchy();
     }
 
+    @needUpdateHierarchy
     [ImageBase.roundAsCircleProperty.setNative]() {
         this.updateHierarchy();
     }
 
+    @needUpdateHierarchy
     [ImageBase.roundTopLeftProperty.setNative]() {
         this.updateHierarchy();
     }
 
+    @needUpdateHierarchy
     [ImageBase.roundTopRightProperty.setNative]() {
         this.updateHierarchy();
     }
 
+    @needUpdateHierarchy
     [ImageBase.roundBottomLeftProperty.setNative]() {
         this.updateHierarchy();
     }
 
+    @needUpdateHierarchy
     [ImageBase.roundBottomRightProperty.setNative]() {
         this.updateHierarchy();
     }
 
+    @needUpdateHierarchy
     [ImageBase.roundedCornerRadiusProperty.setNative]() {
+        this.updateHierarchy();
+    }
+
+    @needUpdateHierarchy
+    [ImageBase.tintColorProperty.setNative](value: Color) {
         this.updateHierarchy();
     }
 
@@ -440,10 +493,22 @@ export class Img extends ImageBase {
         this.initImage();
     }
 
+    @needRequestImage
+    [ImageBase.srcProperty.setNative]() {
+        this.initImage();
+    }
+    
+    @needRequestImage
+    [ImageBase.lowerResSrcProperty.setNative]() {
+        this.initImage();
+    }
+    
+    @needRequestImage
     [ImageBase.blurDownSamplingProperty.setNative]() {
         this.initImage();
     }
 
+    @needRequestImage
     [ImageBase.aspectRatioProperty.setNative]() {
         this.initImage();
     }
@@ -467,6 +532,7 @@ export class Img extends ImageBase {
                     console.log(`Error: 'src' not valid: ${src}`);
                     return;
                 }
+                console.log('requesting image', src);
 
                 // const progressiveRenderingEnabledValue = this.progressiveRenderingEnabled !== undefined ? this.progressiveRenderingEnabled : false;
                 let requestBuilder = com.facebook.imagepipeline.request.ImageRequestBuilder.newBuilderWithSource(uri).setRotationOptions(
@@ -633,6 +699,7 @@ export class Img extends ImageBase {
 
     private updateHierarchy() {
         if (this.nativeViewProtected) {
+            console.log('updateHierarchy');
             let failureImageDrawable: android.graphics.drawable.BitmapDrawable;
             let placeholderImageDrawable: android.graphics.drawable.BitmapDrawable;
             let backgroundDrawable: android.graphics.drawable.BitmapDrawable;
@@ -731,9 +798,6 @@ export class Img extends ImageBase {
         }
 
         return drawable;
-    }
-    [ImageBase.tintColorProperty.setNative](value: Color) {
-        this.updateHierarchy();
     }
     // [ImageBase.stretchProperty.setNative](value: Stretch) {
     //     switch (value) {
