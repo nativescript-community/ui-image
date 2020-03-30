@@ -532,7 +532,6 @@ export class Img extends ImageBase {
                     console.log(`Error: 'src' not valid: ${src}`);
                     return;
                 }
-                console.log('requesting image', src);
 
                 // const progressiveRenderingEnabledValue = this.progressiveRenderingEnabled !== undefined ? this.progressiveRenderingEnabled : false;
                 let requestBuilder = com.facebook.imagepipeline.request.ImageRequestBuilder.newBuilderWithSource(uri).setRotationOptions(
@@ -699,7 +698,6 @@ export class Img extends ImageBase {
 
     private updateHierarchy() {
         if (this.nativeViewProtected) {
-            console.log('updateHierarchy');
             let failureImageDrawable: android.graphics.drawable.BitmapDrawable;
             let placeholderImageDrawable: android.graphics.drawable.BitmapDrawable;
             let backgroundDrawable: android.graphics.drawable.BitmapDrawable;
