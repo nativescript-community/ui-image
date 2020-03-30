@@ -101,7 +101,7 @@ export class ImageBase extends View {
     public lowerResSrc: string;
     public placeholderImageUri: string;
     public failureImageUri: string;
-    public stretch: any;
+    public stretch: ScaleType;
     public fadeDuration: number;
     public backgroundUri: string;
     public progressiveRenderingEnabled: boolean;

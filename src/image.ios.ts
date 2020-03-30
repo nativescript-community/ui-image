@@ -332,7 +332,7 @@ export class Img extends ImageBase {
         this.setMeasuredDimension(widthAndState, heightAndState);
     }
 
-    private static needsSizeAdjustment(scaleType) {
+    private static needsSizeAdjustment(scaleType: ScaleType) {
         if (scaleType === undefined) {
             return true;
         }

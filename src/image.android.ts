@@ -847,7 +847,7 @@ class GenericDraweeHierarchyBuilder {
         this.nativeBuilder = new com.facebook.drawee.generic.GenericDraweeHierarchyBuilder(res);
     }
 
-    public setPlaceholderImage(drawable, scaleType: string): GenericDraweeHierarchyBuilder {
+    public setPlaceholderImage(drawable, scaleType: ScaleType): GenericDraweeHierarchyBuilder {
         if (!this.nativeBuilder) {
             return this;
         }
@@ -870,7 +870,7 @@ class GenericDraweeHierarchyBuilder {
         return this;
     }
 
-    public setFailureImage(drawable, scaleType: string): GenericDraweeHierarchyBuilder {
+    public setFailureImage(drawable, scaleType: ScaleType): GenericDraweeHierarchyBuilder {
         if (!this.nativeBuilder) {
             return null;
         }
@@ -884,7 +884,7 @@ class GenericDraweeHierarchyBuilder {
         return this;
     }
 
-    public setActualImageScaleType(scaleType: string): GenericDraweeHierarchyBuilder {
+    public setActualImageScaleType(scaleType: ScaleType): GenericDraweeHierarchyBuilder {
         if (!this.nativeBuilder) {
             return this;
         }
@@ -961,7 +961,7 @@ class GenericDraweeHierarchyBuilder {
     }
 }
 
-function getScaleType(scaleType: string) {
+function getScaleType(scaleType: ScaleType) {
     if (types.isString(scaleType)) {
         switch (scaleType) {
             case ScaleType.Center:
