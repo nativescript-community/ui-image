@@ -122,6 +122,7 @@ export class ImageBase extends View {
     public decodeWidth: number;
     public decodeHeight: number;
     alwaysFade: boolean;
+    noCache: boolean
     // fade: boolean;
     tintColor: Color;
     // transition: Transition;
@@ -155,6 +156,7 @@ export class ImageBase extends View {
     public static alwaysFadeProperty = new Property<ImageBase, boolean>({ name: 'alwaysFade', valueConverter: booleanConverter, defaultValue: false });
     // public static fadeProperty = new Property<ImageBase, boolean>({ name: 'fade', valueConverter: booleanConverter });
     public static fadeDurationProperty = new Property<ImageBase, number>({ name: 'fadeDuration', valueConverter: v => parseFloat(v) });
+    public static noCacheProperty = new Property<ImageBase, boolean>({ name: 'noCache', defaultValue:false, valueConverter: booleanConverter });
 
     protected handleImageProgress(value: number, totalSize?: number) {
         // console.log('handleImageProgress ', value, totalSize);
@@ -185,3 +187,4 @@ ImageBase.aspectRatioProperty.register(ImageBase);
 ImageBase.decodeWidthProperty.register(ImageBase);
 ImageBase.decodeHeightProperty.register(ImageBase);
 ImageBase.alwaysFadeProperty.register(ImageBase);
+ImageBase.noCacheProperty.register(ImageBase);

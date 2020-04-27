@@ -559,6 +559,24 @@ export class Img extends ImageBase {
                 if (src instanceof ImageSource) {
                     this._setNativeImage(src.ios);
                     return;
+                } else if (utils.isFontIconURI(src as string)) {
+                    const fontIconCode = (src as string).split("//")[1];
+                    if (fontIconCode !== undefined) {
+                        // support sync mode only
+                        const font = this.style.fontInternal;
+                        const color = this.style.color;
+                        this._setNativeImage(ImageSource.fromFontIconCodeSync(fontIconCode, font, color).ios);
+                    }
+                    return;
+                } 
+
+                if (this.noCache) {
+                    const uri = getUri(src);
+                    const imagePipeLine = getImagePipeline();
+                    const isInCache = imagePipeLine.isInBitmapMemoryCache(uri);
+                    if (isInCache) {
+                        imagePipeLine.evictFromCache(uri);
+                    }
                 }
                 this.isLoading = true;
                 let options = SDWebImageOptions.ScaleDownLargeImages | SDWebImageOptions.AvoidAutoSetImage;

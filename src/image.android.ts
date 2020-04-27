@@ -10,9 +10,8 @@ import { ImageAsset } from '@nativescript/core/image-asset/image-asset';
 
 let BaseDataSubscriber: new (onNewResult: () => void, onFailure: () => void) => com.facebook.datasource.BaseDataSubscriber<any>;
 
-
 let initialized = false;
-let initializeConfig:ImagePipelineConfigSetting
+let initializeConfig: ImagePipelineConfigSetting;
 export function initialize(config?: ImagePipelineConfigSetting): void {
     if (!initialized) {
         const context = application.android.context;
@@ -21,9 +20,7 @@ export function initialize(config?: ImagePipelineConfigSetting): void {
             return;
         }
         if (config && config.isDownsampleEnabled) {
-            const imagePipelineConfig = com.facebook.imagepipeline.core.ImagePipelineConfig.newBuilder(context)
-                .setDownsampleEnabled(true)
-                .build();
+            const imagePipelineConfig = com.facebook.imagepipeline.core.ImagePipelineConfig.newBuilder(context).setDownsampleEnabled(true).build();
             com.facebook.drawee.backends.pipeline.Fresco.initialize(context, imagePipelineConfig);
         } else {
             com.facebook.drawee.backends.pipeline.Fresco.initialize(context);
@@ -47,7 +44,7 @@ export function getImagePipeline(): ImagePipeline {
 export function shutDown(): void {
     if (!initialized) {
         return;
-    } 
+    }
     initialized = false;
     com.facebook.drawee.view.SimpleDraweeView.shutDown();
     com.facebook.drawee.backends.pipeline.Fresco.shutDown();
@@ -101,10 +98,7 @@ function getUri(src: string | ImageAsset) {
             const resName = imagePath.substr(utils.RESOURCE_PREFIX.length);
             const identifier = res.getIdentifier(resName, 'drawable', utils.ad.getApplication().getPackageName());
             if (0 < identifier) {
-                uri = new android.net.Uri.Builder()
-                    .scheme(com.facebook.common.util.UriUtil.LOCAL_RESOURCE_SCHEME)
-                    .path(java.lang.String.valueOf(identifier))
-                    .build();
+                uri = new android.net.Uri.Builder().scheme(com.facebook.common.util.UriUtil.LOCAL_RESOURCE_SCHEME).path(java.lang.String.valueOf(identifier)).build();
             }
         } else if (imagePath.indexOf('~/') === 0) {
             uri = android.net.Uri.parse(`file:${fs.path.join(fs.knownFolders.currentApp().path, imagePath.replace('~/', ''))}`);
@@ -334,9 +328,9 @@ export class FailureEventData extends EventData {
     }
 }
 
-export const needUpdateHierarchy = function(target: any, propertyKey: string | Symbol, descriptor: PropertyDescriptor) {
+export const needUpdateHierarchy = function (target: any, propertyKey: string | Symbol, descriptor: PropertyDescriptor) {
     let originalMethod = descriptor.value;
-    descriptor.value = function(...args: any[]) {
+    descriptor.value = function (...args: any[]) {
         if (!this._canUpdateHierarchy) {
             this._needUpdateHierarchy = true;
             return;
@@ -344,9 +338,9 @@ export const needUpdateHierarchy = function(target: any, propertyKey: string | S
         return originalMethod.apply(this, args);
     };
 };
-export const needRequestImage = function(target: any, propertyKey: string | Symbol, descriptor: PropertyDescriptor) {
+export const needRequestImage = function (target: any, propertyKey: string | Symbol, descriptor: PropertyDescriptor) {
     let originalMethod = descriptor.value;
-    descriptor.value = function(...args: any[]) {
+    descriptor.value = function (...args: any[]) {
         if (!this._canRequestImage) {
             this._needRequestImage = true;
             return;
@@ -417,7 +411,6 @@ export class Img extends ImageBase {
         this.src = null;
         this.src = src;
     }
-
 
     @needUpdateHierarchy
     [ImageBase.placeholderImageUriProperty.setNative]() {
@@ -497,12 +490,12 @@ export class Img extends ImageBase {
     [ImageBase.srcProperty.setNative]() {
         this.initImage();
     }
-    
+
     @needRequestImage
     [ImageBase.lowerResSrcProperty.setNative]() {
         this.initImage();
     }
-    
+
     @needRequestImage
     [ImageBase.blurDownSamplingProperty.setNative]() {
         this.initImage();
@@ -525,6 +518,23 @@ export class Img extends ImageBase {
                 if (src instanceof ImageSource) {
                     this.nativeViewProtected.setImageBitmap(src.android);
                     return;
+                } else if (utils.isFontIconURI(src as string)) {
+                    const fontIconCode = (src as string).split('//')[1];
+                    if (fontIconCode !== undefined) {
+                        // support sync mode only
+                        const font = this.style.fontInternal;
+                        const color = this.style.color;
+                        this.nativeViewProtected.setImageBitmap(ImageSource.fromFontIconCodeSync(fontIconCode, font, color).android);
+                    }
+                    return;
+                }
+                if (this.noCache) {
+                    const uri = getUri(src);
+                    const imagePipeLine = getImagePipeline();
+                    const isInCache = imagePipeLine.isInBitmapMemoryCache(uri);
+                    if (isInCache) {
+                        imagePipeLine.evictFromCache(uri);
+                    }
                 }
                 this.isLoading = true;
                 const uri = getUri(src);
@@ -568,7 +578,7 @@ export class Img extends ImageBase {
                                 eventName: ImageBase.finalImageSetEvent,
                                 object: that.get(),
                                 imageInfo: info,
-                                animatable: animatable as AnimatedImage
+                                animatable: animatable as AnimatedImage,
                             } as FinalEventData;
 
                             nativeView.notify(args);
@@ -585,7 +595,7 @@ export class Img extends ImageBase {
                             const args: FailureEventData = {
                                 eventName: ImageBase.failureEvent,
                                 object: nativeView,
-                                error: imageError
+                                error: imageError,
                             } as FailureEventData;
 
                             that.get().notify(args);
@@ -601,7 +611,7 @@ export class Img extends ImageBase {
                             const args: FailureEventData = {
                                 eventName: ImageBase.intermediateImageFailedEvent,
                                 object: nativeView,
-                                error: imageError
+                                error: imageError,
                             } as FailureEventData;
 
                             that.get().notify(args);
@@ -617,7 +627,7 @@ export class Img extends ImageBase {
                             const args: IntermediateEventData = {
                                 eventName: ImageBase.intermediateImageSetEvent,
                                 object: nativeView,
-                                imageInfo: info
+                                imageInfo: info,
                             } as IntermediateEventData;
 
                             that.get().notify(args);
@@ -631,7 +641,7 @@ export class Img extends ImageBase {
                         if (nativeView) {
                             const args: EventData = {
                                 eventName: ImageBase.releaseEvent,
-                                object: nativeView
+                                object: nativeView,
                             } as EventData;
 
                             that.get().notify(args);
@@ -645,14 +655,14 @@ export class Img extends ImageBase {
                         if (nativeView) {
                             const args: EventData = {
                                 eventName: ImageBase.submitEvent,
-                                object: nativeView
+                                object: nativeView,
                             } as EventData;
 
                             that.get().notify(args);
                         } else {
                             console.log("Warning: WeakRef<Image> was GC and no 'submitEvent' callback will be raised.");
                         }
-                    }
+                    },
                 });
                 const builder = com.facebook.drawee.backends.pipeline.Fresco.newDraweeControllerBuilder();
                 builder.setImageRequest(request);
@@ -666,7 +676,7 @@ export class Img extends ImageBase {
                             },
                             onImageVisibilityUpdated(param0: com.facebook.drawee.backends.pipeline.info.ImagePerfData, param1: number) {
                                 CLog(CLogTypes.info, 'onImageVisibilityUpdated', param0, param1);
-                            }
+                            },
                         })
                     );
                 }
