@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.6](https://github.com/Akylas/nativescript-image/compare/v3.0.5...v3.0.6) (2020-04-27)
+
+
+### Bug Fixes
+
+* **ios:** bump dep ([6bae2f1](https://github.com/Akylas/nativescript-image/commit/6bae2f1f0bce88fe216ed89a1e29ef99ee3b2645))
+
+
+
+
+
 ## [3.0.5](https://github.com/Akylas/nativescript-image/compare/v3.0.4...v3.0.5) (2020-03-30)
 
 **Note:** Version bump only for package nativescript-image
