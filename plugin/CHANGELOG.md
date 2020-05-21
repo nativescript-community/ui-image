@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.9](https://github.com/Akylas/nativescript-image/compare/v3.0.8...v3.0.9) (2020-05-21)
+
+
+### Bug Fixes
+
+* sideEffects for tree shacking ([55329a0](https://github.com/Akylas/nativescript-image/commit/55329a00fcab2110a99e96497d134ed04c082e02))
+
+
+
+
+
 ## [3.0.8](https://github.com/Akylas/nativescript-image/compare/v3.0.7...v3.0.8) (2020-05-21)
 
 **Note:** Version bump only for package nativescript-image
