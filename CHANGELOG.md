@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.7](https://github.com/Akylas/nativescript-image/compare/v3.0.6...v3.0.7) (2020-05-21)
+
+
+### Bug Fixes
+
+* full esm support ([3a4ea9b](https://github.com/Akylas/nativescript-image/commit/3a4ea9be6342313763f7fb2c5bbec57915155721))
+
+
+
+
+
 ## [3.0.6](https://github.com/Akylas/nativescript-image/compare/v3.0.5...v3.0.6) (2020-04-27)
 
 
