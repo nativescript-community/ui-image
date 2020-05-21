@@ -1,9 +1,10 @@
 {
     "name": "nativescript-image",
-    "version": "3.0.9",
+    "version": "3.0.10",
     "description": "Nativescript Image plugin using cache.",
     "main": "./image",
-    "sideEffects": false,    "typings": "./image.d.ts",
+    "sideEffects": false,
+    "typings": "./image.d.ts",
     "nativescript": {
         "platforms": {
             "android": "6.0.0",
