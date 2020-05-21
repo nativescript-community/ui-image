@@ -71,7 +71,6 @@ module.exports = env => {
     alias['~'] = appFullPath;
     alias['@'] = appFullPath;
     alias['vue'] = 'nativescript-vue';
-    alias['nativescript-vue'] = 'nativescript-akylas-vue';
 
     if (hasRootLevelScopedModules) {
         coreModulesPackageName = "@nativescript/core";
