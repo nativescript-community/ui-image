@@ -49,37 +49,6 @@ export function shutDown(): void {
     com.facebook.drawee.view.SimpleDraweeView.shutDown();
     com.facebook.drawee.backends.pipeline.Fresco.shutDown();
 }
-
-function initializeBaseDataSubscriber() {
-    if (BaseDataSubscriber) {
-        return;
-    }
-    class BaseDataSubscriberImpl extends com.facebook.datasource.BaseDataSubscriber<any> {
-        private _onNewResult: () => void;
-        private _onFailure: () => void;
-        constructor(onNewResult: () => void, onFailure: () => void) {
-            super();
-            this._onNewResult = onNewResult;
-            this._onFailure = onFailure;
-            return global.__native(this);
-        }
-        public onNewResultImpl(_dataSource: com.facebook.datasource.DataSource<any>): void {
-            // Store image ref to be released later.
-            //const mCloseableImageRef = _dataSource.getResult();
-            if (this._onNewResult) {
-                this._onNewResult();
-            }
-        }
-
-        public onFailureImpl(_dataSource: com.facebook.datasource.DataSource<any>): void {
-            if (this._onFailure) {
-                this._onFailure();
-            }
-        }
-    }
-    BaseDataSubscriber = BaseDataSubscriberImpl;
-}
-
 function getUri(src: string | ImageAsset) {
     let uri: android.net.Uri;
     let imagePath: string;
@@ -172,8 +141,16 @@ export class ImagePipeline {
                 } else {
                     datasource = this._android.prefetchToBitmapCache(request, null);
                 }
-                initializeBaseDataSubscriber();
-                datasource.subscribe(new BaseDataSubscriber(resolve, reject), com.facebook.common.executors.CallerThreadExecutor.getInstance());
+                // initializeBaseDataSubscriber();
+                datasource.subscribe(
+                    new com.nativescript.image.BaseDataSubscriber(
+                        new com.nativescript.image.BaseDataSubscriberListener({
+                            onFailure: reject,
+                            onNewResult: resolve as any,
+                        })
+                    ),
+                    com.facebook.common.executors.CallerThreadExecutor.getInstance()
+                );
             } catch (error) {
                 reject(error);
             }

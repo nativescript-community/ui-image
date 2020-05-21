@@ -45,7 +45,7 @@ Temporary Items
 
 bin
 obj
-build
+build/
 .vs
 .tscache
 *.user
@@ -55,10 +55,11 @@ build
 !gruntfile.js
 node_modules
 *.tmp.*
-platforms
+demo*/platforms
 lib
 *.css
 !webpack.*.js
+!build.esm.js
 report
 *.log
 
@@ -77,3 +78,5 @@ package-lock.json
 
 .update_backup
 .migration_backup
+plugin/**/*js.map
+plugin/**/*js
