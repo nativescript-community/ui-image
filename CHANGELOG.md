@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.8](https://github.com/Akylas/nativescript-image/compare/v3.0.7...v3.0.8) (2020-05-21)
+
+
+### Bug Fixes
+
+* esm using import for tree shaking ([ae5e438](https://github.com/Akylas/nativescript-image/commit/ae5e438a8d7bbce19825519a303cf817cda56377))
+
+
+
+
+
 ## [3.0.7](https://github.com/Akylas/nativescript-image/compare/v3.0.6...v3.0.7) (2020-05-21)
 
 
