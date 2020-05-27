@@ -19,12 +19,23 @@ export function initialize(config?: ImagePipelineConfigSetting): void {
             initializeConfig = config;
             return;
         }
+        let builder = com.facebook.imagepipeline.core.ImagePipelineConfig.newBuilder(context);
         if (config && config.isDownsampleEnabled) {
-            const imagePipelineConfig = com.facebook.imagepipeline.core.ImagePipelineConfig.newBuilder(context).setDownsampleEnabled(true).build();
-            com.facebook.drawee.backends.pipeline.Fresco.initialize(context, imagePipelineConfig);
-        } else {
-            com.facebook.drawee.backends.pipeline.Fresco.initialize(context);
+            builder.setDownsampleEnabled(true);
         }
+        // builder.experiment().setNativeCodeDisabled(true);
+        const imagePipelineConfig = builder.build();
+        com.facebook.drawee.backends.pipeline.Fresco.initialize(context, imagePipelineConfig);
+        // try {
+        //     com.facebook.imagepipeline.nativecode.ImagePipelineNativeLoader.load();
+        // } catch (err) {
+        //     console.log('error loading ImagePipelineNativeLoader');
+        //     com.facebook.drawee.backends.pipeline.Fresco.shutDown();
+        //     builder.experiment().setNativeCodeDisabled(true);
+        //     const imagePipelineConfig = builder.build();
+        //     console.log('test', imagePipelineConfig.getExperiments().isNativeCodeDisabled())
+        //     com.facebook.drawee.backends.pipeline.Fresco.initialize(context, imagePipelineConfig);
+        // }
         initialized = true;
     }
 }
