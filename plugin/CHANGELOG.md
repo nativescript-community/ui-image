@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.11](https://github.com/Akylas/nativescript-image/compare/v3.0.10...v3.0.11) (2020-05-27)
+
+
+### Bug Fixes
+
+* **android:** fix crash on R emulator (fresco issue) ([2a4f2b0](https://github.com/Akylas/nativescript-image/commit/2a4f2b05c6bfd487bcc708ee5c797eb0d1efe753))
+
+
+
+
+
 ## [3.0.10](https://github.com/Akylas/nativescript-image/compare/v3.0.9...v3.0.10) (2020-05-21)
 
 **Note:** Version bump only for package nativescript-image
