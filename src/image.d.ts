@@ -1,8 +1,8 @@
 import * as viewModule from '@nativescript/core/ui/core/view';
-import { ImageSource } from '@nativescript/core/image-source/image-source';
+import { ImageSource } from '@nativescript/core/image-source';
 
 export const debug: boolean;
-declare function setDebug(value: boolean)
+declare function setDebug(value: boolean);
 
 /**
  * When called, initializes the android Image library. Calling this method is required.
