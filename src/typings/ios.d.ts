@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/unified-signatures */
 declare class SDAnimatedImage extends UIImage implements SDAnimatedImageProtocol {
     static alloc(): SDAnimatedImage; // inherited from NSObject
 
@@ -69,7 +70,7 @@ declare class SDAnimatedImage extends UIImage implements SDAnimatedImageProtocol
 interface SDAnimatedImageCoder extends SDAnimatedImageProvider, SDImageCoder {
     initWithAnimatedImageDataOptions?(data: NSData, options: NSDictionary<string, any>): SDAnimatedImageCoder;
 }
-declare var SDAnimatedImageCoder: {
+declare let SDAnimatedImageCoder: {
     prototype: SDAnimatedImageCoder;
 };
 
@@ -84,7 +85,7 @@ interface SDAnimatedImageProtocol extends SDAnimatedImageProvider {
 
     unloadAllFrames?(): void;
 }
-declare var SDAnimatedImageProtocol: {
+declare let SDAnimatedImageProtocol: {
     prototype: SDAnimatedImageProtocol;
 };
 
@@ -99,7 +100,7 @@ interface SDAnimatedImageProvider extends NSObjectProtocol {
 
     animatedImageFrameAtIndex(index: number): UIImage;
 }
-declare var SDAnimatedImageProvider: {
+declare let SDAnimatedImageProvider: {
     prototype: SDAnimatedImageProvider;
 };
 
@@ -112,11 +113,11 @@ declare class SDAnimatedImageView extends UIImageView {
 
     static appearanceForTraitCollectionWhenContainedIn(trait: UITraitCollection, ContainerClass: typeof NSObject): SDAnimatedImageView; // inherited from UIAppearance
 
-    static appearanceForTraitCollectionWhenContainedInInstancesOfClasses(trait: UITraitCollection, containerTypes: NSArray<typeof NSObject> | Array<typeof NSObject>): SDAnimatedImageView; // inherited from UIAppearance
+    static appearanceForTraitCollectionWhenContainedInInstancesOfClasses(trait: UITraitCollection, containerTypes: NSArray<typeof NSObject> | typeof NSObject[]): SDAnimatedImageView; // inherited from UIAppearance
 
     static appearanceWhenContainedIn(ContainerClass: typeof NSObject): SDAnimatedImageView; // inherited from UIAppearance
 
-    static appearanceWhenContainedInInstancesOfClasses(containerTypes: NSArray<typeof NSObject> | Array<typeof NSObject>): SDAnimatedImageView; // inherited from UIAppearance
+    static appearanceWhenContainedInInstancesOfClasses(containerTypes: NSArray<typeof NSObject> | typeof NSObject[]): SDAnimatedImageView; // inherited from UIAppearance
 
     static new(): SDAnimatedImageView; // inherited from NSObject
 
@@ -222,7 +223,7 @@ interface SDDiskCacheProtocol extends NSObjectProtocol {
 
     totalSize(): number;
 }
-declare var SDDiskCacheProtocol: {
+declare let SDDiskCacheProtocol: {
     prototype: SDDiskCacheProtocol;
 };
 
@@ -521,7 +522,7 @@ declare class SDImageCacheConfig extends NSObject implements NSCopying {
 declare const enum SDImageCacheConfigExpireType {
     AccessDate = 0,
 
-    ModificationDate = 1
+    ModificationDate = 1,
 }
 
 declare function SDImageCacheDecodeImageData(imageData: NSData, cacheKey: string, options: SDWebImageOptions, context: NSDictionary<string, any>): UIImage;
@@ -539,7 +540,7 @@ declare const enum SDImageCacheOptions {
 
     DecodeFirstFrameOnly = 32,
 
-    PreloadAllFrames = 64
+    PreloadAllFrames = 64,
 }
 
 interface SDImageCacheProtocol extends NSObjectProtocol {
@@ -558,7 +559,7 @@ interface SDImageCacheProtocol extends NSObjectProtocol {
 
     storeImageImageDataForKeyCacheTypeCompletion(image: UIImage, imageData: NSData, key: string, cacheType: SDImageCacheType, completionBlock: () => void): void;
 }
-declare var SDImageCacheProtocol: {
+declare let SDImageCacheProtocol: {
     prototype: SDImageCacheProtocol;
 };
 
@@ -569,7 +570,7 @@ declare const enum SDImageCacheType {
 
     Memory = 2,
 
-    All = 3
+    All = 3,
 }
 
 declare class SDImageCachesManager extends NSObject implements SDImageCacheProtocol {
@@ -652,7 +653,7 @@ declare const enum SDImageCachesManagerOperationPolicy {
 
     HighestOnly = 2,
 
-    LowestOnly = 3
+    LowestOnly = 3,
 }
 
 interface SDImageCoder extends NSObjectProtocol {
@@ -664,17 +665,17 @@ interface SDImageCoder extends NSObjectProtocol {
 
     encodedDataWithImageFormatOptions(image: UIImage, format: number, options: NSDictionary<string, any>): NSData;
 }
-declare var SDImageCoder: {
+declare let SDImageCoder: {
     prototype: SDImageCoder;
 };
 
-declare var SDImageCoderDecodeFirstFrameOnly: string;
+declare let SDImageCoderDecodeFirstFrameOnly: string;
 
-declare var SDImageCoderDecodeScaleFactor: string;
+declare let SDImageCoderDecodeScaleFactor: string;
 
-declare var SDImageCoderEncodeCompressionQuality: string;
+declare let SDImageCoderEncodeCompressionQuality: string;
 
-declare var SDImageCoderEncodeFirstFrameOnly: string;
+declare let SDImageCoderEncodeFirstFrameOnly: string;
 
 declare class SDImageCoderHelper extends NSObject {
     static CGImageContainsAlpha(cgImage: any): boolean;
@@ -702,7 +703,7 @@ declare class SDImageCoderHelper extends NSObject {
     static new(): SDImageCoderHelper; // inherited from NSObject
 }
 
-declare var SDImageCoderWebImageContext: string;
+declare let SDImageCoderWebImageContext: string;
 
 declare class SDImageCodersManager extends NSObject implements SDImageCoder {
     static alloc(): SDImageCodersManager; // inherited from NSObject
@@ -906,21 +907,21 @@ declare class SDImageFlippingTransformer extends NSObject implements SDImageTran
     transformedImageWithImageForKey(image: UIImage, key: string): UIImage;
 }
 
-declare var SDImageFormatGIF: number;
+declare let SDImageFormatGIF: number;
 
-declare var SDImageFormatHEIC: number;
+declare let SDImageFormatHEIC: number;
 
-declare var SDImageFormatHEIF: number;
+declare let SDImageFormatHEIF: number;
 
-declare var SDImageFormatJPEG: number;
+declare let SDImageFormatJPEG: number;
 
-declare var SDImageFormatPNG: number;
+declare let SDImageFormatPNG: number;
 
-declare var SDImageFormatTIFF: number;
+declare let SDImageFormatTIFF: number;
 
-declare var SDImageFormatUndefined: number;
+declare let SDImageFormatUndefined: number;
 
-declare var SDImageFormatWebP: number;
+declare let SDImageFormatWebP: number;
 
 declare class SDImageFrame extends NSObject {
     static alloc(): SDImageFrame; // inherited from NSObject
@@ -1079,7 +1080,7 @@ interface SDImageLoader extends NSObjectProtocol {
         completedBlock: (p1: UIImage, p2: NSData, p3: NSError, p4: boolean) => void
     ): SDWebImageOperation;
 }
-declare var SDImageLoader: {
+declare let SDImageLoader: {
     prototype: SDImageLoader;
 };
 
@@ -1361,7 +1362,7 @@ declare const enum SDImageScaleMode {
 
     AspectFit = 1,
 
-    AspectFill = 2
+    AspectFill = 2,
 }
 
 declare class SDImageTintTransformer extends NSObject implements SDImageTransformer {
@@ -1417,7 +1418,7 @@ interface SDImageTransformer extends NSObjectProtocol {
 
     transformedImageWithImageForKey(image: UIImage, key: string): UIImage;
 }
-declare var SDImageTransformer: {
+declare let SDImageTransformer: {
     prototype: SDImageTransformer;
 };
 
@@ -1492,7 +1493,7 @@ interface SDMemoryCacheProtocol extends NSObjectProtocol {
 
     setObjectForKeyCost(object: any, key: any, cost: number): void;
 }
-declare var SDMemoryCacheProtocol: {
+declare let SDMemoryCacheProtocol: {
     prototype: SDMemoryCacheProtocol;
 };
 
@@ -1505,7 +1506,7 @@ interface SDProgressiveImageCoder extends SDImageCoder {
 
     updateIncrementalDataFinished(data: NSData, finished: boolean): void;
 }
-declare var SDProgressiveImageCoder: {
+declare let SDProgressiveImageCoder: {
     prototype: SDProgressiveImageCoder;
 };
 
@@ -1622,7 +1623,7 @@ declare class SDWebImageCacheKeyFilter extends NSObject implements SDWebImageCac
 interface SDWebImageCacheKeyFilterProtocol extends NSObjectProtocol {
     cacheKeyForURL(url: NSURL): string;
 }
-declare var SDWebImageCacheKeyFilterProtocol: {
+declare let SDWebImageCacheKeyFilterProtocol: {
     prototype: SDWebImageCacheKeyFilterProtocol;
 };
 
@@ -1677,7 +1678,7 @@ declare class SDWebImageCacheSerializer extends NSObject implements SDWebImageCa
 interface SDWebImageCacheSerializerProtocol extends NSObjectProtocol {
     cacheDataWithImageOriginalDataImageURL(image: UIImage, data: NSData, imageURL: NSURL): NSData;
 }
-declare var SDWebImageCacheSerializerProtocol: {
+declare let SDWebImageCacheSerializerProtocol: {
     prototype: SDWebImageCacheSerializerProtocol;
 };
 
@@ -1727,37 +1728,37 @@ declare class SDWebImageCombinedOperation extends NSObject implements SDWebImage
     self(): this;
 }
 
-declare var SDWebImageContextAnimatedImageClass: string;
+declare let SDWebImageContextAnimatedImageClass: string;
 
-declare var SDWebImageContextCacheKeyFilter: string;
+declare let SDWebImageContextCacheKeyFilter: string;
 
-declare var SDWebImageContextCacheSerializer: string;
+declare let SDWebImageContextCacheSerializer: string;
 
-declare var SDWebImageContextCustomManager: string;
+declare let SDWebImageContextCustomManager: string;
 
-declare var SDWebImageContextDownloadRequestModifier: string;
+declare let SDWebImageContextDownloadRequestModifier: string;
 
-declare var SDWebImageContextImageScaleFactor: string;
+declare let SDWebImageContextImageScaleFactor: string;
 
-declare var SDWebImageContextImageTransformer: string;
+declare let SDWebImageContextImageTransformer: string;
 
-declare var SDWebImageContextLoaderCachedImage: string;
+declare let SDWebImageContextLoaderCachedImage: string;
 
-declare var SDWebImageContextSetImageOperationKey: string;
+declare let SDWebImageContextSetImageOperationKey: string;
 
-declare var SDWebImageContextStoreCacheType: string;
+declare let SDWebImageContextStoreCacheType: string;
 
-declare var SDWebImageDownloadFinishNotification: string;
+declare let SDWebImageDownloadFinishNotification: string;
 
-declare var SDWebImageDownloadReceiveResponseNotification: string;
+declare let SDWebImageDownloadReceiveResponseNotification: string;
 
-declare var SDWebImageDownloadStartNotification: string;
+declare let SDWebImageDownloadStartNotification: string;
 
-declare var SDWebImageDownloadStartNotificationVar: string;
+declare let SDWebImageDownloadStartNotificationVar: string;
 
-declare var SDWebImageDownloadStopNotification: string;
+declare let SDWebImageDownloadStopNotification: string;
 
-declare var SDWebImageDownloadStopNotificationVar: string;
+declare let SDWebImageDownloadStopNotificationVar: string;
 
 declare class SDWebImageDownloadToken extends NSObject implements SDWebImageOperation {
     static alloc(): SDWebImageDownloadToken; // inherited from NSObject
@@ -1927,7 +1928,7 @@ declare class SDWebImageDownloaderConfig extends NSObject implements NSCopying {
 declare const enum SDWebImageDownloaderExecutionOrder {
     FIFOExecutionOrder = 0,
 
-    LIFOExecutionOrder = 1
+    LIFOExecutionOrder = 1,
 }
 
 declare class SDWebImageDownloaderOperation extends NSOperation implements SDWebImageDownloaderOperationProtocol {
@@ -2088,7 +2089,7 @@ interface SDWebImageDownloaderOperationProtocol extends NSURLSessionDataDelegate
         context: NSDictionary<string, any>
     ): SDWebImageDownloaderOperationProtocol;
 }
-declare var SDWebImageDownloaderOperationProtocol: {
+declare let SDWebImageDownloaderOperationProtocol: {
     prototype: SDWebImageDownloaderOperationProtocol;
 };
 
@@ -2115,7 +2116,7 @@ declare const enum SDWebImageDownloaderOptions {
 
     DecodeFirstFrameOnly = 1024,
 
-    PreloadAllFrames = 2048
+    PreloadAllFrames = 2048,
 }
 
 declare class SDWebImageDownloaderRequestModifier extends NSObject implements SDWebImageDownloaderRequestModifierProtocol {
@@ -2169,7 +2170,7 @@ declare class SDWebImageDownloaderRequestModifier extends NSObject implements SD
 interface SDWebImageDownloaderRequestModifierProtocol extends NSObjectProtocol {
     modifiedRequestWithRequest(request: NSURLRequest): NSURLRequest;
 }
-declare var SDWebImageDownloaderRequestModifierProtocol: {
+declare let SDWebImageDownloaderRequestModifierProtocol: {
     prototype: SDWebImageDownloaderRequestModifierProtocol;
 };
 
@@ -2182,12 +2183,12 @@ declare const enum SDWebImageError {
 
     InvalidDownloadOperation = 2000,
 
-    InvalidDownloadStatusCode = 2001
+    InvalidDownloadStatusCode = 2001,
 }
 
-declare var SDWebImageErrorDomain: string;
+declare let SDWebImageErrorDomain: string;
 
-declare var SDWebImageErrorDownloadStatusCodeKey: string;
+declare let SDWebImageErrorDownloadStatusCodeKey: string;
 
 interface SDWebImageIndicator extends NSObjectProtocol {
     indicatorView: UIView;
@@ -2198,7 +2199,7 @@ interface SDWebImageIndicator extends NSObjectProtocol {
 
     updateIndicatorProgress?(progress: number): void;
 }
-declare var SDWebImageIndicator: {
+declare let SDWebImageIndicator: {
     prototype: SDWebImageIndicator;
 };
 
@@ -2256,14 +2257,14 @@ interface SDWebImageManagerDelegate extends NSObjectProtocol {
 
     imageManagerShouldDownloadImageForURL?(imageManager: SDWebImageManager, imageURL: NSURL): boolean;
 }
-declare var SDWebImageManagerDelegate: {
+declare let SDWebImageManagerDelegate: {
     prototype: SDWebImageManagerDelegate;
 };
 
 interface SDWebImageOperation extends NSObjectProtocol {
     cancel(): void;
 }
-declare var SDWebImageOperation: {
+declare let SDWebImageOperation: {
     prototype: SDWebImageOperation;
 };
 
@@ -2308,7 +2309,7 @@ declare const enum SDWebImageOptions {
 
     DecodeFirstFrameOnly = 524288,
 
-    PreloadAllFrames = 1048576
+    PreloadAllFrames = 1048576,
 }
 
 declare class SDWebImagePrefetchToken extends NSObject implements SDWebImageOperation {
@@ -2388,7 +2389,7 @@ interface SDWebImagePrefetcherDelegate extends NSObjectProtocol {
 
     imagePrefetcherDidPrefetchURLFinishedCountTotalCount?(imagePrefetcher: SDWebImagePrefetcher, imageURL: NSURL, finishedCount: number, totalCount: number): void;
 }
-declare var SDWebImagePrefetcherDelegate: {
+declare let SDWebImagePrefetcherDelegate: {
     prototype: SDWebImagePrefetcherDelegate;
 };
 
@@ -2444,7 +2445,7 @@ declare class SDWebImageProgressIndicator extends NSObject implements SDWebImage
     updateIndicatorProgress(progress: number): void;
 }
 
-declare var SDWebImageProgressUnitCountUnknown: number;
+declare let SDWebImageProgressUnitCountUnknown: number;
 
 declare class SDWebImageTransition extends NSObject {
     static alloc(): SDWebImageTransition; // inherited from NSObject
@@ -2478,9 +2479,9 @@ declare class SDWebImageTransition extends NSObject {
     static readonly flipFromTopTransition: SDWebImageTransition;
 }
 
-declare var WebImageVersionNumber: number;
+declare let WebImageVersionNumber: number;
 
-declare var WebImageVersionString: interop.Reference<number>;
+declare let WebImageVersionString: interop.Reference<number>;
 
 declare interface UIImageView {
     sd_setHighlightedImageWithURL(url: NSURL): void;

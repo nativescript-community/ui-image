@@ -5,10 +5,10 @@ import { knownFolders, path } from '@nativescript/core/file-system';
 import { ImageAsset } from '@nativescript/core/image-asset';
 import { ImageSource } from '@nativescript/core/image-source';
 import { isString } from '@nativescript/core/utils/types';
-import { ad, isFileOrResourcePath, isFontIconURI, RESOURCE_PREFIX } from '@nativescript/core/utils/utils';
-import { AnimatedImage, CLog, CLogTypes, debug, EventData, ImageBase, ImageError as ImageErrorBase, ImageInfo as ImageInfoBase, ImagePipelineConfigSetting, ScaleType } from './image-common';
+import { RESOURCE_PREFIX, ad, isFileOrResourcePath, isFontIconURI } from '@nativescript/core/utils/utils';
+import { AnimatedImage, CLog, CLogTypes, EventData, ImageBase, ImageError as ImageErrorBase, ImageInfo as ImageInfoBase, ImagePipelineConfigSetting, ScaleType, debug } from './image-common';
+import { WeakRef } from '@nativescript/core/debugger/dom-node';
 
-// let BaseDataSubscriber: new (onNewResult: () => void, onFailure: () => void) => com.facebook.datasource.BaseDataSubscriber<any>;
 
 let initialized = false;
 let initializeConfig: ImagePipelineConfigSetting;
@@ -19,7 +19,7 @@ export function initialize(config?: ImagePipelineConfigSetting): void {
             initializeConfig = config;
             return;
         }
-        let builder = com.facebook.imagepipeline.core.ImagePipelineConfig.newBuilder(context);
+        const builder = com.facebook.imagepipeline.core.ImagePipelineConfig.newBuilder(context);
         if (config && config.isDownsampleEnabled) {
             builder.setDownsampleEnabled(true);
         }
@@ -317,7 +317,7 @@ export class FailureEventData extends EventData {
 }
 
 export const needUpdateHierarchy = function (target: any, propertyKey: string | Symbol, descriptor: PropertyDescriptor) {
-    let originalMethod = descriptor.value;
+    const originalMethod = descriptor.value;
     descriptor.value = function (...args: any[]) {
         if (!this._canUpdateHierarchy) {
             this._needUpdateHierarchy = true;
@@ -327,7 +327,7 @@ export const needUpdateHierarchy = function (target: any, propertyKey: string | 
     };
 };
 export const needRequestImage = function (target: any, propertyKey: string | Symbol, descriptor: PropertyDescriptor) {
-    let originalMethod = descriptor.value;
+    const originalMethod = descriptor.value;
     descriptor.value = function (...args: any[]) {
         if (!this._canRequestImage) {
             this._needRequestImage = true;

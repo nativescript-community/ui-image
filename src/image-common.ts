@@ -1,8 +1,8 @@
-import { booleanConverter, Color, Property, View } from '@nativescript/core/ui/core/view';
+import { Color, Property, View, booleanConverter } from '@nativescript/core';
 import { EventData as IEventData } from '@nativescript/core/data/observable';
-import { isAndroid, isIOS } from '@nativescript/core/platform';
-import { ImageSource } from '@nativescript/core/image-source';
 import { ImageAsset } from '@nativescript/core/image-asset';
+import { ImageSource } from '@nativescript/core/image-source';
+import { isAndroid } from '@nativescript/core/platform';
 
 export enum CLogTypes {
     info,

@@ -1,11 +1,10 @@
 export * from './image-common';
-import * as fs from '@nativescript/core/file-system';
+import { knownFolders, path } from '@nativescript/core/file-system';
 import { ImageAsset } from '@nativescript/core/image-asset';
 import { ImageSource } from '@nativescript/core/image-source';
-import { screen } from '@nativescript/core/platform/platform';
-import { layout } from '@nativescript/core/ui/core/view';
+import { Screen } from '@nativescript/core/platform';
 import { isString } from '@nativescript/core/utils/types';
-import { isFileOrResourcePath, isFontIconURI, RESOURCE_PREFIX } from '@nativescript/core/utils/utils';
+import { RESOURCE_PREFIX, isFileOrResourcePath, isFontIconURI, layout } from '@nativescript/core/utils/utils';
 import { EventData, ImageBase, ImageInfo as ImageInfoBase, ImagePipelineConfigSetting, ScaleType, Stretch } from './image-common';
 
 class SDImageRoundAsCircleTransformer extends NSObject implements SDImageTransformer {
@@ -241,7 +240,7 @@ function getUri(src: string | ImageAsset) {
     if (uri.indexOf(RESOURCE_PREFIX) === 0) {
         const resName = uri.substr(RESOURCE_PREFIX.length);
         if (screenScale === -1) {
-            screenScale = screen.mainScreen.scale;
+            screenScale = Screen.mainScreen.scale;
         }
         supportedLocalFormats.some((v) => {
             for (let i = screenScale; i >= 1; i--) {
@@ -253,7 +252,7 @@ function getUri(src: string | ImageAsset) {
             return false;
         });
     } else if (uri.indexOf('~/') === 0) {
-        uri = NSURL.alloc().initFileURLWithPath(`${fs.path.join(fs.knownFolders.currentApp().path, uri.replace('~/', ''))}`);
+        uri = NSURL.alloc().initFileURLWithPath(`${path.join(knownFolders.currentApp().path, uri.replace('~/', ''))}`);
     }
     return uri;
 }

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/adjacent-overload-signatures */
+/* eslint-disable @typescript-eslint/unified-signatures */
 
 declare namespace jp {
     export namespace wasabeef {
