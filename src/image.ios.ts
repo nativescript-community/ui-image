@@ -4,6 +4,7 @@ import { isString } from '@nativescript/core/utils/types';
 import { RESOURCE_PREFIX, isFileOrResourcePath, isFontIconURI, layout } from '@nativescript/core/utils/utils';
 import { EventData, ImageBase, ImageInfo as ImageInfoBase, ImagePipelineConfigSetting, ScaleType, Stretch } from './image-common';
 
+@NativeClass
 class SDImageRoundAsCircleTransformer extends NSObject implements SDImageTransformer {
     public static ObjCProtocols = [SDImageTransformer];
     // _cornerRadius = 20;
@@ -43,6 +44,7 @@ class SDImageRoundAsCircleTransformer extends NSObject implements SDImageTransfo
     }
 }
 
+@NativeClass
 class SDDecodeSizeTransformer extends NSObject implements SDImageTransformer {
     public static ObjCProtocols = [SDImageTransformer];
     decodeWidth: number;
