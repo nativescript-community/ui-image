@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.0.0](https://github.com/Akylas/nativescript-image/compare/v3.0.12...v4.0.0) (2020-07-29)
+
+**Note:** Version bump only for package @nativescript-community/ui-image
+
+
+
+
+
 ## [3.0.12](https://github.com/Akylas/nativescript-image/compare/v3.0.11...v3.0.12) (2020-07-29)
 
 **Note:** Version bump only for package nativescript-image
