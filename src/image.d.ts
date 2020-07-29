@@ -1,5 +1,4 @@
-import * as viewModule from '@nativescript/core/ui/core/view';
-import { ImageSource } from '@nativescript/core/image-source';
+import { ImageSource, View } from '@nativescript/core';
 
 export const debug: boolean;
 declare function setDebug(value: boolean);
@@ -25,7 +24,7 @@ declare function getImagePipeline(): ImagePipeline;
 /**
  * Encapsulates the common abstraction behind a platform specific object (typically a Bitmap) that is used view to show remote or local images.
  */
-export class Img extends viewModule.View {
+export class Img extends View {
     /**
      * This event is fired after the final image has been set.
      */
@@ -438,7 +437,7 @@ export enum ScaleType {
     /**
      * Scales the child so that both dimensions will be greater than or equal to the corresponding dimension of the parent.
      */
-    focusCrop
+    focusCrop,
 }
 
 /**

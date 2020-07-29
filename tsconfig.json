@@ -24,16 +24,13 @@
         "paths": {
             "tns-core-modules": ["./node_modules/@nativescript/core"],
             "tns-core-modules/*": ["./node_modules/@nativescript/core/*"],
-            "nativescript-image": ["src/image"],
-            "nativescript-image/*": ["src/*"],
+            "@nativescript-community/ui-image": ["src/image"],
+            "@nativescript-community/ui-image/*": ["src/*"],
             "*": ["node_modules/*"]
         },
         "plugins": [{ "transform": "node_modules/@nativescript/webpack/transformers/ns-transform-native-classes", "type": "raw" }]
     },
     "include": ["src/**/*", "./references.d.ts"],
-    "exclude": ["node_modules", "platforms"],
+    "exclude": ["node_modules", "platforms", "src/angular/**/*"],
     "compileOnSave": false,
-    "angularCompilerOptions": {
-        "skipTemplateCodegen": true
-    }
 }

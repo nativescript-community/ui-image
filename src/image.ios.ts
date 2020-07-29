@@ -1,8 +1,5 @@
 export * from './image-common';
-import { knownFolders, path } from '@nativescript/core/file-system';
-import { ImageAsset } from '@nativescript/core/image-asset';
-import { ImageSource } from '@nativescript/core/image-source';
-import { Screen } from '@nativescript/core/platform';
+import { ImageAsset, ImageSource, Screen, knownFolders, path } from '@nativescript/core';
 import { isString } from '@nativescript/core/utils/types';
 import { RESOURCE_PREFIX, isFileOrResourcePath, isFontIconURI, layout } from '@nativescript/core/utils/utils';
 import { EventData, ImageBase, ImageInfo as ImageInfoBase, ImagePipelineConfigSetting, ScaleType, Stretch } from './image-common';
