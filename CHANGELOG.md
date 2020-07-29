@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.1](https://github.com/Akylas/nativescript-image/compare/v4.0.0...v4.0.1) (2020-07-29)
+
+
+### Bug Fixes
+
+* ios native classes ([a2a23b8](https://github.com/Akylas/nativescript-image/commit/a2a23b88d9cb8e15bcc040b5ff0493bfccfe7e3c))
+
+
+
+
+
 # [4.0.0](https://github.com/Akylas/nativescript-image/compare/v3.0.12...v4.0.0) (2020-07-29)
 
 **Note:** Version bump only for package @nativescript-community/ui-image

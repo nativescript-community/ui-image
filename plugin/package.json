@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/ui-image",
-    "version": "4.0.0",
+    "version": "4.0.1",
     "description": "Nativescript Image plugin using cache.",
     "main": "./image",
     "sideEffects": false,
