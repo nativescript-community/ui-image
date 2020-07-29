@@ -1,5 +1,5 @@
 import { booleanConverter, Color, Property, View } from '@nativescript/core/ui/core/view';
-import * as observableModule from '@nativescript/core/data/observable';
+import { EventData as IEventData } from '@nativescript/core/data/observable';
 import { isAndroid, isIOS } from '@nativescript/core/platform';
 import { ImageSource } from '@nativescript/core/image-source';
 import { ImageAsset } from '@nativescript/core/image-asset';
@@ -7,7 +7,7 @@ import { ImageAsset } from '@nativescript/core/image-asset';
 export enum CLogTypes {
     info,
     warning,
-    error
+    error,
 }
 
 export let debug = false;
@@ -43,7 +43,7 @@ export enum ScaleType {
     FitEnd = 'fitEnd',
     FitStart = 'fitStart',
     FitXY = 'fitXY',
-    FocusCrop = 'focusCrop'
+    FocusCrop = 'focusCrop',
 }
 
 export interface AnimatedImage {
@@ -67,7 +67,7 @@ export interface ImagePipelineConfigSetting {
     isDownsampleEnabled?: boolean;
 }
 
-export class EventData implements observableModule.EventData {
+export class EventData implements IEventData {
     private _eventName: string;
     private _object: any;
 
@@ -122,7 +122,7 @@ export class ImageBase extends View {
     public decodeWidth: number;
     public decodeHeight: number;
     alwaysFade: boolean;
-    noCache: boolean
+    noCache: boolean;
     // fade: boolean;
     tintColor: Color;
     // transition: Transition;
@@ -144,19 +144,19 @@ export class ImageBase extends View {
     public static roundTopRightProperty = new Property<ImageBase, boolean>({ name: 'roundTopRight', valueConverter: booleanConverter, affectsLayout: isAndroid });
     public static roundBottomLeftProperty = new Property<ImageBase, boolean>({ name: 'roundBottomLeft', valueConverter: booleanConverter, affectsLayout: isAndroid });
     public static roundBottomRightProperty = new Property<ImageBase, boolean>({ name: 'roundBottomRight', valueConverter: booleanConverter, affectsLayout: isAndroid });
-    public static roundedCornerRadiusProperty = new Property<ImageBase, number>({ name: 'roundedCornerRadius', valueConverter: v => parseFloat(v) });
-    public static blurRadiusProperty = new Property<ImageBase, number>({ name: 'blurRadius', valueConverter: v => parseFloat(v) });
-    public static blurDownSamplingProperty = new Property<ImageBase, number>({ name: 'blurDownSampling', valueConverter: v => parseFloat(v) });
+    public static roundedCornerRadiusProperty = new Property<ImageBase, number>({ name: 'roundedCornerRadius', valueConverter: (v) => parseFloat(v) });
+    public static blurRadiusProperty = new Property<ImageBase, number>({ name: 'blurRadius', valueConverter: (v) => parseFloat(v) });
+    public static blurDownSamplingProperty = new Property<ImageBase, number>({ name: 'blurDownSampling', valueConverter: (v) => parseFloat(v) });
     public static autoPlayAnimationsProperty = new Property<ImageBase, boolean>({ name: 'autoPlayAnimations', valueConverter: booleanConverter });
     public static tapToRetryEnabledProperty = new Property<ImageBase, boolean>({ name: 'tapToRetryEnabled', valueConverter: booleanConverter });
-    public static aspectRatioProperty = new Property<ImageBase, number>({ name: 'aspectRatio', affectsLayout: true, valueConverter: v => parseFloat(v) });
-    public static decodeWidthProperty = new Property<ImageBase, number>({ name: 'decodeWidth', valueConverter: v => parseFloat(v) });
-    public static decodeHeightProperty = new Property<ImageBase, number>({ name: 'decodeHeight', valueConverter: v => parseFloat(v) });
+    public static aspectRatioProperty = new Property<ImageBase, number>({ name: 'aspectRatio', affectsLayout: true, valueConverter: (v) => parseFloat(v) });
+    public static decodeWidthProperty = new Property<ImageBase, number>({ name: 'decodeWidth', valueConverter: (v) => parseFloat(v) });
+    public static decodeHeightProperty = new Property<ImageBase, number>({ name: 'decodeHeight', valueConverter: (v) => parseFloat(v) });
     public static tintColorProperty = new Property<ImageBase, Color>({ name: 'tintColor' });
     public static alwaysFadeProperty = new Property<ImageBase, boolean>({ name: 'alwaysFade', valueConverter: booleanConverter, defaultValue: false });
     // public static fadeProperty = new Property<ImageBase, boolean>({ name: 'fade', valueConverter: booleanConverter });
-    public static fadeDurationProperty = new Property<ImageBase, number>({ name: 'fadeDuration', valueConverter: v => parseFloat(v) });
-    public static noCacheProperty = new Property<ImageBase, boolean>({ name: 'noCache', defaultValue:false, valueConverter: booleanConverter });
+    public static fadeDurationProperty = new Property<ImageBase, number>({ name: 'fadeDuration', valueConverter: (v) => parseFloat(v) });
+    public static noCacheProperty = new Property<ImageBase, boolean>({ name: 'noCache', defaultValue: false, valueConverter: booleanConverter });
 
     protected handleImageProgress(value: number, totalSize?: number) {
         // console.log('handleImageProgress ', value, totalSize);

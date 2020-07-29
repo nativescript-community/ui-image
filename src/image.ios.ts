@@ -1,13 +1,12 @@
 export * from './image-common';
 import * as fs from '@nativescript/core/file-system';
-import { ImageAsset } from '@nativescript/core/image-asset/image-asset';
+import { ImageAsset } from '@nativescript/core/image-asset';
 import { ImageSource } from '@nativescript/core/image-source';
 import { screen } from '@nativescript/core/platform/platform';
 import { layout } from '@nativescript/core/ui/core/view';
-import * as types from '@nativescript/core/utils/types';
-import * as utils from '@nativescript/core/utils/utils';
+import { isString } from '@nativescript/core/utils/types';
+import { isFileOrResourcePath, isFontIconURI, RESOURCE_PREFIX } from '@nativescript/core/utils/utils';
 import { EventData, ImageBase, ImageInfo as ImageInfoBase, ImagePipelineConfigSetting, ScaleType, Stretch } from './image-common';
-
 
 class SDImageRoundAsCircleTransformer extends NSObject implements SDImageTransformer {
     public static ObjCProtocols = [SDImageTransformer];
@@ -107,7 +106,7 @@ const supportedLocalFormats = ['png', 'jpg', 'gif', 'jpeg', 'webp'];
 let screenScale = -1;
 
 function getScaleType(scaleType: string) {
-    if (types.isString(scaleType)) {
+    if (isString(scaleType)) {
         switch (scaleType) {
             case ScaleType.Center:
             case ScaleType.CenterCrop:
@@ -131,7 +130,7 @@ function getScaleType(scaleType: string) {
 }
 
 function getUIImageScaleType(scaleType: string) {
-    if (types.isString(scaleType)) {
+    if (isString(scaleType)) {
         switch (scaleType) {
             case ScaleType.Center:
                 return UIViewContentMode.Center;
@@ -239,12 +238,12 @@ function getUri(src: string | ImageAsset) {
     if (src instanceof ImageAsset) {
         uri = src.ios;
     }
-    if (uri.indexOf(utils.RESOURCE_PREFIX) === 0) {
-        const resName = uri.substr(utils.RESOURCE_PREFIX.length);
+    if (uri.indexOf(RESOURCE_PREFIX) === 0) {
+        const resName = uri.substr(RESOURCE_PREFIX.length);
         if (screenScale === -1) {
             screenScale = screen.mainScreen.scale;
         }
-        supportedLocalFormats.some(v => {
+        supportedLocalFormats.some((v) => {
             for (let i = screenScale; i >= 1; i--) {
                 uri = NSBundle.mainBundle.URLForResourceWithExtension(i > 1 ? `${resName}@${i}x` : resName, v);
                 if (!!uri) {
@@ -462,7 +461,7 @@ export class Img extends ImageBase {
             const args = {
                 eventName: Img.failureEvent,
                 object: this,
-                error
+                error,
             };
 
             this.notify(args);
@@ -479,7 +478,7 @@ export class Img extends ImageBase {
                 eventName: ImageBase.finalImageSetEvent,
                 object: this,
                 imageInfo: new ImageInfo(image.size.width, image.size.height),
-                ios: image
+                ios: image,
             } as FinalEventData;
 
             this.notify(args);
@@ -537,7 +536,7 @@ export class Img extends ImageBase {
         }
         let image;
         if (typeof path === 'string') {
-            if (utils.isFileOrResourcePath(path)) {
+            if (isFileOrResourcePath(path)) {
                 image = ImageSource.fromFileOrResourceSync(path);
             }
         } else {
@@ -559,8 +558,8 @@ export class Img extends ImageBase {
                 if (src instanceof ImageSource) {
                     this._setNativeImage(src.ios);
                     return;
-                } else if (utils.isFontIconURI(src as string)) {
-                    const fontIconCode = (src as string).split("//")[1];
+                } else if (isFontIconURI(src as string)) {
+                    const fontIconCode = (src as string).split('//')[1];
                     if (fontIconCode !== undefined) {
                         // support sync mode only
                         const font = this.style.fontInternal;
@@ -568,7 +567,7 @@ export class Img extends ImageBase {
                         this._setNativeImage(ImageSource.fromFontIconCodeSync(fontIconCode, font, color).ios);
                     }
                     return;
-                } 
+                }
 
                 if (this.noCache) {
                     const uri = getUri(src);
