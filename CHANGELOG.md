@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.2](https://github.com/Akylas/nativescript-image/compare/v4.0.1...v4.0.2) (2020-07-29)
+
+
+### Bug Fixes
+
+* weakref import ([6ee24be](https://github.com/Akylas/nativescript-image/commit/6ee24bef55fc08f9efddf4e12dcad4039ff29c94))
+
+
+
+
+
 ## [4.0.1](https://github.com/Akylas/nativescript-image/compare/v4.0.0...v4.0.1) (2020-07-29)
 
 
