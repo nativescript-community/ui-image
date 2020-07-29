@@ -1,7 +1,6 @@
 export * from './image-common';
 import { Color, ImageAsset, ImageSource, knownFolders, path } from '@nativescript/core';
 import { android as androidApp } from '@nativescript/core/application';
-import { WeakRef } from '@nativescript/core/debugger/dom-node';
 import { isString } from '@nativescript/core/utils/types';
 import { RESOURCE_PREFIX, ad, isFileOrResourcePath, isFontIconURI } from '@nativescript/core/utils/utils';
 import { AnimatedImage, CLog, CLogTypes, EventData, ImageBase, ImageError as ImageErrorBase, ImageInfo as ImageInfoBase, ImagePipelineConfigSetting, ScaleType, debug } from './image-common';
