@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.4](https://github.com/Akylas/nativescript-image/compare/v4.0.3...v4.0.4) (2020-07-30)
+
+
+### Bug Fixes
+
+* **android:** auto size ([f52a0d4](https://github.com/Akylas/nativescript-image/commit/f52a0d412cb45e733d3ccd191de4035cba498c4a))
+
+
+
+
+
 ## [4.0.3](https://github.com/Akylas/nativescript-image/compare/v4.0.2...v4.0.3) (2020-07-29)
 
 **Note:** Version bump only for package @nativescript-community/ui-image
