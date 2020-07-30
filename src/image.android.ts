@@ -5,7 +5,6 @@ import { isString } from '@nativescript/core/utils/types';
 import { RESOURCE_PREFIX, ad, isFileOrResourcePath, isFontIconURI } from '@nativescript/core/utils/utils';
 import { AnimatedImage, CLog, CLogTypes, EventData, ImageBase, ImageError as ImageErrorBase, ImageInfo as ImageInfoBase, ImagePipelineConfigSetting, ScaleType, debug } from './image-common';
 
-
 let initialized = false;
 let initializeConfig: ImagePipelineConfigSetting;
 export function initialize(config?: ImagePipelineConfigSetting): void {
@@ -366,6 +365,24 @@ export class Img extends ImageBase {
         return new com.facebook.drawee.view.SimpleDraweeView(this._context);
     }
 
+    updateViewSize(imageInfo) {
+        if (imageInfo != null && (this.width === 'auto' || this.height === 'auto')) {
+            const draweeView = this.nativeViewProtected;
+            const ratio = imageInfo.getWidth() / imageInfo.getHeight();
+            if (this.width === 'auto') {
+                draweeView.getLayoutParams().width = android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+            } else {
+                draweeView.getLayoutParams().width = this.getMeasuredWidth();
+            }
+            if (this.height === 'auto') {
+                draweeView.getLayoutParams().height = android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+            } else {
+                draweeView.getLayoutParams().height = this.getMeasuredHeight();
+            }
+            draweeView.setAspectRatio(ratio);
+        }
+    }
+
     // public initNativeView(): void {
     //     this.initDrawee();
     //     this.updateHierarchy();
@@ -501,6 +518,7 @@ export class Img extends ImageBase {
             if (src) {
                 if (src instanceof ImageSource) {
                     this.nativeViewProtected.setImageBitmap(src.android);
+                    this.updateViewSize(src.android);
                     return;
                 } else if (isFontIconURI(src as string)) {
                     const fontIconCode = (src as string).split('//')[1];
@@ -554,6 +572,7 @@ export class Img extends ImageBase {
                         CLog(CLogTypes.info, 'onFinalImageSet', id, imageInfo, animatable);
                         const nativeView = that && that.get();
                         if (nativeView) {
+                            nativeView.updateViewSize(imageInfo);
                             nativeView.isLoading = false;
                             nativeView.onImageSet(imageInfo, animatable);
                             const info = new ImageInfo(imageInfo);
@@ -607,6 +626,7 @@ export class Img extends ImageBase {
                         CLog(CLogTypes.info, 'onIntermediateImageSet', id, imageInfo);
                         const nativeView = that && that.get();
                         if (nativeView) {
+                            nativeView.updateViewSize(imageInfo);
                             const info = new ImageInfo(imageInfo);
                             const args: IntermediateEventData = {
                                 eventName: ImageBase.intermediateImageSetEvent,
