@@ -64,11 +64,11 @@ Use `imageModule` in the XML definition of the page as follows:
 
 ### In NativeScript + Angular 2
 
-1. Import the `TNSImageModule` from `@nativescript-community/ui-image/angular` and add it to the `imports` of your initial `@NgModule`, like shown [here](https://github.com/@nativescript-community/ui-image/blob/master/demo-angular/app/app.module.ts).
+1. Import the `TNSImageModule` from `@nativescript-community/ui-image/angular` and add it to the `imports` of your initial `@NgModule`, like shown [here](https://github.com/nativescript-community/ui-image/blob/master/demo-angular/app/app.module.ts).
 2. As described above make sure to initialize the `@nativescript-community/ui-image` plugin in the `launch` event of your {N} application.
 
 ## Examples
-You can refer the [demo-angular](https://github.com/@nativescript-community/ui-image/tree/master/demo-angular) folder of the repo for runnable {N} project that demonstrates the @nativescript-community/ui-image plugin with all of its features in action.
+You can refer the [demo-angular](https://github.com/nativescript-community/ui-image/tree/master/demo-angular) folder of the repo for runnable {N} project that demonstrates the @nativescript-community/ui-image plugin with all of its features in action.
 
 ## Features
 
@@ -604,9 +604,9 @@ Sample 3 - Image shown successfully from src |  Sample 4 - 'Failure' image shown
 ![Successfully shown image sample](screenshots/screen3-successful-show.png) | ![Successfully shown image sample](screenshots/screen4-unsuccessful-show.png)
 
 ## Contribute
-We love PRs! Check out the [contributing guidelines](CONTRIBUTING.md). If you want to contribute, but you are not sure where to start - look for [issues labeled `help wanted`](https://github.com/@nativescript-community/ui-image/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22).
+We love PRs! Check out the [contributing guidelines](CONTRIBUTING.md). If you want to contribute, but you are not sure where to start - look for [issues labeled `help wanted`](https://github.com/nativescript-community/ui-image/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22).
 
 ## Get Help 
-Please, use [github issues](https://github.com/@nativescript-community/ui-image/issues) strictly for [reporting bugs](CONTRIBUTING.md#reporting-bugs) or [requesting features](CONTRIBUTING.md#requesting-new-features). For general questions and support, check out [Stack Overflow](https://stackoverflow.com/questions/tagged/nativescript) or ask our experts in [NativeScript community Slack channel](http://developer.telerik.com/wp-login.php?action=slack-invitation).
+Please, use [github issues](https://github.com/nativescript-community/ui-image/issues) strictly for [reporting bugs](CONTRIBUTING.md#reporting-bugs) or [requesting features](CONTRIBUTING.md#requesting-new-features). For general questions and support, check out [Stack Overflow](https://stackoverflow.com/questions/tagged/nativescript) or ask our experts in [NativeScript community Slack channel](http://developer.telerik.com/wp-login.php?action=slack-invitation).
 
 ![](https://ga-beacon.appspot.com/UA-111455-24/@nativescript-community/ui-image?pixel)

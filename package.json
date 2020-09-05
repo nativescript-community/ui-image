@@ -55,14 +55,14 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/@nativescript-community/ui-image.git"
+        "url": "git+https://github.com/nativescript-community/ui-image.git"
     },
     "author": "",
     "license": "ISC",
     "bugs": {
-        "url": "https://github.com/@nativescript-community/ui-image/issues"
+        "url": "https://github.com/nativescript-community/ui-image/issues"
     },
-    "homepage": "https://github.com/@nativescript-community/ui-image#readme",
+    "homepage": "https://github.com/nativescript-community/ui-image#readme",
     "commitlint": {
         "extends": [
             "@commitlint/config-conventional"

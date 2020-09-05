@@ -4,7 +4,7 @@
   "description": "NativeScript Application",
   "license": "SEE LICENSE IN <your-license-filename>",
   "readme": "NativeScript Application",
-  "repository": "https://github.com/@nativescript-community/ui-image",
+  "repository": "https://github.com/nativescript-community/ui-image",
   "nativescript": {
     "id": "org.nativescript.imagedemoangular",
     "tns-android": {

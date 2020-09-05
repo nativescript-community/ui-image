@@ -28,10 +28,10 @@
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/@nativescript-community/ui-image"
+        "url": "https://github.com/nativescript-community/ui-image"
     },
     "bugs": {
-        "url": "https://github.com/@nativescript-community/ui-image/issues"
+        "url": "https://github.com/nativescript-community/ui-image/issues"
     },
     "readme": "Sample {N} project that demonstrates the @nativescript-community/ui-image plugin with all of its features in action"
 }
