@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.5](https://github.com/Akylas/nativescript-image/compare/v4.0.4...v4.0.5) (2020-09-05)
+
+
+### Bug Fixes
+
+* angular build fix ([afca0e8](https://github.com/Akylas/nativescript-image/commit/afca0e8a03badde75820185dd04a03b5688e5121))
+
+
+
+
+
 ## [4.0.4](https://github.com/Akylas/nativescript-image/compare/v4.0.3...v4.0.4) (2020-07-30)
 
 
