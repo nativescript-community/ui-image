@@ -1,19 +1,18 @@
 {
-    "$schema": "../../node_modules/ng-packagr/package.schema.json",
-    "name": "@nativescript-community/ui-image-angular",
-    "version": "1.0.0",
-    "ngPackage": {
-        "dest": "../../tempAngular",
-        "lib": {
-            "entryFile": "index.ts",
-            "umdModuleIds": {
-				"@nativescript/core": "ns-core",
-				"@nativescript/angular": "ns-angular",
-				"@nativescript-community/ui-image": "ns-ui-image"
-			}
-        },
-		"whitelistedNonPeerDependencies": [
-			"."
-		]
-    }
+  "name": "@nativescript-community/ui-image-angular",
+  "main": "index.js",
+  "ngPackage": {
+    "dest": "../../plugin/angular",
+    "lib": {
+      "entryFile": "index.ts",
+      "umdModuleIds": {
+        "@nativescript/core": "ns-core",
+        "@nativescript/angular": "ns-angular",
+        "@nativescript-community/ui-image": "ns-image"
+      }
+    },
+    "whitelistedNonPeerDependencies": [
+      "."
+    ]
+  }
 }
