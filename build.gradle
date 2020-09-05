@@ -1,0 +1,18 @@
+apply plugin: 'java'
+
+// Use maven repository
+repositories {
+    mavenCentral()
+    google()
+}
+dependencies {
+	implementation 'com.facebook.fresco:fresco:2.1.0'
+	implementation 'com.facebook.fresco:animated-gif:2.1.0'
+}
+sourceSets {
+    main {
+        java {
+            srcDirs = ["plugin/platforms/android/java"]
+        }
+    }
+}

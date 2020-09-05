@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import * as imageModule from 'nativescript-image';
+import * as imageModule from '@nativescript-community/ui-image';
 
 // tslint:disable:no-console
 

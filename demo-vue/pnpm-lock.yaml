@@ -1,6 +1,6 @@
 dependencies:
   '@nativescript/core': 6.5.1
-  nativescript-image: 'link:../plugin'
+  @nativescript-community/ui-image: 'link:../plugin'
   nativescript-theme-core: 1.0.6
   nativescript-vue: 2.6.2
 devDependencies:
@@ -6836,7 +6836,7 @@ specifiers:
   css-loader: ^3.4.2
   lazy: 1.0.11
   nativescript-dev-webpack: 1.5.1
-  nativescript-image: ../plugin
+  @nativescript-community/ui-image: ../plugin
   nativescript-theme-core: ~1.0.4
   nativescript-vue: 2.6.2
   nativescript-vue-template-compiler: ^2.6.2

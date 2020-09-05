@@ -19,12 +19,12 @@ export const CLog = (type: CLogTypes = 0, ...args) => {
     if (debug) {
         if (type === 0) {
             // Info
-            console.log('[nativescript-image]', ...args);
+            console.log('[@nativescript-community/ui-image]', ...args);
         } else if (type === 1) {
             // Warning
-            console.warn('[nativescript-image]', ...args);
+            console.warn('[@nativescript-community/ui-image]', ...args);
         } else if (type === 2) {
-            console.error('[nativescript-image]', ...args);
+            console.error('[@nativescript-community/ui-image]', ...args);
         }
     }
 };

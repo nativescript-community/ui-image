@@ -36,14 +36,14 @@ Before you begin make sure there is an issue for the bug or feature you will be 
 
 Following these steps is the best way to get your code included in the project:
 
-1. Fork and clone the nativescript-image repo:
+1. Fork and clone the @nativescript-community/ui-image repo:
 
 ```bash
-git clone https://github.com/<your-git-username>/nativescript-image.git
+git clone https://github.com/<your-git-username>/@nativescript-community/ui-image.git
 # Navigate to the newly cloned directory
-cd nativescript-image
+cd @nativescript-community/ui-image
 # Add an "upstream" remote pointing to the original repo.
-git remote add upstream https://github.com/Akylas/nativescript-image.git
+git remote add upstream https://github.com/@nativescript-community/ui-image.git
 ```
 
 2. Read our [development workflow guide](DevelopmentWorkflow.md) for local setup
@@ -71,10 +71,10 @@ git checkout -b <my-fix-branch> master
 git push origin <my-fix-branch> --force
 ```
 
-7. [Submit your pull request](https://github.com/Akylas/nativescript-image/compare) and compare to `NativeScript/nativescript-image`. Please, fill in the Pull Request template - it will help us better understand the PR and increase the chances of it getting merged quickly.
+7. [Submit your pull request](https://github.com/@nativescript-community/ui-image/compare) and compare to `NativeScript/@nativescript-community/ui-image`. Please, fill in the Pull Request template - it will help us better understand the PR and increase the chances of it getting merged quickly.
 
 It's our turn from there on! We will review the PR and discuss changes you might have to make before merging it! Thanks!
 
 ## Where to Start
 
-If you want to contribute, but you are not sure where to start - look for issues labeled [`help wanted`](https://github.com/Akylas/nativescript-image/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22).
+If you want to contribute, but you are not sure where to start - look for issues labeled [`help wanted`](https://github.com/@nativescript-community/ui-image/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22).

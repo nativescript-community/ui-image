@@ -5,7 +5,7 @@
     "android": {
         "v8Flags": "--expose_gc",
         "requireModules": [
-            "nativescript-image"
+            "@nativescript-community/ui-image"
         ],
         "markingMode": "none"
     },
@@ -13,7 +13,7 @@
         "name": "Vladimir Amiorkov",
         "email": "Vladimir.Amiorkov@telerik.com"
     },
-    "description": "Sample {N} project that demonstrates the nativescript-image plugin with all of its features in action.",
+    "description": "Sample {N} project that demonstrates the @nativescript-community/ui-image plugin with all of its features in action.",
     "license": "Apache-2.0",
     "keywords": [
         "telerik",
@@ -28,10 +28,10 @@
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/Akylas/nativescript-image"
+        "url": "https://github.com/@nativescript-community/ui-image"
     },
     "bugs": {
-        "url": "https://github.com/Akylas/nativescript-image/issues"
+        "url": "https://github.com/@nativescript-community/ui-image/issues"
     },
-    "readme": "Sample {N} project that demonstrates the nativescript-image plugin with all of its features in action"
+    "readme": "Sample {N} project that demonstrates the @nativescript-community/ui-image plugin with all of its features in action"
 }

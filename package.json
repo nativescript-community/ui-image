@@ -15,7 +15,7 @@
         "demo.ng.android": "npm run build && cd demo-angular && tns run android --syncAllFiles",
         "demo.ng.android.watch": "npm run build && npm run plugin.tscwatch && cd demo-angular && tns run android --syncAllFiles",
         "demo.ng.reset": "cd ../demo-angular && rimraf platforms",
-        "plugin.prepare": "npm run build && cd demo-angular && tns plugin remove nativescript-image && tns plugin add ../plugin && cd ../demo && tns plugin remove nativescript-image && tns plugin add ../plugin",
+        "plugin.prepare": "npm run build && cd demo-angular && tns plugin remove @nativescript-community/ui-image && tns plugin add ../plugin && cd ../demo && tns plugin remove @nativescript-community/ui-image && tns plugin add ../plugin",
         "publish": "npm run setup && npm run build && npm run build.angular && lerna publish",
         "commitmsg": "commitlint -e $GIT_PARAMS"
     },
@@ -55,14 +55,14 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/Akylas/nativescript-image.git"
+        "url": "git+https://github.com/@nativescript-community/ui-image.git"
     },
     "author": "",
     "license": "ISC",
     "bugs": {
-        "url": "https://github.com/Akylas/nativescript-image/issues"
+        "url": "https://github.com/@nativescript-community/ui-image/issues"
     },
-    "homepage": "https://github.com/Akylas/nativescript-image#readme",
+    "homepage": "https://github.com/@nativescript-community/ui-image#readme",
     "commitlint": {
         "extends": [
             "@commitlint/config-conventional"

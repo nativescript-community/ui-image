@@ -12,9 +12,9 @@ class ImageData {
 }
 
 const images: ImageData[] = new Array(
-    new ImageData('https://raw.githubusercontent.com/Akylas/nativescript-image/master/examples-data/drink1.jpg', 1.49),
-    new ImageData('https://raw.githubusercontent.com/Akylas/nativescript-image/master/examples-data/dessert1.jpg', 0.66),
-    new ImageData('https://raw.githubusercontent.com/Akylas/nativescript-image/master/examples-data/drink2.jpg', 1.49)
+    new ImageData('https://raw.githubusercontent.com/@nativescript-community/ui-image/master/examples-data/drink1.jpg', 1.49),
+    new ImageData('https://raw.githubusercontent.com/@nativescript-community/ui-image/master/examples-data/dessert1.jpg', 0.66),
+    new ImageData('https://raw.githubusercontent.com/@nativescript-community/ui-image/master/examples-data/drink2.jpg', 1.49)
 );
 let currentIndex = 1;
 

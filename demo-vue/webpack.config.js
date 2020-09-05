@@ -78,7 +78,7 @@ module.exports = env => {
     }
 
     if (development) {
-        alias['nativescript-image'] = resolve(projectRoot, '..', 'src', 'image.' + platform);
+        alias['@nativescript-community/ui-image'] = resolve(projectRoot, '..', 'src', 'image.' + platform);
     }
 
     const appResourcesFullPath = resolve(projectRoot, appResourcesPath);
@@ -312,7 +312,7 @@ module.exports = env => {
 
     // if (development) {
     //     config.plugins.push(
-    //         new webpack.ContextReplacementPlugin(/nativescript-image/, resolve(projectRoot, '..', 'src'))
+    //         new webpack.ContextReplacementPlugin(/@nativescript-community/ui-image/, resolve(projectRoot, '..', 'src'))
     //     );
     // }
 

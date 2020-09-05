@@ -5,7 +5,7 @@ import { Label } from '@nativescript/core/ui/label';
 import * as imageModel from 'nativescript-image';
 import { writeToOutputLabel } from './appLogger';
 
-const src = 'https://raw.githubusercontent.com/Akylas/nativescript-image/master/examples-data/breakfast1.jpg';
+const src = 'https://raw.githubusercontent.com/@nativescript-community/ui-image/master/examples-data/breakfast1.jpg';
 
 export function onCheckCache(args: EventData) {
     const button = args.object as Button;

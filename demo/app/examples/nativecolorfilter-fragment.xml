@@ -3,4 +3,4 @@
                     loaded="onLoaded"
                     tintColor="red"
                     placeholderImageUri="res://ns_logo"
-                    src="https://raw.githubusercontent.com/Akylas/nativescript-image/master/examples-data/dessert1.jpg"/>
+                    src="https://raw.githubusercontent.com/@nativescript-community/ui-image/master/examples-data/dessert1.jpg"/>

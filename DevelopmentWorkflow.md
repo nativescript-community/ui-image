@@ -21,7 +21,7 @@ For local development we recommend using the npm commands provided in the packag
 To run and develop using TypeScript demo:
 
 ```bash
-$ cd nativescript-image
+$ cd @nativescript-community/ui-image
 $ npm run demo.ng.android
 ```
 
@@ -30,7 +30,7 @@ Now using that method you won't see live changes to ```src``` folder.
 To see live changes, run this command instead
 
 ```bash
-$ cd nativescript-image
+$ cd @nativescript-community/ui-image
 $ npm run demo.ng.android.watch
 ```
 

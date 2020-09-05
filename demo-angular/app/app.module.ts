@@ -5,8 +5,8 @@ import { NativeScriptFormsModule } from '@nativescript/angular/forms';
 import { NgModule, NO_ERRORS_SCHEMA, OnInit } from '@angular/core';
 import { AppComponent } from './components/app.component';
 
-import { TNSImageModule } from 'nativescript-image/angular';
-import * as imageModule from 'nativescript-image';
+import { TNSImageModule } from '@nativescript-community/ui-image/angular';
+import * as imageModule from '@nativescript-community/ui-image';
 import * as applicationModule from '@nativescript/core/application';
 
 if (applicationModule.android) {

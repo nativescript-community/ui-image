@@ -22,9 +22,9 @@
         "email": "martin@akylas.fr"
     },
     "bugs": {
-        "url": "https://github.com/Akylas/nativescript-image/issues"
+        "url": "https://github.com/@nativescript-community/ui-image/issues"
     },
     "license": "Apache-2.0",
-    "homepage": "https://github.com/Akylas/nativescript-image",
+    "homepage": "https://github.com/@nativescript-community/ui-image",
     "readmeFilename": "README.md"
 }

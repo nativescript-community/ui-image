@@ -20,9 +20,9 @@ class PageModel {
             this._dataItems = new ObservableArray<DataItem>();
 
             for (let i = 1; i <= 50; i++) {
-                let imageUrl = 'https://raw.githubusercontent.com/Akylas/nativescript-image/master/examples-data/dessert1.jpg';
+                let imageUrl = 'https://raw.githubusercontent.com/@nativescript-community/ui-image/master/examples-data/dessert1.jpg';
                 if (i % 2 === 0) {
-                    imageUrl = 'https://raw.githubusercontent.com/Akylas/nativescript-image/master/examples-data/drink1.jpg';
+                    imageUrl = 'https://raw.githubusercontent.com/@nativescript-community/ui-image/master/examples-data/drink1.jpg';
                 }
 
                 this._dataItems.push(new DataItem(i, imageUrl));
@@ -65,6 +65,6 @@ export function onNavigatingTo(args) {
 
 export function onBack(args) {
     const navigationButton = args.object as NavigationButton;
-    const frame = navigationButton.page.frame as Frame;
+    const frame = navigationButton.page.frame;
     frame.goBack();
 }
