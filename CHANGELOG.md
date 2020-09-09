@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.6](https://github.com/nativescript-community/ui-image/compare/v4.0.5...v4.0.6) (2020-09-09)
+
+
+### Bug Fixes
+
+* **angular:** fix imports ([419d681](https://github.com/nativescript-community/ui-image/commit/419d681268f193bb4a8d94a13298fe6f9f046d36))
+
+
+
+
+
 ## [4.0.5](https://github.com/nativescript-community/ui-image/compare/v4.0.4...v4.0.5) (2020-09-05)
 
 
