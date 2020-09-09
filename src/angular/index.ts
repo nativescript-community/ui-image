@@ -1,2 +1,2 @@
 
-export * from './@nativescript-community/ui-image.module';
+export * from './nativescript-image.module';

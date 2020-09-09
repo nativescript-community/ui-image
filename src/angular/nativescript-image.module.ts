@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { registerElement } from '@nativescript/angular';
 
-import { ImgDirective, NSIMG_DIRECTIVES } from './@nativescript-community/ui-image-directives';
+import { ImgDirective, NSIMG_DIRECTIVES } from './nativescript-image-directives';
 import { Img } from '@nativescript-community/ui-image';
 export { ImgDirective };
 @NgModule({
