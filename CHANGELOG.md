@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.7](https://github.com/nativescript-community/ui-image/compare/v4.0.6...v4.0.7) (2020-09-22)
+
+
+### Bug Fixes
+
+* **ios:** ensure latest SDWebImage on iOS ([88db4b6](https://github.com/nativescript-community/ui-image/commit/88db4b6b99dde9a37df3e490a5416da3c82c00b1))
+
+
+
+
+
 ## [4.0.6](https://github.com/nativescript-community/ui-image/compare/v4.0.5...v4.0.6) (2020-09-09)
 
 
