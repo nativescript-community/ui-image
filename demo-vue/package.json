@@ -1,42 +1,28 @@
 {
-    "nativescript": {
-        "id": "org.nativescript.demovue",
-        "tns-android": {
-            "version": "6.4.1"
-        },
-        "tns-ios": {
-            "version": "6.4.2"
-        }
-    },
     "description": "NativeScript Application",
     "repository": "https://github.com/nativescript-community/ui-image",
     "dependencies": {
-        "@nativescript/core": "~6.5.1",
-        "nativescript-vue": "2.6.2",
         "@nativescript-community/ui-image": "../plugin",
-        "nativescript-theme-core": "~1.0.4"
+        "@nativescript/core": "7.0.0",
+        "@nativescript/webpack": "3.0.0",
+        "nativescript-theme-core": "~1.0.4",
+        "nativescript-vue": "2.8.0"
     },
     "devDependencies": {
         "@babel/core": "^7.9.6",
         "@babel/preset-env": "^7.9.6",
+        "@nativescript/ios": "7.0.0",
+        "@nativescript/types": "7.0.0",
         "babel-loader": "^8.1.0",
         "babel-traverse": "6.26.0",
         "babel-types": "6.26.0",
         "babylon": "6.18.0",
-        "clean-webpack-plugin": "^3.0.0",
-        "copy-webpack-plugin": "^5.1.1",
-        "css-loader": "^3.4.2",
         "lazy": "1.0.11",
-        "nativescript-dev-webpack": "1.5.1",
-        "nativescript-vue-template-compiler": "^2.6.2",
+        "nativescript-vue-template-compiler": "2.8.0",
         "node-sass": "^4.14.1",
-        "sass-loader": "^8.0.2",
-        "tns-platform-declarations": "~6.5.1",
-        "typescript": "~3.8.3",
-        "vue": "^2.6.11",
-        "vue-loader": "^15.9.2",
-        "webpack": "^4.42.0",
-        "webpack-bundle-analyzer": "~3.6.1",
-        "webpack-cli": "^3.3.11"
-    }
+        "typescript": "3.9.7",
+        "vue": "2.6.12",
+        "vue-loader": "^15.9.2"
+    },
+    "main": "app.js"
 }

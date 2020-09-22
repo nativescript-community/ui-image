@@ -9,7 +9,7 @@
                 verticalAlignment="center"
                     blurRadius="25"
                 placeholderImageUri="res://ns_logo"
-                src="https://raw.githubusercontent.com/@nativescript-community/ui-image/master/examples-data/breakfast1.jpg">
+                src="https://raw.githubusercontent.com/nativescript-community/ui-image/master/examples-data/breakfast1.jpg">
             </NSImg>
             <Button text="Set 1" row="1" @tap="onSeOpacityTo1"></Button>
             <Button text="Set 0.5" row="2" @tap="onSeOpacityTo05"></Button>
