@@ -288,20 +288,19 @@ export class Img extends ImageBase {
 
         const image = this.nativeViewProtected.image;
 
-        // console.log('onMeasure', !!image, width, widthMode, height, heightMode);
-
         const nativeWidth = image ? layout.toDevicePixels(image.size.width) : 0;
         const nativeHeight = image ? layout.toDevicePixels(image.size.height) : 0;
 
         let measureWidth = Math.max(nativeWidth, this.effectiveMinWidth);
         let measureHeight = Math.max(nativeHeight, this.effectiveMinHeight);
 
-        const finiteWidth: boolean = widthMode !== layout.UNSPECIFIED;
-        const finiteHeight: boolean = heightMode !== layout.UNSPECIFIED;
+        // console.log('onMeasure', !!image, width, widthMode, height, heightMode);
 
         this._imageSourceAffectsLayout = widthMode !== layout.EXACTLY || heightMode !== layout.EXACTLY;
 
         if (image || this.aspectRatio > 0) {
+            const finiteWidth: boolean = widthMode === layout.EXACTLY;
+            const finiteHeight: boolean = heightMode === layout.EXACTLY;
             // if (!image) {
             // if (this.aspectRatio > 0) {
             const scale = this.computeScaleFactor(width, height, finiteWidth, finiteHeight, nativeWidth, nativeHeight);
@@ -311,7 +310,7 @@ export class Img extends ImageBase {
 
             measureWidth = Math.round(measureWidth * scale.width);
             measureHeight = Math.round(measureHeight * scale.height);
-            // console.log('scale', scale, width, height, finiteWidth, finiteHeight, nativeWidth, nativeHeight, measureWidth, measureHeight);
+            // console.log('scale', scale , width, height, finiteWidth, finiteHeight, nativeWidth, nativeHeight, measureWidth, measureHeight);
         }
         // } else {
         // const scale = this.computeScaleFactor(width, height, finiteWidth, finiteHeight, nativeWidth, nativeHeight);
