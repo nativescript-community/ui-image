@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.9](https://github.com/nativescript-community/ui-image/compare/v4.0.8...v4.0.9) (2020-10-02)
+
+
+### Bug Fixes
+
+* another android auto measurement fix ([c79838c](https://github.com/nativescript-community/ui-image/commit/c79838c91d3363bf838f25ee2b5c0c04e99e1881))
+* another ios measurement fix ([fc28275](https://github.com/nativescript-community/ui-image/commit/fc282751c11da01a440d73a0bfa0e9556ab54fec))
+
+
+
+
+
 ## [4.0.8](https://github.com/nativescript-community/ui-image/compare/v4.0.7...v4.0.8) (2020-10-02)
 
 
