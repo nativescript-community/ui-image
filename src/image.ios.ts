@@ -288,6 +288,7 @@ export class Img extends ImageBase {
 
         const image = this.nativeViewProtected.image;
 
+
         const nativeWidth = image ? layout.toDevicePixels(image.size.width) : 0;
         const nativeHeight = image ? layout.toDevicePixels(image.size.height) : 0;
 
@@ -297,16 +298,20 @@ export class Img extends ImageBase {
         const finiteWidth: boolean = widthMode === layout.EXACTLY;
         const finiteHeight: boolean = heightMode === layout.EXACTLY;
         this._imageSourceAffectsLayout = !finiteWidth || !finiteHeight;
-
-        CLog(CLogTypes.info, 'onMeasure', this.src, widthMeasureSpec, heightMeasureSpec, width, height, this.aspectRatio);
+        const imgRatio = finiteHeight ? nativeWidth/nativeHeight : nativeHeight/nativeWidth;
+        CLog(CLogTypes.info, 'onMeasure', this.src, widthMeasureSpec, heightMeasureSpec, width, height, this.aspectRatio, image && image.imageOrientation);
         if (image || this.aspectRatio > 0) {
-            const scale = this.computeScaleFactor(width, height, finiteWidth, finiteHeight, nativeWidth, nativeHeight, this.aspectRatio || nativeHeight/ nativeWidth);
+            const scale = this.computeScaleFactor(width, height, finiteWidth, finiteHeight, nativeWidth, nativeHeight, this.aspectRatio || imgRatio );
 
-            measureWidth = finiteWidth ? width : height;
-            measureHeight = finiteHeight ? height : width;
+            if (!finiteWidth) {
+                measureWidth = Math.round(height * scale.width);
+            } else {
 
-            measureWidth = Math.round(measureWidth * scale.width);
-            measureHeight = Math.round(measureHeight * scale.height);
+            }
+            if (!finiteHeight) {
+                measureHeight = Math.round(width * scale.height);
+            }
+
             CLog(CLogTypes.info, 'onMeasure scale', this.src, this.aspectRatio, finiteWidth, finiteHeight, width, height, nativeWidth, nativeHeight, scale);
         }
         const widthAndState = Img.resolveSizeAndState(measureWidth, width, widthMode, 0);
