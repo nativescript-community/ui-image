@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.8](https://github.com/nativescript-community/ui-image/compare/v4.0.7...v4.0.8) (2020-10-02)
+
+
+### Bug Fixes
+
+* **android:** make fresco version configurable ([bf794e2](https://github.com/nativescript-community/ui-image/commit/bf794e2b9d9d9fd80927d97535f5813069213c35))
+* make sure the image sizes correctly in all cases ([e79355f](https://github.com/nativescript-community/ui-image/commit/e79355f01d1beadf97e200653ab0652b7216e47b))
+* **ios:** aspectRatio compute fix ([576c164](https://github.com/nativescript-community/ui-image/commit/576c16400eb71c5c7421d73f2be6d23165031e1c))
+
+
+
+
+
 ## [4.0.7](https://github.com/nativescript-community/ui-image/compare/v4.0.6...v4.0.7) (2020-09-22)
 
 
