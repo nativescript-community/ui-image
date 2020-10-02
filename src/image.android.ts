@@ -359,7 +359,7 @@ function initializeDraweeView() {
                 if ((this as any).imageWidth && (this as any).imageHeight) {
                     scale = this.owner.computeScaleFactor(width, height, finiteWidth, finiteHeight, (this as any).imageWidth, (this as any).imageHeight, aspectRatio);
                     if (!finiteWidth) {
-                        widthMeasureSpec = Utils.layout.makeMeasureSpec(height * scale.width, Utils.layout.EXACTLY);
+                        widthMeasureSpec = Utils.layout.makeMeasureSpec(height / scale.width, Utils.layout.EXACTLY);
                     }
                     if (!finiteHeight) {
                         heightMeasureSpec = Utils.layout.makeMeasureSpec(width * scale.height, Utils.layout.EXACTLY);
