@@ -61,6 +61,15 @@ export class Img extends View {
     updateImageUri(): void;
 
     /**
+     * Start image animation
+     */
+    startAnimating();
+
+    /**
+     * Stop image animation
+     */
+    stopAnimating();
+    /**
      * The native 'com.facebook.drawee.view.SimpleDraweeView' object.
      */
     android: any;
@@ -215,26 +224,6 @@ export class ImageInfo {
  * Interface of the common abstraction behind a platform specific error object that is used by the Image's events.
  */
 export interface ImageError {
-    /**
-     * Returns the message of the Error.
-     */
-    getMessage(): string;
-
-    /**
-     * Returns the type (typically the class name) of the Error.
-     */
-    getErrorType(): string;
-
-    /**
-     * Returns the string representation of the Error.
-     */
-    toString(): string;
-}
-
-/**
- * Encapsulates the common abstraction behind a platform specific error object that is used by the Image's events.
- */
-export class ImageError {
     /**
      * Returns the message of the Error.
      */

@@ -2,7 +2,7 @@ export * from './image-common';
 import { ImageAsset, ImageSource, Screen, knownFolders, path } from '@nativescript/core';
 import { isString } from '@nativescript/core/utils/types';
 import { RESOURCE_PREFIX, isFileOrResourcePath, isFontIconURI, layout } from '@nativescript/core/utils/utils';
-import { EventData, ImageBase, ImageInfo as ImageInfoBase, ImagePipelineConfigSetting, ScaleType, Stretch } from './image-common';
+import { CLog, CLogTypes, EventData, ImageBase, ImageInfo as ImageInfoBase, ImagePipelineConfigSetting, ScaleType, Stretch } from './image-common';
 
 @NativeClass
 class SDImageRoundAsCircleTransformer extends NSObject implements SDImageTransformer {
@@ -294,135 +294,25 @@ export class Img extends ImageBase {
         let measureWidth = Math.max(nativeWidth, this.effectiveMinWidth);
         let measureHeight = Math.max(nativeHeight, this.effectiveMinHeight);
 
-        // console.log('onMeasure', !!image, width, widthMode, height, heightMode);
+        const finiteWidth: boolean = widthMode === layout.EXACTLY;
+        const finiteHeight: boolean = heightMode === layout.EXACTLY;
+        this._imageSourceAffectsLayout = !finiteWidth || !finiteHeight;
 
-        this._imageSourceAffectsLayout = widthMode !== layout.EXACTLY || heightMode !== layout.EXACTLY;
-
+        CLog(CLogTypes.info, 'onMeasure', this.src, widthMeasureSpec, heightMeasureSpec, width, height, this.aspectRatio);
         if (image || this.aspectRatio > 0) {
-            const finiteWidth: boolean = widthMode === layout.EXACTLY;
-            const finiteHeight: boolean = heightMode === layout.EXACTLY;
-            // if (!image) {
-            // if (this.aspectRatio > 0) {
-            const scale = this.computeScaleFactor(width, height, finiteWidth, finiteHeight, nativeWidth, nativeHeight);
+            const scale = this.computeScaleFactor(width, height, finiteWidth, finiteHeight, nativeWidth, nativeHeight, this.aspectRatio || nativeHeight/ nativeWidth);
 
             measureWidth = finiteWidth ? width : height;
             measureHeight = finiteHeight ? height : width;
 
             measureWidth = Math.round(measureWidth * scale.width);
             measureHeight = Math.round(measureHeight * scale.height);
-            // console.log('scale', scale , width, height, finiteWidth, finiteHeight, nativeWidth, nativeHeight, measureWidth, measureHeight);
+            CLog(CLogTypes.info, 'onMeasure scale', this.src, this.aspectRatio, finiteWidth, finiteHeight, width, height, nativeWidth, nativeHeight, scale);
         }
-        // } else {
-        // const scale = this.computeScaleFactor(width, height, finiteWidth, finiteHeight, nativeWidth, nativeHeight);
-
-        // measureWidth = finiteWidth ? width : height;
-        // measureHeight = finiteHeight ? height : width;
-
-        // measureWidth = Math.round(measureWidth * scale.width);
-        // measureHeight = Math.round(measureHeight * scale.height);
-        // }
-
         const widthAndState = Img.resolveSizeAndState(measureWidth, width, widthMode, 0);
         const heightAndState = Img.resolveSizeAndState(measureHeight, height, heightMode, 0);
 
         this.setMeasuredDimension(widthAndState, heightAndState);
-    }
-
-    private static needsSizeAdjustment(scaleType: ScaleType) {
-        if (scaleType === undefined) {
-            return true;
-        }
-        switch (scaleType) {
-            case ScaleType.FocusCrop:
-            case ScaleType.Center:
-            case ScaleType.CenterCrop:
-            case ScaleType.CenterInside:
-            case ScaleType.FitCenter:
-            case ScaleType.AspectFit:
-            case ScaleType.FitXY:
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    private computeScaleFactor(
-        measureWidth: number,
-        measureHeight: number,
-        widthIsFinite: boolean,
-        heightIsFinite: boolean,
-        nativeWidth: number,
-        nativeHeight: number
-    ): { width: number; height: number } {
-        let scaleW = 1;
-        let scaleH = 1;
-        // console.log('computeScaleFactor', widthIsFinite, heightIsFinite, this.aspectRatio, measureWidth, measureHeight, nativeWidth, nativeHeight, this._imageSourceAffectsLayout);
-        if (Img.needsSizeAdjustment(this.stretch) && (widthIsFinite || heightIsFinite)) {
-            // if (aspectRatio > 0) {
-            //   console.log('handling aspectRatio', aspectRatio);
-            //     if (!widthIsFinite) {
-            //         scaleH = 1;
-            //         scaleW = scaleH / aspectRatio;
-            //     } else if (!heightIsFinite) {
-            //         scaleW = 1;
-            //         scaleH = scaleW * aspectRatio;
-            //     }
-            // } else {
-            const nativeScale = nativeWidth > 0 && nativeHeight > 0 ? nativeWidth / nativeHeight : 1;
-            const measureScale = measureWidth > 0 && measureHeight > 0 ? measureWidth / measureHeight : 1;
-            scaleW = nativeWidth > 0 ? measureWidth / nativeWidth : 1;
-            scaleH = nativeHeight > 0 ? measureHeight / nativeHeight : 1;
-
-            if (this.aspectRatio > 0) {
-                if (!widthIsFinite) {
-                    scaleH = 1;
-                    scaleW = this.aspectRatio;
-                } else if (!heightIsFinite) {
-                    scaleW = 1;
-                    scaleH = this.aspectRatio;
-                }
-                // console.log(
-                //     'handling aspectRatio',
-                //     widthIsFinite,
-                //     heightIsFinite,
-                //     this.aspectRatio,
-                //     measureWidth,
-                //     measureHeight,
-                //     nativeWidth,
-                //     nativeHeight,
-                //     scaleW,
-                //     scaleH,
-                //     this._imageSourceAffectsLayout
-                // );
-            } else {
-                if (!widthIsFinite) {
-                    scaleH = 1;
-                    scaleW = nativeScale * scaleH;
-                } else if (!heightIsFinite) {
-                    scaleW = 1;
-                    scaleH = measureScale / nativeScale;
-                } else {
-                    // No infinite dimensions.
-                    switch (this.stretch) {
-                        case ScaleType.FitXY:
-                        case ScaleType.FocusCrop:
-                        case ScaleType.Fill:
-                            break;
-                        default:
-                            if (measureScale > nativeScale) {
-                                scaleH = 1;
-                                scaleW = nativeScale * scaleH;
-                            } else {
-                                scaleW = 1;
-                                scaleH = measureScale / nativeScale;
-                            }
-                    }
-                }
-            }
-            // }
-        }
-
-        return { width: scaleW, height: scaleH };
     }
 
     // public disposeNativeView() {
@@ -446,7 +336,6 @@ export class Img extends ImageBase {
 
     public _setNativeImage(nativeImage: UIImage) {
         this.nativeViewProtected.image = nativeImage;
-        // console.log('_setNativeImage', !!nativeImage, this._imageSourceAffectsLayout);
         if (this._imageSourceAffectsLayout) {
             this._imageSourceAffectsLayout = false;
             this.requestLayout();
@@ -454,33 +343,7 @@ export class Img extends ImageBase {
     }
 
     private handleImageLoaded = (image: UIImage, error: NSError, cacheType: number) => {
-        if (error) {
-            const args = {
-                eventName: Img.failureEvent,
-                object: this,
-                error,
-            };
 
-            this.notify(args);
-            if (this.failureImageUri) {
-                image = this.getUIImage(this.failureImageUri);
-                // this._setNativeImage();
-                // } else {
-                // console.log("clearing image");
-                // this._setNativeImage(null);
-                // this.nativeViewProtected.image = null;
-            }
-        } else {
-            const args = {
-                eventName: ImageBase.finalImageSetEvent,
-                object: this,
-                imageInfo: new ImageInfo(image.size.width, image.size.height),
-                ios: image,
-            } as FinalEventData;
-
-            this.notify(args);
-        }
-        this.handleImageProgress(1);
         // if (this.tintColor) {
         //   image = image.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
         // }
@@ -522,6 +385,34 @@ export class Img extends ImageBase {
         //         this.nativeView.alpha = this.opacity;
         //     });
         // }
+
+        if (error) {
+            const args = {
+                eventName: Img.failureEvent,
+                object: this,
+                error,
+            };
+
+            this.notify(args);
+            if (this.failureImageUri) {
+                image = this.getUIImage(this.failureImageUri);
+                // this._setNativeImage();
+                // } else {
+                // console.log("clearing image");
+                // this._setNativeImage(null);
+                // this.nativeViewProtected.image = null;
+            }
+        } else {
+            const args = {
+                eventName: ImageBase.finalImageSetEvent,
+                object: this,
+                imageInfo: new ImageInfo(image.size.width, image.size.height),
+                ios: image,
+            } as FinalEventData;
+
+            this.notify(args);
+        }
+        this.handleImageProgress(1);
     };
     private onLoadProgress = (currentSize: number, totalSize: number) => {
         this.handleImageProgress(totalSize > 0 ? currentSize / totalSize : -1, totalSize);
@@ -600,7 +491,7 @@ export class Img extends ImageBase {
                 if (this.roundBottomLeft || this.roundBottomRight || this.roundTopLeft || this.roundTopRight) {
                     let corners = 0;
                     if (this.roundTopLeft) {
-                        corners = corners | UIRectCorner.BottomLeft;
+                        corners = corners | UIRectCorner.TopLeft;
                     }
                     if (this.roundTopRight) {
                         corners = corners | UIRectCorner.BottomRight;
@@ -609,7 +500,7 @@ export class Img extends ImageBase {
                         corners = corners | UIRectCorner.TopRight;
                     }
                     if (this.roundBottomLeft) {
-                        corners = corners | UIRectCorner.TopLeft;
+                        corners = corners | UIRectCorner.BottomLeft;
                     }
                     transformers.push(SDImageRoundCornerTransformer.transformerWithRadiusCornersBorderWidthBorderColor(this.roundedCornerRadius, corners, 0, null));
                     // transformers.push(SDImageFlippingTransformer.transformerWithHorizontalVertical(false, true));

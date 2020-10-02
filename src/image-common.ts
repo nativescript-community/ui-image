@@ -19,12 +19,12 @@ export const CLog = (type: CLogTypes = 0, ...args) => {
     if (debug) {
         if (type === 0) {
             // Info
-            console.log('[@nativescript-community/ui-image]', ...args);
+            console.log('[ui-image]', ...args);
         } else if (type === 1) {
             // Warning
-            console.warn('[@nativescript-community/ui-image]', ...args);
+            console.warn('[ui-image]', ...args);
         } else if (type === 2) {
-            console.error('[@nativescript-community/ui-image]', ...args);
+            console.error('[ui-image]', ...args);
         }
     }
 };
@@ -133,7 +133,7 @@ export class ImageBase extends View {
     public static lowerResSrcProperty = new Property<ImageBase, string>({ name: 'lowerResSrc' });
     public static placeholderImageUriProperty = new Property<ImageBase, string>({ name: 'placeholderImageUri' });
     public static failureImageUriProperty = new Property<ImageBase, string>({ name: 'failureImageUri' });
-    public static stretchProperty = new Property<ImageBase, string>({ name: 'stretch' });
+    public static stretchProperty = new Property<ImageBase, string>({ name: 'stretch', defaultValue:'aspectFit' });
     public static backgroundUriProperty = new Property<ImageBase, string>({ name: 'backgroundUri' });
     public static progressiveRenderingEnabledProperty = new Property<ImageBase, boolean>({ name: 'progressiveRenderingEnabled', valueConverter: booleanConverter });
     public static localThumbnailPreviewsEnabledProperty = new Property<ImageBase, boolean>({ name: 'localThumbnailPreviewsEnabled', valueConverter: booleanConverter });
@@ -154,12 +154,81 @@ export class ImageBase extends View {
     public static decodeHeightProperty = new Property<ImageBase, number>({ name: 'decodeHeight', valueConverter: (v) => parseFloat(v) });
     public static tintColorProperty = new Property<ImageBase, Color>({ name: 'tintColor' });
     public static alwaysFadeProperty = new Property<ImageBase, boolean>({ name: 'alwaysFade', valueConverter: booleanConverter, defaultValue: false });
-    // public static fadeProperty = new Property<ImageBase, boolean>({ name: 'fade', valueConverter: booleanConverter });
     public static fadeDurationProperty = new Property<ImageBase, number>({ name: 'fadeDuration', valueConverter: (v) => parseFloat(v) });
     public static noCacheProperty = new Property<ImageBase, boolean>({ name: 'noCache', defaultValue: false, valueConverter: booleanConverter });
 
     protected handleImageProgress(value: number, totalSize?: number) {
-        // console.log('handleImageProgress ', value, totalSize);
+    }
+    private static needsSizeAdjustment(scaleType: ScaleType) {
+        if (scaleType === undefined) {
+            return true;
+        }
+        switch (scaleType) {
+            case ScaleType.FocusCrop:
+            case ScaleType.Center:
+            case ScaleType.CenterCrop:
+            case ScaleType.CenterInside:
+            case ScaleType.FitCenter:
+            case ScaleType.AspectFit:
+            case ScaleType.FitXY:
+                return true;
+            default:
+                return false;
+        }
+    }
+    public computeScaleFactor(
+        measureWidth: number,
+        measureHeight: number,
+        widthIsFinite: boolean,
+        heightIsFinite: boolean,
+        nativeWidth: number,
+        nativeHeight: number,
+        aspectRatio: number
+    ): { width: number; height: number } {
+        let scaleW = 1;
+        let scaleH = 1;
+        if (ImageBase.needsSizeAdjustment(this.stretch) || widthIsFinite || heightIsFinite) {
+            const nativeScale = nativeWidth > 0 && nativeHeight > 0 ? nativeWidth / nativeHeight : 1;
+            const measureScale = measureWidth > 0 && measureHeight > 0 ? measureWidth / measureHeight : 1;
+            scaleW = nativeWidth > 0 ? measureWidth / nativeWidth : 1;
+            scaleH = nativeHeight > 0 ? measureHeight / nativeHeight : 1;
+
+            if (aspectRatio > 0) {
+                if (!widthIsFinite) {
+                    scaleH = 1;
+                    scaleW = aspectRatio;
+                } else if (!heightIsFinite) {
+                    scaleW = 1;
+                    scaleH = aspectRatio;
+                }
+            } else {
+                if (!widthIsFinite) {
+                    scaleH = 1;
+                    scaleW = nativeScale * scaleH;
+                } else if (!heightIsFinite) {
+                    scaleW = 1;
+                    scaleH = measureScale / nativeScale;
+                } else {
+                    // No infinite dimensions.
+                    switch (this.stretch) {
+                        case ScaleType.FitXY:
+                        case ScaleType.FocusCrop:
+                        case ScaleType.Fill:
+                            break;
+                        default:
+                            if (measureScale > nativeScale) {
+                                scaleH = 1;
+                                scaleW = nativeScale * scaleH;
+                            } else {
+                                scaleW = 1;
+                                scaleH = measureScale / nativeScale;
+                            }
+                    }
+                }
+            }
+        }
+
+        return { width: scaleW, height: scaleH };
     }
 }
 ImageBase.srcProperty.register(ImageBase);
