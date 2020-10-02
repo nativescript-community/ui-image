@@ -1,5 +1,5 @@
 <GridLayout rows="auto">
-    <img:Img xmlns:img="nativescript-image" 
+    <img:Img xmlns:img="@nativescript-community/ui-image" 
                         verticalAlignment="center"
                         backgroundColor="blue"
                         placeholderImageUri="res://ns_logo"
@@ -9,5 +9,5 @@
                         roundBottomLeft="true"
                         roundTopLeft="false"
                         roundTopRight="true"
-                        src="https://raw.githubusercontent.com/@nativescript-community/ui-image/master/examples-data/breakfast2.jpg"/>
+                        src="https://raw.githubusercontent.com/nativescript-community/ui-image/master/examples-data/breakfast2.jpg"/>
 </GridLayout>

@@ -1,8 +1,9 @@
 <GridLayout>
-    <img:Img xmlns:img="nativescript-image" 
+    <img:Img xmlns:img="@nativescript-community/ui-image" 
                         verticalAlignment="center"
                         placeholderImageUri="res://ns_logo"
                         width="100"
+                        backgroundColor="red"
                         autoPlayAnimations="true"
                         src="res://animation"/>
 </GridLayout>

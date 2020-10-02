@@ -2,6 +2,6 @@
     <Button text="set / unset" tap="onSetTap"/>
     <img:Img verticalAlignment="center" row="1"
                         id="imageView"
-                        xmlns:img="nativescript-image"
+                        xmlns:img="@nativescript-community/ui-image"
                         fadeDuration="3000"/>
 </StackLayout>

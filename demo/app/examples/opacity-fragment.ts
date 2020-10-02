@@ -1,7 +1,7 @@
 import { EventData } from '@nativescript/core/data/observable';
 import { Button } from '@nativescript/core/ui/button';
 import { GridLayout } from '@nativescript/core/ui/layouts/grid-layout';
-import { Img } from 'nativescript-image';
+import { Img } from '@nativescript-community/ui-image';
 
 export function onSeOpacityTo1(args: EventData) {
     const button = args.object as Button;

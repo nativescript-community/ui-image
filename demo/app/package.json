@@ -1,9 +1,0 @@
-{
-  "android": {
-    "v8Flags": "--expose_gc",
-    "markingMode": "none"
-  },
-  "main": "app.js",
-  "name": "com.nativescript.imagedemo",
-  "version": "4.0.0"
-}

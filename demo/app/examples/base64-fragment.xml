@@ -1,6 +1,6 @@
 <ScrollView>
     <GridLayout rows="*, auto">
-        <img:Img xmlns:img="nativescript-image"  
+        <img:Img xmlns:img="@nativescript-community/ui-image"  
                         height="200" width="400"
                         placeholderImageUri="{{placeholderUri}}"
                         backgroundColor="blue"

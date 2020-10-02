@@ -1,4 +1,4 @@
-import { FailureEventData, Img } from 'nativescript-image';
+import { FailureEventData, Img } from '@nativescript-community/ui-image';
 import { writeToOutputLabel } from './appLogger';
 
 export function onFailure(args: FailureEventData) {

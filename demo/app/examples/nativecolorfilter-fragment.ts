@@ -1,4 +1,4 @@
-import { Img } from 'nativescript-image';
+import { Img } from '@nativescript-community/ui-image';
 
 export function onLoaded(args) {
     const imageView = args.object as Img;

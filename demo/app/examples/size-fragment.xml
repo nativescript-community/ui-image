@@ -4,8 +4,8 @@
         <img:Img verticalAlignment="center"
                             row="1"
                             id="imageView"
-                            xmlns:img="nativescript-image"
-                            src="https://raw.githubusercontent.com/@nativescript-community/ui-image/master/examples-data/drink1.jpg"
+                            xmlns:img="@nativescript-community/ui-image"
+                            src="https://raw.githubusercontent.com/nativescript-community/ui-image/master/examples-data/drink1.jpg"
                             placeholderImageUri="res://ns_logo"/>
     </StackLayout>
 </ScrollView>

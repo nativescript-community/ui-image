@@ -1,6 +1,6 @@
 <ScrollView>
     <GridLayout rows="*, auto">
-        <img:Img xmlns:img="nativescript-image" 
+        <img:Img xmlns:img="@nativescript-community/ui-image" 
                             placeholderImageUri="res://ns_logo"
                             verticalAlignment="top"
                             width="75%"

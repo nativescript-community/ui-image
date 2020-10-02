@@ -1,7 +1,7 @@
 import './bundle-config';
 import * as app from '@nativescript/core/application';
 
-import * as imageModule from 'nativescript-image';
+import * as imageModule from '@nativescript-community/ui-image';
 
 imageModule.setDebug(true);
 

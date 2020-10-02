@@ -1,6 +1,6 @@
- <lv:CollectionView xmlns:lv="nativescript-collectionview" xmlns:img="nativescript-image" items="{{ dataItems }}" id="listView" width="100%" height="100%" >
+ <lv:CollectionView xmlns:lv="@nativescript-community/ui-collectionview" xmlns:img="@nativescript-community/ui-image" items="{{ dataItems }}" id="listView" width="100%" height="100%" >
     <lv:CollectionView.itemTemplate>
-        <StackLayout rows="*, 20" backgroundColor="blue">
+        <GridLayout rows="auto" backgroundColor="blue">
             <img:Img row="0" verticalAlignment="top"
                                 backgroundUri="res://ns_logo"
                                 backgroundColor="red"
@@ -8,7 +8,7 @@
                                 minHeight="200"
                                 finalImageSet="onFinalImageSet"
                                 />
-            <Label height="22" backgroundColor="yellow" text="{{ id }}" verticalAlignment="center" horizontalAlignment="center"/>
-        </StackLayout>
+            <Label height="22" text="{{ id }}" verticalAlignment="center" horizontalAlignment="center"/>
+        </GridLayout>
     </lv:CollectionView.itemTemplate>
 </lv:CollectionView>

@@ -1,4 +1,4 @@
-<ScrollView xmlns:img="nativescript-image">
+<ScrollView xmlns:img="@nativescript-community/ui-image">
     <StackLayout>
         <img:Img verticalAlignment="center"
                             placeholderImageUri="res://ns_logo"

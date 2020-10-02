@@ -1,8 +1,8 @@
 <GridLayout>
-    <img:Img xmlns:img="nativescript-image" 
+    <img:Img xmlns:img="@nativescript-community/ui-image" 
                         verticalAlignment="center"
                         placeholderImageUri="res://ns_logo"
                         decodeWidth="50"
                         decodeHeight="100"
-                        src="https://raw.githubusercontent.com/@nativescript-community/ui-image/master/examples-data/dessert1.jpg"/>
+                        src="https://raw.githubusercontent.com/nativescript-community/ui-image/master/examples-data/dessert1.jpg"/>
 </GridLayout>

@@ -1,4 +1,4 @@
-import { FailureEventData, FinalEventData, Img, IntermediateEventData } from 'nativescript-image';
+import { FailureEventData, FinalEventData, Img, IntermediateEventData } from '@nativescript-community/ui-image';
 import { EventData } from '@nativescript/core/data/observable';
 import { GridLayout } from '@nativescript/core/ui/layouts/grid-layout';
 import { Label } from '@nativescript/core/ui/label';

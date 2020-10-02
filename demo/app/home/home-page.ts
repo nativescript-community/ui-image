@@ -1,6 +1,6 @@
 import { ViewModel } from './home-view-model';
 import { EventData } from '@nativescript/core/data/observable';
-import * as imageModel from 'nativescript-image';
+import * as imageModel from '@nativescript-community/ui-image';
 
 export function pageLoaded(args) {
     this.page = args.object;

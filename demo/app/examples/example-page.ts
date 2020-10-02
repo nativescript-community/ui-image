@@ -1,8 +1,6 @@
-import { NavigationButton } from '@nativescript/core/ui/action-bar/action-bar';
-import { Frame } from '@nativescript/core/ui/frame/frame';
-import { ObservableArray } from '@nativescript/core/data/observable-array/observable-array';
-import { DataItem } from '~/home/dataItem';
+import { NavigationButton, ObservableArray } from '@nativescript/core';
 import { Builder } from '@nativescript/core/ui/builder';
+import { DataItem } from '~/home/dataItem';
 
 class PageModel {
     private _dataItems: ObservableArray<DataItem>;
@@ -20,9 +18,9 @@ class PageModel {
             this._dataItems = new ObservableArray<DataItem>();
 
             for (let i = 1; i <= 50; i++) {
-                let imageUrl = 'https://raw.githubusercontent.com/@nativescript-community/ui-image/master/examples-data/dessert1.jpg';
+                let imageUrl = 'https://raw.githubusercontent.com/nativescript-community/ui-image/master/examples-data/dessert1.jpg';
                 if (i % 2 === 0) {
-                    imageUrl = 'https://raw.githubusercontent.com/@nativescript-community/ui-image/master/examples-data/drink1.jpg';
+                    imageUrl = 'https://raw.githubusercontent.com/nativescript-community/ui-image/master/examples-data/drink1.jpg';
                 }
 
                 this._dataItems.push(new DataItem(i, imageUrl));

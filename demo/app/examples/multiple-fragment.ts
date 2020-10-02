@@ -1,4 +1,4 @@
-import { FinalEventData } from 'nativescript-image';
+import { FinalEventData } from '@nativescript-community/ui-image';
 
 export function onFinalImageSet(args: FinalEventData) {
     // const listView = (args.object as View).page.getViewById('listView') as CollectionView;

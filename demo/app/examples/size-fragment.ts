@@ -1,5 +1,5 @@
 import { EventData } from '@nativescript/core/data/observable';
-import { Img } from 'nativescript-image';
+import { Img } from '@nativescript-community/ui-image';
 import { View } from '@nativescript/core/ui/page';
 
 class ImageData {
@@ -12,9 +12,9 @@ class ImageData {
 }
 
 const images: ImageData[] = new Array(
-    new ImageData('https://raw.githubusercontent.com/@nativescript-community/ui-image/master/examples-data/drink1.jpg', 1.49),
-    new ImageData('https://raw.githubusercontent.com/@nativescript-community/ui-image/master/examples-data/dessert1.jpg', 0.66),
-    new ImageData('https://raw.githubusercontent.com/@nativescript-community/ui-image/master/examples-data/drink2.jpg', 1.49)
+    new ImageData('https://raw.githubusercontent.com/nativescript-community/ui-image/master/examples-data/drink1.jpg', 1.49),
+    new ImageData('https://raw.githubusercontent.com/nativescript-community/ui-image/master/examples-data/dessert1.jpg', 0.66),
+    new ImageData('https://raw.githubusercontent.com/nativescript-community/ui-image/master/examples-data/drink2.jpg', 1.49)
 );
 let currentIndex = 1;
 

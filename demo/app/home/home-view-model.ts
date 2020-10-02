@@ -1,4 +1,4 @@
-import { Frame } from '@nativescript/core/ui/frame/frame';
+import { Frame } from '@nativescript/core/ui/frame';
 import { ItemEventData } from '@nativescript/core/ui/list-view';
 
 const examples = [
@@ -26,11 +26,9 @@ const examples = [
 ];
 
 export class ViewModel {
-    public examples = examples.map(t => {
-        return {
-            title: t
-        };
-    });
+    public examples = examples.map(t => ({
+        title: t
+    }));
 
     constructor() {}
     public onTap(args: ItemEventData) {
