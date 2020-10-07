@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.10](https://github.com/nativescript-community/ui-image/compare/v4.0.9...v4.0.10) (2020-10-07)
+
+
+### Bug Fixes
+
+* android scale fix ... ([fa5d8fb](https://github.com/nativescript-community/ui-image/commit/fa5d8fb48910c54e69f92c50ab938efd126b2068))
+* simplify ratio computation ([8ac3003](https://github.com/nativescript-community/ui-image/commit/8ac3003908c3422a61287605ada0d78018a50a08))
+
+
+
+
+
 ## [4.0.9](https://github.com/nativescript-community/ui-image/compare/v4.0.8...v4.0.9) (2020-10-02)
 
 
