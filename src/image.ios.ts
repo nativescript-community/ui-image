@@ -298,21 +298,22 @@ export class Img extends ImageBase {
         const finiteWidth: boolean = widthMode === layout.EXACTLY;
         const finiteHeight: boolean = heightMode === layout.EXACTLY;
         this._imageSourceAffectsLayout = !finiteWidth || !finiteHeight;
-        const imgRatio = finiteHeight ? nativeWidth/nativeHeight : nativeHeight/nativeWidth;
+        const imgRatio = nativeWidth / nativeHeight;
         CLog(CLogTypes.info, 'onMeasure', this.src, widthMeasureSpec, heightMeasureSpec, width, height, this.aspectRatio, image && image.imageOrientation);
         if (image || this.aspectRatio > 0) {
-            const scale = this.computeScaleFactor(width, height, finiteWidth, finiteHeight, nativeWidth, nativeHeight, this.aspectRatio || imgRatio );
+            const ratio = this.aspectRatio || imgRatio;
+            // const scale = this.computeScaleFactor(width, height, finiteWidth, finiteHeight, nativeWidth, nativeHeight, this.aspectRatio || imgRatio );
 
             if (!finiteWidth) {
-                measureWidth = Math.round(height * scale.width);
+                measureWidth = Math.round(height * ratio);
             } else {
 
             }
             if (!finiteHeight) {
-                measureHeight = Math.round(width * scale.height);
+                measureHeight = Math.round(width / ratio);
             }
 
-            CLog(CLogTypes.info, 'onMeasure scale', this.src, this.aspectRatio, finiteWidth, finiteHeight, width, height, nativeWidth, nativeHeight, scale);
+            CLog(CLogTypes.info, 'onMeasure scale', this.src, this.aspectRatio, finiteWidth, finiteHeight, width, height, nativeWidth, nativeHeight);
         }
         const widthAndState = Img.resolveSizeAndState(measureWidth, width, widthMode, 0);
         const heightAndState = Img.resolveSizeAndState(measureHeight, height, heightMode, 0);

@@ -133,7 +133,7 @@ export class ImageBase extends View {
     public static lowerResSrcProperty = new Property<ImageBase, string>({ name: 'lowerResSrc' });
     public static placeholderImageUriProperty = new Property<ImageBase, string>({ name: 'placeholderImageUri' });
     public static failureImageUriProperty = new Property<ImageBase, string>({ name: 'failureImageUri' });
-    public static stretchProperty = new Property<ImageBase, string>({ name: 'stretch', defaultValue:'aspectFit' });
+    public static stretchProperty = new Property<ImageBase, string>({ name: 'stretch', defaultValue: 'aspectFit' });
     public static backgroundUriProperty = new Property<ImageBase, string>({ name: 'backgroundUri' });
     public static progressiveRenderingEnabledProperty = new Property<ImageBase, boolean>({ name: 'progressiveRenderingEnabled', valueConverter: booleanConverter });
     public static localThumbnailPreviewsEnabledProperty = new Property<ImageBase, boolean>({ name: 'localThumbnailPreviewsEnabled', valueConverter: booleanConverter });
@@ -157,8 +157,7 @@ export class ImageBase extends View {
     public static fadeDurationProperty = new Property<ImageBase, number>({ name: 'fadeDuration', valueConverter: (v) => parseFloat(v) });
     public static noCacheProperty = new Property<ImageBase, boolean>({ name: 'noCache', defaultValue: false, valueConverter: booleanConverter });
 
-    protected handleImageProgress(value: number, totalSize?: number) {
-    }
+    protected handleImageProgress(value: number, totalSize?: number) {}
     private static needsSizeAdjustment(scaleType: ScaleType) {
         if (scaleType === undefined) {
             return true;
@@ -193,13 +192,14 @@ export class ImageBase extends View {
             scaleW = nativeWidth > 0 ? measureWidth / nativeWidth : 1;
             scaleH = nativeHeight > 0 ? measureHeight / nativeHeight : 1;
 
+            CLog(CLogTypes.info, 'computeScaleFactor', measureWidth, measureHeight, nativeWidth, nativeHeight, widthIsFinite, heightIsFinite, aspectRatio, nativeScale, measureScale);
             if (aspectRatio > 0) {
                 if (!widthIsFinite) {
                     scaleH = 1;
                     scaleW = aspectRatio;
                 } else if (!heightIsFinite) {
                     scaleW = 1;
-                    scaleH = aspectRatio;
+                    scaleH = 1 / aspectRatio;
                 }
             } else {
                 if (!widthIsFinite) {

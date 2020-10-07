@@ -355,18 +355,17 @@ function initializeDraweeView() {
             if (aspectRatio > 0) {
                 const finiteWidth: boolean = widthMode === Utils.layout.EXACTLY;
                 const finiteHeight: boolean = heightMode === Utils.layout.EXACTLY;
-                let scale: { width; height };
+                // let scale: { width; height };
                 if ((this as any).imageWidth && (this as any).imageHeight) {
-                    scale = this.owner.computeScaleFactor(width, height, finiteWidth, finiteHeight, (this as any).imageWidth, (this as any).imageHeight, aspectRatio);
+                    // scale = this.owner.computeScaleFactor(width, height, finiteWidth, finiteHeight, (this as any).imageWidth, (this as any).imageHeight, aspectRatio);
                     if (!finiteWidth) {
-                        widthMeasureSpec = Utils.layout.makeMeasureSpec(height / scale.width, Utils.layout.EXACTLY);
+                        widthMeasureSpec = Utils.layout.makeMeasureSpec(height * aspectRatio, Utils.layout.EXACTLY);
                     }
                     if (!finiteHeight) {
-                        heightMeasureSpec = Utils.layout.makeMeasureSpec(width * scale.height, Utils.layout.EXACTLY);
+                        heightMeasureSpec = Utils.layout.makeMeasureSpec(width / aspectRatio, Utils.layout.EXACTLY);
                     }
-                } else {
                 }
-                CLog(CLogTypes.info, 'onMeasure scale', this.owner.src, aspectRatio, finiteWidth, finiteHeight, width, height, (this as any).imageWidth, (this as any).imageHeight, scale);
+                CLog(CLogTypes.info, 'onMeasure scale', this.owner.src, aspectRatio, finiteWidth, finiteHeight, width, height, (this as any).imageWidth, (this as any).imageHeight);
             }
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         }
