@@ -416,9 +416,9 @@ export class Img extends ImageBase {
         if (!this.aspectRatio && imageInfo != null) {
             const ratio = imageInfo.getWidth() / imageInfo.getHeight();
 
-            draweeView.setAspectRatio(1/ratio);
+            draweeView.setAspectRatio(ratio);
         } else if (this.aspectRatio) {
-            draweeView.setAspectRatio(1/this.aspectRatio);
+            draweeView.setAspectRatio(this.aspectRatio);
         } else {
             draweeView.setAspectRatio(0);
         }
