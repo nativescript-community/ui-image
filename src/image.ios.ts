@@ -288,37 +288,35 @@ export class Img extends ImageBase {
 
         const image = this.nativeViewProtected.image;
 
-
-        const nativeWidth = image ? layout.toDevicePixels(image.size.width) : 0;
-        const nativeHeight = image ? layout.toDevicePixels(image.size.height) : 0;
-
-        let measureWidth = Math.max(nativeWidth, this.effectiveMinWidth);
-        let measureHeight = Math.max(nativeHeight, this.effectiveMinHeight);
+        // const measureWidth = Math.max(nativeWidth, this.effectiveMinWidth);
+        // const measureHeight = Math.max(nativeHeight, this.effectiveMinHeight);
 
         const finiteWidth: boolean = widthMode === layout.EXACTLY;
         const finiteHeight: boolean = heightMode === layout.EXACTLY;
         this._imageSourceAffectsLayout = !finiteWidth || !finiteHeight;
-        const imgRatio = nativeWidth / nativeHeight;
         CLog(CLogTypes.info, 'onMeasure', this.src, widthMeasureSpec, heightMeasureSpec, width, height, this.aspectRatio, image && image.imageOrientation);
         if (image || this.aspectRatio > 0) {
+            const nativeWidth = image ? layout.toDevicePixels(image.size.width) : 0;
+            const nativeHeight = image ? layout.toDevicePixels(image.size.height) : 0;
+            const imgRatio = nativeWidth / nativeHeight;
             const ratio = this.aspectRatio || imgRatio;
             // const scale = this.computeScaleFactor(width, height, finiteWidth, finiteHeight, nativeWidth, nativeHeight, this.aspectRatio || imgRatio );
 
             if (!finiteWidth) {
-                measureWidth = Math.round(height * ratio);
-            } else {
-
+                widthMeasureSpec = layout.makeMeasureSpec(height * ratio, layout.EXACTLY);
             }
             if (!finiteHeight) {
-                measureHeight = Math.round(width / ratio);
+                heightMeasureSpec = layout.makeMeasureSpec(width / ratio, layout.EXACTLY);
             }
 
-            CLog(CLogTypes.info, 'onMeasure scale', this.src, this.aspectRatio, finiteWidth, finiteHeight, width, height, nativeWidth, nativeHeight);
+            CLog(CLogTypes.info, 'onMeasure scale', this.src, this.aspectRatio, finiteWidth, finiteHeight, width, height, nativeWidth, nativeHeight, widthMeasureSpec, heightMeasureSpec);
         }
-        const widthAndState = Img.resolveSizeAndState(measureWidth, width, widthMode, 0);
-        const heightAndState = Img.resolveSizeAndState(measureHeight, height, heightMode, 0);
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-        this.setMeasuredDimension(widthAndState, heightAndState);
+        // const widthAndState = Img.resolveSizeAndState(measureWidth, width, widthMode, 0);
+        // const heightAndState = Img.resolveSizeAndState(measureHeight, height, heightMode, 0);
+
+        // this.setMeasuredDimension(widthAndState, heightAndState);
     }
 
     // public disposeNativeView() {
@@ -349,7 +347,6 @@ export class Img extends ImageBase {
     }
 
     private handleImageLoaded = (image: UIImage, error: NSError, cacheType: number) => {
-
         // if (this.tintColor) {
         //   image = image.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
         // }
