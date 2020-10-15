@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.11](https://github.com/nativescript-community/ui-image/compare/v4.0.10...v4.0.11) (2020-10-15)
+
+
+### Bug Fixes
+
+* ios cleanup size measuring ([d2e3cc6](https://github.com/nativescript-community/ui-image/commit/d2e3cc690fbb3570fe60f32c5d6f4459468749e0))
+
+
+
+
+
 ## [4.0.10](https://github.com/nativescript-community/ui-image/compare/v4.0.9...v4.0.10) (2020-10-07)
 
 
