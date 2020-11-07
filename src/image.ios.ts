@@ -1,5 +1,5 @@
 export * from './image-common';
-import { ImageAsset, ImageSource, Screen, knownFolders, path } from '@nativescript/core';
+import { ImageAsset, ImageSource, Screen, Trace, knownFolders, path } from '@nativescript/core';
 import { isString } from '@nativescript/core/utils/types';
 import { RESOURCE_PREFIX, isFileOrResourcePath, isFontIconURI, layout } from '@nativescript/core/utils/utils';
 import { CLog, CLogTypes, EventData, ImageBase, ImageInfo as ImageInfoBase, ImagePipelineConfigSetting, ScaleType, Stretch } from './image-common';
@@ -294,7 +294,9 @@ export class Img extends ImageBase {
         const finiteWidth: boolean = widthMode === layout.EXACTLY;
         const finiteHeight: boolean = heightMode === layout.EXACTLY;
         this._imageSourceAffectsLayout = !finiteWidth || !finiteHeight;
-        CLog(CLogTypes.info, 'onMeasure', this.src, widthMeasureSpec, heightMeasureSpec, width, height, this.aspectRatio, image && image.imageOrientation);
+        if (Trace.isEnabled()) {
+            CLog(CLogTypes.info, 'onMeasure', this.src, widthMeasureSpec, heightMeasureSpec, width, height, this.aspectRatio, image && image.imageOrientation);
+        }
         if (image || this.aspectRatio > 0) {
             const nativeWidth = image ? layout.toDevicePixels(image.size.width) : 0;
             const nativeHeight = image ? layout.toDevicePixels(image.size.height) : 0;
@@ -309,7 +311,9 @@ export class Img extends ImageBase {
                 heightMeasureSpec = layout.makeMeasureSpec(width / ratio, layout.EXACTLY);
             }
 
-            CLog(CLogTypes.info, 'onMeasure scale', this.src, this.aspectRatio, finiteWidth, finiteHeight, width, height, nativeWidth, nativeHeight, widthMeasureSpec, heightMeasureSpec);
+            if (Trace.isEnabled()) {
+                CLog(CLogTypes.info, 'onMeasure scale', this.src, this.aspectRatio, finiteWidth, finiteHeight, width, height, nativeWidth, nativeHeight, widthMeasureSpec, heightMeasureSpec);
+            }
         }
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
@@ -543,6 +547,20 @@ export class Img extends ImageBase {
         }
         this.nativeViewProtected.contentMode = getUIImageScaleType(value);
     }
+    // [ImageBase.blendingModeProperty.setNative](value: string) {
+    //     console.log('blendingModeProperty', value);
+    //     switch (value) {
+    //         case 'multiply':
+    //             this.nativeViewProtected.layer.compositingFilter = 'multiply';
+    //             break;
+    //         case 'lighten':
+    //             this.nativeViewProtected.layer.compositingFilter = 'lighten';
+    //             break;
+    //         case 'screen':
+    //             this.nativeViewProtected.layer.compositingFilter = 'screen';
+    //             break;
+    //     }
+    // }
 
     startAnimating() {
         this.nativeViewProtected.startAnimating();

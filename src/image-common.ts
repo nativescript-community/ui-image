@@ -1,33 +1,30 @@
-import { Color, Property, View, booleanConverter } from '@nativescript/core';
+import { Color, Property, Trace, View, booleanConverter } from '@nativescript/core';
 import { EventData as IEventData } from '@nativescript/core/data/observable';
 import { ImageAsset } from '@nativescript/core/image-asset';
 import { ImageSource } from '@nativescript/core/image-source';
 import { isAndroid } from '@nativescript/core/platform';
 
 export enum CLogTypes {
-    info,
-    warning,
-    error,
+    log = Trace.messageType.log,
+    info = Trace.messageType.info,
+    warning = Trace.messageType.warn,
+    error = Trace.messageType.error,
 }
 
-export let debug = false;
-export function setDebug(value: boolean) {
-    debug = value;
-}
-
-export const CLog = (type: CLogTypes = 0, ...args) => {
-    if (debug) {
-        if (type === 0) {
-            // Info
-            console.log('[ui-image]', ...args);
-        } else if (type === 1) {
-            // Warning
-            console.warn('[ui-image]', ...args);
-        } else if (type === 2) {
-            console.error('[ui-image]', ...args);
-        }
-    }
+export const ImageViewTraceCategory = 'NativescriptImage';
+export const CLog = (type: CLogTypes, ...args) => {
+    Trace.write(args.join(' '), ImageViewTraceCategory, type);
 };
+
+/**
+ * setDebug method
+ * @deprecated
+ *
+ * @param value: boolean
+ */
+export function setDebug(value: boolean) {
+}
+
 
 export type Transition = 'fade' | 'curlUp';
 
@@ -156,6 +153,7 @@ export class ImageBase extends View {
     public static alwaysFadeProperty = new Property<ImageBase, boolean>({ name: 'alwaysFade', valueConverter: booleanConverter, defaultValue: false });
     public static fadeDurationProperty = new Property<ImageBase, number>({ name: 'fadeDuration', valueConverter: (v) => parseFloat(v) });
     public static noCacheProperty = new Property<ImageBase, boolean>({ name: 'noCache', defaultValue: false, valueConverter: booleanConverter });
+    // public static blendingModeProperty = new Property<ImageBase, string>({ name: 'blendingMode' });
 
     protected handleImageProgress(value: number, totalSize?: number) {}
     private static needsSizeAdjustment(scaleType: ScaleType) {
@@ -257,3 +255,4 @@ ImageBase.decodeWidthProperty.register(ImageBase);
 ImageBase.decodeHeightProperty.register(ImageBase);
 ImageBase.alwaysFadeProperty.register(ImageBase);
 ImageBase.noCacheProperty.register(ImageBase);
+// ImageBase.blendingModeProperty.register(ImageBase);

@@ -1,9 +1,9 @@
 export * from './image-common';
-import { Color, Image, ImageAsset, ImageSource, Utils, knownFolders, path } from '@nativescript/core';
+import { Color, Image, ImageAsset, ImageSource, Trace, Utils, knownFolders, path } from '@nativescript/core';
 import { android as androidApp } from '@nativescript/core/application';
 import { isString } from '@nativescript/core/utils/types';
 import { RESOURCE_PREFIX, ad, isFileOrResourcePath, isFontIconURI } from '@nativescript/core/utils/utils';
-import { AnimatedImage, CLog, CLogTypes, EventData, ImageBase, ImageError as ImageErrorBase, ImageInfo as ImageInfoBase, ImagePipelineConfigSetting, ScaleType, debug } from './image-common';
+import { AnimatedImage, CLog, CLogTypes, EventData, ImageBase, ImageError as ImageErrorBase, ImageInfo as ImageInfoBase, ImagePipelineConfigSetting, ScaleType } from './image-common';
 
 let initialized = false;
 let initializeConfig: ImagePipelineConfigSetting;
@@ -540,6 +540,18 @@ export class Img extends ImageBase {
         this.initImage();
     }
 
+    // [ImageBase.blendingModeProperty.setNative](value: string) {
+    //     console.log('blendingModeProperty', value);
+    //     switch (value) {
+    //         case 'multiply':
+    //             (this.nativeViewProtected as any).setXfermode(android.graphics.PorterDuff.Mode.MULTIPLY);
+    //             break;
+    //         case 'lighten':
+    //             (this.nativeViewProtected as any).setXfermode(android.graphics.PorterDuff.Mode.LIGHTEN);
+    //             break;
+    //     }
+    // }
+
     // private initDrawee() {
     //     this.initImage();
     // }
@@ -602,7 +614,9 @@ export class Img extends ImageBase {
                 const that: WeakRef<Img> = new WeakRef(this);
                 const listener = new com.facebook.drawee.controller.ControllerListener<com.facebook.imagepipeline.image.ImageInfo>({
                     onFinalImageSet(id, imageInfo, animatable) {
-                        CLog(CLogTypes.info, 'onFinalImageSet', id, imageInfo, animatable);
+                        if (Trace.isEnabled()) {
+                            CLog(CLogTypes.info, 'onFinalImageSet', id, imageInfo, animatable);
+                        }
                         const nativeView = that && that.get();
                         if (nativeView) {
                             nativeView.updateViewSize(imageInfo);
@@ -622,7 +636,9 @@ export class Img extends ImageBase {
                         }
                     },
                     onFailure(id, throwable) {
-                        CLog(CLogTypes.info, 'onFailure', id, throwable);
+                        if (Trace.isEnabled()) {
+                            CLog(CLogTypes.info, 'onFailure', id, throwable);
+                        }
                         const nativeView = that && that.get();
                         if (nativeView) {
                             // const nView = nativeView.nativeViewProtected;
@@ -640,7 +656,9 @@ export class Img extends ImageBase {
                         }
                     },
                     onIntermediateImageFailed(id, throwable) {
-                        CLog(CLogTypes.info, 'onIntermediateImageFailed', id, throwable);
+                        if (Trace.isEnabled()) {
+                            CLog(CLogTypes.info, 'onIntermediateImageFailed', id, throwable);
+                        }
                         const nativeView = that && that.get();
                         if (nativeView) {
                             const imageError = new ImageError(throwable);
@@ -656,7 +674,9 @@ export class Img extends ImageBase {
                         }
                     },
                     onIntermediateImageSet(id, imageInfo) {
-                        CLog(CLogTypes.info, 'onIntermediateImageSet', id, imageInfo);
+                        if (Trace.isEnabled()) {
+                            CLog(CLogTypes.info, 'onIntermediateImageSet', id, imageInfo);
+                        }
                         const nativeView = that && that.get();
                         if (nativeView) {
                             nativeView.updateViewSize(imageInfo);
@@ -673,7 +693,9 @@ export class Img extends ImageBase {
                         }
                     },
                     onRelease(id) {
-                        CLog(CLogTypes.info, 'onRelease', id);
+                        if (Trace.isEnabled()) {
+                            CLog(CLogTypes.info, 'onRelease', id);
+                        }
                         const nativeView = that && that.get();
                         if (nativeView) {
                             const args: EventData = {
@@ -687,7 +709,9 @@ export class Img extends ImageBase {
                         }
                     },
                     onSubmit(id, callerContext) {
-                        CLog(CLogTypes.info, 'onSubmit', id, callerContext);
+                        if (Trace.isEnabled()) {
+                            CLog(CLogTypes.info, 'onSubmit', id, callerContext);
+                        }
                         const nativeView = that && that.get();
                         if (nativeView) {
                             const args: EventData = {
@@ -705,7 +729,7 @@ export class Img extends ImageBase {
                 builder.setImageRequest(request);
                 builder.setControllerListener(listener);
                 builder.setOldController(this.nativeViewProtected.getController());
-                if (debug) {
+                if (Trace.isEnabled()) {
                     builder.setPerfDataListener(
                         new com.facebook.drawee.backends.pipeline.info.ImagePerfDataListener({
                             onImageLoadStatusUpdated(param0: com.facebook.drawee.backends.pipeline.info.ImagePerfData, param1: number) {
