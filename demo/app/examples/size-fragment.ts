@@ -1,6 +1,6 @@
 import { EventData } from '@nativescript/core/data/observable';
 import { Img } from '@nativescript-community/ui-image';
-import { View } from '@nativescript/core/ui/page';
+import { View } from '@nativescript/core';
 
 class ImageData {
     public uri: string;
