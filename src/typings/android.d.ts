@@ -4,6 +4,10 @@
 declare namespace com {
     export namespace nativescript {
         export namespace image {
+            class DraweeView extends facebook.drawee.view.SimpleDraweeView {
+                imageWidth: number;
+                imageHeight: number;
+            }
             class ScalingBlurPostprocessor extends facebook.imagepipeline.request.BasePostprocessor {
                 public constructor(iterations: number, blurRadius: number, scaleRatio: number);
             }
