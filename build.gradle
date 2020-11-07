@@ -6,8 +6,9 @@ repositories {
     google()
 }
 dependencies {
-	implementation 'com.facebook.fresco:fresco:2.1.0'
-	implementation 'com.facebook.fresco:animated-gif:2.1.0'
+    implementation files('/Volumes/dev/androidSDK/platforms/android-28/android.jar')
+	implementation 'com.facebook.fresco:fresco:2.3.0'
+	implementation 'com.facebook.fresco:animated-gif:2.3.0'
 }
 sourceSets {
     main {
