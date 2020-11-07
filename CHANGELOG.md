@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.12](https://github.com/nativescript-community/ui-image/compare/v4.0.11...v4.0.12) (2020-11-07)
+
+
+### Bug Fixes
+
+* native android view class to get faster! ([6a46cb0](https://github.com/nativescript-community/ui-image/commit/6a46cb01b9171094e5a6b8368e31e2b85182ba83))
+
+
+
+
+
 ## [4.0.11](https://github.com/nativescript-community/ui-image/compare/v4.0.10...v4.0.11) (2020-10-15)
 
 
