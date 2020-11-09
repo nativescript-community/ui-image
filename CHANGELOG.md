@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.13](https://github.com/nativescript-community/ui-image/compare/v4.0.12...v4.0.13) (2020-11-09)
+
+
+### Bug Fixes
+
+* android instantiation error ([5d41e0c](https://github.com/nativescript-community/ui-image/commit/5d41e0c2a1dc756a35c56db6263526dfa1c9d7ad))
+
+
+
+
+
 ## [4.0.12](https://github.com/nativescript-community/ui-image/compare/v4.0.11...v4.0.12) (2020-11-07)
 
 
