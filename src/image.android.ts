@@ -397,13 +397,10 @@ export class Img extends ImageBase {
             this.initImage();
         }
     }
-    // stretch = ScaleType.FitCenter;
-
     public createNativeView() {
         if (!initialized) {
             initialize(initializeConfig);
         }
-        // initializeDraweeView();
         return new com.nativescript.image.DraweeView(this._context);
     }
     updateViewSize(imageInfo) {

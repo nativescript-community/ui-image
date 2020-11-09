@@ -9,7 +9,7 @@ public class DraweeView extends SimpleDraweeView {
     public int imageWidth = 0;
     public int imageHeight = 0;
 
-    DraweeView(Context context) {
+    public DraweeView(Context context) {
         super(context);
     }
     @Override
