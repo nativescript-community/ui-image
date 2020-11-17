@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.14](https://github.com/nativescript-community/ui-image/compare/v4.0.13...v4.0.14) (2020-11-17)
+
+
+### Bug Fixes
+
+* ios tried to fix v8 crash + ImageAsset full support ([20a27b0](https://github.com/nativescript-community/ui-image/commit/20a27b080f0bb5296dfd94602075750e1449eb1c))
+
+
+
+
+
 ## [4.0.13](https://github.com/nativescript-community/ui-image/compare/v4.0.12...v4.0.13) (2020-11-09)
 
 
