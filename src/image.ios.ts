@@ -156,7 +156,10 @@ function getUIImageScaleType(scaleType: string) {
     return null;
 }
 
-export function initialize(config?: ImagePipelineConfigSetting): void {}
+export function initialize(config?: ImagePipelineConfigSetting): void {
+    SDImageLoadersManager.sharedManager.loaders = NSArray.arrayWithArray([SDWebImageDownloader.sharedDownloader, SDImagePhotosLoader.sharedLoader]);
+
+}
 export function shutDown(): void {}
 
 export class ImagePipeline {
@@ -166,23 +169,23 @@ export class ImagePipeline {
     }
 
     isInDiskCache(uri: string): boolean {
-        return this._ios.diskImageDataExistsWithKey(uri);
+        return this._ios.diskImageDataExistsWithKey(getUri(uri).absoluteString);
     }
 
     isInBitmapMemoryCache(uri: string): boolean {
-        return this._ios.imageFromMemoryCacheForKey(uri) !== null;
+        return this._ios.imageFromMemoryCacheForKey(getUri(uri).absoluteString) !== null;
     }
 
     evictFromMemoryCache(uri: string): void {
-        this._ios.removeImageFromMemoryForKey(uri);
+        this._ios.removeImageFromMemoryForKey(getUri(uri).absoluteString);
     }
 
     evictFromDiskCache(uri: string): void {
-        this._ios.removeImageFromDiskForKey(uri);
+        this._ios.removeImageFromDiskForKey(getUri(uri).absoluteString);
     }
 
     evictFromCache(uri: string): void {
-        this._ios.removeImageForKeyWithCompletion(uri, null);
+        this._ios.removeImageForKeyWithCompletion(getUri(uri).absoluteString, null);
     }
 
     clearCaches() {
@@ -232,9 +235,10 @@ export function getImagePipeline(): ImagePipeline {
 }
 
 function getUri(src: string | ImageAsset) {
+    console.log('getUri', src);
     let uri: any = src;
     if (src instanceof ImageAsset) {
-        uri = src.ios;
+        uri = NSURL.sd_URLWithAsset(src.ios);
     }
     if (uri.indexOf(RESOURCE_PREFIX) === 0) {
         const resName = uri.substr(RESOURCE_PREFIX.length);
@@ -251,9 +255,9 @@ function getUri(src: string | ImageAsset) {
             return false;
         });
     } else if (uri.indexOf('~/') === 0) {
-        uri = NSURL.alloc().initFileURLWithPath(`${path.join(knownFolders.currentApp().path, uri.replace('~/', ''))}`);
+        return NSURL.alloc().initFileURLWithPath(`${path.join(knownFolders.currentApp().path, uri.replace('~/', ''))}`);
     }
-    return uri;
+    return NSURL.URLWithString(uri);
 }
 
 export class Img extends ImageBase {
@@ -332,7 +336,7 @@ export class Img extends ImageBase {
         const imagePipeLine = getImagePipeline();
         const src = this.src;
         if (!(src instanceof ImageSource)) {
-            const uri = getUri(src);
+            const uri = getUri(src).absoluteString;
             const isInCache = imagePipeLine.isInBitmapMemoryCache(uri);
             if (isInCache) {
                 imagePipeLine.evictFromCache(uri);
@@ -464,12 +468,13 @@ export class Img extends ImageBase {
                     return;
                 }
 
+                const uri = getUri(src);
                 if (this.noCache) {
-                    const uri = getUri(src);
+                    const key = uri.absoluteString;
                     const imagePipeLine = getImagePipeline();
-                    const isInCache = imagePipeLine.isInBitmapMemoryCache(uri);
+                    const isInCache = imagePipeLine.isInBitmapMemoryCache(key);
                     if (isInCache) {
-                        imagePipeLine.evictFromCache(uri);
+                        imagePipeLine.evictFromCache(key);
                     }
                 }
                 this.isLoading = true;
@@ -519,7 +524,7 @@ export class Img extends ImageBase {
                 // console.log('about to load', this.src, options);
                 this.nativeViewProtected.sd_setImageWithURLPlaceholderImageOptionsContextProgressCompleted(
                     getUri(src),
-                    this.getUIImage(this.placeholderImageUri),
+                    this.placeholderImage,
                     options,
                     context,
                     this.onLoadProgress,
@@ -533,7 +538,9 @@ export class Img extends ImageBase {
     [ImageBase.srcProperty.setNative](value) {
         this.initImage();
     }
+    placeholderImage: UIImage;
     [ImageBase.placeholderImageUriProperty.setNative]() {
+        this.placeholderImage = this.getUIImage(this.placeholderImageUri);
         this.initImage();
     }
 
