@@ -2,7 +2,7 @@ import { EventData } from '@nativescript/core/data/observable';
 import { Button } from '@nativescript/core/ui/button';
 import { GridLayout } from '@nativescript/core/ui/layouts/grid-layout';
 import { Label } from '@nativescript/core/ui/label';
-import * as imageModel from '@nativescript-community/ui-image';
+import { Img, getImagePipeline  } from '@nativescript-community/ui-image';
 import { writeToOutputLabel } from './appLogger';
 
 const src = 'https://raw.githubusercontent.com/nativescript-community/ui-image/master/examples-data/breakfast1.jpg';
@@ -10,8 +10,8 @@ const src = 'https://raw.githubusercontent.com/nativescript-community/ui-image/m
 export function onCheckCache(args: EventData) {
     const button = args.object as Button;
     const gridLayout = button.parent as GridLayout;
-    const imageView = gridLayout.getViewById('imageView');
-    const imagePipeLine = imageModel.getImagePipeline();
+    const imageView = gridLayout.getViewById('imageView') as Img;
+    const imagePipeLine = getImagePipeline();
     const isInCache = imagePipeLine.isInBitmapMemoryCache(src);
     writeToOutputLabel(imageView, '>>>>> Image is in the Bitmap memory cache - ' + isInCache);
 
@@ -25,8 +25,8 @@ export function onCheckCache(args: EventData) {
 export function onClearCache(args: EventData) {
     const button = args.object as Button;
     const gridLayout = button.parent as GridLayout;
-    const imageView = gridLayout.getViewById('imageView');
-    const imagePipeLine = imageModel.getImagePipeline();
+    const imageView = gridLayout.getViewById('imageView') as Img;
+    const imagePipeLine = getImagePipeline();
     writeToOutputLabel(imageView, '>>>>> Clearning cache');
 
     imagePipeLine.clearCaches();
@@ -35,7 +35,7 @@ export function onClearCache(args: EventData) {
 export function onSetImage(args: EventData) {
     const button = args.object as Button;
     const gridLayout = button.parent as GridLayout;
-    const imageView = gridLayout.getViewById('imageView');
+    const imageView = gridLayout.getViewById('imageView') as Img;
     imageView.src = null;
     imageView.src = src;
 }
@@ -43,7 +43,7 @@ export function onSetImage(args: EventData) {
 export function onResetImage(args: EventData) {
     const button = args.object as Button;
     const gridLayout = button.parent as GridLayout;
-    const imageView = gridLayout.getViewById('imageView');
+    const imageView = gridLayout.getViewById('imageView') as Img;
     writeToOutputLabel(imageView, ">>>>> Refreshing cache and 'src'");
 
     imageView.updateImageUri();

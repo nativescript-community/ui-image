@@ -1,4 +1,4 @@
-import { EventData } from '@nativescript/core/ui/page';
+import { EventData } from '@nativescript/core';
 
 export function onImageTap(args: EventData) {
     console.log('onImageTap', args);
