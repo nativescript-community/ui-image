@@ -235,7 +235,6 @@ export function getImagePipeline(): ImagePipeline {
 }
 
 function getUri(src: string | ImageAsset) {
-    console.log('getUri', src);
     let uri: any = src;
     if (src instanceof ImageAsset) {
         uri = NSURL.sd_URLWithAsset(src.ios);
