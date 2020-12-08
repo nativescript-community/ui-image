@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.18](https://github.com/nativescript-community/ui-image/compare/v4.0.17...v4.0.18) (2020-12-08)
+
+**Note:** Version bump only for package @nativescript-community/ui-image
+
+
+
+
+
 ## [4.0.17](https://github.com/nativescript-community/ui-image/compare/v4.0.16...v4.0.17) (2020-11-25)
 
 **Note:** Version bump only for package @nativescript-community/ui-image

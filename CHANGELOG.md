@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.18](https://github.com/nativescript-community/ui-image/compare/v4.0.17...v4.0.18) (2020-12-08)
+
+
+### Bug Fixes
+
+* ios support ~/ in placeholder ([3e0d75f](https://github.com/nativescript-community/ui-image/commit/3e0d75f06e5a96327449bf2e9f65c3d35515a0be))
+
+
+
+
+
 ## [4.0.17](https://github.com/nativescript-community/ui-image/compare/v4.0.16...v4.0.17) (2020-11-25)
 
 
