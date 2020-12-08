@@ -5,11 +5,13 @@
         </ActionBar>
 
         <GridLayout rows="*, auto, auto, auto, auto, auto">
-            <NSImg ref="opacityImg"
+            <NSImg
+                ref="opacityImg"
                 verticalAlignment="center"
-                    blurRadius="25"
+                borderRadius="100"
                 placeholderImageUri="res://ns_logo"
-                src="https://raw.githubusercontent.com/nativescript-community/ui-image/master/examples-data/breakfast1.jpg">
+                src="https://raw.githubusercontent.com/nativescript-community/ui-image/master/examples-data/breakfast1.jpg"
+            >
             </NSImg>
             <Button text="Set 1" row="1" @tap="onSeOpacityTo1"></Button>
             <Button text="Set 0.5" row="2" @tap="onSeOpacityTo05"></Button>
@@ -21,44 +23,44 @@
 </template>
 
 <script>
-    export default {
-        methods: {
-            onSeOpacityTo1(args) {
-                this.$refs.opacityImg.nativeView.opacity = 1;
-            },
-            onSeOpacityTo01(args) {
-                this.$refs.opacityImg.nativeView.opacity = 0.1;
-            },
-            onSeOpacityTo05(args) {
-               this.$refs.opacityImg.nativeView.opacity = 0.5;
-            },
-            onAnimateTo01(args) {
-               this.$refs.opacityImg.nativeView.animate({
-                    opacity: 0.1,
-                    duration: 500
-                });
-            },
-            onAnimateTo1(args) {
-                this.$refs.opacityImg.nativeView.animate({
-                    opacity: 1,
-                    duration: 500
-                });
-            }
+export default {
+    methods: {
+        onSeOpacityTo1(args) {
+            this.$refs.opacityImg.nativeView.opacity = 1;
+        },
+        onSeOpacityTo01(args) {
+            this.$refs.opacityImg.nativeView.opacity = 0.1;
+        },
+        onSeOpacityTo05(args) {
+            this.$refs.opacityImg.nativeView.opacity = 0.5;
+        },
+        onAnimateTo01(args) {
+            this.$refs.opacityImg.nativeView.animate({
+                opacity: 0.1,
+                duration: 500
+            });
+        },
+        onAnimateTo1(args) {
+            this.$refs.opacityImg.nativeView.animate({
+                opacity: 1,
+                duration: 500
+            });
         }
-    };
+    }
+};
 </script>
 
 <style scoped lang="scss">
-    // Start custom common variables
-    @import '../app-variables';
-    // End custom common variables
+// Start custom common variables
+@import '../app-variables';
+// End custom common variables
 
-    // Custom styles
-    .fa {
-        color: $accent-dark;
-    }
+// Custom styles
+.fa {
+    color: $accent-dark;
+}
 
-    .info {
-        font-size: 20;
-    }
+.info {
+    font-size: 20;
+}
 </style>

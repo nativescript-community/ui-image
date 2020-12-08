@@ -3,8 +3,6 @@ import * as app from '@nativescript/core/application';
 
 import * as imageModule from '@nativescript-community/ui-image';
 
-imageModule.setDebug(true);
-
 if (app.android) {
     app.on(app.launchEvent, () => {
         imageModule.initialize({ isDownsampleEnabled: true });
