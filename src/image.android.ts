@@ -143,9 +143,9 @@ export class ImagePipeline {
                 const request = com.facebook.imagepipeline.request.ImageRequestBuilder.newBuilderWithSource(nativeUri).build();
                 let datasource: com.facebook.datasource.DataSource<java.lang.Void>;
                 if (toDiskCache) {
-                    datasource = this._android.prefetchToDiskCache(request, null);
+                    datasource = this._android.prefetchToDiskCache(request, uri);
                 } else {
-                    datasource = this._android.prefetchToBitmapCache(request, null);
+                    datasource = this._android.prefetchToBitmapCache(request, uri);
                 }
                 // initializeBaseDataSubscriber();
                 datasource.subscribe(
@@ -332,46 +332,6 @@ export const needRequestImage = function (target: any, propertyKey: string | Sym
     };
 };
 
-// type DraweeView = new (owner: Img, context) => com.facebook.drawee.view.SimpleDraweeView;
-// // eslint-disable-next-line no-redeclare
-// let DraweeView: DraweeView;
-// function initializeDraweeView() {
-//     if (DraweeView) {
-//         return;
-//     }
-//     @NativeClass
-//     class DraweeViewImpl extends com.facebook.drawee.view.SimpleDraweeView {
-//         constructor(public owner: Img, context: android.content.Context) {
-//             super(context);
-//             return global.__native(this);
-//         }
-//         public onMeasure(widthMeasureSpec: number, heightMeasureSpec: number) {
-//             const width = Utils.layout.getMeasureSpecSize(widthMeasureSpec);
-//             const widthMode = Utils.layout.getMeasureSpecMode(widthMeasureSpec);
-//             const height = Utils.layout.getMeasureSpecSize(heightMeasureSpec);
-//             const heightMode = Utils.layout.getMeasureSpecMode(heightMeasureSpec);
-//             const aspectRatio = this.getAspectRatio();
-//             CLog(CLogTypes.info, 'onMeasure', this.owner.src, widthMeasureSpec, heightMeasureSpec, width, height, aspectRatio);
-//             if (aspectRatio > 0) {
-//                 const finiteWidth: boolean = widthMode === Utils.layout.EXACTLY;
-//                 const finiteHeight: boolean = heightMode === Utils.layout.EXACTLY;
-//                 // let scale: { width; height };
-//                 if ((this as any).imageWidth && (this as any).imageHeight) {
-//                     // scale = this.owner.computeScaleFactor(width, height, finiteWidth, finiteHeight, (this as any).imageWidth, (this as any).imageHeight, aspectRatio);
-//                     if (!finiteWidth) {
-//                         widthMeasureSpec = Utils.layout.makeMeasureSpec(height * aspectRatio, Utils.layout.EXACTLY);
-//                     }
-//                     if (!finiteHeight) {
-//                         heightMeasureSpec = Utils.layout.makeMeasureSpec(width / aspectRatio, Utils.layout.EXACTLY);
-//                     }
-//                 }
-//                 CLog(CLogTypes.info, 'onMeasure scale', this.owner.src, aspectRatio, finiteWidth, finiteHeight, width, height, (this as any).imageWidth, (this as any).imageHeight);
-//             }
-//             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-//         }
-//     }
-//     DraweeView = DraweeViewImpl as any;
-// }
 
 export class Img extends ImageBase {
     nativeViewProtected: com.nativescript.image.DraweeView;
@@ -724,6 +684,7 @@ export class Img extends ImageBase {
                 });
                 const builder = com.facebook.drawee.backends.pipeline.Fresco.newDraweeControllerBuilder();
                 builder.setImageRequest(request);
+                builder.setCallerContext(src);
                 builder.setControllerListener(listener);
                 builder.setOldController(this.nativeViewProtected.getController());
                 if (Trace.isEnabled()) {
