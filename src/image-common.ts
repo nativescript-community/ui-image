@@ -16,15 +16,6 @@ export const CLog = (type: CLogTypes, ...args) => {
     Trace.write(args.join(' '), ImageViewTraceCategory, type);
 };
 
-/**
- * setDebug method
- * @deprecated
- *
- * @param value: boolean
- */
-export function setDebug(value: boolean) {
-}
-
 
 export type Transition = 'fade' | 'curlUp';
 
