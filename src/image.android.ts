@@ -311,16 +311,7 @@ export class FailureEventData extends EventData {
     }
 }
 
-export const needUpdateHierarchy = function (target: any, propertyKey: string | Symbol, descriptor: PropertyDescriptor) {
-    const originalMethod = descriptor.value;
-    descriptor.value = function (...args: any[]) {
-        if (!this._canUpdateHierarchy) {
-            this._needUpdateHierarchy = true;
-            return;
-        }
-        return originalMethod.apply(this, args);
-    };
-};
+
 export const needRequestImage = function (target: any, propertyKey: string | Symbol, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
     descriptor.value = function (...args: any[]) {
@@ -403,72 +394,58 @@ export class Img extends ImageBase {
         this.src = src;
     }
 
-    @needUpdateHierarchy
     [ImageBase.placeholderImageUriProperty.setNative]() {
         this.updateHierarchy();
     }
 
-    @needUpdateHierarchy
     [ImageBase.failureImageUriProperty.setNative]() {
         this.updateHierarchy();
     }
 
-    @needUpdateHierarchy
     [ImageBase.stretchProperty.setNative]() {
         this.updateHierarchy();
     }
 
-    @needUpdateHierarchy
     [ImageBase.fadeDurationProperty.setNative]() {
         this.updateHierarchy();
     }
 
-    @needUpdateHierarchy
     [ImageBase.backgroundUriProperty.setNative]() {
         this.updateHierarchy();
     }
 
-    @needUpdateHierarchy
     [ImageBase.showProgressBarProperty.setNative]() {
         this.updateHierarchy();
     }
 
-    @needUpdateHierarchy
     [ImageBase.progressBarColorProperty.setNative]() {
         this.updateHierarchy();
     }
 
-    @needUpdateHierarchy
     [ImageBase.roundAsCircleProperty.setNative]() {
         this.updateHierarchy();
     }
 
-    @needUpdateHierarchy
     [ImageBase.roundTopLeftProperty.setNative]() {
         this.updateHierarchy();
     }
 
-    @needUpdateHierarchy
     [ImageBase.roundTopRightProperty.setNative]() {
         this.updateHierarchy();
     }
 
-    @needUpdateHierarchy
     [ImageBase.roundBottomLeftProperty.setNative]() {
         this.updateHierarchy();
     }
 
-    @needUpdateHierarchy
     [ImageBase.roundBottomRightProperty.setNative]() {
         this.updateHierarchy();
     }
 
-    @needUpdateHierarchy
     [ImageBase.roundedCornerRadiusProperty.setNative]() {
         this.updateHierarchy();
     }
 
-    @needUpdateHierarchy
     [ImageBase.tintColorProperty.setNative](value: Color) {
         this.updateHierarchy();
     }
@@ -722,6 +699,10 @@ export class Img extends ImageBase {
     }
 
     private updateHierarchy() {
+        if (!this._canUpdateHierarchy) {
+            this._needUpdateHierarchy = true;
+            return;
+        }
         if (this.nativeViewProtected) {
             let failureImageDrawable: android.graphics.drawable.BitmapDrawable;
             let placeholderImageDrawable: android.graphics.drawable.BitmapDrawable;
