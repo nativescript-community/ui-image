@@ -13,7 +13,7 @@ export enum CLogTypes {
 
 export const ImageViewTraceCategory = 'NativescriptImage';
 export const CLog = (type: CLogTypes, ...args) => {
-    Trace.write(args.join(' '), ImageViewTraceCategory, type);
+    Trace.write(args.map(a=>(a && typeof a === 'object'? JSON.stringify(a) :a)).join(' '), ImageViewTraceCategory, type);
 };
 
 
