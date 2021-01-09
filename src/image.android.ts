@@ -369,10 +369,6 @@ export class Img extends ImageBase {
         } else {
             draweeView.setAspectRatio(0);
         }
-
-        if (this.stretch) {
-            draweeView.setScaleType(getScaleTypeAndroid(this.stretch));
-        }
     }
 
     // public initNativeView(): void {
@@ -980,36 +976,6 @@ function getScaleType(scaleType: ScaleType) {
                 return com.facebook.drawee.drawable.ScalingUtils.ScaleType.FIT_XY;
             case ScaleType.FocusCrop:
                 return com.facebook.drawee.drawable.ScalingUtils.ScaleType.FOCUS_CROP;
-            default:
-                break;
-        }
-    }
-
-    return null;
-}
-
-function getScaleTypeAndroid(scaleType: ScaleType) {
-    if (isString(scaleType)) {
-        switch (scaleType) {
-            case ScaleType.Center:
-                return android.widget.ImageView.ScaleType.CENTER;
-            case ScaleType.AspectFill:
-            case ScaleType.CenterCrop:
-                return android.widget.ImageView.ScaleType.CENTER_CROP;
-            case ScaleType.CenterInside:
-                return android.widget.ImageView.ScaleType.CENTER_INSIDE;
-            case ScaleType.FitCenter:
-            case ScaleType.AspectFit:
-                return android.widget.ImageView.ScaleType.FIT_CENTER;
-            case ScaleType.FitEnd:
-                return android.widget.ImageView.ScaleType.FIT_END;
-            case ScaleType.FitStart:
-                return android.widget.ImageView.ScaleType.FIT_START;
-            case ScaleType.Fill:
-            case ScaleType.FitXY:
-                return android.widget.ImageView.ScaleType.FIT_XY;
-            case ScaleType.FocusCrop:
-                return android.widget.ImageView.ScaleType.CENTER_CROP;
             default:
                 break;
         }
