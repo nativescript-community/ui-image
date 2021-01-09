@@ -434,9 +434,6 @@ export class Img extends ImageBase {
         }
         let image;
         if (typeof imagePath === 'string') {
-            if (imagePath.indexOf('~/') === 0) {
-                imagePath = path.join(knownFolders.currentApp().path, imagePath.substring(2));
-            }
             if (isFileOrResourcePath(imagePath)) {
                 image = ImageSource.fromFileOrResourceSync(imagePath);
             }
@@ -444,7 +441,6 @@ export class Img extends ImageBase {
             image = imagePath;
         }
 
-        // console.log("getUIImage", path, !!image, !!image && !!image.ios);
         if (image) {
             image = image.ios;
         }
