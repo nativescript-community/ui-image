@@ -5,14 +5,10 @@
         </ActionBar>
 
         <GridLayout rows="*, auto, auto, auto, auto, auto">
-            <NSImg
-                ref="opacityImg"
-                verticalAlignment="center"
-                borderRadius="100"
-                placeholderImageUri="res://ns_logo"
-                src="https://raw.githubusercontent.com/nativescript-community/ui-image/master/examples-data/breakfast1.jpg"
-            >
-            </NSImg>
+            <StackLayout orientation="horizontal">
+                <NSImg backgroundColor="yellow" height="100" ref="opacityImg" verticalAlignment="center" borderRadius="100" width="50%" stretch="aspectFill" placeholderImageUri="res://ns_logo" src="~/images/dessert.jpg"> </NSImg>
+                <NSImg backgroundColor="red" width="50%" height="100" verticalAlignment="center" borderRadius="100" stretch="aspectFill" :src="imgSource" > </NSImg>
+            </StackLayout>
             <Button text="Set 1" row="1" @tap="onSeOpacityTo1"></Button>
             <Button text="Set 0.5" row="2" @tap="onSeOpacityTo05"></Button>
             <Button text="Set 0.1" row="3" @tap="onSeOpacityTo01"></Button>
@@ -23,7 +19,13 @@
 </template>
 
 <script>
+import { ImageSource } from '@nativescript/core';
 export default {
+    data: function() {
+        return {
+            imgSource: ImageSource.fromFileSync('~/images/dessert.jpg')
+        };
+    },
     methods: {
         onSeOpacityTo1(args) {
             this.$refs.opacityImg.nativeView.opacity = 1;
