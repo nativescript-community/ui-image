@@ -495,22 +495,26 @@ export class Img extends ImageBase {
             // this.nativeViewProtected.setImageURI(null);
             const src = this.src;
             if (src) {
+                let drawable: android.graphics.drawable.BitmapDrawable;
                 if (src instanceof ImageSource) {
-                    this.nativeViewProtected.setImageBitmap(src.android);
+                    drawable = new android.graphics.drawable.BitmapDrawable(src.android as android.graphics.Bitmap);
                     this.updateViewSize(src.android);
-                    return;
                 } else if (isFontIconURI(src as string)) {
                     const fontIconCode = (src as string).split('//')[1];
                     if (fontIconCode !== undefined) {
                         // support sync mode only
                         const font = this.style.fontInternal;
                         const color = this.style.color;
-                        this.nativeViewProtected.setImageBitmap(ImageSource.fromFontIconCodeSync(fontIconCode, font, color).android);
+                        drawable = new android.graphics.drawable.BitmapDrawable(ImageSource.fromFontIconCodeSync(fontIconCode, font, color).android as android.graphics.Bitmap);
                     }
+                }
+                if (drawable) {
+                    const hierarchy: com.facebook.drawee.generic.GenericDraweeHierarchy = this.nativeViewProtected.getHierarchy();
+                    hierarchy.setImage(drawable, 1, hierarchy.getFadeDuration() === 0);
                     return;
                 }
                 if (this.noCache) {
-                    const uri = getUri(src);
+                    const uri = getUri(src as string);
                     const imagePipeLine = getImagePipeline();
                     const isInCache = imagePipeLine.isInBitmapMemoryCache(uri);
                     if (isInCache) {
@@ -518,7 +522,7 @@ export class Img extends ImageBase {
                     }
                 }
                 this.isLoading = true;
-                const uri = getUri(src);
+                const uri = getUri(src as string);
                 if (!uri) {
                     console.log(`Error: 'src' not valid: ${src}`);
                     return;
