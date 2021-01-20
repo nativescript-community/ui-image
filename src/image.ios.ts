@@ -237,22 +237,25 @@ export function getImagePipeline(): ImagePipeline {
 function getUri(src: string | ImageAsset) {
     let uri: any = src;
     if (src instanceof ImageAsset) {
-        uri = NSURL.sd_URLWithAsset(src.ios);
+        return NSURL.sd_URLWithAsset(src.ios);
     }
     if (uri.indexOf(RESOURCE_PREFIX) === 0) {
         const resName = uri.substr(RESOURCE_PREFIX.length);
         if (screenScale === -1) {
             screenScale = Screen.mainScreen.scale;
         }
-        supportedLocalFormats.some((v) => {
+        const found = supportedLocalFormats.some((v) => {
             for (let i = screenScale; i >= 1; i--) {
                 uri = NSBundle.mainBundle.URLForResourceWithExtension(i > 1 ? `${resName}@${i}x` : resName, v);
-                if (!!uri) {
+                if (uri) {
                     return true;
                 }
             }
             return false;
         });
+        if (found) {
+            return uri;
+        }
     } else if (uri.indexOf('~/') === 0) {
         return NSURL.alloc().initFileURLWithPath(`${path.join(knownFolders.currentApp().path, uri.replace('~/', ''))}`);
     }
@@ -455,15 +458,21 @@ export class Img extends ImageBase {
                 if (src instanceof ImageSource) {
                     this._setNativeImage(src.ios);
                     return;
-                } else if (isFontIconURI(src as string)) {
-                    const fontIconCode = (src as string).split('//')[1];
-                    if (fontIconCode !== undefined) {
-                        // support sync mode only
-                        const font = this.style.fontInternal;
-                        const color = this.style.color;
-                        this._setNativeImage(ImageSource.fromFontIconCodeSync(fontIconCode, font, color).ios);
+                } else if (typeof src === 'string') {
+                    if (isFontIconURI(src)) {
+                        const fontIconCode = (src).split('//')[1];
+                        if (fontIconCode !== undefined) {
+                            // support sync mode only
+                            const font = this.style.fontInternal;
+                            const color = this.style.color;
+                            this._setNativeImage(ImageSource.fromFontIconCodeSync(fontIconCode, font, color).ios);
+                        }
+                        return;
+                    // } else if (src.startsWith(RESOURCE_PREFIX)) {
+                        // this._setNativeImage(ImageSource.fromResourceSync(src.));
+                        //
                     }
-                    return;
+
                 }
 
                 const uri = getUri(src);
