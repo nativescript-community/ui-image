@@ -3,7 +3,6 @@ android {
 
 dependencies {
 	def frescoVersion =  project.hasProperty("frescoVersion") ? project.frescoVersion : "2.3.0"
-  	// debugImplementation 'com.facebook.flipper:flipper-fresco-plugin:0.30.1'
 
 	implementation("com.facebook.fresco:fresco:$frescoVersion") {
         exclude group: 'com.facebook.soloader', module: 'soloader'

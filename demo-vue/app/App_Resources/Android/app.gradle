@@ -17,3 +17,6 @@ android {
     additionalParameters "--no-version-vectors"
   }
 }
+dependencies {
+  	// debugImplementation 'com.facebook.flipper:flipper-fresco-plugin:0.30.1'
+}
