@@ -181,7 +181,9 @@ export class ImageBase extends View {
             scaleW = nativeWidth > 0 ? measureWidth / nativeWidth : 1;
             scaleH = nativeHeight > 0 ? measureHeight / nativeHeight : 1;
 
-            CLog(CLogTypes.info, 'computeScaleFactor', measureWidth, measureHeight, nativeWidth, nativeHeight, widthIsFinite, heightIsFinite, aspectRatio, nativeScale, measureScale);
+            if (Trace.isEnabled()) {
+                CLog(CLogTypes.info, 'computeScaleFactor', measureWidth, measureHeight, nativeWidth, nativeHeight, widthIsFinite, heightIsFinite, aspectRatio, nativeScale, measureScale);
+            }
             if (aspectRatio > 0) {
                 if (!widthIsFinite) {
                     scaleH = 1;
