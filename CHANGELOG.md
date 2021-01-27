@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.21](https://github.com/nativescript-community/ui-image/compare/v4.0.20...v4.0.21) (2021-01-27)
+
+
+### Bug Fixes
+
+* **android:** ensure a hierarchy is set for the default “stretch” property value ([c66f8d5](https://github.com/nativescript-community/ui-image/commit/c66f8d54e7aaf4bfcf5c6a7307d2a9a5c18b3b80))
+
+
+
+
+
 ## [4.0.20](https://github.com/nativescript-community/ui-image/compare/v4.0.19...v4.0.20) (2021-01-20)
 
 
