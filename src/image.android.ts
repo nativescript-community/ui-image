@@ -317,6 +317,9 @@ export const needRequestImage = function (target: any, propertyKey: string | Sym
     descriptor.value = function (...args: any[]) {
         if (!this._canRequestImage) {
             this._needRequestImage = true;
+            // we need to ensure a hierarchy is set or the default aspect ratio wont be set
+            // because aspectFit is the default (wanted) but then we wont go into stretchProperty.setNative
+            this._needUpdateHierarchy = true;
             return;
         }
         return originalMethod.apply(this, args);
