@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.22](https://github.com/nativescript-community/ui-image/compare/v4.0.21...v4.0.22) (2021-02-04)
+
+
+### Bug Fixes
+
+* **ios:** another fix for loading local image ([da29b66](https://github.com/nativescript-community/ui-image/commit/da29b66693c5690b72c852f0a7e8521b306a8359))
+
+
+
+
+
 ## [4.0.21](https://github.com/nativescript-community/ui-image/compare/v4.0.20...v4.0.21) (2021-01-27)
 
 
