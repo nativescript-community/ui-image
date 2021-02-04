@@ -256,6 +256,7 @@ function getUri(src: string | ImageAsset) {
         if (found) {
             return uri;
         }
+    }
     else if (uri.indexOf('~/') === 0) {
         return NSURL.fileURLWithPath(`${path.join(knownFolders.currentApp().path, uri.replace('~/', ''))}`);
     }
