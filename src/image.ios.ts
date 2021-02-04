@@ -256,8 +256,11 @@ function getUri(src: string | ImageAsset) {
         if (found) {
             return uri;
         }
-    } else if (uri.indexOf('~/') === 0) {
-        return NSURL.alloc().initFileURLWithPath(`${path.join(knownFolders.currentApp().path, uri.replace('~/', ''))}`);
+    else if (uri.indexOf('~/') === 0) {
+        return NSURL.fileURLWithPath(`${path.join(knownFolders.currentApp().path, uri.replace('~/', ''))}`);
+    }
+    else if (uri.indexOf('/') === 0) {
+        return NSURL.fileURLWithPath(uri);
     }
     return NSURL.URLWithString(uri);
 }
@@ -530,7 +533,7 @@ export class Img extends ImageBase {
 
                 // console.log('about to load', this.src, options);
                 this.nativeViewProtected.sd_setImageWithURLPlaceholderImageOptionsContextProgressCompleted(
-                    getUri(src),
+                    uri,
                     this.placeholderImage,
                     options,
                     context,
