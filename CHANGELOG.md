@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.23](https://github.com/nativescript-community/ui-image/compare/v4.0.22...v4.0.23) (2021-03-12)
+
+
+### Bug Fixes
+
+* **android:** ensure we update hierarchy to handle default stretch setting ([858af97](https://github.com/nativescript-community/ui-image/commit/858af976e2a6ff7b0a8008f80294382746356c6c))
+
+
+
+
+
 ## [4.0.22](https://github.com/nativescript-community/ui-image/compare/v4.0.21...v4.0.22) (2021-02-04)
 
 
