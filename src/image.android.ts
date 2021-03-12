@@ -333,7 +333,7 @@ export class Img extends ImageBase {
 
     _canRequestImage = true;
     _canUpdateHierarchy = true;
-    _needUpdateHierarchy = false;
+    _needUpdateHierarchy = true;
     _needRequestImage = false;
     public onResumeNativeUpdates(): void {
         // {N} suspends properties update on `_suspendNativeUpdates`. So we only need to do this in onResumeNativeUpdates
