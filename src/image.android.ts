@@ -359,6 +359,9 @@ export class Img extends ImageBase {
     }
     updateViewSize(imageInfo) {
         const draweeView = this.nativeViewProtected;
+        if (!draweeView) {
+            return;
+        }
         if (imageInfo != null) {
             draweeView.imageWidth = imageInfo.getWidth();
             draweeView.imageHeight = imageInfo.getHeight();
@@ -566,7 +569,7 @@ export class Img extends ImageBase {
 
                             const args = {
                                 eventName: ImageBase.finalImageSetEvent,
-                                object: that.get(),
+                                object: nativeView,
                                 imageInfo: info,
                                 animatable: animatable as AnimatedImage,
                             } as FinalEventData;
