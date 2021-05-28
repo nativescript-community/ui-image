@@ -17,7 +17,7 @@
         "demo.ng.android.watch": "npm run build && npm run plugin.tscwatch && cd demo-angular && tns run android --syncAllFiles",
         "demo.ng.reset": "cd ../demo-angular && rimraf platforms",
         "plugin.prepare": "npm run build && cd demo-angular && tns plugin remove @nativescript-community/ui-image && tns plugin add ../plugin && cd ../demo && tns plugin remove @nativescript-community/ui-image && tns plugin add ../plugin",
-        "publish": "npm run setup && npm run build && npm run build.angular && lerna publish --create-release=github",
+        "publish": "npm run setup && npm run build && npm run build.angular && lerna publish --create-release=github --force-publish",
         "commitmsg": "commitlint -e $GIT_PARAMS"
     },
     "devDependencies": {
