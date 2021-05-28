@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.24](https://github.com/nativescript-community/ui-image/compare/v4.0.23...v4.0.24) (2021-05-28)
+
+
+### Bug Fixes
+
+* ensure nativeview exists [#43](https://github.com/nativescript-community/ui-image/issues/43) ([38dce3f](https://github.com/nativescript-community/ui-image/commit/38dce3f21f8db414469290b87e607e2a35f10e01))
+
+
+
+
+
 ## [4.0.23](https://github.com/nativescript-community/ui-image/compare/v4.0.22...v4.0.23) (2021-03-12)
 
 
