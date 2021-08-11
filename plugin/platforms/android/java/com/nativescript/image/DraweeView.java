@@ -42,8 +42,26 @@ public class DraweeView extends SimpleDraweeView {
                     public void getOutline(View view, Outline outline) {
                         Drawable drawable = getBackground();
                         if (drawable instanceof BorderDrawable) {
-                            drawable.getOutline(outline);
+                            BorderDrawable borderDrawable = (BorderDrawable) drawable;
+                            float borderTopLeftRadius = borderDrawable.getBorderTopLeftRadius();
+                            float borderTopRightRadius = borderDrawable.getBorderTopRightRadius();
+                            float borderBottomRightRadius = borderDrawable.getBorderBottomRightRadius();
+                            float borderBottomLeftRadius = borderDrawable.getBorderBottomLeftRadius();
+                            float borderLeftWidth = borderDrawable.getBorderLeftWidth();
+                            float borderBottomWidth = borderDrawable.getBorderBottomWidth();
+                            float borderTopWidth = borderDrawable.getBorderTopWidth();
+                            float borderRightWidth = borderDrawable.getBorderRightWidth();
+                            if (android.os.Build.VERSION.SDK_INT >= 21 && 
+                                borderDrawable.getUniformBorderRadius() > 0 &&
+                                borderLeftWidth == 0 &&
+                                borderBottomWidth == 0 &&
+                                borderTopWidth == 0 &&
+                                borderRightWidth == 0) {
+                                drawable.getOutline(outline);
+                                return;
+                            }
                         }
+                        outline.setRect(0, 0, view.getWidth(), view.getHeight());
                     }
                 });
                 setClipToOutline(true);
