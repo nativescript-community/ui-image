@@ -2,28 +2,28 @@
     "description": "NativeScript Application",
     "repository": "https://github.com/nativescript-community/ui-image",
     "dependencies": {
+        "@akylas/nativescript": "^8.0.10",
         "@nativescript-community/ui-image": "../plugin",
-        "@nativescript/core": "7.0.0",
-        "@nativescript/webpack": "3.0.0",
-        "nativescript-theme-core": "~1.0.4",
-        "nativescript-vue": "2.8.0"
+        "nativescript-vue": "2.9.0"
     },
     "devDependencies": {
-        "@babel/core": "^7.9.6",
-        "@babel/preset-env": "^7.9.6",
-        "@nativescript/android": "7.0.0",
-        "@nativescript/ios": "7.0.0",
-        "@nativescript/types": "7.0.0",
+        "@babel/core": "^7.15.0",
+        "@babel/preset-env": "^7.15.0",
+        "@nativescript/android": "8.0.0",
+        "@nativescript/core": "8.0.8",
+        "@nativescript/ios": "8.0.0",
+        "@nativescript/types": "8.0.1",
+        "@nativescript/webpack": "beta",
         "babel-loader": "^8.1.0",
         "babel-traverse": "6.26.0",
         "babel-types": "6.26.0",
         "babylon": "6.18.0",
         "lazy": "1.0.11",
-        "nativescript-vue-template-compiler": "2.8.0",
+        "nativescript-vue-template-compiler": "2.9.0",
         "node-sass": "^4.14.1",
         "typescript": "3.9.7",
         "vue": "2.6.12",
-        "vue-loader": "^15.9.2"
+        "vue-loader": "^15.9.8"
     },
-    "main": "app.js"
+    "main": "app/app"
 }
