@@ -8,6 +8,6 @@
             "@nativescript-community/ui-image": ["../../plugin"]
         }
     },
-    "include": ["./**/*.ts", "../references.d.ts"],
+    "include": ["./**/*.ts", "../../references.d.ts"],
     "exclude": ["../node_modules"]
 }
