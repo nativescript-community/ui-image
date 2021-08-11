@@ -1,16 +1,15 @@
-android {
-}
 
+repositories {
+    flatDir {
+        dirs '../../../node_modules/@akylas/nativescript/platforms/android'
+    }
+}
 dependencies {
 	def frescoVersion =  project.hasProperty("frescoVersion") ? project.frescoVersion : "2.3.0"
 
 	implementation("com.facebook.fresco:fresco:$frescoVersion") {
         exclude group: 'com.facebook.soloader', module: 'soloader'
 		exclude group: 'com.facebook.fresco', module: 'soloader'
-		// exclude group: 'com.facebook.fresco', module: 'nativeimagefilters'
-		// exclude group: 'com.facebook.fresco', module: 'nativeimagetranscoder'
-		// exclude group: 'com.facebook.fresco', module: 'memory-type-native'
-		// exclude group: 'com.facebook.fresco', module: 'imagepipeline-native'
 	}
 	implementation("com.facebook.fresco:imagepipeline-okhttp3:$frescoVersion") {
 		exclude group: 'com.facebook.soloader', module: 'soloader'
@@ -18,4 +17,5 @@ dependencies {
 	implementation ("com.facebook.fresco:animated-gif:$frescoVersion") {
 		exclude group: 'com.facebook.soloader', module: 'soloader'
 	}
+    compile(name:'widgets-release', ext:'aar')
 }

@@ -355,7 +355,7 @@ export class Img extends ImageBase {
             initialize(initializeConfig);
         }
         const view =  new com.nativescript.image.DraweeView(this._context);
-        (view as any).setClipToBounds(false);
+        // (view as any).setClipToBounds(false);
         return view;
     }
     updateViewSize(imageInfo) {
