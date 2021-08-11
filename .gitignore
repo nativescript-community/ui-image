@@ -82,3 +82,4 @@ plugin/**/*js.map
 plugin/**/*js
 .gradle
 .settings
+pnpm-lock.yaml
