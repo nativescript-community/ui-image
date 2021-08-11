@@ -44,44 +44,6 @@ class SDImageRoundAsCircleTransformer extends NSObject implements SDImageTransfo
     }
 }
 
-@NativeClass
-class SDDecodeSizeTransformer extends NSObject implements SDImageTransformer {
-    public static ObjCProtocols = [SDImageTransformer];
-    decodeWidth: number;
-    decodeHeight: number;
-
-    static transformerWithDecodeWidthDecodeHeight(decodeWidth: number, decodeHeight: number) {
-        const transformer = SDDecodeSizeTransformer.new() as SDDecodeSizeTransformer;
-        transformer.decodeWidth = decodeWidth;
-        transformer.decodeHeight = decodeHeight;
-        return transformer;
-    }
-
-    get transformerKey() {
-        return `SDDecodeSizeTransformer ${this.decodeWidth} ${this.decodeHeight}`;
-    }
-
-    transformedImageWithImageForKey(image: UIImage, key: string) {
-        if (!image) {
-            return null;
-        }
-        let ratio = 1;
-        const width = image.size.width;
-        const height = image.size.height;
-        if (this.decodeWidth && this.decodeHeight) {
-            const widthRatio = this.decodeWidth / width;
-            const heightRatio = this.decodeHeight / height;
-            ratio = Math.max(widthRatio, heightRatio);
-        } else if (this.decodeWidth > 0) {
-            ratio = this.decodeWidth / width;
-        } else {
-            ratio = this.decodeHeight / height;
-        }
-        const minwidth = Math.min(width, height);
-        return (image as any).sd_resizedImageWithSizeScaleMode(CGSizeMake(width * ratio, height * ratio), SDImageScaleMode.AspectFill);
-    }
-}
-
 export class ImageInfo implements ImageInfoBase {
     constructor(private width: number, private height: number) {}
 
@@ -499,7 +461,9 @@ export class Img extends ImageBase {
                     options = options | SDWebImageOptions.ProgressiveLoad;
                 }
                 if (this.decodeWidth && this.decodeHeight) {
-                    transformers.push(SDDecodeSizeTransformer.transformerWithDecodeWidthDecodeHeight(this.decodeWidth, this.decodeHeight));
+                    console.log('NSImageDecodeSizeTransformer', this.decodeWidth, this.decodeHeight);
+                    //@ts-ignore
+                    transformers.push(NSImageDecodeSizeTransformer.transformerWithDecodeWidthDecodeHeight(this.decodeWidth, this.decodeHeight));
                 }
                 if (this.tintColor) {
                     transformers.push(SDImageTintTransformer.transformerWithColor(this.tintColor.ios));
@@ -509,30 +473,19 @@ export class Img extends ImageBase {
                 }
                 if (this.roundAsCircle === true) {
                     transformers.push(SDImageRoundAsCircleTransformer.new());
-                    // transformers.push(SDImageFlippingTransformer.transformerWithHorizontalVertical(false, true));
                 }
-                if (this.roundBottomLeft || this.roundBottomRight || this.roundTopLeft || this.roundTopRight) {
-                    let corners = 0;
-                    if (this.roundTopLeft) {
-                        corners = corners | UIRectCorner.TopLeft;
-                    }
-                    if (this.roundTopRight) {
-                        corners = corners | UIRectCorner.BottomRight;
-                    }
-                    if (this.roundBottomRight) {
-                        corners = corners | UIRectCorner.TopRight;
-                    }
-                    if (this.roundBottomLeft) {
-                        corners = corners | UIRectCorner.BottomLeft;
-                    }
-                    transformers.push(SDImageRoundCornerTransformer.transformerWithRadiusCornersBorderWidthBorderColor(this.roundedCornerRadius, corners, 0, null));
-                    // transformers.push(SDImageFlippingTransformer.transformerWithHorizontalVertical(false, true));
+                if (this.roundBottomLeftRadius || this.roundBottomRightRadius || this.roundTopLeftRadius || this.roundTopRightRadius) {
+                    //@ts-ignore
+                    transformers.push(NSImageRoundCornerTransformer.transformerWithTopLefRadiusTopRightRadiusBottomRightRadiusBottomLeftRadius(
+                        layout.toDeviceIndependentPixels(this.roundTopLeftRadius),
+                        layout.toDeviceIndependentPixels(this.roundTopRightRadius),
+                        layout.toDeviceIndependentPixels(this.roundBottomRightRadius),
+                        layout.toDeviceIndependentPixels(this.roundBottomLeftRadius)));
                 }
                 if (transformers.length > 0) {
                     context.setValueForKey(SDImagePipelineTransformer.transformerWithTransformers(transformers), SDWebImageContextImageTransformer);
                 }
 
-                // console.log('about to load', this.src, options);
                 this.nativeViewProtected.sd_setImageWithURLPlaceholderImageOptionsContextProgressCompleted(
                     uri,
                     this.placeholderImage,

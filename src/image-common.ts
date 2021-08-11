@@ -1,8 +1,12 @@
-import { Color, Property, Trace, View, booleanConverter } from '@nativescript/core';
+import { Color, CoreTypes, Length, Property, ShorthandProperty, Trace, View, booleanConverter } from '@nativescript/core';
 import { EventData as IEventData } from '@nativescript/core/data/observable';
 import { ImageAsset } from '@nativescript/core/image-asset';
 import { ImageSource } from '@nativescript/core/image-source';
 import { isAndroid } from '@nativescript/core/platform';
+
+function isNonNegativeFiniteNumber(value: number): boolean {
+    return isFinite(value) && !isNaN(value) && value >= 0;
+}
 
 export enum CLogTypes {
     log = Trace.messageType.log,
@@ -97,11 +101,10 @@ export class ImageBase extends View {
     public showProgressBar: boolean;
     public progressBarColor: string;
     public roundAsCircle: boolean;
-    public roundBottomRight: boolean;
-    public roundTopLeft: boolean;
-    public roundTopRight: boolean;
-    public roundBottomLeft: boolean;
-    public roundedCornerRadius: number;
+    public roundBottomRightRadius: number;
+    public roundTopLeftRadius: number;
+    public roundTopRightRadius: number;
+    public roundBottomLeftRadius: number;
     public blurRadius: number;
     public blurDownSampling: number;
     public autoPlayAnimations: boolean;
@@ -128,11 +131,6 @@ export class ImageBase extends View {
     public static showProgressBarProperty = new Property<ImageBase, boolean>({ name: 'showProgressBar', valueConverter: booleanConverter });
     public static progressBarColorProperty = new Property<ImageBase, string>({ name: 'progressBarColor', defaultValue: undefined });
     public static roundAsCircleProperty = new Property<ImageBase, boolean>({ name: 'roundAsCircle', valueConverter: booleanConverter, affectsLayout: isAndroid });
-    public static roundTopLeftProperty = new Property<ImageBase, boolean>({ name: 'roundTopLeft', defaultValue: undefined, valueConverter: booleanConverter, affectsLayout: isAndroid });
-    public static roundTopRightProperty = new Property<ImageBase, boolean>({ name: 'roundTopRight', valueConverter: booleanConverter, affectsLayout: isAndroid });
-    public static roundBottomLeftProperty = new Property<ImageBase, boolean>({ name: 'roundBottomLeft', valueConverter: booleanConverter, affectsLayout: isAndroid });
-    public static roundBottomRightProperty = new Property<ImageBase, boolean>({ name: 'roundBottomRight', valueConverter: booleanConverter, affectsLayout: isAndroid });
-    public static roundedCornerRadiusProperty = new Property<ImageBase, number>({ name: 'roundedCornerRadius', valueConverter: (v) => parseFloat(v) });
     public static blurRadiusProperty = new Property<ImageBase, number>({ name: 'blurRadius', valueConverter: (v) => parseFloat(v) });
     public static blurDownSamplingProperty = new Property<ImageBase, number>({ name: 'blurDownSampling', valueConverter: (v) => parseFloat(v) });
     public static autoPlayAnimationsProperty = new Property<ImageBase, boolean>({ name: 'autoPlayAnimations', valueConverter: booleanConverter });
@@ -144,6 +142,14 @@ export class ImageBase extends View {
     public static alwaysFadeProperty = new Property<ImageBase, boolean>({ name: 'alwaysFade', valueConverter: booleanConverter, defaultValue: false });
     public static fadeDurationProperty = new Property<ImageBase, number>({ name: 'fadeDuration', valueConverter: (v) => parseFloat(v) });
     public static noCacheProperty = new Property<ImageBase, boolean>({ name: 'noCache', defaultValue: false, valueConverter: booleanConverter });
+    public static roundTopLeftRadiusProperty = new Property<ImageBase, CoreTypes.LengthType>({ name: 'roundTopLeftRadius', defaultValue: 0,  valueConverter: (v)=>Length.toDevicePixels(Length.parse(v))});
+    public static roundTopRightRadiusProperty = new Property<ImageBase, CoreTypes.LengthType>({ name: 'roundTopRightRadius', defaultValue: 0,  valueConverter: (v)=>Length.toDevicePixels(Length.parse(v))});
+    public static roundBottomLeftRadiusProperty = new Property<ImageBase, CoreTypes.LengthType>({ name: 'roundBottomLeftRadius', defaultValue: 0,  valueConverter: (v)=>Length.toDevicePixels(Length.parse(v))});
+    public static roundBottomRightRadiusProperty = new Property<ImageBase, CoreTypes.LengthType>({ name: 'roundBottomRightRadius', defaultValue: 0,  valueConverter: (v)=>Length.toDevicePixels(Length.parse(v))});
+
+
+
+    public static clipToBoundsProperty = new Property<ImageBase, boolean>({ name: 'clipToBounds', defaultValue: true, valueConverter: booleanConverter});
     // public static blendingModeProperty = new Property<ImageBase, string>({ name: 'blendingMode' });
 
     protected handleImageProgress(value: number, totalSize?: number) {}
@@ -234,11 +240,10 @@ ImageBase.localThumbnailPreviewsEnabledProperty.register(ImageBase);
 ImageBase.showProgressBarProperty.register(ImageBase);
 ImageBase.progressBarColorProperty.register(ImageBase);
 ImageBase.roundAsCircleProperty.register(ImageBase);
-ImageBase.roundTopLeftProperty.register(ImageBase);
-ImageBase.roundTopRightProperty.register(ImageBase);
-ImageBase.roundBottomLeftProperty.register(ImageBase);
-ImageBase.roundBottomRightProperty.register(ImageBase);
-ImageBase.roundedCornerRadiusProperty.register(ImageBase);
+ImageBase.roundTopLeftRadiusProperty.register(ImageBase);
+ImageBase.roundTopRightRadiusProperty.register(ImageBase);
+ImageBase.roundBottomLeftRadiusProperty.register(ImageBase);
+ImageBase.roundBottomRightRadiusProperty.register(ImageBase);
 ImageBase.blurRadiusProperty.register(ImageBase);
 ImageBase.blurDownSamplingProperty.register(ImageBase);
 ImageBase.autoPlayAnimationsProperty.register(ImageBase);
@@ -248,4 +253,6 @@ ImageBase.decodeWidthProperty.register(ImageBase);
 ImageBase.decodeHeightProperty.register(ImageBase);
 ImageBase.alwaysFadeProperty.register(ImageBase);
 ImageBase.noCacheProperty.register(ImageBase);
+ImageBase.clipToBoundsProperty.register(ImageBase);
+
 // ImageBase.blendingModeProperty.register(ImageBase);

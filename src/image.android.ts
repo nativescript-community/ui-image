@@ -326,7 +326,6 @@ export const needRequestImage = function (target: any, propertyKey: string | Sym
     };
 };
 
-
 export class Img extends ImageBase {
     nativeViewProtected: com.nativescript.image.DraweeView;
     isLoading = false;
@@ -355,7 +354,9 @@ export class Img extends ImageBase {
         if (!initialized) {
             initialize(initializeConfig);
         }
-        return new com.nativescript.image.DraweeView(this._context);
+        const view =  new com.nativescript.image.DraweeView(this._context);
+        (view as any).setClipToBounds(false);
+        return view;
     }
     updateViewSize(imageInfo) {
         const draweeView = this.nativeViewProtected;
@@ -432,23 +433,19 @@ export class Img extends ImageBase {
         this.updateHierarchy();
     }
 
-    [ImageBase.roundTopLeftProperty.setNative]() {
+    [ImageBase.roundTopLeftRadiusProperty.setNative]() {
         this.updateHierarchy();
     }
 
-    [ImageBase.roundTopRightProperty.setNative]() {
+    [ImageBase.roundTopRightRadiusProperty.setNative]() {
         this.updateHierarchy();
     }
 
-    [ImageBase.roundBottomLeftProperty.setNative]() {
+    [ImageBase.roundBottomLeftRadiusProperty.setNative]() {
         this.updateHierarchy();
     }
 
-    [ImageBase.roundBottomRightProperty.setNative]() {
-        this.updateHierarchy();
-    }
-
-    [ImageBase.roundedCornerRadiusProperty.setNative]() {
+    [ImageBase.roundBottomRightRadiusProperty.setNative]() {
         this.updateHierarchy();
     }
 
@@ -764,11 +761,11 @@ export class Img extends ImageBase {
                 builder.setRoundingParamsAsCircle();
             }
 
-            if (this.roundBottomLeft || this.roundBottomRight || this.roundTopLeft || this.roundTopRight) {
-                const topLeftRadius = this.roundTopLeft ? this.roundedCornerRadius : 0;
-                const topRightRadius = this.roundTopRight ? this.roundedCornerRadius : 0;
-                const bottomRightRadius = this.roundBottomRight ? this.roundedCornerRadius : 0;
-                const bottomLeftRadius = this.roundBottomLeft ? this.roundedCornerRadius : 0;
+            if (this.roundBottomLeftRadius || this.roundBottomRightRadius || this.roundTopLeftRadius || this.roundTopRightRadius) {
+                const topLeftRadius = this.roundTopLeftRadius|| 0;
+                const topRightRadius = this.roundTopRightRadius|| 0;
+                const bottomRightRadius = this.roundBottomRightRadius|| 0;
+                const bottomLeftRadius = this.roundBottomLeftRadius || 0;
                 builder.setCornersRadii(topLeftRadius, topRightRadius, bottomRightRadius, bottomLeftRadius);
             }
 
