@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.25](https://github.com/nativescript-community/ui-image/compare/v4.0.24...v4.0.25) (2021-08-11)
+
+
+### Bug Fixes
+
+* **android:** outline / clip support ([e26ab7b](https://github.com/nativescript-community/ui-image/commit/e26ab7b64c90d535ff8a1b7ec2410ef55abffaa6))
+
+
+
+
+
 ## [4.0.24](https://github.com/nativescript-community/ui-image/compare/v4.0.23...v4.0.24) (2021-05-28)
 
 **Note:** Version bump only for package @nativescript-community/ui-image

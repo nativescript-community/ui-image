@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.25](https://github.com/nativescript-community/ui-image/compare/v4.0.24...v4.0.25) (2021-08-11)
+
+
+### Bug Fixes
+
+* **android:** outline / clip support ([e26ab7b](https://github.com/nativescript-community/ui-image/commit/e26ab7b64c90d535ff8a1b7ec2410ef55abffaa6))
+
+
+### Features
+
+* rewrote corner handling => new props ([805ff37](https://github.com/nativescript-community/ui-image/commit/805ff370b058884b66a91646cff66393e9190f97))
+
+
+
+
+
 ## [4.0.24](https://github.com/nativescript-community/ui-image/compare/v4.0.23...v4.0.24) (2021-05-28)
 
 
