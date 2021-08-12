@@ -1,7 +1,7 @@
 
 repositories {
     flatDir {
-        dirs '../../../node_modules/@akylas/nativescript/platforms/android'
+        dirs '../../../node_modules/@nativescript/core/platforms/android'
     }
 }
 dependencies {
