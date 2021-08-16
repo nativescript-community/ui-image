@@ -258,35 +258,36 @@ export class Img extends ImageBase {
         const height = layout.getMeasureSpecSize(heightMeasureSpec);
         const heightMode = layout.getMeasureSpecMode(heightMeasureSpec);
 
-        const image = this.nativeViewProtected.image;
+        if (this.nativeViewProtected) {
+            const image = this.nativeViewProtected.image;
+            // const measureWidth = Math.max(nativeWidth, this.effectiveMinWidth);
+            // const measureHeight = Math.max(nativeHeight, this.effectiveMinHeight);
 
-        // const measureWidth = Math.max(nativeWidth, this.effectiveMinWidth);
-        // const measureHeight = Math.max(nativeHeight, this.effectiveMinHeight);
-
-        const finiteWidth: boolean = widthMode === layout.EXACTLY;
-        const finiteHeight: boolean = heightMode === layout.EXACTLY;
-        this._imageSourceAffectsLayout = !finiteWidth || !finiteHeight;
-        if (Trace.isEnabled()) {
-            CLog(CLogTypes.info, 'onMeasure', this.src, widthMeasureSpec, heightMeasureSpec, width, height, this.aspectRatio, image && image.imageOrientation);
-        }
-        if (image || this.aspectRatio > 0) {
-            const nativeWidth = image ? layout.toDevicePixels(image.size.width) : 0;
-            const nativeHeight = image ? layout.toDevicePixels(image.size.height) : 0;
-            const imgRatio = nativeWidth / nativeHeight;
-            const ratio = this.aspectRatio || imgRatio;
-            // const scale = this.computeScaleFactor(width, height, finiteWidth, finiteHeight, nativeWidth, nativeHeight, this.aspectRatio || imgRatio );
-
-            if (!finiteWidth) {
-                widthMeasureSpec = layout.makeMeasureSpec(height * ratio, layout.EXACTLY);
-            }
-            if (!finiteHeight) {
-                heightMeasureSpec = layout.makeMeasureSpec(width / ratio, layout.EXACTLY);
-            }
-
+            const finiteWidth: boolean = widthMode === layout.EXACTLY;
+            const finiteHeight: boolean = heightMode === layout.EXACTLY;
+            this._imageSourceAffectsLayout = !finiteWidth || !finiteHeight;
             if (Trace.isEnabled()) {
-                CLog(CLogTypes.info, 'onMeasure scale', this.src, this.aspectRatio, finiteWidth, finiteHeight, width, height, nativeWidth, nativeHeight, widthMeasureSpec, heightMeasureSpec);
+                CLog(CLogTypes.info, 'onMeasure', this.src, widthMeasureSpec, heightMeasureSpec, width, height, this.aspectRatio, image && image.imageOrientation);
             }
-        }
+            if (image || this.aspectRatio > 0) {
+                const nativeWidth = image ? layout.toDevicePixels(image.size.width) : 0;
+                const nativeHeight = image ? layout.toDevicePixels(image.size.height) : 0;
+                const imgRatio = nativeWidth / nativeHeight;
+                const ratio = this.aspectRatio || imgRatio;
+                // const scale = this.computeScaleFactor(width, height, finiteWidth, finiteHeight, nativeWidth, nativeHeight, this.aspectRatio || imgRatio );
+
+                if (!finiteWidth) {
+                    widthMeasureSpec = layout.makeMeasureSpec(height * ratio, layout.EXACTLY);
+                }
+                if (!finiteHeight) {
+                    heightMeasureSpec = layout.makeMeasureSpec(width / ratio, layout.EXACTLY);
+                }
+
+                if (Trace.isEnabled()) {
+                    CLog(CLogTypes.info, 'onMeasure scale', this.src, this.aspectRatio, finiteWidth, finiteHeight, width, height, nativeWidth, nativeHeight, widthMeasureSpec, heightMeasureSpec);
+                }
+            }
+    }
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
         // const widthAndState = Img.resolveSizeAndState(measureWidth, width, widthMode, 0);
