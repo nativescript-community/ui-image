@@ -229,44 +229,34 @@ Boolean value used for determining if the image will be rounded as a circle. Its
 <@nativescript-community/ui-image:Img roundAsCircle="true"/>
 ```
 
-- **roundedCornerRadius** 
+- **roundTopLeftRadius** 
 
-Number value used as radius for rounding the image's corners.
+Radius of the Top Left corner in 
 
 ```xml
-<@nativescript-community/ui-image:Img roundedCornerRadius="50"/>
+<@nativescript-community/ui-image:Img roundTopLeftRadius="50"/>
 ```
 
-- **roundBottomRight** 
+- **roundTopRightRadius** 
 
-Boolean value used for determining if the image's bottom right corner will be rounded. The *roundedCornerRadius* is used as the rounding radius.
+Radius of the Top Right corner in 
 
 ```xml
-<@nativescript-community/ui-image:Img roundBottomRight="true"/>
+<@nativescript-community/ui-image:Img roundTopRightRadius="50"/>
 ```
+- **roundBottomLeftRadius** 
 
-- **roundBottomLeft** 
-
-Boolean value used for determining if the image's bottom left corner will be rounded. The *roundedCornerRadius* is used as the rounding radius.
+Radius of the Bottom Left corner in 
 
 ```xml
-<@nativescript-community/ui-image:Img roundBottomLeft="true"/>
+<@nativescript-community/ui-image:Img roundBottomLeftRadius="50"/>
 ```
+- **roundBottomRightRadius** 
 
-- **roundTopLeft** 
-
-Boolean value used for determining if the image's top left corner will be rounded. The *roundedCornerRadius* is used as the rounding radius.
-
-```xml
-<@nativescript-community/ui-image:Img roundTopLeft="true"/>
-```
-
-- **roundTopRight** 
-
-Boolean value used for determining if the image's top right corner should be rounded. The *roundedCornerRadius* is used as the rounding radius.
+Radius of the Bottom Right corner in 
 
 ```xml
-<@nativescript-community/ui-image:Img roundTopRight="true"/>
+<@nativescript-community/ui-image:Img roundBottomRightRadius="50"/>
 ```
 
 - **autoPlayAnimations** 
