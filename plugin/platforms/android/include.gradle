@@ -17,5 +17,5 @@ dependencies {
 	implementation ("com.facebook.fresco:animated-gif:$frescoVersion") {
 		exclude group: 'com.facebook.soloader', module: 'soloader'
 	}
-    compile(name:'widgets-release', ext:'aar')
+    implementation(name:'widgets-release', ext:'aar')
 }
