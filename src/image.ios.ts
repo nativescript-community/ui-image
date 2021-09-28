@@ -461,7 +461,6 @@ export class Img extends ImageBase {
                     options = options | SDWebImageOptions.ProgressiveLoad;
                 }
                 if (this.decodeWidth && this.decodeHeight) {
-                    console.log('NSImageDecodeSizeTransformer', this.decodeWidth, this.decodeHeight);
                     //@ts-ignore
                     transformers.push(NSImageDecodeSizeTransformer.transformerWithDecodeWidthDecodeHeight(this.decodeWidth, this.decodeHeight));
                 }
