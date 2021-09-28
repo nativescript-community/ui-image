@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.29](https://github.com/nativescript-community/ui-image/compare/v4.0.28...v4.0.29) (2021-09-28)
+
+
+### Bug Fixes
+
+* **ios:** removed logs ([53c8e70](https://github.com/nativescript-community/ui-image/commit/53c8e707706c6497fa5b9ae6ac6aea95a25b7a52))
+
+
+
+
+
 ## [4.0.28](https://github.com/nativescript-community/ui-image/compare/v4.0.27...v4.0.28) (2021-09-22)
 
 
