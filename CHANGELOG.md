@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.31](https://github.com/nativescript-community/ui-image/compare/v4.0.30...v4.0.31) (2021-10-07)
+
+
+### Features
+
+* fontIcon support for all images (placeholder, ….) ([22eb284](https://github.com/nativescript-community/ui-image/commit/22eb284ebe5927faca1befc09b44210b506c4f8a))
+
+
+
+
+
 ## [4.0.30](https://github.com/nativescript-community/ui-image/compare/v4.0.29...v4.0.30) (2021-10-07)
 
 
