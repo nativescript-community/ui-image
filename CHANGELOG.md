@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.30](https://github.com/nativescript-community/ui-image/compare/v4.0.29...v4.0.30) (2021-10-07)
+
+
+### Bug Fixes
+
+* **android:** placeholder and other wont have memory issues anymore when using `res://...` ([88487a2](https://github.com/nativescript-community/ui-image/commit/88487a2630c9a4b58df40ffa2497feaff43d9f16))
+
+
+
+
+
 ## [4.0.29](https://github.com/nativescript-community/ui-image/compare/v4.0.28...v4.0.29) (2021-09-28)
 
 
