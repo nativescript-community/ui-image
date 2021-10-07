@@ -500,15 +500,16 @@ export class Img extends ImageBase {
             if (src) {
                 let drawable: android.graphics.drawable.BitmapDrawable;
                 if (src instanceof ImageSource) {
-                    drawable = new android.graphics.drawable.BitmapDrawable(src.android as android.graphics.Bitmap);
+                    drawable = new android.graphics.drawable.BitmapDrawable(ad.getApplicationContext().getResources(), src.android as android.graphics.Bitmap);
                     this.updateViewSize(src.android);
                 } else if (isFontIconURI(src as string)) {
+
                     const fontIconCode = (src as string).split('//')[1];
                     if (fontIconCode !== undefined) {
                         // support sync mode only
                         const font = this.style.fontInternal;
                         const color = this.style.color;
-                        drawable = new android.graphics.drawable.BitmapDrawable(ImageSource.fromFontIconCodeSync(fontIconCode, font, color).android as android.graphics.Bitmap);
+                        drawable = new android.graphics.drawable.BitmapDrawable(ad.getApplicationContext().getResources(), ImageSource.fromFontIconCodeSync(fontIconCode, font, color).android);
                     }
                 }
                 if (drawable) {
@@ -779,13 +780,13 @@ export class Img extends ImageBase {
         if (typeof path === 'string') {
             if (isFileOrResourcePath(path)) {
                 if (path.indexOf(RESOURCE_PREFIX) === 0) {
-                    drawable = this.getDrawableFromResource(path);
+                    return this.getDrawableFromResource(path); // number!
                 } else {
                     drawable = this.getDrawableFromLocalFile(path);
                 }
             }
         } else {
-            drawable = new android.graphics.drawable.BitmapDrawable(path.android);
+            drawable = new android.graphics.drawable.BitmapDrawable(ad.getApplicationContext().getResources(), path.android);
         }
 
         return drawable;
