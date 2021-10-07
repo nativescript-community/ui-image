@@ -802,13 +802,9 @@ export class Img extends ImageBase {
     }
 
     private getDrawableFromResource(resourceName: string) {
-        const img = ImageSource.fromResourceSync(resourceName.substr(RESOURCE_PREFIX.length));
-        let drawable: android.graphics.drawable.BitmapDrawable = null;
-        if (img) {
-            drawable = new android.graphics.drawable.BitmapDrawable(ad.getApplicationContext().getResources(), img.android);
-        }
-
-        return drawable;
+        const identifier = ad.getApplication().getResources().getIdentifier(resourceName.substr(RESOURCE_PREFIX.length), 'drawable', ad.getApplication().getPackageName());
+        // we return the identifier to allow Fresco to handle memory / caching
+        return identifier;
     }
 
     startAnimating() {
