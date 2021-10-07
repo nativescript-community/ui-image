@@ -403,7 +403,16 @@ export class Img extends ImageBase {
         }
         let image;
         if (typeof imagePath === 'string') {
-            if (isFileOrResourcePath(imagePath)) {
+            if (isFontIconURI(imagePath)) {
+                const fontIconCode = (imagePath).split('//')[1];
+                if (fontIconCode !== undefined) {
+                    // support sync mode only
+                    const font = this.style.fontInternal;
+                    const color = this.style.color;
+                    image = (ImageSource.fromFontIconCodeSync(fontIconCode, font, color).ios);
+                }
+            }
+            if (!image && isFileOrResourcePath(imagePath)) {
                 image = ImageSource.fromFileOrResourceSync(imagePath);
             }
         } else {

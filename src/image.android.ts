@@ -778,7 +778,15 @@ export class Img extends ImageBase {
     private getDrawable(path: string | ImageSource) {
         let drawable: android.graphics.drawable.BitmapDrawable;
         if (typeof path === 'string') {
-            if (isFileOrResourcePath(path)) {
+            if (isFontIconURI(path)) {
+                const fontIconCode = (path).split('//')[1];
+                if (fontIconCode !== undefined) {
+                    // support sync mode only
+                    const font = this.style.fontInternal;
+                    const color = this.style.color;
+                    drawable = new android.graphics.drawable.BitmapDrawable(ad.getApplicationContext().getResources(), ImageSource.fromFontIconCodeSync(fontIconCode, font, color).android);
+                }
+            } else if (isFileOrResourcePath(path)) {
                 if (path.indexOf(RESOURCE_PREFIX) === 0) {
                     return this.getDrawableFromResource(path); // number!
                 } else {
