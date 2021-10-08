@@ -7,16 +7,6 @@ import { CLog, CLogTypes, EventData, ImageBase, ImageInfo as ImageInfoBase, Imag
 @NativeClass
 class SDImageRoundAsCircleTransformer extends NSObject implements SDImageTransformer {
     public static ObjCProtocols = [SDImageTransformer];
-    // _cornerRadius = 20;
-    // get cornerRadius() {
-    //     return this._cornerRadius;
-    // }
-    // get corners() {
-    //     return UIRectCorner.AllCorners;
-    // }
-    // get borderWidth() {
-    //     return 0;
-    // }
 
     static transformer() {
         const transformer = SDImageRoundAsCircleTransformer.alloc().init();
@@ -241,11 +231,6 @@ export class Img extends ImageBase {
         return result;
     }
 
-    // public initNativeView(): void {
-    //     this.initDrawee();
-    //     // this.updateHierarchy();
-    // }
-
     _setNativeClipToBounds() {
         // Always set clipsToBounds for images
         this.nativeViewProtected.clipsToBounds = true;
@@ -259,9 +244,6 @@ export class Img extends ImageBase {
         const heightMode = layout.getMeasureSpecMode(heightMeasureSpec);
 
         const image = this.nativeViewProtected.image;
-
-        // const measureWidth = Math.max(nativeWidth, this.effectiveMinWidth);
-        // const measureHeight = Math.max(nativeHeight, this.effectiveMinHeight);
 
         const finiteWidth: boolean = widthMode === layout.EXACTLY;
         const finiteHeight: boolean = heightMode === layout.EXACTLY;
@@ -288,18 +270,7 @@ export class Img extends ImageBase {
             }
         }
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-
-        // const widthAndState = Img.resolveSizeAndState(measureWidth, width, widthMode, 0);
-        // const heightAndState = Img.resolveSizeAndState(measureHeight, height, heightMode, 0);
-
-        // this.setMeasuredDimension(widthAndState, heightAndState);
     }
-
-    // public disposeNativeView() {
-    //     this._android.setImageURI(null, null);
-    //     this._android = undefined;
-    // }
-
     public updateImageUri() {
         const imagePipeLine = getImagePipeline();
         const src = this.src;
@@ -323,47 +294,38 @@ export class Img extends ImageBase {
     }
 
     private handleImageLoaded = (image: UIImage, error: NSError, cacheType: number) => {
-        // if (this.tintColor) {
-        //   image = image.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-        // }
         this.isLoading = false;
-        if ((this.alwaysFade || cacheType !== SDImageCacheType.Memory) && this.fadeDuration > 0) {
-            // switch (this.transition) {
-            //     case 'fade':
-            this.nativeViewProtected.alpha = 0.0;
-            this._setNativeImage(image);
-            UIView.animateWithDurationAnimations(this.fadeDuration / 1000, () => {
-                this.nativeViewProtected.alpha = this.opacity;
-            });
-            //     break;
-            // case 'curlUp':
-            //     UIView.transitionWithViewDurationOptionsAnimationsCompletion(
-            //         this.nativeViewProtected,
-            //         0.3,
-            //         UIViewAnimationOptions.TransitionCrossDissolve,
-            //         () => {
-            //             this._setNativeImage(image);
-            //         },
-            //         null
-            //     );
-            //     break;
-            // default:
-            //     this._setNativeImage(image);
-            // }
-        } else {
-            // console.log("setting image", !!image, !!image && image.size);
-            this._setNativeImage(image);
+        if (image) {
+            if ((this.alwaysFade || cacheType !== SDImageCacheType.Memory) && this.fadeDuration > 0) {
+                // switch (this.transition) {
+                //     case 'fade':
+                this.nativeViewProtected.alpha = 0.0;
+                this._setNativeImage(image);
+                UIView.animateWithDurationAnimations(this.fadeDuration / 1000, () => {
+                    this.nativeViewProtected.alpha = this.opacity;
+                });
+                //     break;
+                // case 'curlUp':
+                //     UIView.transitionWithViewDurationOptionsAnimationsCompletion(
+                //         this.nativeViewProtected,
+                //         0.3,
+                //         UIViewAnimationOptions.TransitionCrossDissolve,
+                //         () => {
+                //             this._setNativeImage(image);
+                //         },
+                //         null
+                //     );
+                //     break;
+                // default:
+                //     this._setNativeImage(image);
+                // }
+            } else {
+                this._setNativeImage(image);
+            }
         }
         if (!this.autoPlayAnimations) {
             this.nativeViewProtected.stopAnimating();
         }
-        // if (image && cacheType !== SDImageCacheType.SDImageCacheTypeMemory)
-        // {
-        //     this.nativeView.alpha = 0.0;
-        //     UIView.animateWithDurationAnimations(0.2, ()=>{
-        //         this.nativeView.alpha = this.opacity;
-        //     });
-        // }
 
         if (error) {
             const args = {
@@ -375,13 +337,8 @@ export class Img extends ImageBase {
             this.notify(args);
             if (this.failureImageUri) {
                 image = this.getUIImage(this.failureImageUri);
-                // this._setNativeImage();
-                // } else {
-                // console.log("clearing image");
-                // this._setNativeImage(null);
-                // this.nativeViewProtected.image = null;
             }
-        } else {
+        } else if (image) {
             const args = {
                 eventName: ImageBase.finalImageSetEvent,
                 object: this,
@@ -443,9 +400,6 @@ export class Img extends ImageBase {
                             this._setNativeImage(ImageSource.fromFontIconCodeSync(fontIconCode, font, color).ios);
                         }
                         return;
-                    // } else if (src.startsWith(RESOURCE_PREFIX)) {
-                        // this._setNativeImage(ImageSource.fromResourceSync(src.));
-                        //
                     }
 
                 }
@@ -493,7 +447,6 @@ export class Img extends ImageBase {
                 if (transformers.length > 0) {
                     context.setValueForKey(SDImagePipelineTransformer.transformerWithTransformers(transformers), SDWebImageContextImageTransformer);
                 }
-
                 this.nativeViewProtected.sd_setImageWithURLPlaceholderImageOptionsContextProgressCompleted(
                     uri,
                     this.placeholderImage,
