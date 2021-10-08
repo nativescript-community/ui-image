@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.33](https://github.com/nativescript-community/ui-image/compare/v4.0.32...v4.0.33) (2021-10-08)
+
+
+### Bug Fixes
+
+* **ios:** fade animations trigger like on android ([5448bb5](https://github.com/nativescript-community/ui-image/commit/5448bb52b646384528ad097090acbdfcd329c118))
+
+
+
+
+
 ## [4.0.32](https://github.com/nativescript-community/ui-image/compare/v4.0.31...v4.0.32) (2021-10-08)
 
 
