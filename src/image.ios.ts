@@ -337,6 +337,7 @@ export class Img extends ImageBase {
             this.notify(args);
             if (this.failureImageUri) {
                 image = this.getUIImage(this.failureImageUri);
+                this._setNativeImage(image);
             }
         } else if (image) {
             const args = {
