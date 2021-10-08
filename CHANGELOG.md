@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.32](https://github.com/nativescript-community/ui-image/compare/v4.0.31...v4.0.32) (2021-10-08)
+
+
+### Bug Fixes
+
+* **ios:** fix for failure image not set ([465631f](https://github.com/nativescript-community/ui-image/commit/465631f8c5b0d4f5ef81820bdbefda8d1f79c16e))
+* **ios:** fix for placeholder not “sticking” ([3013405](https://github.com/nativescript-community/ui-image/commit/3013405263f221cc67751de75ec4ba9d614f4f61))
+
+
+
+
+
 ## [4.0.31](https://github.com/nativescript-community/ui-image/compare/v4.0.30...v4.0.31) (2021-10-07)
 
 
