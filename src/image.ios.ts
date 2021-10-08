@@ -285,8 +285,35 @@ export class Img extends ImageBase {
         this.src = src;
     }
 
-    public _setNativeImage(nativeImage: UIImage) {
-        this.nativeViewProtected.image = nativeImage;
+    public _setNativeImage(nativeImage: UIImage, animated = true) {
+
+        if (animated) {
+            // switch (this.transition) {
+            //     case 'fade':
+            this.nativeViewProtected.alpha = 0.0;
+            this.nativeViewProtected.image = nativeImage;
+            UIView.animateWithDurationAnimations(this.fadeDuration / 1000, () => {
+                this.nativeViewProtected.alpha = this.opacity;
+            });
+            //     break;
+            // case 'curlUp':
+            //     UIView.transitionWithViewDurationOptionsAnimationsCompletion(
+            //         this.nativeViewProtected,
+            //         0.3,
+            //         UIViewAnimationOptions.TransitionCrossDissolve,
+            //         () => {
+            //             this._setNativeImage(image);
+            //         },
+            //         null
+            //     );
+            //     break;
+            // default:
+            //     this._setNativeImage(image);
+            // }
+        } else {
+            this.nativeViewProtected.image = nativeImage;
+        }
+
         if (this._imageSourceAffectsLayout) {
             this._imageSourceAffectsLayout = false;
             this.requestLayout();
@@ -295,33 +322,9 @@ export class Img extends ImageBase {
 
     private handleImageLoaded = (image: UIImage, error: NSError, cacheType: number) => {
         this.isLoading = false;
+        const animate = (this.alwaysFade || cacheType !== SDImageCacheType.Memory) && this.fadeDuration > 0;
         if (image) {
-            if ((this.alwaysFade || cacheType !== SDImageCacheType.Memory) && this.fadeDuration > 0) {
-                // switch (this.transition) {
-                //     case 'fade':
-                this.nativeViewProtected.alpha = 0.0;
-                this._setNativeImage(image);
-                UIView.animateWithDurationAnimations(this.fadeDuration / 1000, () => {
-                    this.nativeViewProtected.alpha = this.opacity;
-                });
-                //     break;
-                // case 'curlUp':
-                //     UIView.transitionWithViewDurationOptionsAnimationsCompletion(
-                //         this.nativeViewProtected,
-                //         0.3,
-                //         UIViewAnimationOptions.TransitionCrossDissolve,
-                //         () => {
-                //             this._setNativeImage(image);
-                //         },
-                //         null
-                //     );
-                //     break;
-                // default:
-                //     this._setNativeImage(image);
-                // }
-            } else {
-                this._setNativeImage(image);
-            }
+            this._setNativeImage(image, animate);
         }
         if (!this.autoPlayAnimations) {
             this.nativeViewProtected.stopAnimating();
@@ -337,7 +340,7 @@ export class Img extends ImageBase {
             this.notify(args);
             if (this.failureImageUri) {
                 image = this.getUIImage(this.failureImageUri);
-                this._setNativeImage(image);
+                this._setNativeImage(image, animate);
             }
         } else if (image) {
             const args = {
@@ -388,8 +391,9 @@ export class Img extends ImageBase {
         if (this.nativeViewProtected) {
             const src = this.src;
             if (src) {
+                const animate = this.fadeDuration > 0;
                 if (src instanceof ImageSource) {
-                    this._setNativeImage(src.ios);
+                    this._setNativeImage(src.ios, animate);
                     return;
                 } else if (typeof src === 'string') {
                     if (isFontIconURI(src)) {
@@ -398,7 +402,7 @@ export class Img extends ImageBase {
                             // support sync mode only
                             const font = this.style.fontInternal;
                             const color = this.style.color;
-                            this._setNativeImage(ImageSource.fromFontIconCodeSync(fontIconCode, font, color).ios);
+                            this._setNativeImage(ImageSource.fromFontIconCodeSync(fontIconCode, font, color).ios, animate);
                         }
                         return;
                     }
