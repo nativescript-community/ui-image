@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.34](https://github.com/nativescript-community/ui-image/compare/v4.0.33...v4.0.34) (2021-10-15)
+
+
+### Bug Fixes
+
+* **ios:** placeholder not set when no src ([ab7e91c](https://github.com/nativescript-community/ui-image/commit/ab7e91c1953f96ee77369625c6da6a1fb0a55935))
+
+
+
+
+
 ## [4.0.33](https://github.com/nativescript-community/ui-image/compare/v4.0.32...v4.0.33) (2021-10-08)
 
 
