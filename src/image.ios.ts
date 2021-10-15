@@ -460,6 +460,8 @@ export class Img extends ImageBase {
                     this.onLoadProgress,
                     this.handleImageLoaded
                 );
+            } else if (this.placeholderImage) {
+                this._setNativeImage(this.placeholderImage);
             } else {
                 this._setNativeImage(null);
             }
