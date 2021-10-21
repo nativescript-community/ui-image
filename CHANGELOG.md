@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.1.0](https://github.com/nativescript-community/ui-image/compare/v4.0.34...v4.1.0) (2021-10-21)
+
+
+### Features
+
+* **android:** native-api-usage ([0ec235c](https://github.com/nativescript-community/ui-image/commit/0ec235c2df1d5c4f6f30615766ea17ba74576dc7))
+
+
+
+
+
 ## [4.0.34](https://github.com/nativescript-community/ui-image/compare/v4.0.33...v4.0.34) (2021-10-15)
 
 
