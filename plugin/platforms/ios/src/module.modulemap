@@ -1,0 +1,5 @@
+module NImage {
+  umbrella header "NImage.h"
+  export *
+  module * { export * }
+}

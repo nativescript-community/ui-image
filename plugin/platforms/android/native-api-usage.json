@@ -1,0 +1,32 @@
+{
+    "uses": [
+        "com.facebook.drawee.drawable:ScalingUtils*",
+        "com.facebook.drawee.drawable.ScalingUtils:ScaleType*",
+        "com.facebook.drawee.generic:RoundingParams*",
+        "com.facebook.drawee.drawable:ProgressBarDrawable*",
+        "com.facebook.drawee.view:DraweeView*",
+        "com.facebook.drawee.interfaces:DraweeHierarchy*",
+        "com.facebook.drawee.interfaces:SettableDraweeHierarchy*",
+        "com.facebook.drawee.interfaces:SimpleDraweeControllerBuilder*",
+        "com.facebook.drawee.interfaces:DraweeController*",
+        "com.facebook.drawee.generic:GenericDraweeHierarchyBuilder*",
+        "com.facebook.drawee.generic:GenericDraweeHierarchy*",
+        "com.facebook.imagepipeline.request:ImageRequestBuilder*",
+        "com.facebook.imagepipeline.request:ImageRequest*",
+        "com.facebook.imagepipeline.core:ImagePipelineConfig*",
+        "com.facebook.imagepipeline.common:RotationOptions*",
+        "com.facebook.imagepipeline.common:ResizeOptions*",
+        "com.facebook.drawee.backends.pipeline:Fresco*",
+        "com.facebook.drawee.backends.pipeline:PipelineDraweeControllerBuilder*",
+        "com.facebook.drawee.backends.pipeline:PipelineDraweeController*",
+        "com.facebook.drawee.controller:AbstractDraweeControllerBuilder*",
+        "com.facebook.drawee.controller:AbstractDraweeController*",
+        "com.facebook.drawee.backends.pipeline.info:ImagePerfDataListener*",
+        "com.facebook.drawee.backends.pipeline.info:ImagePerfData*",
+        "com.facebook.drawee.controller:ControllerListener*",
+        "com.nativescript.image:DraweeView*",
+        "com.nativescript.image:ScalingBlurPostprocessor*",
+        "android.graphics.drawable:Animatable",
+        "com.facebook.imagepipeline.image:ImageInfo*"
+    ]
+}
