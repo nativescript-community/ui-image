@@ -24,8 +24,6 @@ import org.nativescript.widgets.BorderDrawable;
 
 import java.util.Arrays;
 
-import androidx.annotation.RequiresApi;
-
 public class DraweeView extends SimpleDraweeView {
     public int imageWidth = 0;
     public int imageHeight = 0;
@@ -108,7 +106,6 @@ public class DraweeView extends SimpleDraweeView {
     Path innerBorderPath;
     Path innerBorderTempPath;
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private Path generateInnerBorderPath(BorderDrawable borderDrawable) {
 
         float borderTopLeftRadius = borderDrawable.getBorderTopLeftRadius();
@@ -154,7 +151,6 @@ public class DraweeView extends SimpleDraweeView {
         return innerBorderPath;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onDraw(Canvas canvas) {
         Drawable drawable = getBackground();

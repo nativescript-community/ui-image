@@ -10,12 +10,16 @@ dependencies {
 	implementation("com.facebook.fresco:fresco:$frescoVersion") {
         exclude group: 'com.facebook.soloader', module: 'soloader'
 		exclude group: 'com.facebook.fresco', module: 'soloader'
+		exclude group: 'com.facebook.fresco', module: 'nativeimagefilters'
+        exclude group: 'com.facebook.fresco', module: 'nativeimagetranscoder'
+        exclude group: 'com.facebook.fresco', module: 'memory-type-native'
+        exclude group: 'com.facebook.fresco', module: 'imagepipeline-native'
 	}
 	implementation("com.facebook.fresco:imagepipeline-okhttp3:$frescoVersion") {
 		exclude group: 'com.facebook.soloader', module: 'soloader'
 	}
-	implementation ("com.facebook.fresco:animated-gif:$frescoVersion") {
-		exclude group: 'com.facebook.soloader', module: 'soloader'
-	}
+	// implementation ("com.facebook.fresco:animated-gif:$frescoVersion") {
+	// 	exclude group: 'com.facebook.soloader', module: 'soloader'
+	// }
     implementation(name:'widgets-release', ext:'aar')
 }
