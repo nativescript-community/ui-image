@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.1.1](https://github.com/nativescript-community/ui-image/compare/v4.1.0...v4.1.1) (2021-12-23)
+
+
+### Bug Fixes
+
+* android remove dep on annotationx ([c9fdfbe](https://github.com/nativescript-community/ui-image/commit/c9fdfbe8f7c7f876abb53b1d8b9b7c68d65ae21f))
+
+
+### Features
+
+* android flipper supprt ([4031fa4](https://github.com/nativescript-community/ui-image/commit/4031fa451ba16ce1ed79323d8ee79b33c570fd25))
+
+
+
+
+
 # [4.1.0](https://github.com/nativescript-community/ui-image/compare/v4.0.34...v4.1.0) (2021-10-21)
 
 
