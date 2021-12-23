@@ -57,6 +57,7 @@ export interface ImageError {
 
 export interface ImagePipelineConfigSetting {
     isDownsampleEnabled?: boolean;
+    leakTracker?: any;
 }
 
 export class EventData implements IEventData {

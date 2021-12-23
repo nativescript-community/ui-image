@@ -18,20 +18,14 @@ export function initialize(config?: ImagePipelineConfigSetting): void {
         if (config && config.isDownsampleEnabled) {
             builder.setDownsampleEnabled(true);
         }
+        if (config && config.leakTracker) {
+            builder.setCloseableReferenceLeakTracker(config.leakTracker);
+        }
         // builder.experiment().setNativeCodeDisabled(true);
         const imagePipelineConfig = builder.build();
         com.facebook.drawee.backends.pipeline.Fresco.initialize(context, imagePipelineConfig);
-        // try {
-        //     com.facebook.imagepipeline.nativecode.ImagePipelineNativeLoader.load();
-        // } catch (err) {
-        //     console.log('error loading ImagePipelineNativeLoader');
-        //     com.facebook.drawee.backends.pipeline.Fresco.shutDown();
-        //     builder.experiment().setNativeCodeDisabled(true);
-        //     const imagePipelineConfig = builder.build();
-        //     console.log('test', imagePipelineConfig.getExperiments().isNativeCodeDisabled())
-        //     com.facebook.drawee.backends.pipeline.Fresco.initialize(context, imagePipelineConfig);
-        // }
         initialized = true;
+        initializeConfig = null;
     }
 }
 
