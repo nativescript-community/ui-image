@@ -4,3 +4,4 @@
 
 #import "NSImageRoundCornerTransformer.h"
 #import "NSImageDecodeSizeTransformer.h"
+#import "NSImageRoundAsCircleTransformer.h"

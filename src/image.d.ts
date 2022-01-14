@@ -194,6 +194,11 @@ export class Img extends View {
      * Number value used as the resized image height
      */
     decodeHeight: number;
+
+    /**
+     * IOS: if you want to show animated images you need to set this to true
+     */
+    animatedImageView: boolean;
 }
 
 /**

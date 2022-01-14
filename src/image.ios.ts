@@ -4,36 +4,6 @@ import { isString } from '@nativescript/core/utils/types';
 import { RESOURCE_PREFIX, isFileOrResourcePath, isFontIconURI, layout } from '@nativescript/core/utils/utils';
 import { CLog, CLogTypes, EventData, ImageBase, ImageInfo as ImageInfoBase, ImagePipelineConfigSetting, ScaleType, Stretch } from './image-common';
 
-@NativeClass
-class SDImageRoundAsCircleTransformer extends NSObject implements SDImageTransformer {
-    public static ObjCProtocols = [SDImageTransformer];
-
-    static transformer() {
-        const transformer = SDImageRoundAsCircleTransformer.alloc().init();
-
-        return transformer;
-    }
-
-    get transformerKey() {
-        return 'SDImageRoundAsCircleTransformer';
-    }
-
-    transformedImageWithImageForKey(image: UIImage, key: string) {
-        if (!image) {
-            return null;
-        }
-        const width = image.size.width;
-        const height = image.size.height;
-        const minwidth = Math.min(width, height);
-        const cornerRadius = minwidth / 2;
-        const result = (image as any)
-            .sd_resizedImageWithSizeScaleMode(CGSizeMake(minwidth, minwidth), SDImageScaleMode.AspectFill)
-            .sd_roundedCornerImageWithRadiusCornersBorderWidthBorderColor(cornerRadius, UIRectCorner.BottomLeft | UIRectCorner.BottomRight | UIRectCorner.TopLeft | UIRectCorner.TopRight, 0, null)
-            .sd_resizedImageWithSizeScaleMode(CGSizeMake(width, height), SDImageScaleMode.AspectFit);
-        return result;
-    }
-}
-
 export class ImageInfo implements ImageInfoBase {
     constructor(private width: number, private height: number) {}
 
@@ -219,11 +189,11 @@ function getUri(src: string | ImageAsset) {
 }
 
 export class Img extends ImageBase {
-    nativeViewProtected: SDAnimatedImageView;
+    nativeViewProtected: SDAnimatedImageView | UIImageView;
     isLoading = false;
     private _imageSourceAffectsLayout: boolean = true;
     public createNativeView() {
-        const result = SDAnimatedImageView.new();
+        const result = this.animatedImageView? SDAnimatedImageView.new() :  UIImageView.new();
         result.contentMode = UIViewContentMode.ScaleAspectFit;
         result.clipsToBounds = true;
         result.userInteractionEnabled = true; // needed for gestures to work
@@ -420,6 +390,7 @@ export class Img extends ImageBase {
                 }
                 this.isLoading = true;
                 let options = SDWebImageOptions.ScaleDownLargeImages | SDWebImageOptions.AvoidAutoSetImage;
+
                 if (this.alwaysFade === true) {
                     options |= SDWebImageOptions.ForceTransition;
                 }
@@ -438,8 +409,10 @@ export class Img extends ImageBase {
                 if (this.blurRadius) {
                     transformers.push(SDImageBlurTransformer.transformerWithRadius(this.blurRadius));
                 }
+                console.log('roundAsCircle', this.roundAsCircle, this.style['roundAsCircle']);
                 if (this.roundAsCircle === true) {
-                    transformers.push(SDImageRoundAsCircleTransformer.new());
+                    //@ts-ignore
+                    transformers.push(NSImageRoundAsCircleTransformer.transformer());
                 }
                 if (this.roundBottomLeftRadius || this.roundBottomRightRadius || this.roundTopLeftRadius || this.roundTopRightRadius) {
                     //@ts-ignore
@@ -450,6 +423,10 @@ export class Img extends ImageBase {
                         layout.toDeviceIndependentPixels(this.roundBottomLeftRadius)));
                 }
                 if (transformers.length > 0) {
+                    if (this.animatedImageView) {
+                        // as we use SDAnimatedImageView  all images are loaded as SDAnimatedImage;
+                        options |= SDWebImageOptions.TransformAnimatedImage;
+                    }
                     context.setValueForKey(SDImagePipelineTransformer.transformerWithTransformers(transformers), SDWebImageContextImageTransformer);
                 }
                 this.nativeViewProtected.sd_setImageWithURLPlaceholderImageOptionsContextProgressCompleted(

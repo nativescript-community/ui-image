@@ -113,6 +113,7 @@ export class ImageBase extends View {
     public aspectRatio: number;
     public decodeWidth: number;
     public decodeHeight: number;
+    public animatedImageView: boolean;
     alwaysFade: boolean;
     noCache: boolean;
     // fade: boolean;
@@ -151,6 +152,7 @@ export class ImageBase extends View {
 
 
     public static clipToBoundsProperty = new Property<ImageBase, boolean>({ name: 'clipToBounds', defaultValue: true, valueConverter: booleanConverter});
+    public static animatedImageViewProperty = new Property<ImageBase, boolean>({ name: 'animatedImageView', defaultValue: false, valueConverter: booleanConverter});
     // public static blendingModeProperty = new Property<ImageBase, string>({ name: 'blendingMode' });
 
     protected handleImageProgress(value: number, totalSize?: number) {}
@@ -255,5 +257,6 @@ ImageBase.decodeHeightProperty.register(ImageBase);
 ImageBase.alwaysFadeProperty.register(ImageBase);
 ImageBase.noCacheProperty.register(ImageBase);
 ImageBase.clipToBoundsProperty.register(ImageBase);
+ImageBase.animatedImageViewProperty.register(ImageBase);
 
 // ImageBase.blendingModeProperty.register(ImageBase);
