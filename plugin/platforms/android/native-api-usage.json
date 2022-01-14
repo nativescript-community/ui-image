@@ -27,6 +27,9 @@
         "com.nativescript.image:DraweeView*",
         "com.nativescript.image:ScalingBlurPostprocessor*",
         "android.graphics.drawable:Animatable",
-        "com.facebook.imagepipeline.image:ImageInfo*"
+        "com.facebook.imagepipeline.image:ImageInfo*",
+        "com.facebook.common.util:UriUtil*",
+        "android.net:Uri*",
+        "android.net.Uri:Builder*"
     ]
 }
