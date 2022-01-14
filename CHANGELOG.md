@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.1.3](https://github.com/nativescript-community/ui-image/compare/v4.1.2...v4.1.3) (2022-01-14)
+
+
+### Bug Fixes
+
+* **ios:** fixed transforms not being applied. New `animatedImageView` property to be set when using animated images ([5fb20f1](https://github.com/nativescript-community/ui-image/commit/5fb20f1d13cc48fe57000dc2fa6bb15c8b568ff0))
+
+
+
+
+
 ## [4.1.2](https://github.com/nativescript-community/ui-image/compare/v4.1.1...v4.1.2) (2021-12-29)
 
 **Note:** Version bump only for package @nativescript-community/ui-image
