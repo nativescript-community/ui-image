@@ -409,7 +409,6 @@ export class Img extends ImageBase {
                 if (this.blurRadius) {
                     transformers.push(SDImageBlurTransformer.transformerWithRadius(this.blurRadius));
                 }
-                console.log('roundAsCircle', this.roundAsCircle, this.style['roundAsCircle']);
                 if (this.roundAsCircle === true) {
                     //@ts-ignore
                     transformers.push(NSImageRoundAsCircleTransformer.transformer());
