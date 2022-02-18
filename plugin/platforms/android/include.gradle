@@ -1,20 +1,4 @@
-
 import groovy.json.JsonSlurper
-repositories {
-	mavenCentral()
-	def appDir = "$rootDir/../../.."
-    def widgetsDir = "$appDir/node_modules/@nativescript/core/platforms/android"
-    def appPackageJsonFile = file("$appDir/package.json")
-    if (appPackageJsonFile.exists()) {
-        def appPackageJson = new JsonSlurper().parseText(appPackageJsonFile.text)
-        if (appPackageJson.dependencies['@akylas/nativescript'] != null) {
-            widgetsDir = "$appDir/node_modules/@akylas/nativescript/platforms/android"
-        }
-    }
-    flatDir {
-        dirs "$widgetsDir"
-    }
-}
 dependencies {
 	def frescoVersion =  project.hasProperty("frescoVersion") ? project.frescoVersion : "2.3.0"
 
@@ -29,4 +13,20 @@ dependencies {
 	// 	exclude group: 'com.facebook.soloader', module: 'soloader'
 	// }
     implementation(name:'widgets-release', ext:'aar')
+}
+
+repositories {
+	mavenCentral()
+	def appDir = "$rootDir/../../.."
+    def widgetsDir = "$appDir/node_modules/@nativescript/core/platforms/android"
+    def appPackageJsonFile = file("$appDir/package.json")
+    if (appPackageJsonFile.exists()) {
+        def appPackageJson = new JsonSlurper().parseText(appPackageJsonFile.text)
+        if (appPackageJson.dependencies["@akylas/nativescript"] != null) {
+            widgetsDir = "$appDir/node_modules/@akylas/nativescript/platforms/android"
+        }
+    }
+    flatDir {
+        dirs "$widgetsDir"
+    }
 }
