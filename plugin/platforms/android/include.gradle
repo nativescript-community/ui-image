@@ -1,7 +1,18 @@
 
+import groovy.json.JsonSlurper
 repositories {
+	mavenCentral()
+	def appDir = "$rootDir/../../.."
+    def widgetsDir = "$appDir/node_modules/@nativescript/core/platforms/android"
+    def appPackageJsonFile = file("$appDir/package.json")
+    if (appPackageJsonFile.exists()) {
+        def appPackageJson = new JsonSlurper().parseText(appPackageJsonFile.text)
+        if (appPackageJson.dependencies['@akylas/nativescript'] != null) {
+            widgetsDir = "$appDir/node_modules/@akylas/nativescript/platforms/android"
+        }
+    }
     flatDir {
-        dirs '../../../node_modules/@nativescript/core/platforms/android'
+        dirs "$widgetsDir"
     }
 }
 dependencies {
