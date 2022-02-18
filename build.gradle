@@ -5,11 +5,11 @@ repositories {
     mavenCentral()
     google()
     flatDir {
-        dirs './node_modules/@nativescript/core/platforms/android'
+        dirs "$rootDir/node_modules/@nativescript/core/platforms/android"
     }
 }
 dependencies {
-    implementation files('/Volumes/dev/androidSDK/platforms/android-28/android.jar')
+    implementation files("${System.getenv('ANDROID_HOME')}/platforms/android-32/android.jar")
 	implementation 'com.facebook.fresco:fresco:2.3.0'
 	implementation 'com.facebook.fresco:animated-gif:2.3.0'
     compile(name:'widgets-release', ext:'aar')
