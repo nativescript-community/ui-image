@@ -22,7 +22,7 @@ repositories {
     def appPackageJsonFile = file("$appDir/package.json")
     if (appPackageJsonFile.exists()) {
         def appPackageJson = new JsonSlurper().parseText(appPackageJsonFile.text)
-        if (appPackageJson.dependencies["@akylas/nativescript"] != null) {
+        if (appPackageJson.dependencies !=null && appPackageJson.dependencies["@akylas/nativescript"] != null) {
             widgetsDir = "$appDir/node_modules/@akylas/nativescript/platforms/android"
         }
     }
