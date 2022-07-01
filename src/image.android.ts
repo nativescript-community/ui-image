@@ -487,10 +487,13 @@ export class Img extends ImageBase {
     //     this.initImage();
     // }
 
-    private initImage() {
+    private async initImage() {
         if (this.nativeViewProtected) {
             // this.nativeViewProtected.setImageURI(null);
-            const src = this.src;
+            let src = this.src;
+            if (src instanceof Promise) {
+                src = await src;
+            }
             if (src) {
                 let drawable: android.graphics.drawable.BitmapDrawable;
                 if (src instanceof ImageSource) {

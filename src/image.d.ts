@@ -1,4 +1,4 @@
-import { ImageSource, View } from '@nativescript/core';
+import { ImageAsset, ImageSource, View } from '@nativescript/core';
 
 
 /**
@@ -75,7 +75,7 @@ export class Img extends View {
     /**
      * String value used for the image URI.
      */
-    src: string | ImageSource;
+    src: string | ImageSource | ImageAsset | Promise<string | ImageSource | ImageAsset> ;
 
     /**
      * String value used for the lower res image URI.
