@@ -359,9 +359,10 @@ export class Img extends ImageBase {
 
     private async initImage() {
         if (this.nativeViewProtected) {
-            let src = this.src;
+            const src = this.src;
             if (src instanceof Promise) {
-                src = await src;
+                this.src = await src;
+                return;
             }
             if (src) {
                 const animate = this.fadeDuration > 0;
