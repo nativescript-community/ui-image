@@ -1,0 +1,47 @@
+{
+    "name": "@nativescript-community/ui-image",
+    "version": "4.1.8",
+    "description": "Advanced and efficient image display plugin which uses Fresco (Android) and SDWebImage (iOS) to implement caching, placeholders, image effects, and much more.",
+    "main": "./index",
+    "sideEffects": false,
+    "typings": "./index.d.ts",
+    "scripts": {
+        "build": "npm run tsc && npm run readme",
+        "build.all": "npm run build && npm run build.angular",
+        "build.angular": "../../node_modules/.bin/ng-packagr -p ../../src/image/angular/ng-package.json -c ../../src/image/angular/tsconfig.json",
+        "readme": "../../node_modules/.bin/readme generate -c ../../tools/readme/blueprint.json",
+        "tsc": "../../node_modules/.bin/cpy '**/*.d.ts' '../../packages/image' --parents --cwd=../../src/image && ../../node_modules/.bin/tsc -skipLibCheck -d",
+        "clean": "../../node_modules/.bin/rimraf ./*.d.ts ./*.js ./*.js.map"
+    },
+    "nativescript": {
+        "platforms": {
+            "android": "6.0.0",
+            "ios": "6.0.0"
+        }
+    },
+    "keywords": [
+        "NativeScript",
+        "JavaScript",
+        "Fresco",
+        "SDWebImage",
+        "cache",
+        "caching",
+        "Android",
+        "iOS",
+        "Angular",
+        "Vue"
+    ],
+    "author": {
+        "name": "Martin Guillon",
+        "email": "martin@akylas.fr"
+    },
+    "bugs": {
+        "url": "https://github.com/nativescript-community/ui-image/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/nativescript-community/ui-image"
+    },
+    "license": "Apache-2.0",
+    "readmeFilename": "README.md"
+}

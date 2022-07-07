@@ -4,3 +4,6 @@
 [submodule "demo-ng"]
 	path = demo-ng
 	url = git@github.com:nativescript-community/plugin-seed-demo-ng.git
+[submodule "demo-vue"]
+	path = demo-vue
+	url = git@github.com:nativescript-community/plugin-seed-demo-vue.git

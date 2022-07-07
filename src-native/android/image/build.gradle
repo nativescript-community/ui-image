@@ -1,0 +1,95 @@
+
+
+apply plugin: 'com.android.library'
+
+def computeCompileSdkVersion () {
+    if(project.hasProperty("compileSdk")) {
+        return compileSdk
+    }
+    else {
+        return 28
+    }
+}
+
+def computeBuildToolsVersion() {
+    if(project.hasProperty("buildToolsVersion")) {
+        return buildToolsVersion
+    }
+    else {
+        return "28.0.3"
+    }
+}
+
+def computeTargetSdkVersion() {
+    if(project.hasProperty("targetSdk")) {
+        return targetSdk
+    }
+    else {
+        return 28
+    }
+}
+
+android {
+    compileSdkVersion = computeCompileSdkVersion()
+    buildToolsVersion = computeBuildToolsVersion()
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion computeTargetSdkVersion()
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
+}
+repositories {
+    mavenCentral()
+    flatDir {
+        dirs '../../../node_modules/@nativescript/core/platforms/android'
+    }
+}
+dependencies {
+    compile(name:'widgets-release', ext:'aar')
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    def androidxVersion =  project.hasProperty("androidxVersion") ? project.androidxVersion : "1.1.0"
+	def androidXAppCompat =  project.hasProperty("androidXAppCompat") ? project.androidXAppCompat : "1.1.0"
+
+	implementation "androidx.appcompat:appcompat:$androidXAppCompat"
+	implementation "androidx.core:core:$androidxVersion"
+
+    def frescoVersion =  project.hasProperty("frescoVersion") ? project.frescoVersion : "2.3.0"
+
+    implementation("com.facebook.fresco:fresco:$frescoVersion") {
+        exclude group: 'com.facebook.soloader', module: 'soloader'
+        exclude group: 'com.facebook.fresco', module: 'soloader'
+    }
+    implementation("com.facebook.fresco:imagepipeline-okhttp3:$frescoVersion") {
+        exclude group: 'com.facebook.soloader', module: 'soloader'
+    }
+    implementation ("com.facebook.fresco:animated-gif:$frescoVersion") {
+        exclude group: 'com.facebook.soloader', module: 'soloader'
+    }
+}
+
+//task cleanBuildDir (type: Delete) {
+//    delete "../build/"
+//}
+
+//task copyAar << {
+//    copy {
+//        from "build/outputs/aar/image-release.aar"
+//        into "../build/"
+//    }
+//}
+
+//assemble.dependsOn(cleanBuildDir)
+//copyAar.dependsOn(assemble)
+//build.dependsOn(copyAar)

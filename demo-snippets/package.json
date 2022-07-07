@@ -1,0 +1,8 @@
+{
+    "name": "@nativescript-community/template-snippet",
+    "version": "0.0.1",
+    "dependencies": {
+        "@nativescript-community/ui-image": "file:../packages/image",
+        "@nativescript-community/ui-zoomimage": "file:../packages/zoomimage"
+    }
+}
