@@ -12,7 +12,6 @@ import android.graphics.PointF;
 import android.graphics.RectF;
 import android.view.MotionEvent;
 import androidx.annotation.IntDef;
-import com.facebook.common.logging.FLog;
 import com.facebook.samples.gestures.TransformGestureDetector;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

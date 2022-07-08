@@ -16,10 +16,8 @@ import android.graphics.drawable.Animatable;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.util.Log;
 import androidx.core.view.ScrollingView;
 import com.facebook.common.internal.Preconditions;
-import com.facebook.common.logging.FLog;
 import com.facebook.drawee.controller.AbstractDraweeController;
 import com.facebook.drawee.controller.BaseControllerListener;
 import com.facebook.drawee.controller.ControllerListener;
@@ -58,7 +56,6 @@ public class ZoomableDraweeView extends DraweeView<GenericDraweeHierarchy>
         @Override
         public void onFinalImageSet(
             String id,Object imageInfo,Animatable animatable) {
-          Log.d("JS", "ControllerListener onFinalImageSet");
           ZoomableDraweeView.this.onFinalImageSet();
         }
 
@@ -234,7 +231,6 @@ public class ZoomableDraweeView extends DraweeView<GenericDraweeHierarchy>
    */
   public void setControllers(
      DraweeController controller,DraweeController hugeImageController) {
-      Log.d("JS", "setControllers");
     setControllersInternal(null, null);
     mZoomableController.setEnabled(false);
     setControllersInternal(controller, hugeImageController);
