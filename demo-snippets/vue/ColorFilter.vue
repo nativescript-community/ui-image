@@ -4,13 +4,17 @@
             <Label text="Simple Grid" />
         </ActionBar>
 
-        <GridLayout rows="*, auto, auto, auto, auto, auto">
-                <NSImg backgroundColor="yellow" ref="opacityImg" stretch="aspectFill" placeholderImageUri="res://logo" :colorMatrix="colorMatrix" :src="src"> </NSImg>
-            <Button text="nightVision" row="1" @tap="onSetNightVision"></Button>
-            <Button text="polaroid" row="2" @tap="onSetPolaroid"></Button>
-            <Button text="grayscale" row="1" @tap="onSetGrayscale"></Button>
-            <Button text="bw" row="2" @tap="onSetBW"></Button>
-            <Button text="change image" row="3" @tap="onChangeImage"></Button>
+        <GridLayout rows="*, auto, auto">
+                <NSZoomImg backgroundColor="yellow" ref="opacityImg" stretch="aspectFill" placeholderImageUri="res://logo" :colorMatrix="colorMatrix" :src="src"> </NSZoomImg>
+                <StackLayout orientation="horizontal"  row="1"> 
+                    <Button text="nightVision" row="1" @tap="onSetNightVision"></Button>
+            <Button text="polaroid"  @tap="onSetPolaroid"></Button>
+            <Button text="grayscale" @tap="onSetGrayscale"></Button>
+            <Button text="bw"  @tap="onSetBW"></Button>
+            <Button text="clear"  @tap="onSetClear"></Button>
+                </StackLayout>
+            
+            <Button text="change image" row="2" @tap="onChangeImage"></Button>
         </GridLayout>
     </Page>
 </template>
@@ -61,6 +65,9 @@ export default {
         },
         onSetBW(args) {
             this.colorMatrix = filters.bw
+        },
+        onSetClear(args) {
+            this.colorMatrix = null
         },
         onChangeImage(){
             this.src= this.src=== '~/images/dessert.jpg' ? '~/images/drink.jpg': '~/images/dessert.jpg';
