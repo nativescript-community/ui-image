@@ -9,7 +9,7 @@ let initialized = false;
 let initializeConfig: ImagePipelineConfigSetting;
 export function initialize(config?: ImagePipelineConfigSetting): void {
     if (!initialized) {
-        const context = androidApp.context;
+        const context = ad.getApplicationContext();
         if (!context) {
             initializeConfig = config;
             return;
@@ -146,7 +146,7 @@ export class ImagePipeline {
                     new com.nativescript.image.BaseDataSubscriber(
                         new com.nativescript.image.BaseDataSubscriberListener({
                             onFailure: reject,
-                            onNewResult: resolve as any,
+                            onNewResult: resolve as any
                         })
                     ),
                     com.facebook.common.executors.CallerThreadExecutor.getInstance()
@@ -177,7 +177,7 @@ export class ImagePipeline {
         // try {
         //    dataSource.subscribe(new BaseBitmapDataSubscriber() {
         //        @Override
-        //        public void onNewResultImpl(@Nullable Bitmap bitmap) {
+        //        public void onNewResultImpl(Bitmap bitmap) {
         //            if (bitmap == null) {
         //                Log.d(TAG, "Bitmap data source returned success, but bitmap null.");
         //                return;
@@ -305,7 +305,6 @@ export class FailureEventData extends EventData {
     }
 }
 
-
 export const needRequestImage = function (target: any, propertyKey: string | Symbol, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
     descriptor.value = function (...args: any[]) {
@@ -322,6 +321,8 @@ export const needRequestImage = function (target: any, propertyKey: string | Sym
 
 export class Img extends ImageBase {
     nativeViewProtected: com.nativescript.image.DraweeView;
+    // @ts-ignore
+    nativeImageViewProtected: com.nativescript.image.DraweeView;
     isLoading = false;
 
     _canRequestImage = true;
@@ -348,12 +349,12 @@ export class Img extends ImageBase {
         if (!initialized) {
             initialize(initializeConfig);
         }
-        const view =  new com.nativescript.image.DraweeView(this._context);
+        const view = new com.nativescript.image.DraweeView(this._context);
         // (view as any).setClipToBounds(false);
         return view;
     }
     updateViewSize(imageInfo) {
-        const draweeView = this.nativeViewProtected;
+        const draweeView = this.nativeImageViewProtected;
         if (!draweeView) {
             return;
         }
@@ -378,7 +379,7 @@ export class Img extends ImageBase {
     // }
 
     // public disposeNativeView() {
-    //     this.nativeViewProtected.setImageURI(null, null);
+    //     this.nativeImageViewProtected.setImageURI(null, null);
     // }
 
     public updateImageUri() {
@@ -475,10 +476,10 @@ export class Img extends ImageBase {
     //     console.log('blendingModeProperty', value);
     //     switch (value) {
     //         case 'multiply':
-    //             (this.nativeViewProtected as any).setXfermode(android.graphics.PorterDuff.Mode.MULTIPLY);
+    //             (this.nativeImageViewProtected as any).setXfermode(android.graphics.PorterDuff.Mode.MULTIPLY);
     //             break;
     //         case 'lighten':
-    //             (this.nativeViewProtected as any).setXfermode(android.graphics.PorterDuff.Mode.LIGHTEN);
+    //             (this.nativeImageViewProtected as any).setXfermode(android.graphics.PorterDuff.Mode.LIGHTEN);
     //             break;
     //     }
     // }
@@ -488,8 +489,8 @@ export class Img extends ImageBase {
     // }
 
     private async initImage() {
-        if (this.nativeViewProtected) {
-            // this.nativeViewProtected.setImageURI(null);
+        if (this.nativeImageViewProtected) {
+            // this.nativeImageViewProtected.setImageURI(null);
             const src = this.src;
             if (src instanceof Promise) {
                 this.src = await src;
@@ -501,7 +502,6 @@ export class Img extends ImageBase {
                     drawable = new android.graphics.drawable.BitmapDrawable(ad.getApplicationContext().getResources(), src.android as android.graphics.Bitmap);
                     this.updateViewSize(src.android);
                 } else if (isFontIconURI(src as string)) {
-
                     const fontIconCode = (src as string).split('//')[1];
                     if (fontIconCode !== undefined) {
                         // support sync mode only
@@ -511,7 +511,7 @@ export class Img extends ImageBase {
                     }
                 }
                 if (drawable) {
-                    const hierarchy: com.facebook.drawee.generic.GenericDraweeHierarchy = this.nativeViewProtected.getHierarchy();
+                    const hierarchy: com.facebook.drawee.generic.GenericDraweeHierarchy = this.nativeImageViewProtected.getHierarchy();
                     hierarchy.setImage(drawable, 1, hierarchy.getFadeDuration() === 0);
                     return;
                 }
@@ -567,7 +567,7 @@ export class Img extends ImageBase {
                                 eventName: ImageBase.finalImageSetEvent,
                                 object: nativeView,
                                 imageInfo: info,
-                                animatable: animatable as AnimatedImage,
+                                animatable: animatable as AnimatedImage
                             } as FinalEventData;
 
                             nativeView.notify(args);
@@ -587,7 +587,7 @@ export class Img extends ImageBase {
                             const args: FailureEventData = {
                                 eventName: ImageBase.failureEvent,
                                 object: nativeView,
-                                error: imageError,
+                                error: imageError
                             } as FailureEventData;
 
                             that.get().notify(args);
@@ -605,7 +605,7 @@ export class Img extends ImageBase {
                             const args: FailureEventData = {
                                 eventName: ImageBase.intermediateImageFailedEvent,
                                 object: nativeView,
-                                error: imageError,
+                                error: imageError
                             } as FailureEventData;
 
                             that.get().notify(args);
@@ -624,7 +624,7 @@ export class Img extends ImageBase {
                             const args: IntermediateEventData = {
                                 eventName: ImageBase.intermediateImageSetEvent,
                                 object: nativeView,
-                                imageInfo: info,
+                                imageInfo: info
                             } as IntermediateEventData;
 
                             that.get().notify(args);
@@ -640,7 +640,7 @@ export class Img extends ImageBase {
                         if (nativeView) {
                             const args: EventData = {
                                 eventName: ImageBase.releaseEvent,
-                                object: nativeView,
+                                object: nativeView
                             } as EventData;
 
                             that.get().notify(args);
@@ -656,20 +656,20 @@ export class Img extends ImageBase {
                         if (nativeView) {
                             const args: EventData = {
                                 eventName: ImageBase.submitEvent,
-                                object: nativeView,
+                                object: nativeView
                             } as EventData;
 
                             that.get().notify(args);
                         } else {
                             console.log("Warning: WeakRef<Image> was GC and no 'submitEvent' callback will be raised.");
                         }
-                    },
+                    }
                 });
                 const builder = com.facebook.drawee.backends.pipeline.Fresco.newDraweeControllerBuilder();
                 builder.setImageRequest(request);
                 builder.setCallerContext(src);
                 builder.setControllerListener(listener);
-                builder.setOldController(this.nativeViewProtected.getController());
+                builder.setOldController(this.nativeImageViewProtected.getController());
                 if (Trace.isEnabled()) {
                     builder.setPerfDataListener(
                         new com.facebook.drawee.backends.pipeline.info.ImagePerfDataListener({
@@ -678,7 +678,7 @@ export class Img extends ImageBase {
                             },
                             onImageVisibilityUpdated(param0: com.facebook.drawee.backends.pipeline.info.ImagePerfData, param1: number) {
                                 CLog(CLogTypes.info, 'onImageVisibilityUpdated', param0, param1);
-                            },
+                            }
                         })
                     );
                 }
@@ -696,10 +696,10 @@ export class Img extends ImageBase {
 
                 const controller = builder.build();
 
-                this.nativeViewProtected.setController(controller);
+                this.nativeImageViewProtected.setController(controller);
             } else {
-                this.nativeViewProtected.setController(null);
-                this.nativeViewProtected.setImageBitmap(null);
+                this.nativeImageViewProtected.setController(null);
+                this.nativeImageViewProtected.setImageBitmap(null);
             }
         }
     }
@@ -709,7 +709,7 @@ export class Img extends ImageBase {
             this._needUpdateHierarchy = true;
             return;
         }
-        if (this.nativeViewProtected) {
+        if (this.nativeImageViewProtected) {
             let failureImageDrawable: android.graphics.drawable.BitmapDrawable;
             let placeholderImageDrawable: android.graphics.drawable.BitmapDrawable;
             let backgroundDrawable: android.graphics.drawable.BitmapDrawable;
@@ -761,15 +761,15 @@ export class Img extends ImageBase {
             }
 
             if (this.roundBottomLeftRadius || this.roundBottomRightRadius || this.roundTopLeftRadius || this.roundTopRightRadius) {
-                const topLeftRadius = this.roundTopLeftRadius|| 0;
-                const topRightRadius = this.roundTopRightRadius|| 0;
-                const bottomRightRadius = this.roundBottomRightRadius|| 0;
+                const topLeftRadius = this.roundTopLeftRadius || 0;
+                const topRightRadius = this.roundTopRightRadius || 0;
+                const bottomRightRadius = this.roundBottomRightRadius || 0;
                 const bottomLeftRadius = this.roundBottomLeftRadius || 0;
                 builder.setCornersRadii(topLeftRadius, topRightRadius, bottomRightRadius, bottomLeftRadius);
             }
 
             const hierarchy = builder.build();
-            this.nativeViewProtected.setHierarchy(hierarchy);
+            this.nativeImageViewProtected.setHierarchy(hierarchy);
         }
     }
 
@@ -777,7 +777,7 @@ export class Img extends ImageBase {
         let drawable: android.graphics.drawable.BitmapDrawable;
         if (typeof path === 'string') {
             if (isFontIconURI(path)) {
-                const fontIconCode = (path).split('//')[1];
+                const fontIconCode = path.split('//')[1];
                 if (fontIconCode !== undefined) {
                     // support sync mode only
                     const font = this.style.fontInternal;
@@ -815,8 +815,8 @@ export class Img extends ImageBase {
     }
 
     startAnimating() {
-        if (this.nativeViewProtected) {
-            const controller = this.nativeViewProtected.getController();
+        if (this.nativeImageViewProtected) {
+            const controller = this.nativeImageViewProtected.getController();
             if (controller) {
                 const animatable = controller.getAnimatable();
                 if (animatable) {
@@ -826,8 +826,8 @@ export class Img extends ImageBase {
         }
     }
     stopAnimating() {
-        if (this.nativeViewProtected) {
-            const controller = this.nativeViewProtected.getController();
+        if (this.nativeImageViewProtected) {
+            const controller = this.nativeImageViewProtected.getController();
             if (controller) {
                 const animatable = controller.getAnimatable();
                 if (animatable) {
@@ -842,7 +842,7 @@ class GenericDraweeHierarchyBuilder {
     private nativeBuilder: com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 
     constructor() {
-        const res = androidApp.context.getResources();
+        const res = ad.getApplicationContext().getResources();
         this.nativeBuilder = new com.facebook.drawee.generic.GenericDraweeHierarchyBuilder(res);
     }
 

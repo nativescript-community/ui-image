@@ -1,0 +1,11 @@
+import groovy.json.JsonSlurper
+dependencies {
+    implementation "androidx.annotation:annotation:1.1.0"
+    def androidxVersion =  project.hasProperty("androidxVersion") ? project.androidxVersion : "1.8.0"
+	implementation "androidx.core:core:$androidxVersion"
+}
+
+repositories {
+	mavenCentral()
+
+}

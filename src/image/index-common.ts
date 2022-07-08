@@ -12,14 +12,13 @@ export enum CLogTypes {
     log = Trace.messageType.log,
     info = Trace.messageType.info,
     warning = Trace.messageType.warn,
-    error = Trace.messageType.error,
+    error = Trace.messageType.error
 }
 
 export const ImageViewTraceCategory = 'NativescriptImage';
 export const CLog = (type: CLogTypes, ...args) => {
-    Trace.write(args.map(a=>(a && typeof a === 'object'? JSON.stringify(a) :a)).join(' '), ImageViewTraceCategory, type);
+    Trace.write(args.map((a) => (a && typeof a === 'object' ? JSON.stringify(a) : a)).join(' '), ImageViewTraceCategory, type);
 };
-
 
 export type Transition = 'fade' | 'curlUp';
 
@@ -35,7 +34,7 @@ export enum ScaleType {
     FitEnd = 'fitEnd',
     FitStart = 'fitStart',
     FitXY = 'fitXY',
-    FocusCrop = 'focusCrop',
+    FocusCrop = 'focusCrop'
 }
 
 export interface AnimatedImage {
@@ -144,16 +143,34 @@ export class ImageBase extends View {
     public static alwaysFadeProperty = new Property<ImageBase, boolean>({ name: 'alwaysFade', valueConverter: booleanConverter, defaultValue: false });
     public static fadeDurationProperty = new Property<ImageBase, number>({ name: 'fadeDuration', valueConverter: (v) => parseFloat(v) });
     public static noCacheProperty = new Property<ImageBase, boolean>({ name: 'noCache', defaultValue: false, valueConverter: booleanConverter });
-    public static roundTopLeftRadiusProperty = new Property<ImageBase, CoreTypes.LengthType>({ name: 'roundTopLeftRadius', defaultValue: 0,  valueConverter: (v)=>Length.toDevicePixels(Length.parse(v))});
-    public static roundTopRightRadiusProperty = new Property<ImageBase, CoreTypes.LengthType>({ name: 'roundTopRightRadius', defaultValue: 0,  valueConverter: (v)=>Length.toDevicePixels(Length.parse(v))});
-    public static roundBottomLeftRadiusProperty = new Property<ImageBase, CoreTypes.LengthType>({ name: 'roundBottomLeftRadius', defaultValue: 0,  valueConverter: (v)=>Length.toDevicePixels(Length.parse(v))});
-    public static roundBottomRightRadiusProperty = new Property<ImageBase, CoreTypes.LengthType>({ name: 'roundBottomRightRadius', defaultValue: 0,  valueConverter: (v)=>Length.toDevicePixels(Length.parse(v))});
+    public static roundTopLeftRadiusProperty = new Property<ImageBase, CoreTypes.LengthType>({
+        name: 'roundTopLeftRadius',
+        defaultValue: 0,
+        valueConverter: (v) => Length.toDevicePixels(Length.parse(v))
+    });
+    public static roundTopRightRadiusProperty = new Property<ImageBase, CoreTypes.LengthType>({
+        name: 'roundTopRightRadius',
+        defaultValue: 0,
+        valueConverter: (v) => Length.toDevicePixels(Length.parse(v))
+    });
+    public static roundBottomLeftRadiusProperty = new Property<ImageBase, CoreTypes.LengthType>({
+        name: 'roundBottomLeftRadius',
+        defaultValue: 0,
+        valueConverter: (v) => Length.toDevicePixels(Length.parse(v))
+    });
+    public static roundBottomRightRadiusProperty = new Property<ImageBase, CoreTypes.LengthType>({
+        name: 'roundBottomRightRadius',
+        defaultValue: 0,
+        valueConverter: (v) => Length.toDevicePixels(Length.parse(v))
+    });
 
-
-
-    public static clipToBoundsProperty = new Property<ImageBase, boolean>({ name: 'clipToBounds', defaultValue: true, valueConverter: booleanConverter});
-    public static animatedImageViewProperty = new Property<ImageBase, boolean>({ name: 'animatedImageView', defaultValue: false, valueConverter: booleanConverter});
+    public static clipToBoundsProperty = new Property<ImageBase, boolean>({ name: 'clipToBounds', defaultValue: true, valueConverter: booleanConverter });
+    public static animatedImageViewProperty = new Property<ImageBase, boolean>({ name: 'animatedImageView', defaultValue: false, valueConverter: booleanConverter });
     // public static blendingModeProperty = new Property<ImageBase, string>({ name: 'blendingMode' });
+
+    get nativeImageViewProtected() {
+        return this.nativeViewProtected;
+    }
 
     protected handleImageProgress(value: number, totalSize?: number) {}
     private static needsSizeAdjustment(scaleType: ScaleType) {

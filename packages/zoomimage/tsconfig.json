@@ -1,0 +1,9 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "rootDir": "../../src/zoomimage",
+        "outDir": "./"
+    },
+    "include": ["../../src/zoomimage/**/*", "../../references.d.ts", "../../src/references.d.ts"],
+    "exclude": ["../../src/zoomimage/angular/**"]
+}

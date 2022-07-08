@@ -80,7 +80,6 @@ function getUIImageScaleType(scaleType: string) {
 
 export function initialize(config?: ImagePipelineConfigSetting): void {
     SDImageLoadersManager.sharedManager.loaders = NSArray.arrayWithArray([SDWebImageDownloader.sharedDownloader, SDImagePhotosLoader.sharedLoader]);
-
 }
 export function shutDown(): void {}
 
@@ -178,11 +177,9 @@ function getUri(src: string | ImageAsset) {
         if (found) {
             return uri;
         }
-    }
-    else if (uri.indexOf('~/') === 0) {
+    } else if (uri.indexOf('~/') === 0) {
         return NSURL.fileURLWithPath(`${path.join(knownFolders.currentApp().path, uri.replace('~/', ''))}`);
-    }
-    else if (uri.indexOf('/') === 0) {
+    } else if (uri.indexOf('/') === 0) {
         return NSURL.fileURLWithPath(uri);
     }
     return NSURL.URLWithString(uri);
@@ -190,10 +187,12 @@ function getUri(src: string | ImageAsset) {
 
 export class Img extends ImageBase {
     nativeViewProtected: SDAnimatedImageView | UIImageView;
+    //@ts-ignore
+    nativeImageViewProtected: SDAnimatedImageView | UIImageView;
     isLoading = false;
     private _imageSourceAffectsLayout: boolean = true;
     public createNativeView() {
-        const result = this.animatedImageView ? SDAnimatedImageView.new() :  UIImageView.new();
+        const result = this.animatedImageView ? SDAnimatedImageView.new() : UIImageView.new();
         result.contentMode = UIViewContentMode.ScaleAspectFit;
         result.clipsToBounds = true;
         result.userInteractionEnabled = true; // needed for gestures to work
@@ -213,7 +212,7 @@ export class Img extends ImageBase {
         const height = layout.getMeasureSpecSize(heightMeasureSpec);
         const heightMode = layout.getMeasureSpecMode(heightMeasureSpec);
 
-        const image = this.nativeViewProtected.image;
+        const image = this.nativeImageViewProtected.image;
 
         const finiteWidth: boolean = widthMode === layout.EXACTLY;
         const finiteHeight: boolean = heightMode === layout.EXACTLY;
@@ -256,19 +255,18 @@ export class Img extends ImageBase {
     }
 
     public _setNativeImage(nativeImage: UIImage, animated = true) {
-
         if (animated) {
             // switch (this.transition) {
             //     case 'fade':
-            this.nativeViewProtected.alpha = 0.0;
-            this.nativeViewProtected.image = nativeImage;
+            this.nativeImageViewProtected.alpha = 0.0;
+            this.nativeImageViewProtected.image = nativeImage;
             UIView.animateWithDurationAnimations(this.fadeDuration / 1000, () => {
-                this.nativeViewProtected.alpha = this.opacity;
+                this.nativeImageViewProtected.alpha = this.opacity;
             });
             //     break;
             // case 'curlUp':
             //     UIView.transitionWithViewDurationOptionsAnimationsCompletion(
-            //         this.nativeViewProtected,
+            //        this.nativeImageViewProtected,
             //         0.3,
             //         UIViewAnimationOptions.TransitionCrossDissolve,
             //         () => {
@@ -281,7 +279,7 @@ export class Img extends ImageBase {
             //     this._setNativeImage(image);
             // }
         } else {
-            this.nativeViewProtected.image = nativeImage;
+            this.nativeImageViewProtected.image = nativeImage;
         }
 
         if (this._imageSourceAffectsLayout) {
@@ -297,14 +295,14 @@ export class Img extends ImageBase {
             this._setNativeImage(image, animate);
         }
         if (!this.autoPlayAnimations) {
-            this.nativeViewProtected.stopAnimating();
+            this.nativeImageViewProtected.stopAnimating();
         }
 
         if (error) {
             const args = {
                 eventName: Img.failureEvent,
                 object: this,
-                error,
+                error
             };
 
             this.notify(args);
@@ -317,7 +315,7 @@ export class Img extends ImageBase {
                 eventName: ImageBase.finalImageSetEvent,
                 object: this,
                 imageInfo: new ImageInfo(image.size.width, image.size.height),
-                ios: image,
+                ios: image
             } as FinalEventData;
 
             this.notify(args);
@@ -335,12 +333,12 @@ export class Img extends ImageBase {
         let image;
         if (typeof imagePath === 'string') {
             if (isFontIconURI(imagePath)) {
-                const fontIconCode = (imagePath).split('//')[1];
+                const fontIconCode = imagePath.split('//')[1];
                 if (fontIconCode !== undefined) {
                     // support sync mode only
                     const font = this.style.fontInternal;
                     const color = this.style.color;
-                    image = (ImageSource.fromFontIconCodeSync(fontIconCode, font, color).ios);
+                    image = ImageSource.fromFontIconCodeSync(fontIconCode, font, color).ios;
                 }
             }
             if (!image && isFileOrResourcePath(imagePath)) {
@@ -371,7 +369,7 @@ export class Img extends ImageBase {
                     return;
                 } else if (typeof src === 'string') {
                     if (isFontIconURI(src)) {
-                        const fontIconCode = (src).split('//')[1];
+                        const fontIconCode = src.split('//')[1];
                         if (fontIconCode !== undefined) {
                             // support sync mode only
                             const font = this.style.fontInternal;
@@ -380,7 +378,6 @@ export class Img extends ImageBase {
                         }
                         return;
                     }
-
                 }
 
                 const uri = getUri(src);
@@ -418,12 +415,15 @@ export class Img extends ImageBase {
                     transformers.push(NSImageRoundAsCircleTransformer.transformer());
                 }
                 if (this.roundBottomLeftRadius || this.roundBottomRightRadius || this.roundTopLeftRadius || this.roundTopRightRadius) {
-                    //@ts-ignore
-                    transformers.push(NSImageRoundCornerTransformer.transformerWithTopLefRadiusTopRightRadiusBottomRightRadiusBottomLeftRadius(
-                        layout.toDeviceIndependentPixels(this.roundTopLeftRadius),
-                        layout.toDeviceIndependentPixels(this.roundTopRightRadius),
-                        layout.toDeviceIndependentPixels(this.roundBottomRightRadius),
-                        layout.toDeviceIndependentPixels(this.roundBottomLeftRadius)));
+                    transformers.push(
+                        //@ts-ignore
+                        NSImageRoundCornerTransformer.transformerWithTopLefRadiusTopRightRadiusBottomRightRadiusBottomLeftRadius(
+                            layout.toDeviceIndependentPixels(this.roundTopLeftRadius),
+                            layout.toDeviceIndependentPixels(this.roundTopRightRadius),
+                            layout.toDeviceIndependentPixels(this.roundBottomRightRadius),
+                            layout.toDeviceIndependentPixels(this.roundBottomLeftRadius)
+                        )
+                    );
                 }
                 if (transformers.length > 0) {
                     if (this.animatedImageView) {
@@ -432,7 +432,7 @@ export class Img extends ImageBase {
                     }
                     context.setValueForKey(SDImagePipelineTransformer.transformerWithTransformers(transformers), SDWebImageContextImageTransformer);
                 }
-                this.nativeViewProtected.sd_setImageWithURLPlaceholderImageOptionsContextProgressCompleted(
+                this.nativeImageViewProtected.sd_setImageWithURLPlaceholderImageOptionsContextProgressCompleted(
                     uri,
                     this.placeholderImage,
                     options,
@@ -464,27 +464,27 @@ export class Img extends ImageBase {
         if (!this.nativeView) {
             return;
         }
-        this.nativeViewProtected.contentMode = getUIImageScaleType(value);
+        this.nativeImageViewProtected.contentMode = getUIImageScaleType(value);
     }
     // [ImageBase.blendingModeProperty.setNative](value: string) {
     //     console.log('blendingModeProperty', value);
     //     switch (value) {
     //         case 'multiply':
-    //             this.nativeViewProtected.layer.compositingFilter = 'multiply';
+    //            this.nativeImageViewProtected.layer.compositingFilter = 'multiply';
     //             break;
     //         case 'lighten':
-    //             this.nativeViewProtected.layer.compositingFilter = 'lighten';
+    //            this.nativeImageViewProtected.layer.compositingFilter = 'lighten';
     //             break;
     //         case 'screen':
-    //             this.nativeViewProtected.layer.compositingFilter = 'screen';
+    //            this.nativeImageViewProtected.layer.compositingFilter = 'screen';
     //             break;
     //     }
     // }
 
     startAnimating() {
-        this.nativeViewProtected.startAnimating();
+        this.nativeImageViewProtected.startAnimating();
     }
     stopAnimating() {
-        this.nativeViewProtected.stopAnimating();
+        this.nativeImageViewProtected.stopAnimating();
     }
 }

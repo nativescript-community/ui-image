@@ -1,0 +1,18 @@
+{
+  "name": "@nativescript-community/ui-image-angular",
+  "main": "index.js",
+  "ngPackage": {
+    "dest": "../../plugin/angular",
+    "lib": {
+      "entryFile": "index.ts",
+      "umdModuleIds": {
+        "@nativescript/core": "ns-core",
+        "@nativescript/angular": "ns-angular",
+        "@nativescript-community/ui-image": "ns-image"
+      }
+    },
+    "whitelistedNonPeerDependencies": [
+      "."
+    ]
+  }
+}
