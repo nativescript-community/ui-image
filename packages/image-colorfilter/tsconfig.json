@@ -1,0 +1,9 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "rootDir": "../../src/image-colorfilter",
+        "outDir": "./"
+    },
+    "include": ["../../src/image-colorfilter/**/*", "../../references.d.ts", "../../src/references.d.ts"],
+    "exclude": ["../../src/image-colorfilter/angular/**"]
+}

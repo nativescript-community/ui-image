@@ -1,0 +1,49 @@
+{
+    "name": "@nativescript-community/ui-image-colorfilter",
+    "version": "4.1.8",
+    "description": "color matrix filters for @nativescript-community/ui-image",
+    "main": "./index",
+    "sideEffects": false,
+    "typings": "./index.d.ts",
+    "scripts": {
+        "build": "npm run tsc && npm run readme",
+        "build.all": "npm run build && npm run build.angular",
+        "readme": "../../node_modules/.bin/readme generate -c ../../tools/readme/blueprint.json",
+        "tsc": "../../node_modules/.bin/cpy '**/*.d.ts' '../../packages/image-colorfilter' --parents --cwd=../../src/image-colorfilter && ../../node_modules/.bin/tsc -skipLibCheck -d",
+        "clean": "../../node_modules/.bin/rimraf ./*.d.ts ./*.js ./*.js.map"
+    },
+    "nativescript": {
+        "platforms": {
+            "android": "6.0.0",
+            "ios": "6.0.0"
+        }
+    },
+    "keywords": [
+        "NativeScript",
+        "JavaScript",
+        "Fresco",
+        "SDWebImage",
+        "cache",
+        "caching",
+        "Android",
+        "iOS",
+        "Angular",
+        "Vue"
+    ],
+    "author": {
+        "name": "Martin Guillon",
+        "email": "martin@akylas.fr"
+    },
+    "bugs": {
+        "url": "https://github.com/nativescript-community/ui-image/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/nativescript-community/ui-image"
+    },
+    "dependencies": {
+        "@nativescript-community/ui-image": "^4.1.8"
+    },
+    "license": "Apache-2.0",
+    "readmeFilename": "README.md"
+}
