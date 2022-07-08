@@ -1,6 +1,6 @@
 import groovy.json.JsonSlurper
 dependencies {
-	def frescoVersion =  project.hasProperty("frescoVersion") ? project.frescoVersion : "2.3.0"
+	def frescoVersion =  project.hasProperty("frescoVersion") ? project.frescoVersion : "2.6.0"
 
 	implementation("com.facebook.fresco:fresco:$frescoVersion") {
         exclude group: 'com.facebook.soloader', module: 'soloader'
@@ -17,13 +17,12 @@ dependencies {
 
 repositories {
 	mavenCentral()
-	def appDir = "$rootDir/../../.."
-    def widgetsDir = "$appDir/node_modules/@nativescript/core/platforms/android"
-    def appPackageJsonFile = file("$appDir/package.json")
+	def widgetsDir = "$USER_PROJECT_ROOT/node_modules/@nativescript/core/platforms/android"
+    def appPackageJsonFile = file("$USER_PROJECT_ROOT/package.json")
     if (appPackageJsonFile.exists()) {
         def appPackageJson = new JsonSlurper().parseText(appPackageJsonFile.text)
-        if (appPackageJson.dependencies !=null && appPackageJson.dependencies["@akylas/nativescript"] != null) {
-            widgetsDir = "$appDir/node_modules/@akylas/nativescript/platforms/android"
+        if (appPackageJson.dependencies['@akylas/nativescript'] != null) {
+            widgetsDir = "$USER_PROJECT_ROOT/node_modules/@akylas/nativescript/platforms/android"
         }
     }
     flatDir {
