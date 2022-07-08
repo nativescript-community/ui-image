@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.2.1](https://github.com/nativescript-community/ui-image/compare/v4.2.0...v4.2.1) (2022-07-08)
+
+
+### Bug Fixes
+
+* **zoomimage:** cleanup ([bbaf5cc](https://github.com/nativescript-community/ui-image/commit/bbaf5cc5f3697a8204ca7ed17815e77db389de57))
+
+
+
+
+
 # [4.2.0](https://github.com/nativescript-community/ui-image/compare/v4.1.8...v4.2.0) (2022-07-08)
 
 
