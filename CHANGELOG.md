@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.2.0](https://github.com/@nativescript-community/ui-image/compare/v4.1.8...v4.2.0) (2022-07-08)
+
+
+### Bug Fixes
+
+* **image:** updated native deps ([8fb1f4b](https://github.com/@nativescript-community/ui-image/commit/8fb1f4ba1c30101443dbeb098ae23161ccf56a62))
+
+
+### Features
+
+* new `@nativescript-community/ui-image-colorfilter` pacakge ([2701766](https://github.com/@nativescript-community/ui-image/commit/27017668061e4ee988c45e068d709eff9b1a8f8c))
+* new `@nativescript-community/ui-zoomimage` package ([c8a2903](https://github.com/@nativescript-community/ui-image/commit/c8a2903b5dd014e13aa8c2df93724da995100a9b))
+
+
+
+
+
 ## [4.1.8](https://github.com/nativescript-community/ui-image/compare/v4.1.7...v4.1.8) (2022-07-01)
 
 

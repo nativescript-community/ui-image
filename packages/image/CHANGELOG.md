@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.2.0](https://github.com/nativescript-community/ui-image/compare/v4.1.8...v4.2.0) (2022-07-08)
+
+
+### Bug Fixes
+
+* **image:** updated native deps ([8fb1f4b](https://github.com/nativescript-community/ui-image/commit/8fb1f4ba1c30101443dbeb098ae23161ccf56a62))
+
+
+
+
+
 ## [4.1.8](https://github.com/nativescript-community/ui-image/compare/v4.1.7...v4.1.8) (2022-07-01)
 
 **Note:** Version bump only for package @nativescript-community/ui-image
