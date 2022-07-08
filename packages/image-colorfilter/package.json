@@ -7,7 +7,7 @@
     "typings": "./index.d.ts",
     "scripts": {
         "build": "npm run tsc && npm run readme",
-        "build.all": "npm run build && npm run build.angular",
+        "build.all": "npm run build",
         "readme": "../../node_modules/.bin/readme generate -c ../../tools/readme/blueprint.json",
         "tsc": "../../node_modules/.bin/cpy '**/*.d.ts' '../../packages/image-colorfilter' --parents --cwd=../../src/image-colorfilter && ../../node_modules/.bin/tsc -skipLibCheck -d",
         "clean": "../../node_modules/.bin/rimraf ./*.d.ts ./*.js ./*.js.map"
