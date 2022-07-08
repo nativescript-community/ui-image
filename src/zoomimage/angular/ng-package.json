@@ -1,0 +1,9 @@
+{
+    "dest": "../../../packages/zoomimage/angular",
+    "lib": {
+      "entryFile": "index.ts"
+    },
+    "allowedNonPeerDependencies": [
+      "."
+    ]
+}

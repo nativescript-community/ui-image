@@ -1,13 +1,12 @@
 {
-    "extends": "../../tsconfig.json",
+    "extends": "../../../tsconfig.json",
     "compilerOptions": {
         "rootDir": "./",
-        "baseUrl": "./",
         "plugins": [],
         "paths": {
-            "@nativescript-community/ui-image": ["../../plugin"]
+            "@nativescript-community/ui-zoomimage": ["packages/zoomimage"]
         }
     },
-    "include": ["./**/*.ts", "../references.d.ts", "../../references.d.ts"],
-    "exclude": ["../node_modules","../../node_modules"]
+    "include": ["./**/*.ts"],
+    "exclude": ["../node_modules"]
 }
