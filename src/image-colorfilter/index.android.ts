@@ -5,6 +5,10 @@ class ImgExtended {
     nativeImageViewProtected: com.nativescript.image.DraweeView;
     @cssProperty colorMatrix: number[];
     [colorMatrixProperty.setNative](value: number[]) {
+        if (!value) {
+            this.nativeImageViewProtected.setColorFilter(null);
+            return;
+        }
         const arr = Array.create('float', value.length);
         for (let index = 0; index < value.length; index++) {
             arr[index] = value[index];

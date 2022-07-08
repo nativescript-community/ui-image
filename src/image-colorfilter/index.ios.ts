@@ -44,7 +44,7 @@ class ImgExtended3 {
     _filter: CIFilter;
 
     filteredImage(image: UIImage, filter: CIFilter) {
-        if (image !== null) {
+        if (image !== null && filter !== null) {
             const tmp = CIImage.alloc().initWithImage(image);
             this._filter.setValueForKey(tmp, 'inputImage');
 
@@ -55,7 +55,7 @@ class ImgExtended3 {
             // CGImageRelease(cgim);
             return filteredImage;
         }
-        return null;
+        return image;
     }
     _applyColorFilter(image) {
         if (image) {
