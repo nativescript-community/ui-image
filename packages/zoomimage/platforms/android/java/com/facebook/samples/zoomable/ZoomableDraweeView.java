@@ -17,7 +17,6 @@ import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import androidx.core.view.ScrollingView;
-import com.facebook.common.internal.Preconditions;
 import com.facebook.drawee.controller.AbstractDraweeController;
 import com.facebook.drawee.controller.BaseControllerListener;
 import com.facebook.drawee.controller.ControllerListener;
@@ -158,7 +157,6 @@ public class ZoomableDraweeView extends DraweeView<GenericDraweeHierarchy>
 
   /** Sets a custom zoomable controller, instead of using the default one. */
   public void setZoomableController(ZoomableController zoomableController) {
-    Preconditions.checkNotNull(zoomableController);
     mZoomableController.setListener(null);
     mZoomableController = zoomableController;
     mZoomableController.setListener(mZoomableListener);

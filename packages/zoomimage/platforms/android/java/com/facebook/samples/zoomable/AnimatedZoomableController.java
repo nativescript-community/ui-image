@@ -13,7 +13,6 @@ import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.graphics.Matrix;
 import android.view.animation.DecelerateInterpolator;
-import com.facebook.common.internal.Preconditions;
 import com.facebook.samples.gestures.TransformGestureDetector;
 
 /**
@@ -42,8 +41,6 @@ public class AnimatedZoomableController extends AbstractAnimatedZoomableControll
   public void setTransformAnimated(
       final Matrix newTransform, long durationMs,final Runnable onAnimationComplete) {
     stopAnimation();
-    Preconditions.checkArgument(durationMs > 0);
-    Preconditions.checkState(!isAnimating());
     setAnimating(true);
     mValueAnimator.setDuration(durationMs);
     getTransform().getValues(getStartValues());

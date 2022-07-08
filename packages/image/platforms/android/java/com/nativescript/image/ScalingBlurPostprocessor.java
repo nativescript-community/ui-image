@@ -11,7 +11,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import com.facebook.common.internal.Preconditions;
 import com.facebook.common.references.CloseableReference;
 import com.facebook.imagepipeline.bitmaps.PlatformBitmapFactory;
 import com.facebook.imagepipeline.nativecode.NativeBlurFilter;
@@ -32,7 +31,6 @@ public class ScalingBlurPostprocessor extends BasePostprocessor {
   private final int mScaleRatio;
 
   public ScalingBlurPostprocessor(int iterations, int blurRadius, int scaleRatio) {
-    Preconditions.checkArgument(scaleRatio > 0);
 
     mIterations = iterations;
     mBlurRadius = blurRadius;
