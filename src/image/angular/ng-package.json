@@ -1,0 +1,9 @@
+{
+    "dest": "../../../packages/image/angular",
+    "lib": {
+      "entryFile": "index.ts"
+    },
+    "allowedNonPeerDependencies": [
+      "."
+    ]
+}
