@@ -431,6 +431,11 @@ export class Img extends ImageBase {
     [ImageBase.roundTopLeftRadiusProperty.setNative]() {
         this.updateHierarchy();
     }
+    [ImageBase.imageRotationProperty.setNative](value) {
+        const scaleType = this.nativeImageViewProtected.getHierarchy().getActualImageScaleType();
+        scaleType['setImageRotation']?.(value);
+        this.nativeImageViewProtected.invalidate();
+    }
 
     [ImageBase.roundTopRightRadiusProperty.setNative]() {
         this.updateHierarchy();
@@ -739,7 +744,7 @@ export class Img extends ImageBase {
             }
 
             if (this.stretch) {
-                builder.setActualImageScaleType(this.stretch);
+                builder.setActualImageScaleType(this.stretch, this.imageRotation);
             }
 
             if (this.fadeDuration) {
@@ -883,12 +888,15 @@ class GenericDraweeHierarchyBuilder {
         return this;
     }
 
-    public setActualImageScaleType(scaleType: ScaleType): GenericDraweeHierarchyBuilder {
+    public setActualImageScaleType(scaleType: ScaleType, imageRotation): GenericDraweeHierarchyBuilder {
         if (!this.nativeBuilder) {
             return this;
         }
-
-        this.nativeBuilder.setActualImageScaleType(getScaleType(scaleType));
+        const nativeScaleType = getScaleType(scaleType);
+        if (nativeScaleType['setImageRotation']) {
+            nativeScaleType['setImageRotation'](imageRotation);
+        }
+        this.nativeBuilder.setActualImageScaleType(nativeScaleType);
 
         return this;
     }
@@ -964,24 +972,32 @@ function getScaleType(scaleType: ScaleType) {
     if (isString(scaleType)) {
         switch (scaleType) {
             case ScaleType.Center:
-                return com.facebook.drawee.drawable.ScalingUtils.ScaleType.CENTER;
+                //@ts-ignore
+                return com.nativescript.image.ScalingUtils.ScaleType.CENTER;
             case ScaleType.AspectFill:
             case ScaleType.CenterCrop:
-                return com.facebook.drawee.drawable.ScalingUtils.ScaleType.CENTER_CROP;
+                //@ts-ignore
+                return com.nativescript.image.ScalingUtils.ScaleType.CENTER_CROP;
             case ScaleType.CenterInside:
-                return com.facebook.drawee.drawable.ScalingUtils.ScaleType.CENTER_INSIDE;
+                //@ts-ignore
+                return com.nativescript.image.ScalingUtils.ScaleType.CENTER_INSIDE;
             case ScaleType.FitCenter:
             case ScaleType.AspectFit:
-                return com.facebook.drawee.drawable.ScalingUtils.ScaleType.FIT_CENTER;
+                //@ts-ignore
+                return com.nativescript.image.ScalingUtils.ScaleType.FIT_CENTER;
             case ScaleType.FitEnd:
-                return com.facebook.drawee.drawable.ScalingUtils.ScaleType.FIT_END;
+                //@ts-ignore
+                return com.nativescript.image.ScalingUtils.ScaleType.FIT_END;
             case ScaleType.FitStart:
-                return com.facebook.drawee.drawable.ScalingUtils.ScaleType.FIT_START;
+                //@ts-ignore
+                return com.nativescript.image.ScalingUtils.ScaleType.FIT_START;
             case ScaleType.Fill:
             case ScaleType.FitXY:
-                return com.facebook.drawee.drawable.ScalingUtils.ScaleType.FIT_XY;
+                //@ts-ignore
+                return com.nativescript.image.ScalingUtils.ScaleType.FIT_XY;
             case ScaleType.FocusCrop:
-                return com.facebook.drawee.drawable.ScalingUtils.ScaleType.FOCUS_CROP;
+                //@ts-ignore
+                return com.nativescript.image.ScalingUtils.ScaleType.FOCUS_CROP;
             default:
                 break;
         }

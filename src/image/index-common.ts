@@ -95,6 +95,7 @@ export class ImageBase extends View {
     public failureImageUri: string;
     public stretch: ScaleType;
     public fadeDuration: number;
+    public imageRotation: number;
     public backgroundUri: string;
     public progressiveRenderingEnabled: boolean;
     public localThumbnailPreviewsEnabled: boolean;
@@ -134,6 +135,7 @@ export class ImageBase extends View {
     public static roundAsCircleProperty = new Property<ImageBase, boolean>({ name: 'roundAsCircle', valueConverter: booleanConverter, affectsLayout: isAndroid });
     public static blurRadiusProperty = new Property<ImageBase, number>({ name: 'blurRadius', valueConverter: (v) => parseFloat(v) });
     public static blurDownSamplingProperty = new Property<ImageBase, number>({ name: 'blurDownSampling', valueConverter: (v) => parseFloat(v) });
+    public static imageRotationProperty = new Property<ImageBase, number>({ name: 'imageRotation', valueConverter: (v) => parseFloat(v) });
     public static autoPlayAnimationsProperty = new Property<ImageBase, boolean>({ name: 'autoPlayAnimations', valueConverter: booleanConverter });
     public static tapToRetryEnabledProperty = new Property<ImageBase, boolean>({ name: 'tapToRetryEnabled', valueConverter: booleanConverter });
     public static aspectRatioProperty = new Property<ImageBase, number>({ name: 'aspectRatio', affectsLayout: true, valueConverter: (v) => parseFloat(v) });
@@ -266,6 +268,7 @@ ImageBase.roundBottomLeftRadiusProperty.register(ImageBase);
 ImageBase.roundBottomRightRadiusProperty.register(ImageBase);
 ImageBase.blurRadiusProperty.register(ImageBase);
 ImageBase.blurDownSamplingProperty.register(ImageBase);
+ImageBase.imageRotationProperty.register(ImageBase);
 ImageBase.autoPlayAnimationsProperty.register(ImageBase);
 ImageBase.tapToRetryEnabledProperty.register(ImageBase);
 ImageBase.aspectRatioProperty.register(ImageBase);
