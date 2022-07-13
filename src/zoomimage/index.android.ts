@@ -8,7 +8,12 @@ export class ZoomImg extends ZoomImageBase {
     nativeImageViewProtected: com.facebook.samples.zoomable.ZoomableDraweeView;
     public createNativeView() {
         //@ts-ignore
-        return new com.facebook.samples.zoomable.ZoomableDraweeView(this._context);
+        const view = new com.facebook.samples.zoomable.ZoomableDraweeView(this._context);
+        view.setIsLongpressEnabled(false);
+        view.setAllowTouchInterceptionWhileZoomed(false);
+        //@ts-ignore
+        view.setTapListener(new com.facebook.samples.zoomable.DoubleTapGestureListener(view));
+        return view;
     }
 
     [zoomScaleProperty.setNative](scale: number) {
