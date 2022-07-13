@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.3.0](https://github.com/nativescript-community/ui-image/compare/v4.2.1...v4.3.0) (2022-07-13)
+
+
+### Features
+
+* **image:** imageRotation support (android only for now) ([1f5b597](https://github.com/nativescript-community/ui-image/commit/1f5b59749317ad73e03961c280206fa2523d0b8d))
+
+
+
+
+
 ## [4.2.1](https://github.com/nativescript-community/ui-image/compare/v4.2.0...v4.2.1) (2022-07-08)
 
 **Note:** Version bump only for package @nativescript-community/ui-image

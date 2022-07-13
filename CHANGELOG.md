@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.3.0](https://github.com/@nativescript-community/ui-image/compare/v4.2.1...v4.3.0) (2022-07-13)
+
+
+### Bug Fixes
+
+* **image-colorfilter:** property handling fix ([49ee178](https://github.com/@nativescript-community/ui-image/commit/49ee178cbf3100c96d12116a7894af67abc4c05c))
+* **zoomimage:** double tap zoom + pager fix ([c94408c](https://github.com/@nativescript-community/ui-image/commit/c94408cc9eb80ccf150da8348ffbac4903d428d6))
+
+
+### Features
+
+* **image:** imageRotation support (android only for now) ([1f5b597](https://github.com/@nativescript-community/ui-image/commit/1f5b59749317ad73e03961c280206fa2523d0b8d))
+
+
+
+
+
 ## [4.2.1](https://github.com/@nativescript-community/ui-image/compare/v4.2.0...v4.2.1) (2022-07-08)
 
 
