@@ -100,14 +100,13 @@ export const colorMatrixProperty = new CssProperty<Style, number[]>({
     name: 'colorMatrix',
     cssName: 'color-matrix',
     valueConverter: (v) => {
-        if (Array.isArray(v)) {
-            return v;
-        } else if (typeof v === 'string') {
+        if (typeof v === 'string') {
             if (!v.startsWith('[')) {
                 v = `[${v}]`;
             }
             return JSON.parse(v);
         }
+        return v;
     }
 });
 colorMatrixProperty.register(Style);

@@ -9,9 +9,12 @@ class ImgExtended {
             this.nativeImageViewProtected.setColorFilter(null);
             return;
         }
-        const arr = Array.create('float', value.length);
-        for (let index = 0; index < value.length; index++) {
-            arr[index] = value[index];
+        let arr = value;
+        if (Array.isArray(value)) {
+            arr = Array.create('float', value.length);
+            for (let index = 0; index < value.length; index++) {
+                arr[index] = value[index];
+            }
         }
         this.nativeImageViewProtected.setColorFilter(new android.graphics.ColorMatrixColorFilter(arr));
     }
