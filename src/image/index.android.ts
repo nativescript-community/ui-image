@@ -973,31 +973,31 @@ function getScaleType(scaleType: ScaleType) {
         switch (scaleType) {
             case ScaleType.Center:
                 //@ts-ignore
-                return com.nativescript.image.ScalingUtils.ScaleType.CENTER;
+                return new com.nativescript.image.ScalingUtils.ScaleTypeCenter();
             case ScaleType.AspectFill:
             case ScaleType.CenterCrop:
                 //@ts-ignore
-                return com.nativescript.image.ScalingUtils.ScaleType.CENTER_CROP;
+                return new com.nativescript.image.ScalingUtils.ScaleTypeCenterCrop();
             case ScaleType.CenterInside:
                 //@ts-ignore
-                return com.nativescript.image.ScalingUtils.ScaleType.CENTER_INSIDE;
+                return new com.nativescript.image.ScalingUtils.ScaleTypeCenterInside();
             case ScaleType.FitCenter:
             case ScaleType.AspectFit:
                 //@ts-ignore
-                return com.nativescript.image.ScalingUtils.ScaleType.FIT_CENTER;
+                return new com.nativescript.image.ScalingUtils.ScaleTypeFitCenter();
             case ScaleType.FitEnd:
                 //@ts-ignore
-                return com.nativescript.image.ScalingUtils.ScaleType.FIT_END;
+                return new com.nativescript.image.ScalingUtils.ScaleTypeFitEnd();
             case ScaleType.FitStart:
                 //@ts-ignore
-                return com.nativescript.image.ScalingUtils.ScaleType.FIT_START;
+                return new com.nativescript.image.ScalingUtils.ScaleTypeFitStart();
             case ScaleType.Fill:
             case ScaleType.FitXY:
                 //@ts-ignore
-                return com.nativescript.image.ScalingUtils.ScaleType.FIT_XY;
+                return new com.nativescript.image.ScalingUtils.ScaleTypeFitXY();
             case ScaleType.FocusCrop:
                 //@ts-ignore
-                return com.nativescript.image.ScalingUtils.ScaleType.FOCUS_CROP;
+                return new com.nativescript.image.ScalingUtils.ScaleTypeFocusCrop();
             default:
                 break;
         }

@@ -173,7 +173,7 @@ public class ScalingUtils {
         float scaleY);
   }
 
-  private static class ScaleTypeFitXY extends AbstractScaleType {
+  public static class ScaleTypeFitXY extends AbstractScaleType {
 
     public static final com.facebook.drawee.drawable.ScalingUtils.ScaleType INSTANCE = new ScaleTypeFitXY();
 
@@ -199,7 +199,7 @@ public class ScalingUtils {
     }
   }
 
-  private static class ScaleTypeFitStart extends AbstractScaleType {
+  public static class ScaleTypeFitStart extends AbstractScaleType {
 
     public static final com.facebook.drawee.drawable.ScalingUtils.ScaleType INSTANCE = new ScaleTypeFitStart();
 
@@ -226,7 +226,7 @@ public class ScalingUtils {
     }
   }
 
-  private static class ScaleTypeFitBottomStart extends AbstractScaleType {
+  public static class ScaleTypeFitBottomStart extends AbstractScaleType {
 
     public static final com.facebook.drawee.drawable.ScalingUtils.ScaleType INSTANCE = new ScaleTypeFitBottomStart();
 
@@ -253,7 +253,7 @@ public class ScalingUtils {
     }
   }
 
-  private static class ScaleTypeFitCenter extends AbstractScaleType {
+  public static class ScaleTypeFitCenter extends AbstractScaleType {
 
     public static final com.facebook.drawee.drawable.ScalingUtils.ScaleType INSTANCE = new ScaleTypeFitCenter();
 
@@ -280,7 +280,7 @@ public class ScalingUtils {
     }
   }
 
-  private static class ScaleTypeFitEnd extends AbstractScaleType {
+  public static class ScaleTypeFitEnd extends AbstractScaleType {
 
     public static final com.facebook.drawee.drawable.ScalingUtils.ScaleType INSTANCE = new ScaleTypeFitEnd();
 
@@ -307,7 +307,7 @@ public class ScalingUtils {
     }
   }
 
-  private static class ScaleTypeCenter extends AbstractScaleType {
+  public static class ScaleTypeCenter extends AbstractScaleType {
 
     public static final com.facebook.drawee.drawable.ScalingUtils.ScaleType INSTANCE = new ScaleTypeCenter();
 
@@ -332,7 +332,7 @@ public class ScalingUtils {
     }
   }
 
-  private static class ScaleTypeCenterInside extends AbstractScaleType {
+  public static class ScaleTypeCenterInside extends AbstractScaleType {
 
     public static final com.facebook.drawee.drawable.ScalingUtils.ScaleType INSTANCE = new ScaleTypeCenterInside();
 
@@ -359,7 +359,7 @@ public class ScalingUtils {
     }
   }
 
-  private static class ScaleTypeCenterCrop extends AbstractScaleType {
+  public static class ScaleTypeCenterCrop extends AbstractScaleType {
 
     public static final com.facebook.drawee.drawable.ScalingUtils.ScaleType INSTANCE = new ScaleTypeCenterCrop();
 
@@ -393,7 +393,7 @@ public class ScalingUtils {
     }
   }
 
-  private static class ScaleTypeFocusCrop extends AbstractScaleType {
+  public static class ScaleTypeFocusCrop extends AbstractScaleType {
 
     public static final com.facebook.drawee.drawable.ScalingUtils.ScaleType INSTANCE = new ScaleTypeFocusCrop();
 
@@ -429,7 +429,7 @@ public class ScalingUtils {
     }
   }
 
-  private static class ScaleTypeFitX extends AbstractScaleType {
+  public static class ScaleTypeFitX extends AbstractScaleType {
 
     public static final com.facebook.drawee.drawable.ScalingUtils.ScaleType INSTANCE = new ScaleTypeFitX();
 
@@ -457,7 +457,7 @@ public class ScalingUtils {
     }
   }
 
-  private static class ScaleTypeFitY extends AbstractScaleType {
+  public static class ScaleTypeFitY extends AbstractScaleType {
 
     public static final com.facebook.drawee.drawable.ScalingUtils.ScaleType INSTANCE = new ScaleTypeFitY();
 
