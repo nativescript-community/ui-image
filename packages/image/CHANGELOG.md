@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.1](https://github.com/nativescript-community/ui-image/compare/v4.3.0...v4.3.1) (2022-07-14)
+
+
+### Bug Fixes
+
+* **image:** make imageRotation work in ListView ([58913bd](https://github.com/nativescript-community/ui-image/commit/58913bde275284ed704fac07b4154c11090bc7b9))
+
+
+
+
+
 # [4.3.0](https://github.com/nativescript-community/ui-image/compare/v4.2.1...v4.3.0) (2022-07-13)
 
 
