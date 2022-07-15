@@ -144,13 +144,18 @@ public class ScalingUtils {
         float focusY) {
         float sX = (float) parentRect.width() / (float) childWidth;
         float sY = (float) parentRect.height() / (float) childHeight;
-        float rotationDelta = _imageRotation % 180;
-        if (rotationDelta != 0) {
+        float rotationDelta = (90 - (_imageRotation % 180))/90.0f;
+        if (rotationDelta != 1) {
             float destSX = (float) parentRect.width() / (float) childHeight;
             float destSY = (float) parentRect.height() / (float) childWidth;
-            final float pos = Math.abs(rotationDelta)/90.0f;
-            sX = sX + pos * (destSX - sX);
-            sY = sY + pos * (destSY - sY);
+          if (rotationDelta < 0) {
+            sX = destSX + rotationDelta * (destSX - sX);
+            sY = destSY + rotationDelta * (destSY - sY);
+          } else {
+            sX = sX + (1 - rotationDelta) * (destSX - sX);
+            sY = sY + (1 - rotationDelta) * (destSY - sY);
+          }
+            
         }
         getTransformImpl(outTransform, parentRect, childWidth, childHeight, focusX, focusY, sX, sY);
         if (_imageMatrix != null) {
