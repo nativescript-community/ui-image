@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.2](https://github.com/@nativescript-community/ui-image/compare/v4.3.1...v4.3.2) (2022-07-15)
+
+
+### Bug Fixes
+
+* **image:** imageRotation scaling fix ([2f12172](https://github.com/@nativescript-community/ui-image/commit/2f12172c022c9e6122420763a43b68a2bc137503))
+
+
+
+
+
 ## [4.3.1](https://github.com/@nativescript-community/ui-image/compare/v4.3.0...v4.3.1) (2022-07-14)
 
 
