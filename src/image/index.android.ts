@@ -313,6 +313,16 @@ export const needRequestImage = function (target: any, propertyKey: string | Sym
         return originalMethod.apply(this, args);
     };
 };
+export const needUpdateHierarchy = function (target: any, propertyKey: string | Symbol, descriptor: PropertyDescriptor) {
+    const originalMethod = descriptor.value;
+    descriptor.value = function (...args: any[]) {
+        if (!this._canUpdateHierarchy) {
+            this._needUpdateHierarchy = true;
+            return;
+        }
+        return originalMethod.apply(this, args);
+    };
+};
 
 export class Img extends ImageBase {
     nativeViewProtected: com.nativescript.image.DraweeView;
@@ -391,38 +401,47 @@ export class Img extends ImageBase {
         this.src = src;
     }
 
+    @needUpdateHierarchy
     [ImageBase.placeholderImageUriProperty.setNative]() {
         this.updateHierarchy();
     }
 
+    @needUpdateHierarchy
     [ImageBase.failureImageUriProperty.setNative]() {
         this.updateHierarchy();
     }
 
+    @needUpdateHierarchy
     [ImageBase.stretchProperty.setNative]() {
         this.updateHierarchy();
     }
 
+    @needUpdateHierarchy
     [ImageBase.fadeDurationProperty.setNative]() {
         this.updateHierarchy();
     }
 
+    @needUpdateHierarchy
     [ImageBase.backgroundUriProperty.setNative]() {
         this.updateHierarchy();
     }
 
+    @needUpdateHierarchy
     [ImageBase.showProgressBarProperty.setNative]() {
         this.updateHierarchy();
     }
 
+    @needUpdateHierarchy
     [ImageBase.progressBarColorProperty.setNative]() {
         this.updateHierarchy();
     }
 
+    @needUpdateHierarchy
     [ImageBase.roundAsCircleProperty.setNative]() {
         this.updateHierarchy();
     }
 
+    @needUpdateHierarchy
     [ImageBase.roundTopLeftRadiusProperty.setNative]() {
         this.updateHierarchy();
     }
@@ -432,22 +451,27 @@ export class Img extends ImageBase {
         this.nativeImageViewProtected.invalidate();
     }
 
+    @needUpdateHierarchy
     [ImageBase.roundTopRightRadiusProperty.setNative]() {
         this.updateHierarchy();
     }
 
+    @needUpdateHierarchy
     [ImageBase.roundBottomLeftRadiusProperty.setNative]() {
         this.updateHierarchy();
     }
 
+    @needUpdateHierarchy
     [ImageBase.roundBottomRightRadiusProperty.setNative]() {
         this.updateHierarchy();
     }
 
+    @needUpdateHierarchy
     [ImageBase.tintColorProperty.setNative](value: Color) {
         this.updateHierarchy();
     }
 
+    @needRequestImage
     [ImageBase.blurRadiusProperty.setNative]() {
         this.initImage();
     }
@@ -515,8 +539,12 @@ export class Img extends ImageBase {
                     hierarchy.setImage(drawable, 1, hierarchy.getFadeDuration() === 0);
                     return;
                 }
+                const uri = getUri(src as string);
+                if (!uri) {
+                    console.log(`Error: 'src' not valid: ${src}`);
+                    return;
+                }
                 if (this.noCache) {
-                    const uri = getUri(src as string);
                     const imagePipeLine = getImagePipeline();
                     const isInCache = imagePipeLine.isInBitmapMemoryCache(uri);
                     if (isInCache) {
@@ -524,11 +552,6 @@ export class Img extends ImageBase {
                     }
                 }
                 this.isLoading = true;
-                const uri = getUri(src as string);
-                if (!uri) {
-                    console.log(`Error: 'src' not valid: ${src}`);
-                    return;
-                }
 
                 // const progressiveRenderingEnabledValue = this.progressiveRenderingEnabled !== undefined ? this.progressiveRenderingEnabled : false;
                 let requestBuilder = com.facebook.imagepipeline.request.ImageRequestBuilder.newBuilderWithSource(uri).setRotationOptions(
@@ -577,7 +600,7 @@ export class Img extends ImageBase {
                     },
                     onFailure(id, throwable) {
                         if (Trace.isEnabled()) {
-                            CLog(CLogTypes.info, 'onFailure', id, throwable);
+                            CLog(CLogTypes.info, 'onFailure', id, throwable.getLocalizedMessage());
                         }
                         const nativeView = that && that.get();
                         if (nativeView) {
@@ -665,6 +688,8 @@ export class Img extends ImageBase {
                         }
                     }
                 });
+                // const async = this.loadMode === 'async';
+                // if (async) {
                 const builder = com.facebook.drawee.backends.pipeline.Fresco.newDraweeControllerBuilder();
                 builder.setImageRequest(request);
                 builder.setCallerContext(src);
@@ -697,6 +722,14 @@ export class Img extends ImageBase {
                 const controller = builder.build();
 
                 this.nativeImageViewProtected.setController(controller);
+                console.log('setController', this, src, uri);
+                // } else {
+                // const dataSource = com.facebook.drawee.backends.pipeline.Fresco.getImagePipeline().fetchDecodedImage(request, src);
+                // const result = com.facebook.datasource.DataSources.waitForFinalResult(dataSource);
+                // const bitmap = result.get().underlyingBitmap;
+                // CloseableReference.closeSafely(result);
+                // dataSource.close();
+                // }
             } else {
                 this.nativeImageViewProtected.setController(null);
                 this.nativeImageViewProtected.setImageBitmap(null);
