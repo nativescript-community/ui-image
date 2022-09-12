@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.3](https://github.com/@nativescript-community/ui-image/compare/v4.3.2...v4.3.3) (2022-09-12)
+
+
+### Bug Fixes
+
+* **image:** android prevent image reloading too many times ([e9a53b8](https://github.com/@nativescript-community/ui-image/commit/e9a53b8111e7d52b05e6c94edd689148321745eb))
+
+
+### Features
+
+* **image-colorfilter:** works with N Image component ([50910b9](https://github.com/@nativescript-community/ui-image/commit/50910b936d4e5e8633904f81ca86f4dd46222c8a))
+
+
+
+
+
 ## [4.3.2](https://github.com/@nativescript-community/ui-image/compare/v4.3.1...v4.3.2) (2022-07-15)
 
 
