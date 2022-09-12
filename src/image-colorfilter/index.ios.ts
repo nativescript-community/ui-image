@@ -1,5 +1,6 @@
 import { Img } from '@nativescript-community/ui-image';
 import { applyMixins, colorMatrixProperty, cssProperty } from './index-common';
+import { Image } from '@nativescript/core';
 
 declare module '@nativescript-community/ui-image' {
     interface Img {}
@@ -40,6 +41,7 @@ class ImgExtended2 {
 }
 class ImgExtended3 {
     nativeImageViewProtected: SDAnimatedImageView | UIImageView;
+    nativeViewProtected: SDAnimatedImageView | UIImageView;
     _oldImage: UIImage;
     _filter: CIFilter;
 
@@ -67,7 +69,8 @@ class ImgExtended3 {
         return null;
     }
     applyColorFilter() {
-        this.nativeImageViewProtected.image = this._applyColorFilter(this.nativeImageViewProtected.image);
+        const nativeView = this.nativeImageViewProtected || this.nativeViewProtected;
+        nativeView.image = this._applyColorFilter(nativeView.image);
     }
     public _setNativeImage(superCall, ...args) {
         this._oldImage = args[0];
@@ -83,6 +86,9 @@ export function overrideImgBase() {
     applyMixins(Img, [ImgExtended], { override: true });
     applyMixins(Img, [ImgExtended2]);
     applyMixins(Img, [ImgExtended3], { callWithSuper: true });
+    applyMixins(Image, [ImgExtended], { override: true });
+    applyMixins(Image, [ImgExtended2]);
+    applyMixins(Image, [ImgExtended3], { callWithSuper: true });
 }
 
 export function installMixins() {

@@ -1,12 +1,15 @@
 import { Img } from '@nativescript-community/ui-image';
+import { Image } from '@nativescript/core';
 import { applyMixins, colorMatrixProperty, cssProperty } from './index-common';
 
 class ImgExtended {
     nativeImageViewProtected: com.nativescript.image.DraweeView;
+    nativeViewProtected: com.nativescript.image.DraweeView;
     @cssProperty colorMatrix: number[];
     [colorMatrixProperty.setNative](value: number[]) {
+        const nativeView = this.nativeImageViewProtected || this.nativeViewProtected;
         if (!value) {
-            this.nativeImageViewProtected.setColorFilter(null);
+            nativeView.setColorFilter(null);
             return;
         }
         let arr = value;
@@ -16,12 +19,13 @@ class ImgExtended {
                 arr[index] = value[index];
             }
         }
-        this.nativeImageViewProtected.setColorFilter(new android.graphics.ColorMatrixColorFilter(arr));
+        nativeView.setColorFilter(new android.graphics.ColorMatrixColorFilter(arr));
     }
 }
 let mixinInstalled = false;
 export function overrideImgBase() {
     applyMixins(Img, [ImgExtended], { override: true });
+    applyMixins(Image, [ImgExtended], { override: true });
 }
 
 export function installMixins() {
