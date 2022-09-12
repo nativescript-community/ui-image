@@ -58,14 +58,9 @@ function getUri(src: string | ImageAsset) {
         imagePath = src;
     }
     if (isFileOrResourcePath(imagePath)) {
-        const res = ad.getApplicationContext().getResources();
-        if (!res) {
-            return null;
-        }
-
         if (imagePath.indexOf(RESOURCE_PREFIX) === 0) {
-            const resName = imagePath.substr(RESOURCE_PREFIX.length);
-            const identifier = res.getIdentifier(resName, 'drawable', ad.getApplication().getPackageName());
+            const resName = imagePath.substring(RESOURCE_PREFIX.length);
+            const identifier = Utils.ad.resources.getDrawableId(resName);
             if (0 < identifier) {
                 uri = new android.net.Uri.Builder().scheme(com.facebook.common.util.UriUtil.LOCAL_RESOURCE_SCHEME).path(java.lang.String.valueOf(identifier)).build();
             }
