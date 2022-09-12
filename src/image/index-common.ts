@@ -114,6 +114,7 @@ export class ImageBase extends View {
     public decodeWidth: number;
     public decodeHeight: number;
     public animatedImageView: boolean;
+    public loadMode: 'sync' | 'async';
     alwaysFade: boolean;
     noCache: boolean;
     // fade: boolean;
@@ -164,6 +165,10 @@ export class ImageBase extends View {
         name: 'roundBottomRightRadius',
         defaultValue: 0,
         valueConverter: (v) => Length.toDevicePixels(Length.parse(v))
+    });
+    public static loadModeProperty = new Property<ImageBase, 'sync' | 'async'>({
+        name: 'loadMode',
+        defaultValue: 'sync'
     });
 
     public static clipToBoundsProperty = new Property<ImageBase, boolean>({ name: 'clipToBounds', defaultValue: true, valueConverter: booleanConverter });
@@ -278,5 +283,6 @@ ImageBase.alwaysFadeProperty.register(ImageBase);
 ImageBase.noCacheProperty.register(ImageBase);
 ImageBase.clipToBoundsProperty.register(ImageBase);
 ImageBase.animatedImageViewProperty.register(ImageBase);
+ImageBase.loadModeProperty.register(ImageBase);
 
 // ImageBase.blendingModeProperty.register(ImageBase);
