@@ -14,11 +14,24 @@ export function initialize(config?: ImagePipelineConfigSetting): void {
             initializeConfig = config;
             return;
         }
-        const builder = com.facebook.imagepipeline.core.ImagePipelineConfig.newBuilder(context);
-        if (config && config.isDownsampleEnabled) {
+        let builder: com.facebook.imagepipeline.core.ImagePipelineConfig.Builder;
+        const useOkhttp = config?.useOkhttp;
+        if (useOkhttp) {
+            //@ts-ignore
+            if (useOkhttp instanceof okhttp3.OkHttpClient) {
+                //@ts-ignore
+                builder = com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory.newBuilder(context, useOkhttp);
+            } else {
+                //@ts-ignore
+                builder = com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory.newBuilder(context, new okhttp3.OkHttpClient());
+            }
+        } else {
+            builder = com.facebook.imagepipeline.core.ImagePipelineConfig.newBuilder(context);
+        }
+        if (config?.isDownsampleEnabled) {
             builder.setDownsampleEnabled(true);
         }
-        if (config && config.leakTracker) {
+        if (config?.leakTracker) {
             builder.setCloseableReferenceLeakTracker(config.leakTracker);
         }
         // builder.experiment().setNativeCodeDisabled(true);
@@ -722,7 +735,6 @@ export class Img extends ImageBase {
                 const controller = builder.build();
 
                 this.nativeImageViewProtected.setController(controller);
-                console.log('setController', this, src, uri);
                 // } else {
                 // const dataSource = com.facebook.drawee.backends.pipeline.Fresco.getImagePipeline().fetchDecodedImage(request, src);
                 // const result = com.facebook.datasource.DataSources.waitForFinalResult(dataSource);
