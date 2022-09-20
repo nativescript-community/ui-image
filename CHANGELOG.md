@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.4](https://github.com/@nativescript-community/ui-image/compare/v4.3.3...v4.3.4) (2022-09-20)
+
+
+### Features
+
+* **image:** android support for `useOkhttp` ([dd79abf](https://github.com/@nativescript-community/ui-image/commit/dd79abf5f9c2419b501284ecf419327d0bc7597e))
+
+
+
+
+
 ## [4.3.3](https://github.com/@nativescript-community/ui-image/compare/v4.3.2...v4.3.3) (2022-09-12)
 
 
