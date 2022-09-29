@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.5](https://github.com/@nativescript-community/ui-image/compare/v4.3.4...v4.3.5) (2022-09-29)
+
+
+### Bug Fixes
+
+* **ios:** prevent error when image loaded after view dispose ([4fdaadb](https://github.com/@nativescript-community/ui-image/commit/4fdaadbdcfd485ac5b65f7d25903720644a6c749))
+
+
+
+
+
 ## [4.3.4](https://github.com/@nativescript-community/ui-image/compare/v4.3.3...v4.3.4) (2022-09-20)
 
 
