@@ -290,6 +290,9 @@ export class Img extends ImageBase {
 
     private handleImageLoaded = (image: UIImage, error: NSError, cacheType: number) => {
         this.isLoading = false;
+        if (!this.nativeViewProtected) {
+            return;
+        }
         const animate = (this.alwaysFade || cacheType !== SDImageCacheType.Memory) && this.fadeDuration > 0;
         if (image) {
             this._setNativeImage(image, animate);
