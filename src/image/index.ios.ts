@@ -1,8 +1,8 @@
 export * from './index-common';
-import { ImageAsset, ImageSource, Screen, Trace, knownFolders, path } from '@nativescript/core';
+import { ImageAsset, ImageSource, Screen, Trace, Utils, knownFolders, path } from '@nativescript/core';
 import { isString } from '@nativescript/core/utils/types';
-import { RESOURCE_PREFIX, isFileOrResourcePath, isFontIconURI, layout } from '@nativescript/core/utils/utils';
 import { CLog, CLogTypes, EventData, ImageBase, ImageInfo as ImageInfoBase, ImagePipelineConfigSetting, ScaleType, Stretch } from './index-common';
+import { layout } from '@nativescript/core/utils/layout-helper';
 
 export class ImageInfo implements ImageInfoBase {
     constructor(private width: number, private height: number) {}
@@ -160,8 +160,8 @@ function getUri(src: string | ImageAsset) {
     if (src instanceof ImageAsset) {
         return NSURL.sd_URLWithAsset(src.ios);
     }
-    if (uri.indexOf(RESOURCE_PREFIX) === 0) {
-        const resName = uri.substr(RESOURCE_PREFIX.length);
+    if (uri.indexOf(Utils.RESOURCE_PREFIX) === 0) {
+        const resName = uri.substr(Utils.RESOURCE_PREFIX.length);
         if (screenScale === -1) {
             screenScale = Screen.mainScreen.scale;
         }
@@ -335,7 +335,7 @@ export class Img extends ImageBase {
         }
         let image;
         if (typeof imagePath === 'string') {
-            if (isFontIconURI(imagePath)) {
+            if (Utils.isFontIconURI(imagePath)) {
                 const fontIconCode = imagePath.split('//')[1];
                 if (fontIconCode !== undefined) {
                     // support sync mode only
@@ -344,7 +344,7 @@ export class Img extends ImageBase {
                     image = ImageSource.fromFontIconCodeSync(fontIconCode, font, color).ios;
                 }
             }
-            if (!image && isFileOrResourcePath(imagePath)) {
+            if (!image && Utils.isFileOrResourcePath(imagePath)) {
                 image = ImageSource.fromFileOrResourceSync(imagePath);
             }
         } else {
@@ -371,7 +371,7 @@ export class Img extends ImageBase {
                     this._setNativeImage(src.ios, animate);
                     return;
                 } else if (typeof src === 'string') {
-                    if (isFontIconURI(src)) {
+                    if (Utils.isFontIconURI(src)) {
                         const fontIconCode = src.split('//')[1];
                         if (fontIconCode !== undefined) {
                             // support sync mode only

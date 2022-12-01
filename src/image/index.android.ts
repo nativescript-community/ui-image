@@ -2,14 +2,14 @@ export * from './index-common';
 import { Color, Image, ImageAsset, ImageSource, Trace, Utils, knownFolders, path } from '@nativescript/core';
 import { android as androidApp } from '@nativescript/core/application';
 import { isString } from '@nativescript/core/utils/types';
-import { RESOURCE_PREFIX, ad, isFileOrResourcePath, isFontIconURI } from '@nativescript/core/utils/utils';
 import { AnimatedImage, CLog, CLogTypes, EventData, ImageBase, ImageError as ImageErrorBase, ImageInfo as ImageInfoBase, ImagePipelineConfigSetting, ScaleType } from './index-common';
+import { layout } from '@nativescript/core/utils/layout-helper';
 
 let initialized = false;
 let initializeConfig: ImagePipelineConfigSetting;
 export function initialize(config?: ImagePipelineConfigSetting): void {
     if (!initialized) {
-        const context = ad.getApplicationContext();
+        const context = Utils.ad.getApplicationContext();
         if (!context) {
             initializeConfig = config;
             return;
@@ -70,9 +70,9 @@ function getUri(src: string | ImageAsset) {
     } else {
         imagePath = src;
     }
-    if (isFileOrResourcePath(imagePath)) {
-        if (imagePath.indexOf(RESOURCE_PREFIX) === 0) {
-            const resName = imagePath.substring(RESOURCE_PREFIX.length);
+    if (Utils.isFileOrResourcePath(imagePath)) {
+        if (imagePath.indexOf(Utils.RESOURCE_PREFIX) === 0) {
+            const resName = imagePath.substring(Utils.RESOURCE_PREFIX.length);
             const identifier = Utils.ad.resources.getDrawableId(resName);
             if (0 < identifier) {
                 uri = new android.net.Uri.Builder().scheme(com.facebook.common.util.UriUtil.LOCAL_RESOURCE_SCHEME).path(java.lang.String.valueOf(identifier)).build();
@@ -536,15 +536,15 @@ export class Img extends ImageBase {
             if (src) {
                 let drawable: android.graphics.drawable.BitmapDrawable;
                 if (src instanceof ImageSource) {
-                    drawable = new android.graphics.drawable.BitmapDrawable(ad.getApplicationContext().getResources(), src.android as android.graphics.Bitmap);
+                    drawable = new android.graphics.drawable.BitmapDrawable(Utils.ad.getApplicationContext().getResources(), src.android as android.graphics.Bitmap);
                     this.updateViewSize(src.android);
-                } else if (isFontIconURI(src as string)) {
+                } else if (Utils.isFontIconURI(src as string)) {
                     const fontIconCode = (src as string).split('//')[1];
                     if (fontIconCode !== undefined) {
                         // support sync mode only
                         const font = this.style.fontInternal;
                         const color = this.style.color;
-                        drawable = new android.graphics.drawable.BitmapDrawable(ad.getApplicationContext().getResources(), ImageSource.fromFontIconCodeSync(fontIconCode, font, color).android);
+                        drawable = new android.graphics.drawable.BitmapDrawable(Utils.ad.getApplicationContext().getResources(), ImageSource.fromFontIconCodeSync(fontIconCode, font, color).android);
                     }
                 }
                 if (drawable) {
@@ -821,23 +821,23 @@ export class Img extends ImageBase {
     private getDrawable(path: string | ImageSource) {
         let drawable: android.graphics.drawable.BitmapDrawable;
         if (typeof path === 'string') {
-            if (isFontIconURI(path)) {
+            if (Utils.isFontIconURI(path)) {
                 const fontIconCode = path.split('//')[1];
                 if (fontIconCode !== undefined) {
                     // support sync mode only
                     const font = this.style.fontInternal;
                     const color = this.style.color;
-                    drawable = new android.graphics.drawable.BitmapDrawable(ad.getApplicationContext().getResources(), ImageSource.fromFontIconCodeSync(fontIconCode, font, color).android);
+                    drawable = new android.graphics.drawable.BitmapDrawable(Utils.ad.getApplicationContext().getResources(), ImageSource.fromFontIconCodeSync(fontIconCode, font, color).android);
                 }
-            } else if (isFileOrResourcePath(path)) {
-                if (path.indexOf(RESOURCE_PREFIX) === 0) {
+            } else if (Utils.isFileOrResourcePath(path)) {
+                if (path.indexOf(Utils.RESOURCE_PREFIX) === 0) {
                     return this.getDrawableFromResource(path); // number!
                 } else {
                     drawable = this.getDrawableFromLocalFile(path);
                 }
             }
         } else {
-            drawable = new android.graphics.drawable.BitmapDrawable(ad.getApplicationContext().getResources(), path.android);
+            drawable = new android.graphics.drawable.BitmapDrawable(Utils.ad.getApplicationContext().getResources(), path.android);
         }
 
         return drawable;
@@ -847,14 +847,14 @@ export class Img extends ImageBase {
         const img = ImageSource.fromFileSync(localFilePath);
         let drawable: android.graphics.drawable.BitmapDrawable = null;
         if (img) {
-            drawable = new android.graphics.drawable.BitmapDrawable(ad.getApplicationContext().getResources(), img.android);
+            drawable = new android.graphics.drawable.BitmapDrawable(Utils.ad.getApplicationContext().getResources(), img.android);
         }
 
         return drawable;
     }
 
     private getDrawableFromResource(resourceName: string) {
-        const identifier = ad.getApplication().getResources().getIdentifier(resourceName.substr(RESOURCE_PREFIX.length), 'drawable', ad.getApplication().getPackageName());
+        const identifier = Utils.ad.getApplication().getResources().getIdentifier(resourceName.substr(Utils.RESOURCE_PREFIX.length), 'drawable', Utils.ad.getApplication().getPackageName());
         // we return the identifier to allow Fresco to handle memory / caching
         return identifier;
     }
@@ -887,7 +887,7 @@ class GenericDraweeHierarchyBuilder {
     private nativeBuilder: com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 
     constructor() {
-        const res = ad.getApplicationContext().getResources();
+        const res = Utils.ad.getApplicationContext().getResources();
         this.nativeBuilder = new com.facebook.drawee.generic.GenericDraweeHierarchyBuilder(res);
     }
 
