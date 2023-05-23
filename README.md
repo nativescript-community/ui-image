@@ -1,47 +1,95 @@
-# Welcome to NativeScript imageModule
+<!-- ⚠️ This README has been generated from the file(s) "blueprint.md" ⚠️-->This monorepo contains multiple packages:<br><br><details>
+<summary><b>image</b></summary>
+<!-- ⚠️ This README has been generated from the file(s) "blueprint.md" ⚠️-->
+<!--  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      DO NOT EDIT THIS READEME DIRECTLY! Edit "bluesprint.md" instead.
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+<h1 align="center">@nativescript-community/ui-image</h1>
+<p align="center">
+		<a href="https://npmcharts.com/compare/@nativescript-community/ui-image?minimal=true"><img alt="Downloads per month" src="https://img.shields.io/npm/dm/@nativescript-community/ui-image.svg" height="20"/></a>
+<a href="https://www.npmjs.com/package/@nativescript-community/ui-image"><img alt="NPM Version" src="https://img.shields.io/npm/v/@nativescript-community/ui-image.svg" height="20"/></a>
+	</p>
 
-> A NativeScript Plugin for Android apps.
+<p align="center">
+  <b>Advanced and efficient image display plugin which uses Fresco (Android) and SDWebImage (iOS) to implement caching, placeholders, image effects, and much more.</b></br>
+  <sub><sub>
+</p>
 
-[![Build Status](https://travis-ci.org/@nativescript-community/ui-image.svg?branch=master)](https://travis-ci.org/@nativescript-community/ui-image)
-[![npm](https://img.shields.io/npm/v/@nativescript-community/ui-image.svg)](https://www.npmjs.com/package/@nativescript-community/ui-image)
-[![npm](https://img.shields.io/npm/dt/@nativescript-community/ui-image.svg?label=npm%20downloads)](https://www.npmjs.com/package/@nativescript-community/ui-image)
-[![Dependency status](https://david-dm.org/@nativescript-community/ui-image.svg)](https://david-dm.org/@nativescript-community/ui-image)
-[![peerDependencies Status](https://david-dm.org/@nativescript-community/ui-image/peer-status.svg)](https://david-dm.org/@nativescript-community/ui-image?type=peer)
+<br />
 
 
-<!-- TOC depthFrom:2 depthTo:3 -->
+| <img src="https://github.com/nativescript-community/ui-image/raw/master/images/demo-ios.gif" height="500" /> | <img src="https://github.com/nativescript-community/ui-image/raw/master/images/demo-android.gif" height="500" /> |
+| --- | ----------- |
+| iOS Demo | Android Demo |
 
-- [What is `@nativescript-community/ui-image`?](#what-is-@nativescript-community/ui-image)
-- [How to use `@nativescript-community/ui-image`?](#how-to-use-@nativescript-community/ui-image)
-    - [In vanila NativeScript](#in-vanila-nativescript)
-    - [In NativeScript + Angular 2](#in-nativescript--angular-2)
-- [Examples](#examples)
-- [Features](#features)
-    - [Basic attributes](#basic-attributes)
-    - [Advanced *optional* attributes](#advanced-optional-attributes)
-    - [Events](#events)
-    - [Cache](#cache)
-- [Sample Screenshots](#sample-screenshots)
-- [Contribute](#contribute)
-- [Get Help](#get-help)
 
-<!-- /TOC -->
+[](#table-of-contents)
 
-## What is `@nativescript-community/ui-image`?
-`@nativescript-community/ui-image` is a NativeScript plugin for efficiently displaying images on iOS and Android. It uses imageModule on [Android](https://code.facebook.com/posts/366199913563917/introducing-imageModule-a-new-image-library-for-android/) and [SDWebImage](https://sdwebimage.github.io/) on iOS
 
-## How to use `@nativescript-community/ui-image`?
+[](#table-of-contents)
 
-### In vanila NativeScript
-#### From npm
-1. Go to the root folder of your {N} application where you would like to install the plugin and type `tns plugin add @nativescript-community/ui-image`.
-4. Initialize `@nativescript-community/ui-image` in the `launch` event of your {N} application by using the following code:
+## Table of Contents
 
-#### From local repo?
-1. Clone the repository and go to the root directory on your computer.
-2. Use `tsc` to transpile the `.ts` sources: `tsc -p`.
-3. Go to the root folder of your {N} application where you would like to install the plugin and type `tns plugin add <path-to-imageModule-repo-dir>`.
-4. When working with "downsampling" you will need to initialize the image a configuration to the `initialize` function:
+* [Installation](#installation)
+* [setup](#setup)
+* [API](#api)
+	* [Events](#events)
+		* [Event arguments](#event-arguments)
+	* [Properties](#properties)
+	* [Advanced *optional* attributes](#advanced-optional-attributes)
+	* [Cache](#cache)
+		* ['Refresh' the 'src'](#refresh-the-src)
+		* [Clear everything from the cache](#clear-everything-from-the-cache)
+		* [Evict all images with a specific URI from the cache](#evict-all-images-with-a-specific-uri-from-the-cache)
+		* [Manually shut down the native imageModule library](#manually-shut-down-the-native-imagemodule-library)
+* [Flavors](#flavors)
+* [Demos](#demos)
+* [Demos and Development](#demos-and-development)
+	* [Repo Setup](#repo-setup)
+	* [Build](#build)
+	* [Demos](#demos-1)
+* [Contributing](#contributing)
+	* [Update repo ](#update-repo-)
+	* [Update readme ](#update-readme-)
+	* [Update doc ](#update-doc-)
+	* [Publish](#publish)
+	* [modifying submodules](#modifying-submodules)
+* [Questions](#questions)
+
+
+[](#installation)
+
+
+[](#installation)
+
+## Installation
+Run the following command from the root of your project:
+
+`ns plugin add @nativescript-community/ui-image`
+
+
+[](#setup)
+
+
+[](#setup)
+
+## setup
 
 ```javascript
 import imageModule = require("@nativescript-community/ui-image");
@@ -51,28 +99,237 @@ imageModule.initialize({ isDownsampleEnabled: true });
 ```
 
 
-Use `imageModule` in the XML definition of the page as follows:
+[](#api)
+
+
+[](#api)
+
+## API
+
+### Events
+
+ **finalImageSet** - arguments *FinalEventData*
+
+This event is fired after the final image has been set. When working with animated images you could use this event to start the animation by calling the *FinalEventData.animatable.start()* function.
 
 ```xml
-<Page
-    xmlns="http://www.nativescript.org/tns.xsd" 
-    xmlns:@nativescript-community/ui-image="@nativescript-community/ui-image">
-    <@nativescript-community/ui-image:Img width="250" height="250"
-                                      src="<uri-to-a-photo-from-the-web-or-a-local-resource>"/>
-</Page>
+<@nativescript-community/ui-image:Img finalImageSet="onFinalImageSet"/>
 ```
 
-### In NativeScript + Angular 2
+JavaScript:
 
-1. Import the `TNSImageModule` from `@nativescript-community/ui-image/angular` and add it to the `imports` of your initial `@NgModule`, like shown [here](https://github.com/nativescript-community/ui-image/blob/master/demo-angular/app/app.module.ts).
-2. As described above make sure to initialize the `@nativescript-community/ui-image` plugin in the `launch` event of your {N} application.
+```javascript
+function onFinalImageSet(args) {
+    var imageModuleEventData = args;
+    var img = imageModuleEventData.object;
+}
+exports.onFinalImageSet = onFinalImageSet;
+```
 
-## Examples
-You can refer the [demo-angular](https://github.com/nativescript-community/ui-image/tree/master/demo-angular) folder of the repo for runnable {N} project that demonstrates the @nativescript-community/ui-image plugin with all of its features in action.
+TypeScript:
 
-## Features
+```typescript
+import {Img, FinalEventData } from "@nativescript-community/ui-image";
 
-### Basic attributes
+export function onFinalImageSet(args: FinalEventData) {
+    var img = args.object as Img;
+}
+```
+
+- **failure** - arguments *FailureEventData*
+
+This event is fired after the fetch of the final image failed.
+
+```xml
+<@nativescript-community/ui-image:Img failure="onFailure"/>
+```
+
+JavaScript:
+
+```javascript
+function onFailure(args) {
+    var img = args.object;
+}
+exports.onFailure = onFailure;
+```
+
+TypeScript:
+
+```typescript
+import {Img, FailureEventData } from "@nativescript-community/ui-image";
+
+export function onFailure(args: FailureEventData) {
+    var img = args.object as Img;
+}
+```
+
+- **intermediateImageSet** - arguments *IntermediateEventData* (Android only)
+
+This event is fired after any intermediate image has been set.
+
+```xml
+<@nativescript-community/ui-image:Img intermediateImageSet="onIntermediateImageSet"/>
+```
+
+JavaScript:
+
+```javascript
+function onIntermediateImageSet(args) {
+    var img = args.object;
+}
+exports.onIntermediateImageSet = onIntermediateImageSet;
+```
+
+TypeScript:
+
+```typescript
+import {Img, IntermediateEventData } from "@nativescript-community/ui-image";
+
+export function onIntermediateImageSet(args: IntermediateEventData) {
+    var img = args.object as Img;
+}
+```
+
+- **intermediateImageFailed** - arguments *FailureEventData* (Android only)
+
+This event is fired after the fetch of the intermediate image failed.
+
+```xml
+<@nativescript-community/ui-image:Img intermediateImageFailed="onIntermediateImageFailed"/>
+```
+
+JavaScript:
+
+```javascript
+function intermediateImageFailed(args) {
+    var img = args.object;
+}
+exports.intermediateImageFailed = intermediateImageFailed;
+```
+
+TypeScript:
+
+```typescript
+import {Img, FailureEventData } from "@nativescript-community/ui-image";
+
+export function intermediateImageFailed(args: FailureEventData) {
+    var img = args.object as Img;
+}
+```
+
+- **submit** - arguments *EventData* (Android only)
+
+This event is fired before the image request is submitted.
+
+```xml
+<@nativescript-community/ui-image:Img submit="onSubmit"/>
+```
+
+JavaScript:
+
+```javascript
+function onSubmit(args) {
+    var img = args.object;
+}
+exports.onSubmit = onSubmit;
+```
+
+TypeScript:
+
+```typescript
+import {Img, EventData } from "@nativescript-community/ui-image";
+
+export function onSubmit(args: EventData) {
+    var img = args.object as Img;
+}
+```
+
+- **release** - arguments *EventData* (Android only)
+
+This event is fired after the controller released the fetched image.
+
+```xml
+<@nativescript-community/ui-image:Img release="onRelease"/>
+```
+
+JavaScript:
+
+```javascript
+function onRelease(args) {
+    var img = args.object;
+}
+exports.onRelease = onRelease;
+```
+
+TypeScript:
+
+```typescript
+import {Img, EventData } from "@nativescript-community/ui-image";
+
+export function onRelease(args: EventData) {
+    var img = args.object as Img;
+}
+```
+
+#### Event arguments
+
+Instances of this class are provided to the handlers of the *finalImageSet*.
+
+```typescript
+import {Img, FinalEventData, ImageInfo, AnimatedImage } from "@nativescript-community/ui-image";
+
+export function onFinalImageSet(args: FinalEventData) {
+    var info: ImageInfo  = args.imageInfo;
+    var animatable: AnimatedImage = args.animatable;
+    var quality: number = info.getQualityInfo().getQuality();
+    var isFullQuality: boolean = info.getQualityInfo().isOfFullQuality();
+    var isOfGoodEnoughQuality: boolean = info.getQualityInfo().isOfGoodEnoughQuality();
+}
+```
+
+- **FailureEventData**
+
+Instances of this class are provided to the handlers of the *failure* and *intermediateImageFailed*.
+
+```typescript
+import {Img, FailureEventData, imageModuleError } from "@nativescript-community/ui-image";
+
+export function onFailure(args: FailureEventData) {
+    var error: imageModuleError = args.error;
+    var message: string = error.getMessage();
+    var type: string = error.getErrorType();
+    var fullError: string = error.toString();
+}
+```
+
+- **IntermediateEventData**
+
+Instances of this class are provided to the handlers of the *intermediateImageSet*.
+
+```typescript
+import {Img, IntermediateEventData, ImageInfo } from "@nativescript-community/ui-image";
+
+export function onIntermediateImageSet(args: IntermediateEventData) {
+    var info: ImageInfo  = args.imageInfo;
+    var quality: number = info.getQualityInfo().getQuality();
+    var isFullQuality: boolean = info.getQualityInfo().isOfFullQuality();
+    var isOfGoodEnoughQuality: boolean = info.getQualityInfo().isOfGoodEnoughQuality();}
+```
+
+- **EventData**
+
+Instances of this class are provided to the handlers of the *release* and *submit*.
+
+```typescript
+import {Img, EventData } from "@nativescript-community/ui-image";
+
+export function onSubmit(args: EventData) {
+    var img = args.object as Img;
+}
+```
+
+
+### Properties
 
 - **src** 
 
@@ -275,232 +532,6 @@ Boolean value used for enabling/disabling a tap to retry action for the download
 <@nativescript-community/ui-image:Img tapToRetryEnabled="true"/>
 ```
 
-### Events
-
-- **finalImageSet** - arguments *FinalEventData*
-
-This event is fired after the final image has been set. When working with animated images you could use this event to start the animation by calling the *FinalEventData.animatable.start()* function.
-
-```xml
-<@nativescript-community/ui-image:Img finalImageSet="onFinalImageSet"/>
-```
-
-JavaScript:
-
-```javascript
-function onFinalImageSet(args) {
-    var imageModuleEventData = args;
-    var img = imageModuleEventData.object;
-}
-exports.onFinalImageSet = onFinalImageSet;
-```
-
-TypeScript:
-
-```typescript
-import {Img, FinalEventData } from "@nativescript-community/ui-image";
-
-export function onFinalImageSet(args: FinalEventData) {
-    var img = args.object as Img;
-}
-```
-
-- **failure** - arguments *FailureEventData*
-
-This event is fired after the fetch of the final image failed.
-
-```xml
-<@nativescript-community/ui-image:Img failure="onFailure"/>
-```
-
-JavaScript:
-
-```javascript
-function onFailure(args) {
-    var img = args.object;
-}
-exports.onFailure = onFailure;
-```
-
-TypeScript:
-
-```typescript
-import {Img, FailureEventData } from "@nativescript-community/ui-image";
-
-export function onFailure(args: FailureEventData) {
-    var img = args.object as Img;
-}
-```
-
-- **intermediateImageSet** - arguments *IntermediateEventData* (Android only)
-
-This event is fired after any intermediate image has been set.
-
-```xml
-<@nativescript-community/ui-image:Img intermediateImageSet="onIntermediateImageSet"/>
-```
-
-JavaScript:
-
-```javascript
-function onIntermediateImageSet(args) {
-    var img = args.object;
-}
-exports.onIntermediateImageSet = onIntermediateImageSet;
-```
-
-TypeScript:
-
-```typescript
-import {Img, IntermediateEventData } from "@nativescript-community/ui-image";
-
-export function onIntermediateImageSet(args: IntermediateEventData) {
-    var img = args.object as Img;
-}
-```
-
-- **intermediateImageFailed** - arguments *FailureEventData* (Android only)
-
-This event is fired after the fetch of the intermediate image failed.
-
-```xml
-<@nativescript-community/ui-image:Img intermediateImageFailed="onIntermediateImageFailed"/>
-```
-
-JavaScript:
-
-```javascript
-function intermediateImageFailed(args) {
-    var img = args.object;
-}
-exports.intermediateImageFailed = intermediateImageFailed;
-```
-
-TypeScript:
-
-```typescript
-import {Img, FailureEventData } from "@nativescript-community/ui-image";
-
-export function intermediateImageFailed(args: FailureEventData) {
-    var img = args.object as Img;
-}
-```
-
-- **submit** - arguments *EventData* (Android only)
-
-This event is fired before the image request is submitted.
-
-```xml
-<@nativescript-community/ui-image:Img submit="onSubmit"/>
-```
-
-JavaScript:
-
-```javascript
-function onSubmit(args) {
-    var img = args.object;
-}
-exports.onSubmit = onSubmit;
-```
-
-TypeScript:
-
-```typescript
-import {Img, EventData } from "@nativescript-community/ui-image";
-
-export function onSubmit(args: EventData) {
-    var img = args.object as Img;
-}
-```
-
-- **release** - arguments *EventData* (Android only)
-
-This event is fired after the controller released the fetched image.
-
-```xml
-<@nativescript-community/ui-image:Img release="onRelease"/>
-```
-
-JavaScript:
-
-```javascript
-function onRelease(args) {
-    var img = args.object;
-}
-exports.onRelease = onRelease;
-```
-
-TypeScript:
-
-```typescript
-import {Img, EventData } from "@nativescript-community/ui-image";
-
-export function onRelease(args: EventData) {
-    var img = args.object as Img;
-}
-```
-
-#### Event arguments
-
-All events exposed by '@nativescript-community/ui-image' provide additional information to their handlers that is needed to properly handle them. Here's a brief description of the event arguments coming with each of the events:
-
-- **FinalEventData**
-
-Instances of this class are provided to the handlers of the *finalImageSet*.
-
-```typescript
-import {Img, FinalEventData, ImageInfo, AnimatedImage } from "@nativescript-community/ui-image";
-
-export function onFinalImageSet(args: FinalEventData) {
-    var info: ImageInfo  = args.imageInfo;
-    var animatable: AnimatedImage = args.animatable;
-    var quality: number = info.getQualityInfo().getQuality();
-    var isFullQuality: boolean = info.getQualityInfo().isOfFullQuality();
-    var isOfGoodEnoughQuality: boolean = info.getQualityInfo().isOfGoodEnoughQuality();
-}
-```
-
-- **FailureEventData**
-
-Instances of this class are provided to the handlers of the *failure* and *intermediateImageFailed*.
-
-```typescript
-import {Img, FailureEventData, imageModuleError } from "@nativescript-community/ui-image";
-
-export function onFailure(args: FailureEventData) {
-    var error: imageModuleError = args.error;
-    var message: string = error.getMessage();
-    var type: string = error.getErrorType();
-    var fullError: string = error.toString();
-}
-```
-
-- **IntermediateEventData**
-
-Instances of this class are provided to the handlers of the *intermediateImageSet*.
-
-```typescript
-import {Img, IntermediateEventData, ImageInfo } from "@nativescript-community/ui-image";
-
-export function onIntermediateImageSet(args: IntermediateEventData) {
-    var info: ImageInfo  = args.imageInfo;
-    var quality: number = info.getQualityInfo().getQuality();
-    var isFullQuality: boolean = info.getQualityInfo().isOfFullQuality();
-    var isOfGoodEnoughQuality: boolean = info.getQualityInfo().isOfGoodEnoughQuality();}
-```
-
-- **EventData**
-
-Instances of this class are provided to the handlers of the *release* and *submit*.
-
-```typescript
-import {Img, EventData } from "@nativescript-community/ui-image";
-
-export function onSubmit(args: EventData) {
-    var img = args.object as Img;
-}
-```
-
 ### Cache
 The @nativescript-community/ui-image {N} plugin has built-in cache mechanism which handles managing the images in the memory. There are two types of cache mechanisms `memory` and `disk`, you can manually manage both of them with the following functionality.
 
@@ -581,22 +612,682 @@ if (app.android) {
 }
 ```
 
-## Sample Screenshots
 
-All of the images are sample images for showcasing purposes.
+[](#flavors)
 
-Sample 1 - Placeholder image |  Sample 2 - Transition (fade-in animation)
--------- | ---------
-![Placeholder image sample](screenshots/screen1-with-placeholder.png) | ![Transition sample](screenshots/screen2-transition-effect.png)
 
-Sample 3 - Image shown successfully from src |  Sample 4 - 'Failure' image shown
--------- | ---------
-![Successfully shown image sample](screenshots/screen3-successful-show.png) | ![Successfully shown image sample](screenshots/screen4-unsuccessful-show.png)
+[](#flavors)
 
-## Contribute
-We love PRs! Check out the [contributing guidelines](CONTRIBUTING.md). If you want to contribute, but you are not sure where to start - look for [issues labeled `help wanted`](https://github.com/nativescript-community/ui-image/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22).
+## Flavors
 
-## Get Help 
-Please, use [github issues](https://github.com/nativescript-community/ui-image/issues) strictly for [reporting bugs](CONTRIBUTING.md#reporting-bugs) or [requesting features](CONTRIBUTING.md#requesting-new-features). For general questions and support, check out [Stack Overflow](https://stackoverflow.com/questions/tagged/nativescript) or ask our experts in [NativeScript community Slack channel](http://developer.telerik.com/wp-login.php?action=slack-invitation).
+Using core
+```xml
+<Page
+    xmlns="http://www.nativescript.org/tns.xsd" 
+    xmlns:@nativescript-community/ui-image="@nativescript-community/ui-image">
+    <@nativescript-community/ui-image:Img width="250" height="250"
+                                      src="<uri-to-a-photo-from-the-web-or-a-local-resource>"/>
+</Page>
+```
 
-![](https://ga-beacon.appspot.com/UA-111455-24/@nativescript-community/ui-image?pixel)
+Other flavors are presented in the demo apps that you can find under `demo-snippets`
+
+
+[](#demos)
+
+
+[](#demos)
+
+## Demos
+This repository includes Angular, Vue.js demos. In order to run these execute the following in your shell:
+```shell
+$ git clone https://github.com/@nativescript-community/ui-image
+$ cd ui-image
+$ npm i
+$ npm run setup
+$ npm run build # && npm run build.angular
+$ cd demo-ng # or demo-vue or demo-svelte
+$ ns run ios|android
+```
+
+
+[](#demos-and-development)
+
+
+[](#demos-and-development)
+
+## Demos and Development
+
+
+### Repo Setup
+
+The repo uses submodules. If you did not clone with ` --recursive` then you need to call
+```
+git submodule update --init
+```
+
+The package manager used to install and link dependencies must be `pnpm` or `yarn`. `npm` wont work.
+
+To develop and test:
+if you use `yarn` then run `yarn`
+if you use `pnpm` then run `pnpm i`
+
+**Interactive Menu:**
+
+To start the interactive menu, run `npm start` (or `yarn start` or `pnpm start`). This will list all of the commonly used scripts.
+
+### Build
+
+```bash
+npm run build.all
+```
+WARNING: it seems `yarn build.all` wont always work (not finding binaries in `node_modules/.bin`) which is why the doc explicitly uses `npm run`
+
+### Demos
+
+```bash
+npm run demo.[ng|react|svelte|vue].[ios|android]
+
+npm run demo.svelte.ios # Example
+```
+
+Demo setup is a bit special in the sense that if you want to modify/add demos you dont work directly in `demo-[ng|react|svelte|vue]`
+Instead you work in `demo-snippets/[ng|react|svelte|vue]`
+You can start from the `install.ts` of each flavor to see how to register new demos 
+
+
+[](#contributing)
+
+
+[](#contributing)
+
+## Contributing
+
+### Update repo 
+
+You can update the repo files quite easily
+
+First update the submodules
+
+```bash
+npm run update
+```
+
+Then commit the changes
+Then update common files
+
+```bash
+npm run sync
+```
+Then you can run `yarn|pnpm`, commit changed files if any
+
+### Update readme 
+```bash
+npm run readme
+```
+
+### Update doc 
+```bash
+npm run doc
+```
+
+### Publish
+
+The publishing is completely handled by `lerna` (you can add `-- --bump major` to force a major release)
+Simply run 
+```shell
+npm run publish
+```
+
+### modifying submodules
+
+The repo uses https:// for submodules which means you won't be able to push directly into the submodules.
+One easy solution is t modify `~/.gitconfig` and add
+```
+[url "ssh://git@github.com/"]
+	pushInsteadOf = https://github.com/
+```
+
+
+[](#questions)
+
+
+[](#questions)
+
+## Questions
+
+If you have any questions/issues/comments please feel free to create an issue or start a conversation in the [NativeScript Community Discord](https://nativescript.org/discord).
+</details><details>
+<summary><b>image-colorfilter</b></summary>
+<!-- ⚠️ This README has been generated from the file(s) "blueprint.md" ⚠️-->
+<!--  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      DO NOT EDIT THIS READEME DIRECTLY! Edit "bluesprint.md" instead.
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+<h1 align="center">@nativescript-community/ui-image-colorfilter</h1>
+<p align="center">
+		<a href="https://npmcharts.com/compare/@nativescript-community/ui-image-colorfilter?minimal=true"><img alt="Downloads per month" src="https://img.shields.io/npm/dm/@nativescript-community/ui-image-colorfilter.svg" height="20"/></a>
+<a href="https://www.npmjs.com/package/@nativescript-community/ui-image-colorfilter"><img alt="NPM Version" src="https://img.shields.io/npm/v/@nativescript-community/ui-image-colorfilter.svg" height="20"/></a>
+	</p>
+
+<p align="center">
+  <b>color matrix filters for @nativescript-community/ui-image</b></br>
+  <sub><sub>
+</p>
+
+<br />
+
+
+| <img src="https://github.com/nativescript-community/ui-image/raw/master/images/demo-ios.gif" height="500" /> | <img src="https://github.com/nativescript-community/ui-image/raw/master/images/demo-android.gif" height="500" /> |
+| --- | ----------- |
+| iOS Demo | Android Demo |
+
+
+[](#table-of-contents)
+
+
+[](#table-of-contents)
+
+## Table of Contents
+
+* [Installation](#installation)
+* [setup](#setup)
+* [Demos](#demos)
+* [Demos and Development](#demos-and-development)
+	* [Repo Setup](#repo-setup)
+	* [Build](#build)
+	* [Demos](#demos-1)
+* [Contributing](#contributing)
+	* [Update repo ](#update-repo-)
+	* [Update readme ](#update-readme-)
+	* [Update doc ](#update-doc-)
+	* [Publish](#publish)
+	* [modifying submodules](#modifying-submodules)
+* [Questions](#questions)
+
+
+[](#installation)
+
+
+[](#installation)
+
+## Installation
+Run the following command from the root of your project:
+
+`ns plugin add @nativescript-community/ui-image-colorfilter`
+
+
+[](#setup)
+
+
+[](#setup)
+
+## setup
+
+```typescript
+import { installMixins } from "@nativescript-community/ui-image-colorfilter";
+
+//do this before creating any image view
+installMixins();
+```
+
+
+It adds one property `colorMatrix` which is a `number[]`
+You can find samples color matrix [here](https://github.com/skratchdot/color-matrix)
+
+
+[](#demos)
+
+
+[](#demos)
+
+## Demos
+This repository includes Angular, Vue.js demos. In order to run these execute the following in your shell:
+```shell
+$ git clone https://github.com/@nativescript-community/ui-image
+$ cd ui-image
+$ npm i
+$ npm run setup
+$ npm run build # && npm run build.angular
+$ cd demo-ng # or demo-vue or demo-svelte
+$ ns run ios|android
+```
+
+
+[](#demos-and-development)
+
+
+[](#demos-and-development)
+
+## Demos and Development
+
+
+### Repo Setup
+
+The repo uses submodules. If you did not clone with ` --recursive` then you need to call
+```
+git submodule update --init
+```
+
+The package manager used to install and link dependencies must be `pnpm` or `yarn`. `npm` wont work.
+
+To develop and test:
+if you use `yarn` then run `yarn`
+if you use `pnpm` then run `pnpm i`
+
+**Interactive Menu:**
+
+To start the interactive menu, run `npm start` (or `yarn start` or `pnpm start`). This will list all of the commonly used scripts.
+
+### Build
+
+```bash
+npm run build.all
+```
+WARNING: it seems `yarn build.all` wont always work (not finding binaries in `node_modules/.bin`) which is why the doc explicitly uses `npm run`
+
+### Demos
+
+```bash
+npm run demo.[ng|react|svelte|vue].[ios|android]
+
+npm run demo.svelte.ios # Example
+```
+
+Demo setup is a bit special in the sense that if you want to modify/add demos you dont work directly in `demo-[ng|react|svelte|vue]`
+Instead you work in `demo-snippets/[ng|react|svelte|vue]`
+You can start from the `install.ts` of each flavor to see how to register new demos 
+
+
+[](#contributing)
+
+
+[](#contributing)
+
+## Contributing
+
+### Update repo 
+
+You can update the repo files quite easily
+
+First update the submodules
+
+```bash
+npm run update
+```
+
+Then commit the changes
+Then update common files
+
+```bash
+npm run sync
+```
+Then you can run `yarn|pnpm`, commit changed files if any
+
+### Update readme 
+```bash
+npm run readme
+```
+
+### Update doc 
+```bash
+npm run doc
+```
+
+### Publish
+
+The publishing is completely handled by `lerna` (you can add `-- --bump major` to force a major release)
+Simply run 
+```shell
+npm run publish
+```
+
+### modifying submodules
+
+The repo uses https:// for submodules which means you won't be able to push directly into the submodules.
+One easy solution is t modify `~/.gitconfig` and add
+```
+[url "ssh://git@github.com/"]
+	pushInsteadOf = https://github.com/
+```
+
+
+[](#questions)
+
+
+[](#questions)
+
+## Questions
+
+If you have any questions/issues/comments please feel free to create an issue or start a conversation in the [NativeScript Community Discord](https://nativescript.org/discord).
+</details><details>
+<summary><b>zoomimage</b></summary>
+<!-- ⚠️ This README has been generated from the file(s) "blueprint.md" ⚠️-->
+<!--  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      DO NOT EDIT THIS READEME DIRECTLY! Edit "bluesprint.md" instead.
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+<h1 align="center">@nativescript-community/ui-zoomimage</h1>
+<p align="center">
+		<a href="https://npmcharts.com/compare/@nativescript-community/ui-zoomimage?minimal=true"><img alt="Downloads per month" src="https://img.shields.io/npm/dm/@nativescript-community/ui-zoomimage.svg" height="20"/></a>
+<a href="https://www.npmjs.com/package/@nativescript-community/ui-zoomimage"><img alt="NPM Version" src="https://img.shields.io/npm/v/@nativescript-community/ui-zoomimage.svg" height="20"/></a>
+	</p>
+
+<p align="center">
+  <b>Zoomable image view based on @nativescript-community/ui-image</b></br>
+  <sub><sub>
+</p>
+
+<br />
+
+
+| <img src="https://github.com/nativescript-community/ui-image/raw/master/images/demo-ios.gif" height="500" /> | <img src="https://github.com/nativescript-community/ui-image/raw/master/images/demo-android.gif" height="500" /> |
+| --- | ----------- |
+| iOS Demo | Android Demo |
+
+
+[](#table-of-contents)
+
+
+[](#table-of-contents)
+
+## Table of Contents
+
+* [Installation](#installation)
+* [setup](#setup)
+* [Demos](#demos)
+* [Demos and Development](#demos-and-development)
+	* [Repo Setup](#repo-setup)
+	* [Build](#build)
+	* [Demos](#demos-1)
+* [Contributing](#contributing)
+	* [Update repo ](#update-repo-)
+	* [Update readme ](#update-readme-)
+	* [Update doc ](#update-doc-)
+	* [Publish](#publish)
+	* [modifying submodules](#modifying-submodules)
+* [Questions](#questions)
+
+
+[](#installation)
+
+
+[](#installation)
+
+## Installation
+Run the following command from the root of your project:
+
+`ns plugin add @nativescript-community/ui-zoomimage`
+
+
+[](#setup)
+
+
+[](#setup)
+
+## setup
+
+```javascript
+import imageModule = require("@nativescript-community/ui-zoomimage");
+
+//do this before creating any image view
+imageModule.initialize({ isDownsampleEnabled: true });
+```
+
+This component directly inherint `@nativescript-community/ui-image` so you can find the doc [here]()
+
+It adds a few properties
+
+
+[](#demos)
+
+
+[](#demos)
+
+## Demos
+This repository includes Angular, Vue.js demos. In order to run these execute the following in your shell:
+```shell
+$ git clone https://github.com/@nativescript-community/ui-image
+$ cd ui-image
+$ npm i
+$ npm run setup
+$ npm run build # && npm run build.angular
+$ cd demo-ng # or demo-vue or demo-svelte
+$ ns run ios|android
+```
+
+
+[](#demos-and-development)
+
+
+[](#demos-and-development)
+
+## Demos and Development
+
+
+### Repo Setup
+
+The repo uses submodules. If you did not clone with ` --recursive` then you need to call
+```
+git submodule update --init
+```
+
+The package manager used to install and link dependencies must be `pnpm` or `yarn`. `npm` wont work.
+
+To develop and test:
+if you use `yarn` then run `yarn`
+if you use `pnpm` then run `pnpm i`
+
+**Interactive Menu:**
+
+To start the interactive menu, run `npm start` (or `yarn start` or `pnpm start`). This will list all of the commonly used scripts.
+
+### Build
+
+```bash
+npm run build.all
+```
+WARNING: it seems `yarn build.all` wont always work (not finding binaries in `node_modules/.bin`) which is why the doc explicitly uses `npm run`
+
+### Demos
+
+```bash
+npm run demo.[ng|react|svelte|vue].[ios|android]
+
+npm run demo.svelte.ios # Example
+```
+
+Demo setup is a bit special in the sense that if you want to modify/add demos you dont work directly in `demo-[ng|react|svelte|vue]`
+Instead you work in `demo-snippets/[ng|react|svelte|vue]`
+You can start from the `install.ts` of each flavor to see how to register new demos 
+
+
+[](#contributing)
+
+
+[](#contributing)
+
+## Contributing
+
+### Update repo 
+
+You can update the repo files quite easily
+
+First update the submodules
+
+```bash
+npm run update
+```
+
+Then commit the changes
+Then update common files
+
+```bash
+npm run sync
+```
+Then you can run `yarn|pnpm`, commit changed files if any
+
+### Update readme 
+```bash
+npm run readme
+```
+
+### Update doc 
+```bash
+npm run doc
+```
+
+### Publish
+
+The publishing is completely handled by `lerna` (you can add `-- --bump major` to force a major release)
+Simply run 
+```shell
+npm run publish
+```
+
+### modifying submodules
+
+The repo uses https:// for submodules which means you won't be able to push directly into the submodules.
+One easy solution is t modify `~/.gitconfig` and add
+```
+[url "ssh://git@github.com/"]
+	pushInsteadOf = https://github.com/
+```
+
+
+[](#questions)
+
+
+[](#questions)
+
+## Questions
+
+If you have any questions/issues/comments please feel free to create an issue or start a conversation in the [NativeScript Community Discord](https://nativescript.org/discord).
+</details>
+
+[](#demos-and-development)
+
+## Demos and Development
+
+
+### Repo Setup
+
+The repo uses submodules. If you did not clone with ` --recursive` then you need to call
+```
+git submodule update --init
+```
+
+The package manager used to install and link dependencies must be `pnpm` or `yarn`. `npm` wont work.
+
+To develop and test:
+if you use `yarn` then run `yarn`
+if you use `pnpm` then run `pnpm i`
+
+**Interactive Menu:**
+
+To start the interactive menu, run `npm start` (or `yarn start` or `pnpm start`). This will list all of the commonly used scripts.
+
+### Build
+
+```bash
+npm run build.all
+```
+WARNING: it seems `yarn build.all` wont always work (not finding binaries in `node_modules/.bin`) which is why the doc explicitly uses `npm run`
+
+### Demos
+
+```bash
+npm run demo.[ng|react|svelte|vue].[ios|android]
+
+npm run demo.svelte.ios # Example
+```
+
+Demo setup is a bit special in the sense that if you want to modify/add demos you dont work directly in `demo-[ng|react|svelte|vue]`
+Instead you work in `demo-snippets/[ng|react|svelte|vue]`
+You can start from the `install.ts` of each flavor to see how to register new demos 
+
+
+[](#contributing)
+
+## Contributing
+
+### Update repo 
+
+You can update the repo files quite easily
+
+First update the submodules
+
+```bash
+npm run update
+```
+
+Then commit the changes
+Then update common files
+
+```bash
+npm run sync
+```
+Then you can run `yarn|pnpm`, commit changed files if any
+
+### Update readme 
+```bash
+npm run readme
+```
+
+### Update doc 
+```bash
+npm run doc
+```
+
+### Publish
+
+The publishing is completely handled by `lerna` (you can add `-- --bump major` to force a major release)
+Simply run 
+```shell
+npm run publish
+```
+
+### modifying submodules
+
+The repo uses https:// for submodules which means you won't be able to push directly into the submodules.
+One easy solution is t modify `~/.gitconfig` and add
+```
+[url "ssh://git@github.com/"]
+	pushInsteadOf = https://github.com/
+```
+
+[](#questions)
+
+## Questions
+
+If you have any questions/issues/comments please feel free to create an issue or start a conversation in the [NativeScript Community Discord](https://nativescript.org/discord).
