@@ -559,7 +559,7 @@ export class Img extends ImageBase {
                 }
                 if (this.noCache) {
                     const imagePipeLine = getImagePipeline();
-                    const isInCache = imagePipeLine.isInBitmapMemoryCache(uri);
+                    const isInCache = imagePipeLine.isInBitmapMemoryCache(uri) || imagePipeLine.isInDiskCache(uri);
                     if (isInCache) {
                         imagePipeLine.evictFromCache(uri);
                     }
