@@ -46,5 +46,6 @@
         "@nativescript-community/ui-image": "^4.3.7"
     },
     "license": "Apache-2.0",
-    "readmeFilename": "README.md"
+    "readmeFilename": "README.md",
+    "gitHead": "e97c94836db13b09c15553f71ddac95f6d8a38f3"
 }

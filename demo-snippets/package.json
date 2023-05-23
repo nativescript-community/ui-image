@@ -1,9 +1,11 @@
 {
     "name": "@nativescript-community/template-snippet",
+    "private": true,
     "version": "4.3.7",
     "dependencies": {
-        "@nativescript-community/ui-image": "file:../packages/image",
-        "@nativescript-community/ui-image-colorfilter": "file:../packages/image-colorfilter",
-        "@nativescript-community/ui-zoomimage": "file:../packages/zoomimage"
-    }
+        "@nativescript-community/ui-image": "^4.3.7",
+        "@nativescript-community/ui-image-colorfilter": "^4.3.7",
+        "@nativescript-community/ui-zoomimage": "^4.3.7"
+    },
+    "gitHead": "e97c94836db13b09c15553f71ddac95f6d8a38f3"
 }
