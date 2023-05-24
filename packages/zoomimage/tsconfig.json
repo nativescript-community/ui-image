@@ -4,6 +4,6 @@
         "rootDir": "../../src/zoomimage",
         "outDir": "./"
     },
-    "include": ["../../src/zoomimage/**/*", "../../references.d.ts", "../../src/references.d.ts"],
+    "include": ["../../src/zoomimage/**/*", "../../references.d.ts", "../../tools/references.d.ts", "../../src/references.d.ts"],
     "exclude": ["../../src/zoomimage/angular/**"]
 }

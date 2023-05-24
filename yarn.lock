@@ -3602,56 +3602,31 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@nativescript-community/template-snippet@workspace:demo-snippets"
   dependencies:
-    "@nativescript-community/ui-image": "file:../packages/image"
-    "@nativescript-community/ui-image-colorfilter": "file:../packages/image-colorfilter"
-    "@nativescript-community/ui-zoomimage": "file:../packages/zoomimage"
+    "@nativescript-community/ui-image": "*"
+    "@nativescript-community/ui-image-colorfilter": "*"
+    "@nativescript-community/ui-zoomimage": "*"
   languageName: unknown
   linkType: soft
 
-"@nativescript-community/ui-image-colorfilter@file:../packages/image-colorfilter::locator=%40nativescript-community%2Ftemplate-snippet%40workspace%3Ademo-snippets":
-  version: 4.3.6
-  resolution: "@nativescript-community/ui-image-colorfilter@file:../packages/image-colorfilter#../packages/image-colorfilter::hash=4c044e&locator=%40nativescript-community%2Ftemplate-snippet%40workspace%3Ademo-snippets"
-  dependencies:
-    "@nativescript-community/ui-image": ^4.3.6
-  checksum: dd60c5ec1519a1a8cf8e34fb7525a061b599ff39f95f1d82766bd8b1fd470f613884583a9ddc2c1d555bd78c06110843f4b49a3569d6fcfa07f2263b6303f2ce
-  languageName: node
-  linkType: hard
-
-"@nativescript-community/ui-image-colorfilter@workspace:packages/image-colorfilter":
+"@nativescript-community/ui-image-colorfilter@*, @nativescript-community/ui-image-colorfilter@workspace:packages/image-colorfilter":
   version: 0.0.0-use.local
   resolution: "@nativescript-community/ui-image-colorfilter@workspace:packages/image-colorfilter"
   dependencies:
-    "@nativescript-community/ui-image": ^4.3.6
+    "@nativescript-community/ui-image": ^4.3.7
   languageName: unknown
   linkType: soft
 
-"@nativescript-community/ui-image@^4.3.6, @nativescript-community/ui-image@workspace:packages/image":
+"@nativescript-community/ui-image@*, @nativescript-community/ui-image@^4.3.7, @nativescript-community/ui-image@workspace:packages/image":
   version: 0.0.0-use.local
   resolution: "@nativescript-community/ui-image@workspace:packages/image"
   languageName: unknown
   linkType: soft
 
-"@nativescript-community/ui-image@file:../packages/image::locator=%40nativescript-community%2Ftemplate-snippet%40workspace%3Ademo-snippets":
-  version: 4.3.6
-  resolution: "@nativescript-community/ui-image@file:../packages/image#../packages/image::hash=f66c0c&locator=%40nativescript-community%2Ftemplate-snippet%40workspace%3Ademo-snippets"
-  checksum: d38cefe317c33dc6fa6baa29d192b8bb30739eb0a730108272378be3b122dafc7ca0a2bffb8775732cfabf841d391e17917f69168085c22a4a1425a36b6c6a29
-  languageName: node
-  linkType: hard
-
-"@nativescript-community/ui-zoomimage@file:../packages/zoomimage::locator=%40nativescript-community%2Ftemplate-snippet%40workspace%3Ademo-snippets":
-  version: 4.3.6
-  resolution: "@nativescript-community/ui-zoomimage@file:../packages/zoomimage#../packages/zoomimage::hash=4bc8a7&locator=%40nativescript-community%2Ftemplate-snippet%40workspace%3Ademo-snippets"
-  dependencies:
-    "@nativescript-community/ui-image": ^4.3.6
-  checksum: 1955426b022aa55552868806ddda0d02b0d2c91b0b491f68c32b3d8c857365612d5c2c7ef10cb80b03799e7665cf27dd69d2fcd696af208dc90dd75dcbfe789c
-  languageName: node
-  linkType: hard
-
-"@nativescript-community/ui-zoomimage@workspace:packages/zoomimage":
+"@nativescript-community/ui-zoomimage@*, @nativescript-community/ui-zoomimage@workspace:packages/zoomimage":
   version: 0.0.0-use.local
   resolution: "@nativescript-community/ui-zoomimage@workspace:packages/zoomimage"
   dependencies:
-    "@nativescript-community/ui-image": ^4.3.6
+    "@nativescript-community/ui-image": ^4.3.7
   languageName: unknown
   linkType: soft
 

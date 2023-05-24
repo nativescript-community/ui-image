@@ -4,6 +4,6 @@
         "rootDir": "../../src/image",
         "outDir": "./"
     },
-    "include": ["../../src/image/**/*", "../../references.d.ts", "../../src/references.d.ts"],
+    "include": ["../../src/image/**/*", "../../references.d.ts", "../../tools/references.d.ts", "../../src/references.d.ts"],
     "exclude": ["../../src/image/angular/**"]
 }
