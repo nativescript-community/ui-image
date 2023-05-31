@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.9](https://github.com/nativescript-community/ui-image/compare/v4.3.8...v4.3.9) (2023-05-31)
+
+
+### Bug Fixes
+
+* **android:** trying to remove build warnings ([e4686b2](https://github.com/nativescript-community/ui-image/commit/e4686b202f4c841730ea32357035d9ebb440020f))
+
+
+
+
+
 ## [4.3.8](https://github.com/nativescript-community/ui-image/compare/v4.3.7...v4.3.8) (2023-05-24)
 
 **Note:** Version bump only for package @nativescript-community/ui-image
