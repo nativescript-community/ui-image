@@ -19,7 +19,6 @@ export function initialize(config?: ImagePipelineConfigSetting): void {
         if (useOkhttp) {
             //@ts-ignore
             if (useOkhttp instanceof okhttp3.OkHttpClient) {
-                //@ts-ignore
                 builder = com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory.newBuilder(context, useOkhttp);
             } else {
                 //@ts-ignore

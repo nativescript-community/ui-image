@@ -11858,3 +11858,213 @@ declare namespace com {
         }
     }
 }
+
+
+declare module com {
+	export module facebook {
+		export module imagepipeline {
+			export module backends {
+				export module okhttp3 {
+					export class BuildConfig extends java.lang.Object {
+						public static class: java.lang.Class<com.facebook.imagepipeline.backends.okhttp3.BuildConfig>;
+						public static DEBUG: boolean;
+						public static LIBRARY_PACKAGE_NAME: string;
+						public static BUILD_TYPE: string;
+						public constructor();
+					}
+				}
+			}
+		}
+	}
+}
+
+declare module com {
+	export module facebook {
+		export module imagepipeline {
+			export module backends {
+				export module okhttp3 {
+					export class OkHttpImagePipelineConfigFactory extends java.lang.Object {
+						public static class: java.lang.Class<com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory>;
+						public constructor();
+						public static newBuilder(param0: globalAndroid.content.Context, param1: okhttp3.OkHttpClient): com.facebook.imagepipeline.core.ImagePipelineConfig.Builder;
+					}
+				}
+			}
+		}
+	}
+}
+
+declare module com {
+	export module facebook {
+		export module imagepipeline {
+			export module backends {
+				export module okhttp3 {
+					export class OkHttpNetworkFetcher extends com.facebook.imagepipeline.producers.BaseNetworkFetcher<com.facebook.imagepipeline.backends.okhttp3.OkHttpNetworkFetcher.OkHttpNetworkFetchState> {
+						public static class: java.lang.Class<com.facebook.imagepipeline.backends.okhttp3.OkHttpNetworkFetcher>;
+						public constructor(param0: okhttp3.OkHttpClient);
+						public createFetchState(param0: com.facebook.imagepipeline.producers.Consumer<com.facebook.imagepipeline.image.EncodedImage>, param1: com.facebook.imagepipeline.producers.ProducerContext): com.facebook.imagepipeline.backends.okhttp3.OkHttpNetworkFetcher.OkHttpNetworkFetchState;
+						public constructor(param0: okhttp3.Call.Factory, param1: java.util.concurrent.Executor);
+						public getExtraMap(param0: com.facebook.imagepipeline.backends.okhttp3.OkHttpNetworkFetcher.OkHttpNetworkFetchState, param1: number): java.util.Map<string,string>;
+						public onFetchCompletion(param0: com.facebook.imagepipeline.backends.okhttp3.OkHttpNetworkFetcher.OkHttpNetworkFetchState, param1: number): void;
+						public constructor(param0: okhttp3.Call.Factory, param1: java.util.concurrent.Executor, param2: boolean);
+						public fetchWithRequest(param0: com.facebook.imagepipeline.backends.okhttp3.OkHttpNetworkFetcher.OkHttpNetworkFetchState, param1: com.facebook.imagepipeline.producers.NetworkFetcher.Callback, param2: okhttp3.Request): void;
+						public fetch(param0: com.facebook.imagepipeline.backends.okhttp3.OkHttpNetworkFetcher.OkHttpNetworkFetchState, param1: com.facebook.imagepipeline.producers.NetworkFetcher.Callback): void;
+					}
+					export module OkHttpNetworkFetcher {
+						export class OkHttpNetworkFetchState {
+							public static class: java.lang.Class<com.facebook.imagepipeline.backends.okhttp3.OkHttpNetworkFetcher.OkHttpNetworkFetchState>;
+							public submitTime: number;
+							public responseTime: number;
+							public fetchCompleteTime: number;
+							public constructor(param0: com.facebook.imagepipeline.producers.Consumer<com.facebook.imagepipeline.image.EncodedImage>, param1: com.facebook.imagepipeline.producers.ProducerContext);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+declare module com {
+	export module facebook {
+		export module imagepipeline {
+			export module backends {
+				export module okhttp3 {
+					export class R extends java.lang.Object {
+						public static class: java.lang.Class<com.facebook.imagepipeline.backends.okhttp3.R>;
+					}
+					export module R {
+						export class attr extends java.lang.Object {
+							public static class: java.lang.Class<com.facebook.imagepipeline.backends.okhttp3.R.attr>;
+							public static alpha: number;
+							public static font: number;
+							public static fontProviderAuthority: number;
+							public static fontProviderCerts: number;
+							public static fontProviderFetchStrategy: number;
+							public static fontProviderFetchTimeout: number;
+							public static fontProviderPackage: number;
+							public static fontProviderQuery: number;
+							public static fontStyle: number;
+							public static fontVariationSettings: number;
+							public static fontWeight: number;
+							public static ttcIndex: number;
+						}
+						export class color extends java.lang.Object {
+							public static class: java.lang.Class<com.facebook.imagepipeline.backends.okhttp3.R.color>;
+							public static notification_action_color_filter: number;
+							public static notification_icon_bg_color: number;
+							public static ripple_material_light: number;
+							public static secondary_text_default_material_light: number;
+						}
+						export class dimen extends java.lang.Object {
+							public static class: java.lang.Class<com.facebook.imagepipeline.backends.okhttp3.R.dimen>;
+							public static compat_button_inset_horizontal_material: number;
+							public static compat_button_inset_vertical_material: number;
+							public static compat_button_padding_horizontal_material: number;
+							public static compat_button_padding_vertical_material: number;
+							public static compat_control_corner_material: number;
+							public static compat_notification_large_icon_max_height: number;
+							public static compat_notification_large_icon_max_width: number;
+							public static notification_action_icon_size: number;
+							public static notification_action_text_size: number;
+							public static notification_big_circle_margin: number;
+							public static notification_content_margin_start: number;
+							public static notification_large_icon_height: number;
+							public static notification_large_icon_width: number;
+							public static notification_main_column_padding_top: number;
+							public static notification_media_narrow_margin: number;
+							public static notification_right_icon_size: number;
+							public static notification_right_side_padding_top: number;
+							public static notification_small_icon_background_padding: number;
+							public static notification_small_icon_size_as_large: number;
+							public static notification_subtext_size: number;
+							public static notification_top_pad: number;
+							public static notification_top_pad_large_text: number;
+						}
+						export class drawable extends java.lang.Object {
+							public static class: java.lang.Class<com.facebook.imagepipeline.backends.okhttp3.R.drawable>;
+							public static notification_action_background: number;
+							public static notification_bg: number;
+							public static notification_bg_low: number;
+							public static notification_bg_low_normal: number;
+							public static notification_bg_low_pressed: number;
+							public static notification_bg_normal: number;
+							public static notification_bg_normal_pressed: number;
+							public static notification_icon_background: number;
+							public static notification_template_icon_bg: number;
+							public static notification_template_icon_low_bg: number;
+							public static notification_tile_bg: number;
+							public static notify_panel_notification_icon_bg: number;
+						}
+						export class integer extends java.lang.Object {
+							public static class: java.lang.Class<com.facebook.imagepipeline.backends.okhttp3.R.integer>;
+							public static status_bar_notification_info_maxnum: number;
+						}
+						export class layout extends java.lang.Object {
+							public static class: java.lang.Class<com.facebook.imagepipeline.backends.okhttp3.R.layout>;
+							public static notification_action: number;
+							public static notification_action_tombstone: number;
+							public static notification_template_custom_big: number;
+							public static notification_template_icon_group: number;
+							public static notification_template_part_chronometer: number;
+							public static notification_template_part_time: number;
+						}
+						export class style extends java.lang.Object {
+							public static class: java.lang.Class<com.facebook.imagepipeline.backends.okhttp3.R.style>;
+							public static TextAppearance_Compat_Notification: number;
+							public static TextAppearance_Compat_Notification_Info: number;
+							public static TextAppearance_Compat_Notification_Line2: number;
+							public static TextAppearance_Compat_Notification_Time: number;
+							public static TextAppearance_Compat_Notification_Title: number;
+							public static Widget_Compat_NotificationActionContainer: number;
+							public static Widget_Compat_NotificationActionText: number;
+						}
+						export class styleable extends java.lang.Object {
+							public static class: java.lang.Class<com.facebook.imagepipeline.backends.okhttp3.R.styleable>;
+							public static ColorStateListItem: androidNative.Array<number>;
+							public static ColorStateListItem_alpha: number;
+							public static ColorStateListItem_android_alpha: number;
+							public static ColorStateListItem_android_color: number;
+							public static FontFamily: androidNative.Array<number>;
+							public static FontFamily_fontProviderAuthority: number;
+							public static FontFamily_fontProviderCerts: number;
+							public static FontFamily_fontProviderFetchStrategy: number;
+							public static FontFamily_fontProviderFetchTimeout: number;
+							public static FontFamily_fontProviderPackage: number;
+							public static FontFamily_fontProviderQuery: number;
+							public static FontFamilyFont: androidNative.Array<number>;
+							public static FontFamilyFont_android_font: number;
+							public static FontFamilyFont_android_fontStyle: number;
+							public static FontFamilyFont_android_fontVariationSettings: number;
+							public static FontFamilyFont_android_fontWeight: number;
+							public static FontFamilyFont_android_ttcIndex: number;
+							public static FontFamilyFont_font: number;
+							public static FontFamilyFont_fontStyle: number;
+							public static FontFamilyFont_fontVariationSettings: number;
+							public static FontFamilyFont_fontWeight: number;
+							public static FontFamilyFont_ttcIndex: number;
+							public static GradientColor: androidNative.Array<number>;
+							public static GradientColor_android_centerColor: number;
+							public static GradientColor_android_centerX: number;
+							public static GradientColor_android_centerY: number;
+							public static GradientColor_android_endColor: number;
+							public static GradientColor_android_endX: number;
+							public static GradientColor_android_endY: number;
+							public static GradientColor_android_gradientRadius: number;
+							public static GradientColor_android_startColor: number;
+							public static GradientColor_android_startX: number;
+							public static GradientColor_android_startY: number;
+							public static GradientColor_android_tileMode: number;
+							public static GradientColor_android_type: number;
+							public static GradientColorItem: androidNative.Array<number>;
+							public static GradientColorItem_android_color: number;
+							public static GradientColorItem_android_offset: number;
+							public static <clinit>(): void;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
