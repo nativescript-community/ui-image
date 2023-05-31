@@ -9,6 +9,7 @@ dependencies {
 	implementation("com.facebook.fresco:imagepipeline-okhttp3:$frescoVersion") {
 		exclude group: 'com.facebook.soloader', module: 'soloader'
 	}
+    implementation 'com.facebook.infer.annotation:infer-annotation:0.18.0'
 	// implementation ("com.facebook.fresco:animated-gif:$frescoVersion") {
 	// 	exclude group: 'com.facebook.soloader', module: 'soloader'
 	// }
