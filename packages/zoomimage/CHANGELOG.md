@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.10](https://github.com/nativescript-community/ui-image/compare/v4.3.9...v4.3.10) (2023-06-08)
+
+**Note:** Version bump only for package @nativescript-community/ui-zoomimage
+
+
+
+
+
 ## [4.3.9](https://github.com/nativescript-community/ui-image/compare/v4.3.8...v4.3.9) (2023-05-31)
 
 **Note:** Version bump only for package @nativescript-community/ui-zoomimage
