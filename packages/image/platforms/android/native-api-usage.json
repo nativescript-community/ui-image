@@ -14,6 +14,7 @@
         "com.facebook.imagepipeline.request:ImageRequestBuilder",
         "com.facebook.imagepipeline.request:ImageRequest",
         "com.facebook.imagepipeline.core:ImagePipelineConfig",
+        "com.facebook.imagepipeline.core:ImagePipelineConfig.Builder",
         "com.facebook.imagepipeline.core:ImagePipeline",
         "com.facebook.imagepipeline.common:RotationOptions",
         "com.facebook.imagepipeline.common:ResizeOptions",
@@ -31,6 +32,6 @@
         "com.facebook.imagepipeline.image:ImageInfo",
         "com.facebook.common.util:UriUtil",
         "android.net:Uri",
-        "android.net.Uri:Builder"
+        "android.net:Uri.Builder"
     ]
 }
