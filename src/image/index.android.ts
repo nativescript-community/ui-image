@@ -557,11 +557,12 @@ export class Img extends ImageBase {
                     return;
                 }
                 if (this.noCache) {
-                    const imagePipeLine = getImagePipeline();
-                    const isInCache = imagePipeLine.isInBitmapMemoryCache(uri) || imagePipeLine.isInDiskCache(uri);
-                    if (isInCache) {
-                        imagePipeLine.evictFromCache(uri);
-                    }
+                    // testing if is in cache is slow so lets remove without testing
+                    // const imagePipeLine = getImagePipeline();
+                    // const isInCache = imagePipeLine.isInBitmapMemoryCache(uri) || imagePipeLine.isInDiskCache(uri);
+                    // if (isInCache) {
+                    getImagePipeline().evictFromCache(uri);
+                    // }
                 }
                 this.isLoading = true;
 
