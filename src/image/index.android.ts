@@ -361,7 +361,6 @@ export const needUpdateHierarchy = function (target: any, propertyKey: string | 
     const originalMethod = descriptor.value;
     descriptor.value = function (...args: any[]) {
         if (!this._canUpdateHierarchy) {
-            console.log('needUpdateHierarchy', propertyKey);
             this._needUpdateHierarchy = true;
             return;
         }
@@ -575,7 +574,6 @@ export class Img extends ImageBase {
                 return;
             }
             if (src) {
-                const startTime = Date.now();
                 let drawable: android.graphics.drawable.BitmapDrawable;
                 if (src instanceof ImageSource) {
                     drawable = new android.graphics.drawable.BitmapDrawable(Utils.ad.getApplicationContext().getResources(), src.android as android.graphics.Bitmap);
@@ -596,7 +594,7 @@ export class Img extends ImageBase {
                 }
                 const uri = getUri(src as string) as android.net.Uri;
                 if (!uri) {
-                    console.log(`Error: 'src' not valid: ${src}`);
+                    console.error(`Error: 'src' not valid: ${src}`);
                     return;
                 }
                 if (this.noCache) {
@@ -722,7 +720,6 @@ export class Img extends ImageBase {
                     tapToRetryEnabled: this.tapToRetryEnabled
                 });
                 view.setUri(uri, options, this.controllerListener);
-                console.log('src done', Date.now() - startTime);
                 // const async = this.loadMode === 'async';
                 // if (async) {
                 // const builder = com.facebook.drawee.backends.pipeline.Fresco.newDraweeControllerBuilder();
@@ -776,7 +773,6 @@ export class Img extends ImageBase {
             this._needUpdateHierarchy = true;
             return;
         }
-        const startTime = Date.now();
         if (this.nativeImageViewProtected) {
             let failureImageDrawable: android.graphics.drawable.BitmapDrawable;
             let placeholderImageDrawable: android.graphics.drawable.BitmapDrawable;
@@ -833,7 +829,6 @@ export class Img extends ImageBase {
             }
 
             this.nativeImageViewProtected.setHierarchy(builder.build());
-            console.log('hierarchy done', Date.now() - startTime);
         }
     }
 
