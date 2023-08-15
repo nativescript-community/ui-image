@@ -1,6 +1,6 @@
 import groovy.json.JsonSlurper
 dependencies {
-	def frescoVersion =  project.hasProperty("frescoVersion") ? project.frescoVersion : "2.6.0"
+	def frescoVersion =  project.hasProperty("frescoVersion") ? project.frescoVersion : "3.0.0"
 
 	implementation("com.facebook.fresco:fresco:$frescoVersion") {
         exclude group: 'com.facebook.soloader', module: 'soloader'
@@ -9,6 +9,11 @@ dependencies {
 	implementation("com.facebook.fresco:imagepipeline-okhttp3:$frescoVersion") {
 		exclude group: 'com.facebook.soloader', module: 'soloader'
 	}
+    implementation('com.facebook.fresco:nativeimagetranscoder') {
+        version {
+            strictly '2.6.0'
+        }
+    }
     implementation 'com.facebook.infer.annotation:infer-annotation:0.18.0'
 	// implementation ("com.facebook.fresco:animated-gif:$frescoVersion") {
 	// 	exclude group: 'com.facebook.soloader', module: 'soloader'
