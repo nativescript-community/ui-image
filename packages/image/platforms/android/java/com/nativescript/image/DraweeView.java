@@ -1,6 +1,9 @@
 package com.nativescript.image;
 
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
+import com.facebook.imagepipeline.request.ImageRequest;
+import com.facebook.drawee.backends.pipeline.PipelineDraweeControllerBuilder;
 
 import android.graphics.Outline;
 import android.graphics.Rect;
@@ -21,6 +24,10 @@ import android.graphics.PorterDuffXfermode;
 import android.view.ViewOutlineProvider;
 
 import org.nativescript.widgets.BorderDrawable;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONException;
 
 import java.util.Arrays;
 
@@ -120,6 +127,7 @@ public class DraweeView extends SimpleDraweeView {
                 && (borderLeftWidth == 0 && borderBottomWidth == 0 && borderTopWidth == 0 && borderRightWidth == 0))
                 || (borderTopLeftRadius == 0 && borderTopRightRadius == 0 && borderBottomRightRadius == 0
                         && borderBottomLeftRadius == 0))) {
+                // we can use outline
             return null;
         }
         if (innerBorderPath == null) {
@@ -177,5 +185,71 @@ public class DraweeView extends SimpleDraweeView {
             }
         }
         super.onDraw(canvas);
+    }
+
+    public void setUri(android.net.Uri uri, String jsonOptions, com.facebook.drawee.controller.ControllerListener listener) {
+    long start = System.nanoTime();
+    ImageRequestBuilder requestBuilder = ImageRequestBuilder.newBuilderWithSource(uri).setRotationOptions( com.facebook.imagepipeline.common.RotationOptions.autoRotate());
+        JSONObject object = null;
+        if (jsonOptions.length() > 2) {
+            try {
+                object = new JSONObject(jsonOptions);
+            } catch (Exception ignored) {
+            }
+        }
+        if (object != null) {
+            if (object.optBoolean("progressiveRenderingEnabled")) {
+                requestBuilder = requestBuilder.setProgressiveRenderingEnabled(true);
+            }
+            if (object.optBoolean("localThumbnailPreviewsEnabled")) {
+                requestBuilder = requestBuilder.setLocalThumbnailPreviewsEnabled(true);
+            }
+            int decodeWidth = object.optInt("decodeWidth");
+            int decodeHeight = object.optInt("decodeHeight");
+
+            if (decodeWidth > 0 && decodeHeight > 0) {
+                requestBuilder = requestBuilder.setResizeOptions(new com.facebook.imagepipeline.common.ResizeOptions(decodeWidth, decodeHeight));
+            }
+            int blurRadius = object.optInt("blurRadius", 0);
+            if (blurRadius > 0) {
+                int blurDownSampling = object.optInt("blurDownSampling", 1);
+                requestBuilder = requestBuilder.setPostprocessor(new com.nativescript.image.ScalingBlurPostprocessor(2, blurRadius, blurDownSampling));
+            }
+        }
+        
+        ImageRequest request = requestBuilder.build();
+        PipelineDraweeControllerBuilder builder = com.facebook.drawee.backends.pipeline.Fresco.newDraweeControllerBuilder();
+        builder.setImageRequest(request);
+        builder.setCallerContext(uri.toString());
+        builder.setControllerListener(listener);
+        builder.setOldController(getController());
+        // if (Trace.isEnabled()) {
+        //     builder.setPerfDataListener(
+        //         new com.facebook.drawee.backends.pipeline.info.ImagePerfDataListener({
+        //             onImageLoadStatusUpdated(param0: com.facebook.drawee.backends.pipeline.info.ImagePerfData, param1: number) {
+        //                 CLog(CLogTypes.info, 'onImageLoadStatusUpdated', param0, param1);
+        //             },
+        //             onImageVisibilityUpdated(param0: com.facebook.drawee.backends.pipeline.info.ImagePerfData, param1: number) {
+        //                 CLog(CLogTypes.info, 'onImageVisibilityUpdated', param0, param1);
+        //             }
+        //         })
+        //     );
+        // }
+        if (object != null) {
+           String lowerResSrc = object.optString("lowerResSrc");
+            if (lowerResSrc != null) {
+                builder.setLowResImageRequest(com.facebook.imagepipeline.request.ImageRequest.fromUri(android.net.Uri.parse(lowerResSrc)));
+            }
+
+            if (object.optBoolean("autoPlayAnimations")) {
+                builder.setAutoPlayAnimations(true);
+            }
+
+            if (object.optBoolean("tapToRetryEnabled")) {
+                builder.setTapToRetryEnabled(true);
+            }
+        }
+
+        setController(builder.build());
     }
 }

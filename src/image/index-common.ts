@@ -7,6 +7,55 @@ import { isAndroid } from '@nativescript/core/platform';
 function isNonNegativeFiniteNumber(value: number): boolean {
     return isFinite(value) && !isNaN(value) && value >= 0;
 }
+interface Thickness {
+    top: string;
+    right: string;
+    bottom: string;
+    left: string;
+}
+function parseThickness(value: string): Thickness {
+    if (typeof value === 'string') {
+        const arr = value.split(/[ ,]+/);
+
+        let top: string;
+        let right: string;
+        let bottom: string;
+        let left: string;
+
+        if (arr.length === 1) {
+            top = arr[0];
+            right = arr[0];
+            bottom = arr[0];
+            left = arr[0];
+        } else if (arr.length === 2) {
+            top = arr[0];
+            bottom = arr[0];
+            right = arr[1];
+            left = arr[1];
+        } else if (arr.length === 3) {
+            top = arr[0];
+            right = arr[1];
+            left = arr[1];
+            bottom = arr[2];
+        } else if (arr.length === 4) {
+            top = arr[0];
+            right = arr[1];
+            bottom = arr[2];
+            left = arr[3];
+        } else {
+            throw new Error('Expected 1, 2, 3 or 4 parameters. Actual: ' + value);
+        }
+
+        return {
+            top,
+            right,
+            bottom,
+            left
+        };
+    } else {
+        return value;
+    }
+}
 
 export enum CLogTypes {
     log = Trace.messageType.log,
@@ -82,6 +131,94 @@ export class EventData implements IEventData {
 }
 export type Stretch = 'none' | 'fill' | 'aspectFill' | 'aspectFit';
 
+export const srcProperty = new Property<ImageBase, string | ImageSource | ImageAsset>({ name: 'src' });
+export const lowerResSrcProperty = new Property<ImageBase, string>({ name: 'lowerResSrc' });
+export const placeholderImageUriProperty = new Property<ImageBase, string>({ name: 'placeholderImageUri' });
+export const failureImageUriProperty = new Property<ImageBase, string>({ name: 'failureImageUri' });
+export const stretchProperty = new Property<ImageBase, string>({ name: 'stretch', defaultValue: 'aspectFit' });
+export const backgroundUriProperty = new Property<ImageBase, string>({ name: 'backgroundUri' });
+export const progressiveRenderingEnabledProperty = new Property<ImageBase, boolean>({ name: 'progressiveRenderingEnabled', valueConverter: booleanConverter });
+export const localThumbnailPreviewsEnabledProperty = new Property<ImageBase, boolean>({ name: 'localThumbnailPreviewsEnabled', valueConverter: booleanConverter });
+export const showProgressBarProperty = new Property<ImageBase, boolean>({ name: 'showProgressBar', valueConverter: booleanConverter });
+export const progressBarColorProperty = new Property<ImageBase, string>({ name: 'progressBarColor', defaultValue: undefined });
+export const roundAsCircleProperty = new Property<ImageBase, boolean>({ name: 'roundAsCircle', valueConverter: booleanConverter, affectsLayout: isAndroid });
+export const blurRadiusProperty = new Property<ImageBase, number>({ name: 'blurRadius', valueConverter: (v) => parseFloat(v) });
+export const blurDownSamplingProperty = new Property<ImageBase, number>({ name: 'blurDownSampling', valueConverter: (v) => parseFloat(v) });
+export const imageRotationProperty = new Property<ImageBase, number>({ name: 'imageRotation', valueConverter: (v) => parseFloat(v) });
+export const autoPlayAnimationsProperty = new Property<ImageBase, boolean>({ name: 'autoPlayAnimations', valueConverter: booleanConverter });
+export const tapToRetryEnabledProperty = new Property<ImageBase, boolean>({ name: 'tapToRetryEnabled', valueConverter: booleanConverter });
+export const aspectRatioProperty = new Property<ImageBase, number>({ name: 'aspectRatio', affectsLayout: true, valueConverter: (v) => parseFloat(v) });
+export const decodeWidthProperty = new Property<ImageBase, number>({ name: 'decodeWidth', valueConverter: (v) => parseFloat(v) });
+export const decodeHeightProperty = new Property<ImageBase, number>({ name: 'decodeHeight', valueConverter: (v) => parseFloat(v) });
+export const tintColorProperty = new Property<ImageBase, Color>({ name: 'tintColor' });
+export const alwaysFadeProperty = new Property<ImageBase, boolean>({ name: 'alwaysFade', valueConverter: booleanConverter, defaultValue: false });
+export const fadeDurationProperty = new Property<ImageBase, number>({ name: 'fadeDuration', valueConverter: (v) => parseFloat(v) });
+export const noCacheProperty = new Property<ImageBase, boolean>({ name: 'noCache', defaultValue: false, valueConverter: booleanConverter });
+export const roundTopLeftRadiusProperty = new Property<ImageBase, CoreTypes.LengthType>({
+    name: 'roundTopLeftRadius',
+    defaultValue: 0,
+    valueConverter: (v) => Length.toDevicePixels(Length.parse(v))
+});
+export const roundTopRightRadiusProperty = new Property<ImageBase, CoreTypes.LengthType>({
+    name: 'roundTopRightRadius',
+    defaultValue: 0,
+    valueConverter: (v) => Length.toDevicePixels(Length.parse(v))
+});
+export const roundBottomLeftRadiusProperty = new Property<ImageBase, CoreTypes.LengthType>({
+    name: 'roundBottomLeftRadius',
+    defaultValue: 0,
+    valueConverter: (v) => Length.toDevicePixels(Length.parse(v))
+});
+export const roundBottomRightRadiusProperty = new Property<ImageBase, CoreTypes.LengthType>({
+    name: 'roundBottomRightRadius',
+    defaultValue: 0,
+    valueConverter: (v) => Length.toDevicePixels(Length.parse(v))
+});
+// export const roundRadiusProperty = new ShorthandProperty<any, string | CoreTypes.LengthType>({
+//     name: 'borderRadius',
+//     cssName: 'border-radius',
+//     getter(this) {
+//         if (
+//             Length.equals(this.borderTopLeftRadius, this.borderTopRightRadius) &&
+//             Length.equals(this.borderTopLeftRadius, this.borderBottomRightRadius) &&
+//             Length.equals(this.borderTopLeftRadius, this.borderBottomLeftRadius)
+//         ) {
+//             return this.borderTopLeftRadius;
+//         }
+
+//         return `${Length.convertToString(this.borderTopLeftRadius)} ${Length.convertToString(this.borderTopRightRadius)} ${Length.convertToString(
+//             this.borderBottomRightRadius
+//         )} ${Length.convertToString(this.borderBottomLeftRadius)}`;
+//     },
+//     //@ts-ignore
+//     converter(value) {
+//         if (typeof value === 'string') {
+//             const borderRadius = parseThickness(value);
+
+//             return [
+//                 [roundTopLeftRadiusProperty, borderRadius.top],
+//                 [roundTopRightRadiusProperty, borderRadius.right],
+//                 [roundBottomRightRadiusProperty, borderRadius.bottom],
+//                 [roundBottomLeftRadiusProperty, borderRadius.left]
+//             ];
+//         } else {
+//             return [
+//                 [roundTopLeftRadiusProperty, value],
+//                 [roundTopRightRadiusProperty, value],
+//                 [roundBottomRightRadiusProperty, value],
+//                 [roundBottomLeftRadiusProperty, value]
+//             ];
+//         }
+//     }
+// });
+export const loadModeProperty = new Property<ImageBase, 'sync' | 'async'>({
+    name: 'loadMode',
+    defaultValue: 'sync'
+});
+
+export const clipToBoundsProperty = new Property<ImageBase, boolean>({ name: 'clipToBounds', defaultValue: true, valueConverter: booleanConverter });
+export const animatedImageViewProperty = new Property<ImageBase, boolean>({ name: 'animatedImageView', defaultValue: false, valueConverter: booleanConverter });
+
 export class ImageBase extends View {
     public static finalImageSetEvent: string = 'finalImageSet';
     public static failureEvent: string = 'failure';
@@ -124,56 +261,6 @@ export class ImageBase extends View {
 
     public readonly isLoading: boolean;
 
-    public static srcProperty = new Property<ImageBase, string | ImageSource | ImageAsset>({ name: 'src' });
-    public static lowerResSrcProperty = new Property<ImageBase, string>({ name: 'lowerResSrc' });
-    public static placeholderImageUriProperty = new Property<ImageBase, string>({ name: 'placeholderImageUri' });
-    public static failureImageUriProperty = new Property<ImageBase, string>({ name: 'failureImageUri' });
-    public static stretchProperty = new Property<ImageBase, string>({ name: 'stretch', defaultValue: 'aspectFit' });
-    public static backgroundUriProperty = new Property<ImageBase, string>({ name: 'backgroundUri' });
-    public static progressiveRenderingEnabledProperty = new Property<ImageBase, boolean>({ name: 'progressiveRenderingEnabled', valueConverter: booleanConverter });
-    public static localThumbnailPreviewsEnabledProperty = new Property<ImageBase, boolean>({ name: 'localThumbnailPreviewsEnabled', valueConverter: booleanConverter });
-    public static showProgressBarProperty = new Property<ImageBase, boolean>({ name: 'showProgressBar', valueConverter: booleanConverter });
-    public static progressBarColorProperty = new Property<ImageBase, string>({ name: 'progressBarColor', defaultValue: undefined });
-    public static roundAsCircleProperty = new Property<ImageBase, boolean>({ name: 'roundAsCircle', valueConverter: booleanConverter, affectsLayout: isAndroid });
-    public static blurRadiusProperty = new Property<ImageBase, number>({ name: 'blurRadius', valueConverter: (v) => parseFloat(v) });
-    public static blurDownSamplingProperty = new Property<ImageBase, number>({ name: 'blurDownSampling', valueConverter: (v) => parseFloat(v) });
-    public static imageRotationProperty = new Property<ImageBase, number>({ name: 'imageRotation', valueConverter: (v) => parseFloat(v) });
-    public static autoPlayAnimationsProperty = new Property<ImageBase, boolean>({ name: 'autoPlayAnimations', valueConverter: booleanConverter });
-    public static tapToRetryEnabledProperty = new Property<ImageBase, boolean>({ name: 'tapToRetryEnabled', valueConverter: booleanConverter });
-    public static aspectRatioProperty = new Property<ImageBase, number>({ name: 'aspectRatio', affectsLayout: true, valueConverter: (v) => parseFloat(v) });
-    public static decodeWidthProperty = new Property<ImageBase, number>({ name: 'decodeWidth', valueConverter: (v) => parseFloat(v) });
-    public static decodeHeightProperty = new Property<ImageBase, number>({ name: 'decodeHeight', valueConverter: (v) => parseFloat(v) });
-    public static tintColorProperty = new Property<ImageBase, Color>({ name: 'tintColor' });
-    public static alwaysFadeProperty = new Property<ImageBase, boolean>({ name: 'alwaysFade', valueConverter: booleanConverter, defaultValue: false });
-    public static fadeDurationProperty = new Property<ImageBase, number>({ name: 'fadeDuration', valueConverter: (v) => parseFloat(v) });
-    public static noCacheProperty = new Property<ImageBase, boolean>({ name: 'noCache', defaultValue: false, valueConverter: booleanConverter });
-    public static roundTopLeftRadiusProperty = new Property<ImageBase, CoreTypes.LengthType>({
-        name: 'roundTopLeftRadius',
-        defaultValue: 0,
-        valueConverter: (v) => Length.toDevicePixels(Length.parse(v))
-    });
-    public static roundTopRightRadiusProperty = new Property<ImageBase, CoreTypes.LengthType>({
-        name: 'roundTopRightRadius',
-        defaultValue: 0,
-        valueConverter: (v) => Length.toDevicePixels(Length.parse(v))
-    });
-    public static roundBottomLeftRadiusProperty = new Property<ImageBase, CoreTypes.LengthType>({
-        name: 'roundBottomLeftRadius',
-        defaultValue: 0,
-        valueConverter: (v) => Length.toDevicePixels(Length.parse(v))
-    });
-    public static roundBottomRightRadiusProperty = new Property<ImageBase, CoreTypes.LengthType>({
-        name: 'roundBottomRightRadius',
-        defaultValue: 0,
-        valueConverter: (v) => Length.toDevicePixels(Length.parse(v))
-    });
-    public static loadModeProperty = new Property<ImageBase, 'sync' | 'async'>({
-        name: 'loadMode',
-        defaultValue: 'sync'
-    });
-
-    public static clipToBoundsProperty = new Property<ImageBase, boolean>({ name: 'clipToBounds', defaultValue: true, valueConverter: booleanConverter });
-    public static animatedImageViewProperty = new Property<ImageBase, boolean>({ name: 'animatedImageView', defaultValue: false, valueConverter: booleanConverter });
     // public static blendingModeProperty = new Property<ImageBase, string>({ name: 'blendingMode' });
 
     get nativeImageViewProtected() {
@@ -256,34 +343,35 @@ export class ImageBase extends View {
         return { width: scaleW, height: scaleH };
     }
 }
-ImageBase.srcProperty.register(ImageBase);
-ImageBase.lowerResSrcProperty.register(ImageBase);
-ImageBase.placeholderImageUriProperty.register(ImageBase);
-ImageBase.failureImageUriProperty.register(ImageBase);
-ImageBase.stretchProperty.register(ImageBase);
-ImageBase.fadeDurationProperty.register(ImageBase);
-ImageBase.backgroundUriProperty.register(ImageBase);
-ImageBase.progressiveRenderingEnabledProperty.register(ImageBase);
-ImageBase.localThumbnailPreviewsEnabledProperty.register(ImageBase);
-ImageBase.showProgressBarProperty.register(ImageBase);
-ImageBase.progressBarColorProperty.register(ImageBase);
-ImageBase.roundAsCircleProperty.register(ImageBase);
-ImageBase.roundTopLeftRadiusProperty.register(ImageBase);
-ImageBase.roundTopRightRadiusProperty.register(ImageBase);
-ImageBase.roundBottomLeftRadiusProperty.register(ImageBase);
-ImageBase.roundBottomRightRadiusProperty.register(ImageBase);
-ImageBase.blurRadiusProperty.register(ImageBase);
-ImageBase.blurDownSamplingProperty.register(ImageBase);
-ImageBase.imageRotationProperty.register(ImageBase);
-ImageBase.autoPlayAnimationsProperty.register(ImageBase);
-ImageBase.tapToRetryEnabledProperty.register(ImageBase);
-ImageBase.aspectRatioProperty.register(ImageBase);
-ImageBase.decodeWidthProperty.register(ImageBase);
-ImageBase.decodeHeightProperty.register(ImageBase);
-ImageBase.alwaysFadeProperty.register(ImageBase);
-ImageBase.noCacheProperty.register(ImageBase);
-ImageBase.clipToBoundsProperty.register(ImageBase);
-ImageBase.animatedImageViewProperty.register(ImageBase);
-ImageBase.loadModeProperty.register(ImageBase);
+srcProperty.register(ImageBase);
+lowerResSrcProperty.register(ImageBase);
+placeholderImageUriProperty.register(ImageBase);
+failureImageUriProperty.register(ImageBase);
+stretchProperty.register(ImageBase);
+fadeDurationProperty.register(ImageBase);
+backgroundUriProperty.register(ImageBase);
+progressiveRenderingEnabledProperty.register(ImageBase);
+localThumbnailPreviewsEnabledProperty.register(ImageBase);
+showProgressBarProperty.register(ImageBase);
+progressBarColorProperty.register(ImageBase);
+roundAsCircleProperty.register(ImageBase);
+roundTopLeftRadiusProperty.register(ImageBase);
+roundTopRightRadiusProperty.register(ImageBase);
+roundBottomLeftRadiusProperty.register(ImageBase);
+roundBottomRightRadiusProperty.register(ImageBase);
+blurRadiusProperty.register(ImageBase);
+blurDownSamplingProperty.register(ImageBase);
+imageRotationProperty.register(ImageBase);
+autoPlayAnimationsProperty.register(ImageBase);
+tapToRetryEnabledProperty.register(ImageBase);
+aspectRatioProperty.register(ImageBase);
+decodeWidthProperty.register(ImageBase);
+decodeHeightProperty.register(ImageBase);
+alwaysFadeProperty.register(ImageBase);
+noCacheProperty.register(ImageBase);
+clipToBoundsProperty.register(ImageBase);
+animatedImageViewProperty.register(ImageBase);
+loadModeProperty.register(ImageBase);
+// roundRadiusProperty.register(ImageBase as any);
 
 // ImageBase.blendingModeProperty.register(ImageBase);

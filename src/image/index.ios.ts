@@ -1,8 +1,21 @@
 export * from './index-common';
 import { ImageAsset, ImageSource, Screen, Trace, Utils, knownFolders, path } from '@nativescript/core';
-import { isString } from '@nativescript/core/utils/types';
-import { CLog, CLogTypes, EventData, ImageBase, ImageInfo as ImageInfoBase, ImagePipelineConfigSetting, ScaleType, Stretch } from './index-common';
 import { layout } from '@nativescript/core/utils/layout-helper';
+import { isString } from '@nativescript/core/utils/types';
+import {
+    CLog,
+    CLogTypes,
+    EventData,
+    ImageBase,
+    ImageInfo as ImageInfoBase,
+    ImagePipelineConfigSetting,
+    ScaleType,
+    Stretch,
+    failureImageUriProperty,
+    placeholderImageUriProperty,
+    srcProperty,
+    stretchProperty
+} from './index-common';
 
 export class ImageInfo implements ImageInfoBase {
     constructor(private width: number, private height: number) {}
@@ -450,20 +463,20 @@ export class Img extends ImageBase {
             }
         }
     }
-    [ImageBase.srcProperty.setNative](value) {
+    [srcProperty.setNative](value) {
         this.initImage();
     }
     placeholderImage: UIImage;
-    [ImageBase.placeholderImageUriProperty.setNative]() {
+    [placeholderImageUriProperty.setNative]() {
         this.placeholderImage = this.getUIImage(this.placeholderImageUri);
         this.initImage();
     }
 
-    [ImageBase.failureImageUriProperty.setNative]() {
+    [failureImageUriProperty.setNative]() {
         // this.updateHierarchy();
     }
 
-    [ImageBase.stretchProperty.setNative](value: Stretch) {
+    [stretchProperty.setNative](value: Stretch) {
         if (!this.nativeView) {
             return;
         }

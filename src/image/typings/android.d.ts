@@ -7,6 +7,7 @@ declare namespace com {
             class DraweeView extends facebook.drawee.view.SimpleDraweeView {
                 imageWidth: number;
                 imageHeight: number;
+                setUri(uri: globalAndroid.net.Uri, options: string, listener: facebook.drawee.controller.ControllerListener);
             }
             class ScalingBlurPostprocessor extends facebook.imagepipeline.request.BasePostprocessor {
                 public constructor(iterations: number, blurRadius: number, scaleRatio: number);

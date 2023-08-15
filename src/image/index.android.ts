@@ -1,9 +1,36 @@
 export * from './index-common';
-import { Color, Image, ImageAsset, ImageSource, Trace, Utils, knownFolders, path } from '@nativescript/core';
-import { android as androidApp } from '@nativescript/core/application';
+import { Application, Background, Color, ImageAsset, ImageSource, Trace, Utils, backgroundInternalProperty, knownFolders, path } from '@nativescript/core';
 import { isString } from '@nativescript/core/utils/types';
-import { AnimatedImage, CLog, CLogTypes, EventData, ImageBase, ImageError as ImageErrorBase, ImageInfo as ImageInfoBase, ImagePipelineConfigSetting, ScaleType } from './index-common';
-import { layout } from '@nativescript/core/utils/layout-helper';
+import {
+    AnimatedImage,
+    CLog,
+    CLogTypes,
+    EventData,
+    ImageBase,
+    ImageError as ImageErrorBase,
+    ImageInfo as ImageInfoBase,
+    ImagePipelineConfigSetting,
+    ScaleType,
+    aspectRatioProperty,
+    backgroundUriProperty,
+    blurDownSamplingProperty,
+    blurRadiusProperty,
+    fadeDurationProperty,
+    failureImageUriProperty,
+    imageRotationProperty,
+    lowerResSrcProperty,
+    placeholderImageUriProperty,
+    progressBarColorProperty,
+    roundAsCircleProperty,
+    roundBottomLeftRadiusProperty,
+    roundBottomRightRadiusProperty,
+    roundTopLeftRadiusProperty,
+    roundTopRightRadiusProperty,
+    showProgressBarProperty,
+    srcProperty,
+    stretchProperty,
+    tintColorProperty
+} from './index-common';
 
 let initialized = false;
 let initializeConfig: ImagePipelineConfigSetting;
@@ -41,16 +68,17 @@ export function initialize(config?: ImagePipelineConfigSetting): void {
     }
 }
 
+let imagePineLine: ImagePipeline;
 export function getImagePipeline(): ImagePipeline {
-    if (androidApp) {
-        const nativePipe = com.facebook.drawee.backends.pipeline.Fresco.getImagePipeline();
-        const imagePineLine = new ImagePipeline();
-        imagePineLine.android = nativePipe;
-
-        return imagePineLine;
+    if (!imagePineLine) {
+        if (Application.android.nativeApp) {
+            const nativePipe = com.facebook.drawee.backends.pipeline.Fresco.getImagePipeline();
+            imagePineLine = new ImagePipeline();
+            imagePineLine.android = nativePipe;
+        }
     }
 
-    return null;
+    return imagePineLine;
 }
 
 export function shutDown(): void {
@@ -61,8 +89,8 @@ export function shutDown(): void {
     com.facebook.drawee.view.SimpleDraweeView.shutDown();
     com.facebook.drawee.backends.pipeline.Fresco.shutDown();
 }
-function getUri(src: string | ImageAsset) {
-    let uri: android.net.Uri;
+function getUri(src: string | ImageAsset, asNative = true) {
+    let uri: string;
     let imagePath: string;
     if (src instanceof ImageAsset) {
         imagePath = src.android;
@@ -74,17 +102,21 @@ function getUri(src: string | ImageAsset) {
             const resName = imagePath.substring(Utils.RESOURCE_PREFIX.length);
             const identifier = Utils.ad.resources.getDrawableId(resName);
             if (0 < identifier) {
-                uri = new android.net.Uri.Builder().scheme(com.facebook.common.util.UriUtil.LOCAL_RESOURCE_SCHEME).path(java.lang.String.valueOf(identifier)).build();
+                const netUri = new android.net.Uri.Builder().scheme(com.facebook.common.util.UriUtil.LOCAL_RESOURCE_SCHEME).path(java.lang.String.valueOf(identifier)).build();
+                if (asNative) {
+                    return netUri;
+                }
+                uri = netUri.toString();
             }
         } else if (imagePath.indexOf('~/') === 0) {
-            uri = android.net.Uri.parse(`file:${path.join(knownFolders.currentApp().path, imagePath.replace('~/', ''))}`);
+            uri = `file:${path.join(knownFolders.currentApp().path, imagePath.replace('~/', ''))}`;
         } else if (imagePath.indexOf('/') === 0) {
-            uri = android.net.Uri.parse(`file:${imagePath}`);
+            uri = `file:${imagePath}`;
         }
     } else {
-        uri = android.net.Uri.parse(imagePath);
+        uri = imagePath;
     }
-    return uri;
+    return asNative ? android.net.Uri.parse(uri) : uri;
 }
 
 export class ImagePipeline {
@@ -319,7 +351,7 @@ export const needRequestImage = function (target: any, propertyKey: string | Sym
             this._needRequestImage = true;
             // we need to ensure a hierarchy is set or the default aspect ratio wont be set
             // because aspectFit is the default (wanted) but then we wont go into stretchProperty.setNative
-            this._needUpdateHierarchy = true;
+            // this._needUpdateHierarchy = true;
             return;
         }
         return originalMethod.apply(this, args);
@@ -329,6 +361,7 @@ export const needUpdateHierarchy = function (target: any, propertyKey: string | 
     const originalMethod = descriptor.value;
     descriptor.value = function (...args: any[]) {
         if (!this._canUpdateHierarchy) {
+            console.log('needUpdateHierarchy', propertyKey);
             this._needUpdateHierarchy = true;
             return;
         }
@@ -344,7 +377,7 @@ export class Img extends ImageBase {
 
     _canRequestImage = true;
     _canUpdateHierarchy = true;
-    _needUpdateHierarchy = true;
+    _needUpdateHierarchy = false;
     _needRequestImage = false;
     public onResumeNativeUpdates(): void {
         // {N} suspends properties update on `_suspendNativeUpdates`. So we only need to do this in onResumeNativeUpdates
@@ -395,9 +428,10 @@ export class Img extends ImageBase {
     //     this.updateHierarchy();
     // }
 
-    // public disposeNativeView() {
-    //     this.nativeImageViewProtected.setImageURI(null, null);
-    // }
+    public disposeNativeView() {
+        this.controllerListener = null;
+        // this.nativeImageViewProtected.setImageURI(null, null);
+    }
 
     public updateImageUri() {
         const imagePipeLine = getImagePipeline();
@@ -414,98 +448,103 @@ export class Img extends ImageBase {
     }
 
     @needUpdateHierarchy
-    [ImageBase.placeholderImageUriProperty.setNative]() {
+    [placeholderImageUriProperty.setNative]() {
         this.updateHierarchy();
     }
 
     @needUpdateHierarchy
-    [ImageBase.failureImageUriProperty.setNative]() {
+    [failureImageUriProperty.setNative]() {
         this.updateHierarchy();
     }
 
     @needUpdateHierarchy
-    [ImageBase.stretchProperty.setNative]() {
+    [stretchProperty.setNative]() {
         this.updateHierarchy();
     }
 
     @needUpdateHierarchy
-    [ImageBase.fadeDurationProperty.setNative]() {
+    [fadeDurationProperty.setNative]() {
         this.updateHierarchy();
     }
 
     @needUpdateHierarchy
-    [ImageBase.backgroundUriProperty.setNative]() {
+    [backgroundUriProperty.setNative]() {
         this.updateHierarchy();
     }
 
     @needUpdateHierarchy
-    [ImageBase.showProgressBarProperty.setNative]() {
+    [showProgressBarProperty.setNative]() {
         this.updateHierarchy();
     }
 
     @needUpdateHierarchy
-    [ImageBase.progressBarColorProperty.setNative]() {
+    [progressBarColorProperty.setNative]() {
         this.updateHierarchy();
     }
 
     @needUpdateHierarchy
-    [ImageBase.roundAsCircleProperty.setNative]() {
+    [roundAsCircleProperty.setNative]() {
         this.updateHierarchy();
     }
 
     @needUpdateHierarchy
-    [ImageBase.roundTopLeftRadiusProperty.setNative]() {
+    [roundTopLeftRadiusProperty.setNative]() {
         this.updateHierarchy();
     }
-    [ImageBase.imageRotationProperty.setNative](value) {
+    [imageRotationProperty.setNative](value) {
         const scaleType = this.nativeImageViewProtected.getHierarchy().getActualImageScaleType();
         scaleType['setImageRotation']?.(value);
         this.nativeImageViewProtected.invalidate();
     }
 
     @needUpdateHierarchy
-    [ImageBase.roundTopRightRadiusProperty.setNative]() {
+    [roundTopRightRadiusProperty.setNative]() {
         this.updateHierarchy();
     }
 
     @needUpdateHierarchy
-    [ImageBase.roundBottomLeftRadiusProperty.setNative]() {
+    [roundBottomLeftRadiusProperty.setNative]() {
         this.updateHierarchy();
     }
 
     @needUpdateHierarchy
-    [ImageBase.roundBottomRightRadiusProperty.setNative]() {
+    [roundBottomRightRadiusProperty.setNative]() {
         this.updateHierarchy();
     }
 
     @needUpdateHierarchy
-    [ImageBase.tintColorProperty.setNative](value: Color) {
+    [tintColorProperty.setNative](value: Color) {
         this.updateHierarchy();
     }
 
     @needRequestImage
-    [ImageBase.blurRadiusProperty.setNative]() {
+    [blurRadiusProperty.setNative]() {
         this.initImage();
     }
 
     @needRequestImage
-    [ImageBase.srcProperty.setNative]() {
+    [srcProperty.setNative]() {
         this.initImage();
     }
 
     @needRequestImage
-    [ImageBase.lowerResSrcProperty.setNative]() {
+    [lowerResSrcProperty.setNative]() {
         this.initImage();
     }
 
     @needRequestImage
-    [ImageBase.blurDownSamplingProperty.setNative]() {
+    [blurDownSamplingProperty.setNative]() {
         this.initImage();
     }
 
     @needRequestImage
-    [ImageBase.aspectRatioProperty.setNative]() {
+    [aspectRatioProperty.setNative]() {
         this.initImage();
+    }
+
+    [backgroundInternalProperty.setNative](value: Background) {
+        super[backgroundInternalProperty.setNative](value);
+        this.nativeViewProtected.setClipToOutline(value?.hasBorderRadius());
     }
 
     // [ImageBase.blendingModeProperty.setNative](value: string) {
@@ -524,8 +563,11 @@ export class Img extends ImageBase {
     //     this.initImage();
     // }
 
+    controllerListener: com.facebook.drawee.controller.ControllerListener<com.facebook.imagepipeline.image.ImageInfo>;
+
     private async initImage() {
-        if (this.nativeImageViewProtected) {
+        const view = this.nativeViewProtected;
+        if (view) {
             // this.nativeImageViewProtected.setImageURI(null);
             const src = this.src;
             if (src instanceof Promise) {
@@ -533,6 +575,7 @@ export class Img extends ImageBase {
                 return;
             }
             if (src) {
+                const startTime = Date.now();
                 let drawable: android.graphics.drawable.BitmapDrawable;
                 if (src instanceof ImageSource) {
                     drawable = new android.graphics.drawable.BitmapDrawable(Utils.ad.getApplicationContext().getResources(), src.android as android.graphics.Bitmap);
@@ -551,7 +594,7 @@ export class Img extends ImageBase {
                     hierarchy.setImage(drawable, 1, hierarchy.getFadeDuration() === 0);
                     return;
                 }
-                const uri = getUri(src as string);
+                const uri = getUri(src as string) as android.net.Uri;
                 if (!uri) {
                     console.log(`Error: 'src' not valid: ${src}`);
                     return;
@@ -566,175 +609,154 @@ export class Img extends ImageBase {
                 }
                 this.isLoading = true;
 
-                // const progressiveRenderingEnabledValue = this.progressiveRenderingEnabled !== undefined ? this.progressiveRenderingEnabled : false;
-                let requestBuilder = com.facebook.imagepipeline.request.ImageRequestBuilder.newBuilderWithSource(uri).setRotationOptions(
-                    com.facebook.imagepipeline.common.RotationOptions.autoRotate()
-                );
-                if (this.progressiveRenderingEnabled === true) {
-                    requestBuilder = requestBuilder.setProgressiveRenderingEnabled(this.progressiveRenderingEnabled);
+                if (!this.controllerListener) {
+                    const that: WeakRef<Img> = new WeakRef(this);
+                    this.controllerListener = new com.facebook.drawee.controller.ControllerListener<com.facebook.imagepipeline.image.ImageInfo>({
+                        onFinalImageSet(id, imageInfo, animatable) {
+                            if (Trace.isEnabled()) {
+                                CLog(CLogTypes.info, 'onFinalImageSet', id, imageInfo, animatable);
+                            }
+                            const nativeView = that?.get();
+                            if (nativeView) {
+                                nativeView.updateViewSize(imageInfo);
+                                nativeView.isLoading = false;
+                                const eventName = ImageBase.finalImageSetEvent;
+                                if (nativeView.hasListeners(eventName)) {
+                                    const info = new ImageInfo(imageInfo);
+                                    nativeView.notify({
+                                        eventName,
+                                        imageInfo: info,
+                                        animatable: animatable as AnimatedImage
+                                    } as FinalEventData);
+                                }
+                            }
+                        },
+                        onFailure(id, throwable) {
+                            if (Trace.isEnabled()) {
+                                CLog(CLogTypes.info, 'onFailure', id, throwable.getLocalizedMessage());
+                            }
+                            const nativeView = that?.get();
+                            if (nativeView) {
+                                // const nView = nativeView.nativeViewProtected;
+                                nativeView.isLoading = false;
+                                const eventName = ImageBase.failureEvent;
+                                if (nativeView.hasListeners(eventName)) {
+                                    const imageError = new ImageError(throwable);
+                                    nativeView.notify({
+                                        eventName,
+                                        error: imageError
+                                    } as FailureEventData);
+                                }
+                            }
+                        },
+                        onIntermediateImageFailed(id, throwable) {
+                            if (Trace.isEnabled()) {
+                                CLog(CLogTypes.info, 'onIntermediateImageFailed', id, throwable);
+                            }
+                            const nativeView = that?.get();
+                            if (nativeView) {
+                                const eventName = ImageBase.intermediateImageFailedEvent;
+                                if (nativeView.hasListeners(eventName)) {
+                                    const imageError = new ImageError(throwable);
+                                    nativeView.notify({
+                                        eventName,
+                                        error: imageError
+                                    } as FailureEventData);
+                                }
+                            }
+                        },
+                        onIntermediateImageSet(id, imageInfo) {
+                            if (Trace.isEnabled()) {
+                                CLog(CLogTypes.info, 'onIntermediateImageSet', id, imageInfo);
+                            }
+                            const nativeView = that?.get();
+                            if (nativeView) {
+                                nativeView.updateViewSize(imageInfo);
+                                const eventName = ImageBase.intermediateImageSetEvent;
+                                if (nativeView.hasListeners(eventName)) {
+                                    const info = new ImageInfo(imageInfo);
+                                    nativeView.notify({
+                                        eventName,
+                                        imageInfo: info
+                                    } as IntermediateEventData);
+                                }
+                            }
+                        },
+                        onRelease(id) {
+                            if (Trace.isEnabled()) {
+                                CLog(CLogTypes.info, 'onRelease', id);
+                            }
+                            const nativeView = that?.get();
+                            if (nativeView) {
+                                const eventName = ImageBase.releaseEvent;
+                                if (nativeView.hasListeners(eventName)) {
+                                    nativeView.notify({
+                                        eventName
+                                    } as EventData);
+                                }
+                            }
+                        },
+                        onSubmit(id, callerContext) {
+                            if (Trace.isEnabled()) {
+                                CLog(CLogTypes.info, 'onSubmit', id, callerContext);
+                            }
+                            const nativeView = that?.get();
+                            const eventName = ImageBase.submitEvent;
+                            if (nativeView?.hasListeners(eventName)) {
+                                nativeView.notify({
+                                    eventName
+                                } as EventData);
+                            }
+                        }
+                    });
                 }
-                if (this.localThumbnailPreviewsEnabled === true) {
-                    requestBuilder = requestBuilder.setLocalThumbnailPreviewsEnabled(this.localThumbnailPreviewsEnabled);
-                }
-
-                if (this.decodeWidth && this.decodeHeight) {
-                    requestBuilder = requestBuilder.setResizeOptions(new com.facebook.imagepipeline.common.ResizeOptions(this.decodeWidth, this.decodeHeight));
-                }
-                if (this.blurRadius) {
-                    const postProcessor: any = new com.nativescript.image.ScalingBlurPostprocessor(2, this.blurRadius, this.blurDownSampling || 1);
-                    requestBuilder = requestBuilder.setPostprocessor(postProcessor);
-                }
-
-                const request = requestBuilder.build();
-
-                const that: WeakRef<Img> = new WeakRef(this);
-                const listener = new com.facebook.drawee.controller.ControllerListener<com.facebook.imagepipeline.image.ImageInfo>({
-                    onFinalImageSet(id, imageInfo, animatable) {
-                        if (Trace.isEnabled()) {
-                            CLog(CLogTypes.info, 'onFinalImageSet', id, imageInfo, animatable);
-                        }
-                        const nativeView = that && that.get();
-                        if (nativeView) {
-                            nativeView.updateViewSize(imageInfo);
-                            nativeView.isLoading = false;
-                            const info = new ImageInfo(imageInfo);
-
-                            const args = {
-                                eventName: ImageBase.finalImageSetEvent,
-                                object: nativeView,
-                                imageInfo: info,
-                                animatable: animatable as AnimatedImage
-                            } as FinalEventData;
-
-                            nativeView.notify(args);
-                        } else {
-                            console.log("Warning: WeakRef<Image> was GC and no '" + ImageBase.finalImageSetEvent + "' callback will be raised.");
-                        }
-                    },
-                    onFailure(id, throwable) {
-                        if (Trace.isEnabled()) {
-                            CLog(CLogTypes.info, 'onFailure', id, throwable.getLocalizedMessage());
-                        }
-                        const nativeView = that && that.get();
-                        if (nativeView) {
-                            // const nView = nativeView.nativeViewProtected;
-                            nativeView.isLoading = false;
-                            const imageError = new ImageError(throwable);
-                            const args: FailureEventData = {
-                                eventName: ImageBase.failureEvent,
-                                object: nativeView,
-                                error: imageError
-                            } as FailureEventData;
-
-                            that.get().notify(args);
-                        } else {
-                            console.log("Warning: WeakRef<Image> was GC and no '" + ImageBase.failureEvent + "' callback will be raised.");
-                        }
-                    },
-                    onIntermediateImageFailed(id, throwable) {
-                        if (Trace.isEnabled()) {
-                            CLog(CLogTypes.info, 'onIntermediateImageFailed', id, throwable);
-                        }
-                        const nativeView = that && that.get();
-                        if (nativeView) {
-                            const imageError = new ImageError(throwable);
-                            const args: FailureEventData = {
-                                eventName: ImageBase.intermediateImageFailedEvent,
-                                object: nativeView,
-                                error: imageError
-                            } as FailureEventData;
-
-                            that.get().notify(args);
-                        } else {
-                            console.log("Warning: WeakRef<Image> was GC and no '" + ImageBase.intermediateImageFailedEvent + "' callback will be raised.");
-                        }
-                    },
-                    onIntermediateImageSet(id, imageInfo) {
-                        if (Trace.isEnabled()) {
-                            CLog(CLogTypes.info, 'onIntermediateImageSet', id, imageInfo);
-                        }
-                        const nativeView = that && that.get();
-                        if (nativeView) {
-                            nativeView.updateViewSize(imageInfo);
-                            const info = new ImageInfo(imageInfo);
-                            const args: IntermediateEventData = {
-                                eventName: ImageBase.intermediateImageSetEvent,
-                                object: nativeView,
-                                imageInfo: info
-                            } as IntermediateEventData;
-
-                            that.get().notify(args);
-                        } else {
-                            console.log("Warning: WeakRef<Image> was GC and no '" + ImageBase.intermediateImageSetEvent + "' callback will be raised.");
-                        }
-                    },
-                    onRelease(id) {
-                        if (Trace.isEnabled()) {
-                            CLog(CLogTypes.info, 'onRelease', id);
-                        }
-                        const nativeView = that && that.get();
-                        if (nativeView) {
-                            const args: EventData = {
-                                eventName: ImageBase.releaseEvent,
-                                object: nativeView
-                            } as EventData;
-
-                            that.get().notify(args);
-                        } else {
-                            console.log("Warning: WeakRef<Image> was GC and no '" + ImageBase.releaseEvent + "' callback will be raised.");
-                        }
-                    },
-                    onSubmit(id, callerContext) {
-                        if (Trace.isEnabled()) {
-                            CLog(CLogTypes.info, 'onSubmit', id, callerContext);
-                        }
-                        const nativeView = that && that.get();
-                        if (nativeView) {
-                            const args: EventData = {
-                                eventName: ImageBase.submitEvent,
-                                object: nativeView
-                            } as EventData;
-
-                            that.get().notify(args);
-                        } else {
-                            console.log("Warning: WeakRef<Image> was GC and no 'submitEvent' callback will be raised.");
-                        }
-                    }
+                const options = JSON.stringify({
+                    progressiveRenderingEnabled: this.blurRadius,
+                    localThumbnailPreviewsEnabled: this.blurRadius,
+                    decodeWidth: this.decodeWidth,
+                    decodeHeight: this.decodeHeight,
+                    blurRadius: this.blurRadius,
+                    lowerResSrc: this.lowerResSrc ? getUri(this.lowerResSrc, false) : undefined,
+                    blurDownSampling: this.blurDownSampling,
+                    autoPlayAnimations: this.autoPlayAnimations,
+                    tapToRetryEnabled: this.tapToRetryEnabled
                 });
+                view.setUri(uri, options, this.controllerListener);
+                console.log('src done', Date.now() - startTime);
                 // const async = this.loadMode === 'async';
                 // if (async) {
-                const builder = com.facebook.drawee.backends.pipeline.Fresco.newDraweeControllerBuilder();
-                builder.setImageRequest(request);
-                builder.setCallerContext(src);
-                builder.setControllerListener(listener);
-                builder.setOldController(this.nativeImageViewProtected.getController());
-                if (Trace.isEnabled()) {
-                    builder.setPerfDataListener(
-                        new com.facebook.drawee.backends.pipeline.info.ImagePerfDataListener({
-                            onImageLoadStatusUpdated(param0: com.facebook.drawee.backends.pipeline.info.ImagePerfData, param1: number) {
-                                CLog(CLogTypes.info, 'onImageLoadStatusUpdated', param0, param1);
-                            },
-                            onImageVisibilityUpdated(param0: com.facebook.drawee.backends.pipeline.info.ImagePerfData, param1: number) {
-                                CLog(CLogTypes.info, 'onImageVisibilityUpdated', param0, param1);
-                            }
-                        })
-                    );
-                }
-                if (this.lowerResSrc) {
-                    builder.setLowResImageRequest(com.facebook.imagepipeline.request.ImageRequest.fromUri(getUri(this.lowerResSrc)));
-                }
+                // const builder = com.facebook.drawee.backends.pipeline.Fresco.newDraweeControllerBuilder();
+                // builder.setImageRequest(request);
+                // builder.setCallerContext(src);
+                // builder.setControllerListener(listener);
+                // builder.setOldController(this.nativeImageViewProtected.getController());
+                // if (Trace.isEnabled()) {
+                //     builder.setPerfDataListener(
+                //         new com.facebook.drawee.backends.pipeline.info.ImagePerfDataListener({
+                //             onImageLoadStatusUpdated(param0: com.facebook.drawee.backends.pipeline.info.ImagePerfData, param1: number) {
+                //                 CLog(CLogTypes.info, 'onImageLoadStatusUpdated', param0, param1);
+                //             },
+                //             onImageVisibilityUpdated(param0: com.facebook.drawee.backends.pipeline.info.ImagePerfData, param1: number) {
+                //                 CLog(CLogTypes.info, 'onImageVisibilityUpdated', param0, param1);
+                //             }
+                //         })
+                //     );
+                // }
+                // if (this.lowerResSrc) {
+                //     builder.setLowResImageRequest(com.facebook.imagepipeline.request.ImageRequest.fromUri(getUri(this.lowerResSrc)));
+                // }
 
-                if (this.autoPlayAnimations) {
-                    builder.setAutoPlayAnimations(this.autoPlayAnimations);
-                }
+                // if (this.autoPlayAnimations) {
+                //     builder.setAutoPlayAnimations(this.autoPlayAnimations);
+                // }
 
-                if (this.tapToRetryEnabled) {
-                    builder.setTapToRetryEnabled(this.tapToRetryEnabled);
-                }
+                // if (this.tapToRetryEnabled) {
+                //     builder.setTapToRetryEnabled(this.tapToRetryEnabled);
+                // }
 
-                const controller = builder.build();
+                // const controller = builder.build();
 
-                this.nativeImageViewProtected.setController(controller);
+                // this.nativeImageViewProtected.setController(controller);
                 // } else {
                 // const dataSource = com.facebook.drawee.backends.pipeline.Fresco.getImagePipeline().fetchDecodedImage(request, src);
                 // const result = com.facebook.datasource.DataSources.waitForFinalResult(dataSource);
@@ -754,6 +776,7 @@ export class Img extends ImageBase {
             this._needUpdateHierarchy = true;
             return;
         }
+        const startTime = Date.now();
         if (this.nativeImageViewProtected) {
             let failureImageDrawable: android.graphics.drawable.BitmapDrawable;
             let placeholderImageDrawable: android.graphics.drawable.BitmapDrawable;
@@ -787,11 +810,7 @@ export class Img extends ImageBase {
                 builder.setActualImageScaleType(this.stretch, this.imageRotation);
             }
 
-            if (this.fadeDuration) {
-                builder.setFadeDuration(this.fadeDuration);
-            } else {
-                builder.setFadeDuration(0);
-            }
+            builder.setFadeDuration(this.fadeDuration || 0);
 
             if (this.backgroundUri && backgroundDrawable) {
                 builder.setBackground(backgroundDrawable);
@@ -805,16 +824,16 @@ export class Img extends ImageBase {
                 builder.setRoundingParamsAsCircle();
             }
 
-            if (this.roundBottomLeftRadius || this.roundBottomRightRadius || this.roundTopLeftRadius || this.roundTopRightRadius) {
-                const topLeftRadius = this.roundTopLeftRadius || 0;
-                const topRightRadius = this.roundTopRightRadius || 0;
-                const bottomRightRadius = this.roundBottomRightRadius || 0;
-                const bottomLeftRadius = this.roundBottomLeftRadius || 0;
+            const topLeftRadius = this.roundTopLeftRadius || 0;
+            const topRightRadius = this.roundTopRightRadius || 0;
+            const bottomRightRadius = this.roundBottomRightRadius || 0;
+            const bottomLeftRadius = this.roundBottomLeftRadius || 0;
+            if (topLeftRadius || topRightRadius || bottomRightRadius || bottomLeftRadius) {
                 builder.setCornersRadii(topLeftRadius, topRightRadius, bottomRightRadius, bottomLeftRadius);
             }
 
-            const hierarchy = builder.build();
-            this.nativeImageViewProtected.setHierarchy(hierarchy);
+            this.nativeImageViewProtected.setHierarchy(builder.build());
+            console.log('hierarchy done', Date.now() - startTime);
         }
     }
 
