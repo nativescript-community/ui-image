@@ -2,6 +2,7 @@ export * from './index-common';
 import { ZoomImageBase, maxZoomScaleProperty, minZoomScaleProperty, zoomScaleProperty } from './index-common';
 
 export class ZoomImg extends ZoomImageBase {
+    _needUpdateHierarchy = true;
     //@ts-ignore
     nativeViewProtected: com.facebook.samples.zoomable.ZoomableDraweeView;
     //@ts-ignore
@@ -24,14 +25,10 @@ export class ZoomImg extends ZoomImageBase {
     }
 
     [minZoomScaleProperty.setNative](scale: number) {
-        if (this.nativeViewProtected) {
-            this.nativeViewProtected.getZoomableController().setMinScaleFactor(scale);
-        }
+        this.nativeViewProtected.getZoomableController().setMinScaleFactor(scale);
     }
 
     [maxZoomScaleProperty.setNative](scale: number) {
-        if (this.nativeViewProtected) {
-            this.nativeViewProtected.getZoomableController().setMaxScaleFactor(scale);
-        }
+        this.nativeViewProtected.getZoomableController().setMaxScaleFactor(scale);
     }
 }
