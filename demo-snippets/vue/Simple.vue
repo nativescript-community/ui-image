@@ -6,8 +6,8 @@
 
         <GridLayout rows="*, auto, auto, auto, auto, auto">
             <StackLayout orientation="horizontal">
-                <NSImg backgroundColor="yellow" height="100" ref="opacityImg" verticalAlignment="center" borderRadius="100" width="50%" stretch="aspectFill" placeholderImageUri="res://logo" src="~/images/desserts.jpg"> </NSImg>
-                <NSImg backgroundColor="red" width="50%" height="100" verticalAlignment="center" borderRadius="100" stretch="aspectFill" :src="imgSource" > </NSImg>
+                <NSImg backgroundColor="yellow" height="400" ref="opacityImg" verticalAlignment="center" borderRadius="100" width="50%" src="~/assets/images/dessert.jpg"> </NSImg>
+                <NSImg backgroundColor="red" width="50%" height="100" verticalAlignment="center" borderRadius="100" :src="imgSource" > </NSImg>
             </StackLayout>
             <Button text="Set 1" row="1" @tap="onSeOpacityTo1"></Button>
             <Button text="Set 0.5" row="2" @tap="onSeOpacityTo05"></Button>
@@ -25,7 +25,7 @@ export default {
      data: function() {
         return {
             // warning image source native android image will not be released!
-            imgSource: ImageSource.fromFileSync('~/images/dessert.jpg')
+            imgSource: ImageSource.fromFileSync('~/assets/images/drink.jpg')
         };
     },
     methods: {

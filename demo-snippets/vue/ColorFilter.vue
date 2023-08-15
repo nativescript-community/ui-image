@@ -5,7 +5,7 @@
         </ActionBar>
 
         <GridLayout rows="*, auto, auto">
-                <NSZoomImg backgroundColor="yellow" ref="opacityImg" stretch="aspectFill" placeholderImageUri="res://logo" :colorMatrix="colorMatrix" :src="src"> </NSZoomImg>
+                <NSZoomImg backgroundColor="yellow" ref="opacityImg" placeholderImageUri="res://logo" :colorMatrix="colorMatrix" :src="src"> </NSZoomImg>
                 <StackLayout orientation="horizontal"  row="1"> 
                     <Button text="nightVision" row="1" @tap="onSetNightVision"></Button>
             <Button text="polaroid"  @tap="onSetPolaroid"></Button>
