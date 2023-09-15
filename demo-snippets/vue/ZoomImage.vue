@@ -1,7 +1,7 @@
 <template>
     <Page>
         <ActionBar>
-            <Label text="Simple Grid" />
+            <Label text="Zoom Image" />
         </ActionBar>
 
         <NSZoomImg :src="imgSource"/>
@@ -15,7 +15,7 @@ export default {
     data: function() {
         return {
             // warning image source native android image will not be released!
-            imgSource: ImageSource.fromFileSync('~/images/dessert.jpg')
+            imgSource: ImageSource.fromFileSync('~/assets/images/dessert.jpg')
         };
     },
 };

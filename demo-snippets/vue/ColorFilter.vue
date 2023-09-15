@@ -5,7 +5,7 @@
         </ActionBar>
 
         <GridLayout rows="*, auto, auto">
-                <NSZoomImg backgroundColor="yellow" ref="opacityImg" placeholderImageUri="res://logo" :colorMatrix="colorMatrix" :src="src"> </NSZoomImg>
+                <NSImg backgroundColor="yellow" ref="opacityImg" placeholderImageUri="res://logo" :colorMatrix="colorMatrix" :src="src"> </NSImg>
                 <StackLayout orientation="horizontal"  row="1"> 
                     <Button text="nightVision" row="1" @tap="onSetNightVision"></Button>
             <Button text="polaroid"  @tap="onSetPolaroid"></Button>
@@ -47,9 +47,9 @@ export default {
      data: function() {
         return {
             colorMatrix:filters.nightVision,
-            src:'~/images/dessert.jpg',
+            src:'~/assets/images/dessert.jpg',
             // warning image source native android image will not be released!
-            imgSource: ImageSource.fromFileSync('~/images/dessert.jpg')
+            // imgSource: ImageSource.fromFileSync('~/assets/images/dessert.jpg')
         };
     },
     methods: {
@@ -69,7 +69,7 @@ export default {
             this.colorMatrix = null
         },
         onChangeImage(){
-            this.src= this.src=== '~/images/dessert.jpg' ? '~/images/drink.jpg': '~/images/dessert.jpg';
+            this.src= this.src=== '~/assets/images/dessert.jpg' ? '~/assets/images/drink.jpg': '~/assets/images/dessert.jpg';
         }
     }
 };
