@@ -5,15 +5,15 @@
         </ActionBar>
 
         <GridLayout rows="*, auto, auto">
-                <NSImg backgroundColor="yellow" ref="opacityImg" placeholderImageUri="res://logo" :colorMatrix="colorMatrix" :src="src"> </NSImg>
-                <StackLayout orientation="horizontal"  row="1"> 
-                    <Button text="nightVision" row="1" @tap="onSetNightVision"></Button>
-            <Button text="polaroid"  @tap="onSetPolaroid"></Button>
-            <Button text="grayscale" @tap="onSetGrayscale"></Button>
-            <Button text="bw"  @tap="onSetBW"></Button>
-            <Button text="clear"  @tap="onSetClear"></Button>
-                </StackLayout>
-            
+            <NSImg backgroundColor="yellow" ref="opacityImg" placeholderImageUri="res://logo" :colorMatrix="colorMatrix" :src="src"> </NSImg>
+            <StackLayout orientation="horizontal" row="1">
+                <Button text="nightVision" row="1" @tap="onSetNightVision"></Button>
+                <Button text="polaroid" @tap="onSetPolaroid"></Button>
+                <Button text="grayscale" @tap="onSetGrayscale"></Button>
+                <Button text="bw" @tap="onSetBW"></Button>
+                <Button text="clear" @tap="onSetClear"></Button>
+            </StackLayout>
+
             <Button text="change image" row="2" @tap="onChangeImage"></Button>
         </GridLayout>
     </Page>
@@ -23,53 +23,39 @@
 import { ImageSource } from '@nativescript/core';
 
 const filters = {
-    nightVision:[0.1, 0.4, 0, 0, 0,
-    0.3, 1, 0.3, 0, 0,
-    0, 0.4, 0.1, 0, 0,
-    0, 0, 0, 1, 0],
-    polaroid: [
-    1.438, -0.062, -0.062, 0, 0,
-    -0.122, 1.378, -0.122, 0, 0,
-    -0.016, -0.016, 1.483, 0, 0,
-    0, 0, 0, 1, 0
-  ], 
-  grayscale:[
-     .299, 0.587, 0.114, 0, 0,
-				0.299, 0.587, 0.114, 0, 0,
-				0.299, 0.587, 0.114, 0, 0,
-				0, 0, 0, 1, 0
-    ],
-    bw: [1.5, 1.5, 1.5, -1, 0, 1.5, 1.5, 1.5, -1, 0, 1.5, 1.5, 1.5, -1, 0, 0, 0, 0, 1, 0],
-
-}
+    nightVision: [0.1, 0.4, 0, 0, 0, 0.3, 1, 0.3, 0, 0, 0, 0.4, 0.1, 0, 0, 0, 0, 0, 1, 0],
+    polaroid: [1.438, -0.062, -0.062, 0, 0, -0.122, 1.378, -0.122, 0, 0, -0.016, -0.016, 1.483, 0, 0, 0, 0, 0, 1, 0],
+    grayscale: [0.299, 0.587, 0.114, 0, 0, 0.299, 0.587, 0.114, 0, 0, 0.299, 0.587, 0.114, 0, 0, 0, 0, 0, 1, 0],
+    bw: [1.5, 1.5, 1.5, -1, 0, 1.5, 1.5, 1.5, -1, 0, 1.5, 1.5, 1.5, -1, 0, 0, 0, 0, 1, 0]
+};
 
 export default {
-     data: function() {
+    data: function () {
         return {
-            colorMatrix:filters.nightVision,
-            src:'~/assets/images/dessert.jpg',
+            colorMatrix: filters.nightVision,
+            src: '~/assets/images/dessert.jpg'
             // warning image source native android image will not be released!
             // imgSource: ImageSource.fromFileSync('~/assets/images/dessert.jpg')
         };
     },
     methods: {
         onSetNightVision(args) {
-            this.colorMatrix = filters.nightVision
+            this.colorMatrix = filters.nightVision;
         },
         onSetPolaroid(args) {
-            this.colorMatrix = filters.polaroid
+            this.colorMatrix = filters.polaroid;
         },
         onSetGrayscale(args) {
-            this.colorMatrix = filters.grayscale
+            this.colorMatrix = filters.grayscale;
         },
         onSetBW(args) {
-            this.colorMatrix = filters.bw
+            this.colorMatrix = filters.bw;
         },
         onSetClear(args) {
-            this.colorMatrix = null
+            this.colorMatrix = null;
         },
-        onChangeImage(){
-            this.src= this.src=== '~/assets/images/dessert.jpg' ? '~/assets/images/drink.jpg': '~/assets/images/dessert.jpg';
+        onChangeImage() {
+            this.src = this.src === '~/assets/images/dessert.jpg' ? '~/assets/images/drink.jpg' : '~/assets/images/dessert.jpg';
         }
     }
 };
