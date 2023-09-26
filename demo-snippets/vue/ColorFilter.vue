@@ -30,7 +30,7 @@ const filters = {
 };
 
 export default {
-    data: function () {
+    data() {
         return {
             colorMatrix: filters.nightVision,
             src: '~/assets/images/dessert.jpg'

@@ -4,7 +4,7 @@
             <Label text="Zoom Image" />
         </ActionBar>
 
-        <NSZoomImg :src="imgSource"/>
+        <NSZoomImg :src="imgSource" />
     </Page>
 </template>
 
@@ -12,12 +12,12 @@
 import { ImageSource } from '@nativescript/core';
 
 export default {
-    data: function() {
+    data() {
         return {
             // warning image source native android image will not be released!
-            imgSource: ImageSource.fromFileSync('~/assets/images/dessert.jpg')
+            imgSource: ImageSource.fromFileSync('~/assets/images/drink.jpg')
         };
-    },
+    }
 };
 </script>
 
