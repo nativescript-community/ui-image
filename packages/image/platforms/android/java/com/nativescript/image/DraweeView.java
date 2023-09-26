@@ -4,6 +4,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.drawee.backends.pipeline.PipelineDraweeControllerBuilder;
+import com.facebook.drawee.generic.GenericDraweeHierarchy;
 
 import android.graphics.Outline;
 import android.graphics.Rect;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.content.Context;
 import android.os.Build;
 import android.util.Log;
+import android.util.AttributeSet;
 
 import android.graphics.Canvas;
 import android.graphics.Path;
@@ -37,6 +39,26 @@ public class DraweeView extends SimpleDraweeView {
     private static Paint clipPaint;
 
     private boolean clipEnabled = true;
+
+    public DraweeView(Context context, GenericDraweeHierarchy hierarchy) {
+    super(context);
+    setClipToBounds(clipEnabled);
+  }
+
+  public DraweeView(Context context) {
+    super(context);
+    setClipToBounds(clipEnabled);
+  }
+
+  public DraweeView(Context context, AttributeSet attrs) {
+    super(context, attrs);
+    setClipToBounds(clipEnabled);
+  }
+
+  public DraweeView(Context context, AttributeSet attrs, int defStyle) {
+    super(context, attrs, defStyle);
+    setClipToBounds(clipEnabled);
+  }
 
     public void setClipToBounds(boolean value) {
         clipEnabled = value;
@@ -81,10 +103,6 @@ public class DraweeView extends SimpleDraweeView {
         return clipEnabled;
     }
 
-    public DraweeView(Context context) {
-        super(context);
-        setClipToBounds(clipEnabled);
-    }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -188,7 +206,7 @@ public class DraweeView extends SimpleDraweeView {
     }
 
     public void setUri(android.net.Uri uri, String jsonOptions, com.facebook.drawee.controller.ControllerListener listener) {
-    long start = System.nanoTime();
+        Log.d("JS", "setUri " + uri.toString());
     ImageRequestBuilder requestBuilder = ImageRequestBuilder.newBuilderWithSource(uri).setRotationOptions( com.facebook.imagepipeline.common.RotationOptions.autoRotate());
         JSONObject object = null;
         if (jsonOptions.length() > 2) {
@@ -249,7 +267,7 @@ public class DraweeView extends SimpleDraweeView {
                 builder.setTapToRetryEnabled(true);
             }
         }
-
+        Log.d("JS", "setUri " + uri.toString() + " " + object);
         setController(builder.build());
     }
 }

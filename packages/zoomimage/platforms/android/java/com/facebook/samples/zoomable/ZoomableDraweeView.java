@@ -25,14 +25,14 @@ import com.facebook.drawee.generic.GenericDraweeHierarchy;
 import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 import com.facebook.drawee.generic.GenericDraweeHierarchyInflater;
 import com.facebook.drawee.interfaces.DraweeController;
-import com.facebook.drawee.view.DraweeView;
+import com.nativescript.image.DraweeView;
 
 /**
  * DraweeView that has zoomable capabilities.
  *
  * <p>Once the image loads, pinch-to-zoom and translation gestures are enabled.
  */
-public class ZoomableDraweeView extends DraweeView<GenericDraweeHierarchy>
+public class ZoomableDraweeView extends DraweeView
     implements ScrollingView {
 
   private static final Class<?> TAG = ZoomableDraweeView.class;
@@ -42,7 +42,7 @@ public class ZoomableDraweeView extends DraweeView<GenericDraweeHierarchy>
   private final RectF mImageBounds = new RectF();
   private final RectF mViewBounds = new RectF();
 
- private DraweeController mHugeImageController;
+  private DraweeController mHugeImageController;
   private ZoomableController mZoomableController;
   private GestureDetector mTapGestureDetector;
   private boolean mAllowTouchInterceptionWhileZoomed = true;
