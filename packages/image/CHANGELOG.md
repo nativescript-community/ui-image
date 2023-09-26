@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.12](https://github.com/nativescript-community/ui-image/compare/v4.3.11...v4.3.12) (2023-09-26)
+
+### Bug Fixes
+
+* **android:** zoomimage not showing anything ([a8c666b](https://github.com/nativescript-community/ui-image/commit/a8c666bec8ffd0b3bc0907e0e9ddab89ec8dfbaf))
+
 ## [4.3.11](https://github.com/nativescript-community/ui-image/compare/v4.3.10...v4.3.11) (2023-08-15)
 
 ### Bug Fixes
