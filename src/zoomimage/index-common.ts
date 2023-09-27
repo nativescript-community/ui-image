@@ -16,12 +16,14 @@ export const zoomScaleProperty = new Property<ZoomImageBase, number>({
 
 export const minZoomScaleProperty = new Property<ZoomImageBase, number>({
     name: 'minZoom',
-    defaultValue: 1
+    defaultValue: 1,
+    valueConverter: parseFloat
 });
 
 export const maxZoomScaleProperty = new Property<ZoomImageBase, number>({
     name: 'maxZoom',
-    defaultValue: 4
+    defaultValue: 4,
+    valueConverter: parseFloat
 });
 
 zoomScaleProperty.register(ZoomImageBase);
