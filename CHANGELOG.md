@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.14](https://github.com/@nativescript-community/ui-image/compare/v4.3.13...v4.3.14) (2023-09-27)
+
+### Bug Fixes
+
+* **zoomimage:** support minZoom and maxZoom as string ([57280ad](https://github.com/@nativescript-community/ui-image/commit/57280adf32361a21999b0ffc1033c49354ce3ad1))
+
 ## [4.3.13](https://github.com/@nativescript-community/ui-image/compare/v4.3.12...v4.3.13) (2023-09-27)
 
 ### Bug Fixes
