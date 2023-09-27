@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.13](https://github.com/nativescript-community/ui-image/compare/v4.3.12...v4.3.13) (2023-09-27)
+
+### Bug Fixes
+
+* **android:** border radius correctly working now ([69c2732](https://github.com/nativescript-community/ui-image/commit/69c27327ebc627901a6aa4e7617b8975b3d14bc4))
+
 ## [4.3.12](https://github.com/nativescript-community/ui-image/compare/v4.3.11...v4.3.12) (2023-09-26)
 
 ### Bug Fixes
