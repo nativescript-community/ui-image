@@ -36,73 +36,55 @@ import java.util.Arrays;
 public class DraweeView extends SimpleDraweeView {
     public int imageWidth = 0;
     public int imageHeight = 0;
+    public boolean isUsingOutlineProvider = false;
     private static Paint clipPaint;
 
-    private boolean clipEnabled = true;
-
     public DraweeView(Context context, GenericDraweeHierarchy hierarchy) {
-    super(context);
-    setClipToBounds(clipEnabled);
-  }
+        super(context);
+    }
 
-  public DraweeView(Context context) {
-    super(context);
-    setClipToBounds(clipEnabled);
-  }
+    public DraweeView(Context context) {
+        super(context);
+    }
 
-  public DraweeView(Context context, AttributeSet attrs) {
-    super(context, attrs);
-    setClipToBounds(clipEnabled);
-  }
+    public DraweeView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
 
-  public DraweeView(Context context, AttributeSet attrs, int defStyle) {
-    super(context, attrs, defStyle);
-    setClipToBounds(clipEnabled);
-  }
+    public DraweeView(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+    }
 
-    public void setClipToBounds(boolean value) {
-        clipEnabled = value;
-        if (value) {
-            if (android.os.Build.VERSION.SDK_INT >= 21) {
-                setOutlineProvider(new ViewOutlineProvider() {
-                    @Override
-                    public void getOutline(View view, Outline outline) {
-                        Drawable drawable = getBackground();
-                        if (drawable instanceof BorderDrawable) {
-                            BorderDrawable borderDrawable = (BorderDrawable) drawable;
-                            float borderTopLeftRadius = borderDrawable.getBorderTopLeftRadius();
-                            float borderTopRightRadius = borderDrawable.getBorderTopRightRadius();
-                            float borderBottomRightRadius = borderDrawable.getBorderBottomRightRadius();
-                            float borderBottomLeftRadius = borderDrawable.getBorderBottomLeftRadius();
-                            float borderLeftWidth = borderDrawable.getBorderLeftWidth();
-                            float borderBottomWidth = borderDrawable.getBorderBottomWidth();
-                            float borderTopWidth = borderDrawable.getBorderTopWidth();
-                            float borderRightWidth = borderDrawable.getBorderRightWidth();
-                            if (android.os.Build.VERSION.SDK_INT >= 21 && 
-                                borderDrawable.getUniformBorderRadius() > 0 &&
-                                borderLeftWidth == 0 &&
-                                borderBottomWidth == 0 &&
-                                borderTopWidth == 0 &&
-                                borderRightWidth == 0) {
-                                drawable.getOutline(outline);
-                                return;
-                            }
+	// private final Rect outlineRect = new RectF();
+    public void updateOutlineProvider() {
+        Drawable drawable = getBackground();
+        isUsingOutlineProvider = false;
+        if (android.os.Build.VERSION.SDK_INT >= 21 && drawable instanceof BorderDrawable && (android.os.Build.VERSION.SDK_INT >= 33 || ((BorderDrawable)drawable).hasUniformBorderRadius())) {
+            setOutlineProvider(new ViewOutlineProvider() {
+                @Override
+                public void getOutline(View view, Outline outline) {
+                    Drawable drawable = getBackground();
+                    if (drawable instanceof BorderDrawable) {
+                        BorderDrawable borderDrawable = (BorderDrawable) drawable;
+                        // that if test is only needed until N BorderDrawable is updated to do it
+                        if (borderDrawable.hasUniformBorderRadius()) {
+			                // outlineRect.set(borderDrawable.getBounds());
+                            outline.setRoundRect(borderDrawable.getBounds(), borderDrawable.getBorderBottomLeftRadius());
+                        } else {
+                            drawable.getOutline(outline);
                         }
-                        outline.setRect(0, 0, view.getWidth(), view.getHeight());
+                    } else {
+                        outline.setRect(100, 100, view.getWidth() - 200, view.getHeight() - 200);
                     }
-                });
-                setClipToOutline(true);
-            }
+                }
+            });
+            setClipToOutline(true);
+            isUsingOutlineProvider = true;
         } else if (android.os.Build.VERSION.SDK_INT >= 21) {
             setOutlineProvider(null);
             setClipToOutline(false);
         }
     }
-
-    public boolean getClipToBounds() {
-        return clipEnabled;
-    }
-
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -141,13 +123,6 @@ public class DraweeView extends SimpleDraweeView {
         float borderBottomWidth = borderDrawable.getBorderBottomWidth();
         float borderTopWidth = borderDrawable.getBorderTopWidth();
         float borderRightWidth = borderDrawable.getBorderRightWidth();
-        if (android.os.Build.VERSION.SDK_INT >= 21 && ((borderDrawable.hasUniformBorderRadius()
-                && (borderLeftWidth == 0 && borderBottomWidth == 0 && borderTopWidth == 0 && borderRightWidth == 0))
-                || (borderTopLeftRadius == 0 && borderTopRightRadius == 0 && borderBottomRightRadius == 0
-                        && borderBottomLeftRadius == 0))) {
-                // we can use outline
-            return null;
-        }
         if (innerBorderPath == null) {
             innerBorderPath = new Path();
         } else {
@@ -180,7 +155,7 @@ public class DraweeView extends SimpleDraweeView {
     @Override
     protected void onDraw(Canvas canvas) {
         Drawable drawable = getBackground();
-        if (clipEnabled && drawable instanceof BorderDrawable) {
+        if (!isUsingOutlineProvider && drawable instanceof BorderDrawable) {
             BorderDrawable borderDrawable = (BorderDrawable) drawable;
             Path clipPath = generateInnerBorderPath(borderDrawable);
             if (clipPath != null) {
@@ -201,12 +176,11 @@ public class DraweeView extends SimpleDraweeView {
                 canvas.restoreToCount(saveCount);
                 return;
             }
-        }
+        } 
         super.onDraw(canvas);
     }
 
     public void setUri(android.net.Uri uri, String jsonOptions, com.facebook.drawee.controller.ControllerListener listener) {
-        Log.d("JS", "setUri " + uri.toString());
     ImageRequestBuilder requestBuilder = ImageRequestBuilder.newBuilderWithSource(uri).setRotationOptions( com.facebook.imagepipeline.common.RotationOptions.autoRotate());
         JSONObject object = null;
         if (jsonOptions.length() > 2) {
@@ -267,7 +241,18 @@ public class DraweeView extends SimpleDraweeView {
                 builder.setTapToRetryEnabled(true);
             }
         }
-        Log.d("JS", "setUri " + uri.toString() + " " + object);
         setController(builder.build());
     }
+
+    @Override
+    public void setBackground(Drawable background) {
+        super.setBackground(background);
+        updateOutlineProvider();
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+          updateOutlineProvider();
+  }
 }
