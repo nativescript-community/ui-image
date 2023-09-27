@@ -4,7 +4,7 @@
             <Label text="Zoom Image" />
         </ActionBar>
 
-        <NSZoomImg :src="imgSource" />
+        <NSZoomImg :src="imgSource" maxZoom="10" minZoom="0.2"/>
     </Page>
 </template>
 
