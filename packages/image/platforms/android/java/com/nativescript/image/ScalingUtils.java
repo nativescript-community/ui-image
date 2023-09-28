@@ -136,33 +136,33 @@ public class ScalingUtils {
     }
     @Override
     public Matrix getTransform(
-        Matrix outTransform,
-        Rect parentRect,
-        int childWidth,
-        int childHeight,
-        float focusX,
-        float focusY) {
-        float sX = (float) parentRect.width() / (float) childWidth;
-        float sY = (float) parentRect.height() / (float) childHeight;
-        float rotationDelta = (90 - (_imageRotation % 180))/90.0f;
-        if (rotationDelta != 1) {
-            float destSX = (float) parentRect.width() / (float) childHeight;
-            float destSY = (float) parentRect.height() / (float) childWidth;
-          if (rotationDelta < 0) {
-            sX = destSX + rotationDelta * (destSX - sX);
-            sY = destSY + rotationDelta * (destSY - sY);
-          } else {
-            sX = sX + (1 - rotationDelta) * (destSX - sX);
-            sY = sY + (1 - rotationDelta) * (destSY - sY);
-          }
-            
+      Matrix outTransform,
+      Rect parentRect,
+      int childWidth,
+      int childHeight,
+      float focusX,
+      float focusY) {
+      float sX = (float) parentRect.width() / (float) childWidth;
+      float sY = (float) parentRect.height() / (float) childHeight;
+      float rotationDelta = (90 - (_imageRotation % 180))/90.0f;
+      if (rotationDelta != 1) {
+          float destSX = (float) parentRect.width() / (float) childHeight;
+          float destSY = (float) parentRect.height() / (float) childWidth;
+        if (rotationDelta < 0) {
+          sX = destSX + rotationDelta * (destSX - sX);
+          sY = destSY + rotationDelta * (destSY - sY);
+        } else {
+          sX = sX + (1 - rotationDelta) * (destSX - sX);
+          sY = sY + (1 - rotationDelta) * (destSY - sY);
         }
-        getTransformImpl(outTransform, parentRect, childWidth, childHeight, focusX, focusY, sX, sY);
-        if (_imageMatrix != null) {
-            outTransform.preConcat(_imageMatrix);
-        } else if (_imageRotation != 0) {
-            outTransform.preRotate(_imageRotation, childWidth / 2.0f, childHeight / 2.0f);
-        }
+          
+      }
+      getTransformImpl(outTransform, parentRect, childWidth, childHeight, focusX, focusY, sX, sY, rotationDelta);
+      if (_imageMatrix != null) {
+          outTransform.preConcat(_imageMatrix);
+      } else if (_imageRotation != 0) {
+          outTransform.preRotate(_imageRotation, childWidth / 2.0f, childHeight / 2.0f);
+      }
       
       return outTransform;
     }
@@ -175,7 +175,8 @@ public class ScalingUtils {
         float focusX,
         float focusY,
         float scaleX,
-        float scaleY);
+        float scaleY, 
+        float rotationDelta);
   }
 
   public static class ScaleTypeFitXY extends AbstractScaleType {
@@ -191,10 +192,14 @@ public class ScalingUtils {
         float focusX,
         float focusY,
         float scaleX,
-        float scaleY) {
-      float dx = parentRect.left;
-      float dy = parentRect.top;
+        float scaleY, 
+        float rotationDelta) {
+      float deltaX = ((rotationDelta != 1) ? (childWidth - childHeight) * scaleX/ 2.0f : 0.0f);
+      float deltaY = ((rotationDelta != 1) ? (childWidth - childHeight) * scaleY/ 2.0f : 0.0f);
+      float dx = parentRect.left - deltaX;
+      float dy = parentRect.top + deltaY;
       outTransform.setScale(scaleX, scaleY);
+      
       outTransform.postTranslate((int) (dx + 0.5f), (int) (dy + 0.5f));
     }
 
@@ -217,10 +222,13 @@ public class ScalingUtils {
         float focusX,
         float focusY,
         float scaleX,
-        float scaleY) {
+        float scaleY, 
+        float rotationDelta) {
       float scale = Math.min(scaleX, scaleY);
-      float dx = parentRect.left;
-      float dy = parentRect.top;
+      float delta = ((rotationDelta != 1) ? (childWidth - childHeight) * scale/ 2.0f : 0.0f);
+
+      float dx = parentRect.left - delta;
+      float dy = parentRect.top + delta;
       outTransform.setScale(scale, scale);
       outTransform.postTranslate((int) (dx + 0.5f), (int) (dy + 0.5f));
     }
@@ -244,7 +252,8 @@ public class ScalingUtils {
         float focusX,
         float focusY,
         float scaleX,
-        float scaleY) {
+        float scaleY, 
+        float rotationDelta) {
       float scale = Math.min(scaleX, scaleY);
       float dx = parentRect.left;
       float dy = parentRect.top + (parentRect.height() - childHeight * scale);
@@ -271,7 +280,8 @@ public class ScalingUtils {
         float focusX,
         float focusY,
         float scaleX,
-        float scaleY) {
+        float scaleY, 
+        float rotationDelta) {
       float scale =  Math.min(scaleX, scaleY);
       float dx = parentRect.left + (parentRect.width() - childWidth * scale) * 0.5f;
       float dy = parentRect.top + (parentRect.height() - childHeight * scale) * 0.5f;
@@ -298,10 +308,12 @@ public class ScalingUtils {
         float focusX,
         float focusY,
         float scaleX,
-        float scaleY) {
+        float scaleY, 
+        float rotationDelta) {
       float scale = Math.min(scaleX, scaleY);
-      float dx = parentRect.left + (parentRect.width() - childWidth * scale);
-      float dy = parentRect.top + (parentRect.height() - childHeight * scale);
+      float delta = ((rotationDelta != 1) ? (childWidth - childHeight) * scale/ 2.0f : 0.0f);
+      float dx = parentRect.left + (parentRect.width() - childWidth * scale) + delta;
+      float dy = parentRect.top + (parentRect.height() - childHeight * scale) - delta;
       outTransform.setScale(scale, scale);
       outTransform.postTranslate((int) (dx + 0.5f), (int) (dy + 0.5f));
     }
@@ -325,7 +337,8 @@ public class ScalingUtils {
         float focusX,
         float focusY,
         float scaleX,
-        float scaleY) {
+        float scaleY, 
+        float rotationDelta) {
       float dx = parentRect.left + (parentRect.width() - childWidth) * 0.5f;
       float dy = parentRect.top + (parentRect.height() - childHeight) * 0.5f;
       outTransform.setTranslate((int) (dx + 0.5f), (int) (dy + 0.5f));
@@ -350,7 +363,8 @@ public class ScalingUtils {
         float focusX,
         float focusY,
         float scaleX,
-        float scaleY) {
+        float scaleY, 
+        float rotationDelta) {
       float scale = Math.min(Math.min(scaleX, scaleY), 1.0f);
       float dx = parentRect.left + (parentRect.width() - childWidth * scale) * 0.5f;
       float dy = parentRect.top + (parentRect.height() - childHeight * scale) * 0.5f;
@@ -377,15 +391,16 @@ public class ScalingUtils {
         float focusX,
         float focusY,
         float scaleX,
-        float scaleY) {
+        float scaleY, 
+        float rotationDelta) {
       float scale, dx, dy;
       if (scaleY > scaleX) {
         scale = scaleY;
         dx = parentRect.left + (parentRect.width() - childWidth * scale) * 0.5f;
-        dy = parentRect.top;
+        dy = parentRect.top + (parentRect.height() - childHeight * scale) * 0.5f;
       } else {
         scale = scaleX;
-        dx = parentRect.left;
+        dx = parentRect.left + (parentRect.width() - childWidth * scale) * 0.5f;
         dy = parentRect.top + (parentRect.height() - childHeight * scale) * 0.5f;
       }
       outTransform.setScale(scale, scale);
@@ -411,16 +426,21 @@ public class ScalingUtils {
         float focusX,
         float focusY,
         float scaleX,
-        float scaleY) {
-      float scale, dx, dy;
+        float scaleY, 
+        float rotationDelta) {
+      float scale, dx, dy, delta;
       if (scaleY > scaleX) {
         scale = scaleY;
+        delta = ((rotationDelta != 1) ? (childWidth - childHeight) * scale/ 2.0f : 0.0f);
         dx = parentRect.width() * 0.5f - childWidth * scale * focusX;
         dx = parentRect.left + Math.max(Math.min(dx, 0), parentRect.width() - childWidth * scale);
-        dy = parentRect.top;
+        dy = parentRect.height() * 0.5f - childHeight * scale * focusY;
+        dy = parentRect.top + Math.max(Math.min(dy, 0), parentRect.height() - childHeight * scale) - delta;
       } else {
         scale = scaleX;
-        dx = parentRect.left;
+        delta = ((rotationDelta != 1) ? (childWidth - childHeight) * scale: 0.0f);
+        dx = parentRect.width() * 0.5f - childWidth * scale * focusX;
+        dx = parentRect.left + Math.max(Math.min(dx, 0), parentRect.width() - childWidth * scale) + Math.min(delta / 2.0f, 0.0f);
         dy = parentRect.height() * 0.5f - childHeight * scale * focusY;
         dy = parentRect.top + Math.max(Math.min(dy, 0), parentRect.height() - childHeight * scale);
       }
@@ -447,7 +467,8 @@ public class ScalingUtils {
         float focusX,
         float focusY,
         float scaleX,
-        float scaleY) {
+        float scaleY, 
+        float rotationDelta) {
       float scale, dx, dy;
       scale = scaleX;
       dx = parentRect.left;
@@ -475,7 +496,8 @@ public class ScalingUtils {
         float focusX,
         float focusY,
         float scaleX,
-        float scaleY) {
+        float scaleY, 
+        float rotationDelta) {
       float scale, dx, dy;
       scale = scaleY;
       dx = parentRect.left + (parentRect.width() - childWidth * scale) * 0.5f;
