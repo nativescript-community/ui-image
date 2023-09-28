@@ -490,6 +490,7 @@ export class Img extends ImageBase {
     [roundTopLeftRadiusProperty.setNative]() {
         this.updateHierarchy();
     }
+    @needUpdateHierarchy
     [imageRotationProperty.setNative](value) {
         const scaleType = this.nativeImageViewProtected.getHierarchy().getActualImageScaleType();
         scaleType['setImageRotation']?.(value);
@@ -829,6 +830,9 @@ export class Img extends ImageBase {
             }
 
             this.nativeImageViewProtected.setHierarchy(builder.build());
+            if (!this._needRequestImage) {
+                this.nativeImageViewProtected.setController(this.nativeImageViewProtected.getController());
+            }
         }
     }
 
@@ -942,12 +946,12 @@ class GenericDraweeHierarchyBuilder {
         return this;
     }
 
-    public setActualImageScaleType(scaleType: ScaleType, imageRotation): GenericDraweeHierarchyBuilder {
+    public setActualImageScaleType(scaleType: ScaleType, imageRotation = 0): GenericDraweeHierarchyBuilder {
         if (!this.nativeBuilder) {
             return this;
         }
         const nativeScaleType = getScaleType(scaleType);
-        if (nativeScaleType['setImageRotation']) {
+        if (imageRotation !== 0 && nativeScaleType['setImageRotation']) {
             nativeScaleType['setImageRotation'](imageRotation);
         }
         this.nativeBuilder.setActualImageScaleType(nativeScaleType);
