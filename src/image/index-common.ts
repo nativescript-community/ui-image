@@ -144,7 +144,7 @@ export const progressBarColorProperty = new Property<ImageBase, string>({ name: 
 export const roundAsCircleProperty = new Property<ImageBase, boolean>({ name: 'roundAsCircle', valueConverter: booleanConverter, affectsLayout: isAndroid });
 export const blurRadiusProperty = new Property<ImageBase, number>({ name: 'blurRadius', valueConverter: (v) => parseFloat(v) });
 export const blurDownSamplingProperty = new Property<ImageBase, number>({ name: 'blurDownSampling', valueConverter: (v) => parseFloat(v) });
-export const imageRotationProperty = new Property<ImageBase, number>({ name: 'imageRotation', valueConverter: (v) => parseFloat(v) });
+export const imageRotationProperty = new Property<ImageBase, number>({ name: 'imageRotation', valueConverter: (v) => parseFloat(v), defaultValue: 0 });
 export const autoPlayAnimationsProperty = new Property<ImageBase, boolean>({ name: 'autoPlayAnimations', valueConverter: booleanConverter });
 export const tapToRetryEnabledProperty = new Property<ImageBase, boolean>({ name: 'tapToRetryEnabled', valueConverter: booleanConverter });
 export const aspectRatioProperty = new Property<ImageBase, number>({ name: 'aspectRatio', affectsLayout: true, valueConverter: (v) => parseFloat(v) });
@@ -253,11 +253,9 @@ export class ImageBase extends View {
     public decodeHeight: number;
     public animatedImageView: boolean;
     public loadMode: 'sync' | 'async';
-    alwaysFade: boolean;
-    noCache: boolean;
-    // fade: boolean;
-    tintColor: Color;
-    // transition: Transition;
+    public alwaysFade: boolean;
+    public noCache: boolean;
+    public tintColor: Color;
 
     public readonly isLoading: boolean;
 
