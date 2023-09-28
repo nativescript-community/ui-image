@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.15](https://github.com/@nativescript-community/ui-image/compare/v4.3.14...v4.3.15) (2023-09-28)
+
+### Bug Fixes
+
+* **android:** ensure stretch and imageRotation are updated correctly on change ([fb6d15e](https://github.com/@nativescript-community/ui-image/commit/fb6d15e0e6c90908b68c7aa6369f2b66e2104b20))
+* **android:** most stretch values are now working correctly with imageRotation ([323d42e](https://github.com/@nativescript-community/ui-image/commit/323d42edc85e57145cb4e7e6158b72e256437d0d))
+* imageRotation default value ([f9f4cef](https://github.com/@nativescript-community/ui-image/commit/f9f4cefa5fbe8f98e7aa8b372d5e6cf80af1d08f))
+* typings fix ([3aa9b71](https://github.com/@nativescript-community/ui-image/commit/3aa9b713d091d5b324756b9198e21643564c35f9))
+
 ## [4.3.14](https://github.com/@nativescript-community/ui-image/compare/v4.3.13...v4.3.14) (2023-09-27)
 
 ### Bug Fixes
