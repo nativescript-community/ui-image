@@ -198,6 +198,12 @@ export class Img extends View {
      * IOS: if you want to show animated images you need to set this to true
      */
     animatedImageView: boolean;
+
+    loadMode: 'sync' | 'async';
+    alwaysFade: boolean;
+    noCache: boolean;
+    tintColor: Color;
+    imageRotation: number;
 }
 
 /**
