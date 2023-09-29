@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.16](https://github.com/nativescript-community/ui-image/compare/v4.3.15...v4.3.16) (2023-09-29)
+
+### Bug Fixes
+
+* **android:** fix for image disappearing on fragment/ativity transitions. See https://github.com/facebook/fresco/issues/1446 ([b36d001](https://github.com/nativescript-community/ui-image/commit/b36d0012af443fadcdb969e901f7f0e69f4e0c80))
+
 ## [4.3.15](https://github.com/nativescript-community/ui-image/compare/v4.3.14...v4.3.15) (2023-09-28)
 
 ### Bug Fixes
