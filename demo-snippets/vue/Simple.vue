@@ -4,22 +4,37 @@
             <Label text="Simple Grid" />
         </ActionBar>
 
-        <GridLayout rows="*, auto, auto, auto, auto, auto">
+        <GridLayout rows="300, auto, auto, auto, auto, auto">
             <StackLayout orientation="horizontal">
-                <NSImg backgroundColor="yellow" height="400" ref="opacityImg" verticalAlignment="center" borderRadius="100" width="50%" src="~/assets/images/dessert.jpg"> </NSImg>
+                <NSImg backgroundColor="yellow" height="100" ref="opacityImg" borderRadius="10" width="50%" src="~/assets/images/dessert.jpg" stretch="aspectFit" />
                 <NSImg backgroundColor="red" width="50%" height="100" verticalAlignment="center" borderRadius="100" :src="imgSource"> </NSImg>
             </StackLayout>
-            <Button text="Set 1" row="1" @tap="onSeOpacityTo1"></Button>
-            <Button text="Set 0.5" row="2" @tap="onSeOpacityTo05"></Button>
-            <Button text="Set 0.1" row="3" @tap="onSeOpacityTo01"></Button>
-            <Button text="Animate to 0.1" row="4" @tap="onAnimateTo01"></Button>
-            <Button text="Animate to 1" row="5" @tap="onAnimateTo1"></Button>
+            <WrapLayout row="1">
+                <Button text="rotate" @tap="onRotate"></Button>
+                <Button text="stretch" @tap="onStretch"></Button>
+                <Button text="Set 1" @tap="onSeOpacityTo1"></Button>
+                <Button text="Set 0.5" @tap="onSeOpacityTo05"></Button>
+                <Button text="Set 0.1" @tap="onSeOpacityTo01"></Button>
+                <Button text="Animate to 0.1" @tap="onAnimateTo01"></Button>
+                <Button text="Animate to 1" @tap="onAnimateTo1"></Button>
+            </WrapLayout>
         </GridLayout>
     </Page>
 </template>
 
 <script lang="ts">
 import { ImageSource } from '@nativescript/core';
+import { Img } from '@nativescript-community/ui-image';
+import { ScaleType } from '@nativescript-community/ui-image/index-common';
+
+class EnumX {
+    static of<T extends object>(e: T) {
+        const values = Object.values(e);
+        return {
+            next: <K extends keyof T>(v: T[K]) => values[(values.indexOf(v) + 1) % values.length]
+        };
+    }
+}
 
 export default {
     data() {
@@ -29,6 +44,30 @@ export default {
         };
     },
     methods: {
+        async onRotate() {
+            const imageView = this.$refs.opacityImg.nativeView as Img;
+            const imageRotation = (imageView.imageRotation + 90) % 360;
+            console.log('onRotate', imageView.imageRotation, imageRotation);
+            try {
+                await imageView.animate({
+                    duration: 200,
+                    imageRotation
+                } as any);
+                imageView.imageRotation = imageRotation;
+            } catch (err) {
+                imageView.imageRotation = imageRotation;
+            }
+        },
+        async onStretch() {
+            const imageView = this.$refs.opacityImg.nativeView as Img;
+            const stretch = EnumX.of(ScaleType).next(imageView.stretch as ScaleType);
+            console.log('onStretch', imageView.stretch, stretch);
+            try {
+                imageView.stretch = stretch;
+            } catch (err) {
+                console.error(err);
+            }
+        },
         onSeOpacityTo1(args) {
             this.$refs.opacityImg.nativeView.opacity = 1;
         },
