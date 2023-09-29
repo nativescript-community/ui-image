@@ -39,12 +39,24 @@ public class DraweeView extends SimpleDraweeView {
     public boolean isUsingOutlineProvider = false;
     private static Paint clipPaint;
 
+    private boolean mLegacyVisibilityHandlingEnabled = false;
+
+    private static boolean sGlobalLegacyVisibilityHandlingEnabled = true;
+
+    public static void setGlobalLegacyVisibilityHandlingEnabled(
+        boolean legacyVisibilityHandlingEnabled) {
+        sGlobalLegacyVisibilityHandlingEnabled = legacyVisibilityHandlingEnabled;
+    }
+
     public DraweeView(Context context, GenericDraweeHierarchy hierarchy) {
         super(context);
     }
 
     public DraweeView(Context context) {
         super(context);
+        // In Android N and above, visibility handling for Drawables has been changed, which breaks
+        // activity transitions with DraweeViews.
+        mLegacyVisibilityHandlingEnabled = sGlobalLegacyVisibilityHandlingEnabled  && context.getApplicationInfo().targetSdkVersion >= 24; //Build.VERSION_CODES.N
     }
 
     public DraweeView(Context context, AttributeSet attrs) {
@@ -53,6 +65,61 @@ public class DraweeView extends SimpleDraweeView {
 
     public DraweeView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        maybeOverrideVisibilityHandling();
+        onAttach();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        maybeOverrideVisibilityHandling();
+        onDetach();
+    }
+
+    @Override
+    public void onStartTemporaryDetach() {
+        super.onStartTemporaryDetach();
+        maybeOverrideVisibilityHandling();
+        onDetach();
+    }
+
+    @Override
+    public void onFinishTemporaryDetach() {
+        super.onFinishTemporaryDetach();
+        maybeOverrideVisibilityHandling();
+        onAttach();
+    }
+
+    @Override
+    protected void onVisibilityChanged(
+        View changedView,
+        int visibility) {
+        super.onVisibilityChanged(changedView, visibility);
+        maybeOverrideVisibilityHandling();
+    }
+
+    @Override
+    public void onVisibilityAggregated (boolean isVisible) {
+        super.onVisibilityAggregated(isVisible);
+        maybeOverrideVisibilityHandling();
+    }
+
+    private void maybeOverrideVisibilityHandling() {
+        if (mLegacyVisibilityHandlingEnabled)  {
+            Drawable drawable = getDrawable();
+            if (drawable != null) {
+                drawable.setVisible(getVisibility() == VISIBLE, false);
+            }
+        }
+    }
+
+    public void setLegacyVisibilityHandlingEnabled(boolean legacyVisibilityHandlingEnabled) {
+        mLegacyVisibilityHandlingEnabled = legacyVisibilityHandlingEnabled;
     }
 
 	// private final Rect outlineRect = new RectF();
