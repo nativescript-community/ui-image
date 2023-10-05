@@ -5,9 +5,9 @@ __metadata:
   version: 6
   cacheKey: 8
 
-"@akylas/nativescript@npm:~8.4.1":
-  version: 8.4.9
-  resolution: "@akylas/nativescript@npm:8.4.9"
+"@akylas/nativescript@portal:/home/mguillon/dev/nativescript/NativeScript/dist/packages/core::locator=root-workspace-0b6124%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "@akylas/nativescript@portal:/home/mguillon/dev/nativescript/NativeScript/dist/packages/core::locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@nativescript/hook": ~2.0.0
     acorn: ^8.7.0
@@ -15,23 +15,8 @@ __metadata:
     emoji-regex: ^10.2.1
     reduce-css-calc: ^2.1.7
     tslib: ^2.0.0
-  checksum: 8fd350be996e6d9d57908d5c258142a71228fa7d688da5dab3849877467620e9f7a8807ea329bc08c3d6d0453299e67cd219f268857ee915b18d280d3215fefd
   languageName: node
-  linkType: hard
-
-"@akylas/nativescript@npm:~8.5.10":
-  version: 8.5.10
-  resolution: "@akylas/nativescript@npm:8.5.10"
-  dependencies:
-    "@nativescript/hook": ~2.0.0
-    acorn: ^8.7.0
-    css-tree: ^1.1.2
-    emoji-regex: ^10.2.1
-    reduce-css-calc: ^2.1.7
-    tslib: ^2.0.0
-  checksum: f37e82340260d2f9d402d84cd1d0bb9f5c5d5906cafe9879fde702ff31bfb4826d97adea75ec63438a51f2325d28e46def2fd6c02d25e5998b3616071b9e1add
-  languageName: node
-  linkType: hard
+  linkType: soft
 
 "@ampproject/remapping@npm:2.2.0":
   version: 2.2.0
@@ -2975,7 +2960,7 @@ __metadata:
 
 "@nativescript-community/plugin-seed-tools@file:tools::locator=root-workspace-0b6124%40workspace%3A.":
   version: 1.0.0
-  resolution: "@nativescript-community/plugin-seed-tools@file:tools#tools::hash=c5b7b3&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "@nativescript-community/plugin-seed-tools@file:tools#tools::hash=a098ed&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@angular/animations": ~15.2.6
     "@angular/common": ~15.2.6
@@ -3005,6 +2990,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": 5.57.1
     "@typescript-eslint/parser": 5.57.1
     "@vue/runtime-core": 3.2.45
+    "@vue/runtime-dom": 3.3.4
     cpy-cli: ^3.1.1
     detox: 20.6.0
     eslint: 8.37.0
@@ -3040,7 +3026,7 @@ __metadata:
     vue: ~2.6.14
     yargs: ^17.6.2
     zone.js: ~0.12.0
-  checksum: 189dde804cc709bd28538593e4df10a28bd064e460c08b14d784911adbd514e982004b929a569949da3b56200aca71e28780c908cd4b4795efa6e1e1bf7598c3
+  checksum: 97ec7b834e3d7aa71f0ea53dff73bd03a23f7263e21f52fddc145e700dc7636c2278dd8cb80a46b0cb60a016ba4359be480ac1ef7ee01879084eb16795a75d35
   languageName: node
   linkType: hard
 
@@ -3058,11 +3044,11 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@nativescript-community/ui-image-colorfilter@workspace:packages/image-colorfilter"
   dependencies:
-    "@nativescript-community/ui-image": ^4.3.11
+    "@nativescript-community/ui-image": ^4.3.16
   languageName: unknown
   linkType: soft
 
-"@nativescript-community/ui-image@*, @nativescript-community/ui-image@^4.3.11, @nativescript-community/ui-image@workspace:packages/image":
+"@nativescript-community/ui-image@*, @nativescript-community/ui-image@^4.3.16, @nativescript-community/ui-image@workspace:packages/image":
   version: 0.0.0-use.local
   resolution: "@nativescript-community/ui-image@workspace:packages/image"
   languageName: unknown
@@ -3072,7 +3058,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@nativescript-community/ui-zoomimage@workspace:packages/zoomimage"
   dependencies:
-    "@nativescript-community/ui-image": ^4.3.11
+    "@nativescript-community/ui-image": ^4.3.16
   languageName: unknown
   linkType: soft
 
@@ -4705,6 +4691,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vue/reactivity@npm:3.3.4":
+  version: 3.3.4
+  resolution: "@vue/reactivity@npm:3.3.4"
+  dependencies:
+    "@vue/shared": 3.3.4
+  checksum: 81c3d0c587d23656a57a7a31afb51357274f6512b51baffc67cda183b2361a7e65e646029c26a8bc28587f26b65bba808dcd93cdd3bacab48d2b99d11ad0ec97
+  languageName: node
+  linkType: hard
+
 "@vue/runtime-core@npm:3.2.45":
   version: 3.2.45
   resolution: "@vue/runtime-core@npm:3.2.45"
@@ -4712,6 +4707,27 @@ __metadata:
     "@vue/reactivity": 3.2.45
     "@vue/shared": 3.2.45
   checksum: 0ac376a7602663d51a37b460c1184e2e035649090e53e972c18d24b30f3c47e5d61b921baf2492203f041d9edd864b3e9024a3ecef243b840637b62e9c0169a1
+  languageName: node
+  linkType: hard
+
+"@vue/runtime-core@npm:3.3.4":
+  version: 3.3.4
+  resolution: "@vue/runtime-core@npm:3.3.4"
+  dependencies:
+    "@vue/reactivity": 3.3.4
+    "@vue/shared": 3.3.4
+  checksum: d402da51269658cba5d857d65fbe322121160bcb1a6fcf03601d5183705e92505c6e90418f491a331ca3e27628f457a6ca7158b9add25f5b0cf5cf53664b8011
+  languageName: node
+  linkType: hard
+
+"@vue/runtime-dom@npm:3.3.4":
+  version: 3.3.4
+  resolution: "@vue/runtime-dom@npm:3.3.4"
+  dependencies:
+    "@vue/runtime-core": 3.3.4
+    "@vue/shared": 3.3.4
+    csstype: ^3.1.1
+  checksum: dac9ada7f6128bcccc031fe5c25d00db94ffb7c011fcb70bada22fa4d889ff842eeb139ab9304bcc52cb5ae9030911a52cb3510b691bb190bbe5fab680b4411a
   languageName: node
   linkType: hard
 
@@ -7356,7 +7372,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"csstype@npm:^3.0.2":
+"csstype@npm:^3.0.2, csstype@npm:^3.1.1":
   version: 3.1.2
   resolution: "csstype@npm:3.1.2"
   checksum: e1a52e6c25c1314d6beef5168da704ab29c5186b877c07d822bd0806717d9a265e8493a2e35ca7e68d0f5d472d43fac1cdce70fd79fd0853dff81f3028d857b5

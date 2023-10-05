@@ -11,8 +11,8 @@ import ZoomImage from './ZoomImage.vue';
 import ColorFilter from './ColorFilter.vue';
 import NavigationTest from './NavigationTest.vue';
 
-Trace.addCategories('NativescriptImage');
-Trace.enable();
+// Trace.addCategories('NativescriptImage');
+// Trace.enable();
 
 export function installPlugin() {
     installMixins();
@@ -23,7 +23,7 @@ export function installPlugin() {
 
 export const demos = [
     { name: 'Simple', path: 'simple', component: Simple },
-    { name: 'NavigationTest', path: 'navigation', component: NavigationTest },
+    { name: 'hero', path: 'navigation', component: NavigationTest },
     { name: 'ZoomImage', path: 'zoom', component: ZoomImage },
     { name: 'ColorFilter', path: 'color-filter', component: ColorFilter }
 ];
