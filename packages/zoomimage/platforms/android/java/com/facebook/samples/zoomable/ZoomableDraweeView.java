@@ -289,7 +289,7 @@ public class ZoomableDraweeView extends DraweeView
     }
 
     if (!mIsDialtoneEnabled && mZoomableController.onTouchEvent(event)) {
-      if (!mAllowTouchInterceptionWhileZoomed && !mZoomableController.isIdentity()) {
+      if (!mAllowTouchInterceptionWhileZoomed && mZoomableController.getScaleFactor() > 1.0f) {
         getParent().requestDisallowInterceptTouchEvent(true);
       }
       return true;
