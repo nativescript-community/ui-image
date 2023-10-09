@@ -73,8 +73,5 @@
         "demo-svelte",
         "demo-react",
         "demo-snippets"
-    ],
-    "resolutions": {
-        "@akylas/nativescript": "portal:/home/mguillon/dev/nativescript/NativeScript/dist/packages/core"
-    }
+    ]
 }
