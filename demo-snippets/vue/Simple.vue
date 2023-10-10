@@ -6,11 +6,12 @@
 
         <GridLayout rows="300, auto, auto, auto, auto, auto">
             <StackLayout orientation="horizontal">
-                <NSImg backgroundColor="yellow" height="100" ref="opacityImg" borderRadius="10" width="50%" src="~/assets/images/dessert.jpg" stretch="aspectFit" />
+                <NSImg  backgroundColor="yellow" height="500" ref="opacityImg" borderRadius="10" width="50%" src="~/assets/images/dessert.jpg" stretch="aspectFit" />
                 <NSImg backgroundColor="red" width="50%" height="100" verticalAlignment="center" borderRadius="100" :src="imgSource"> </NSImg>
             </StackLayout>
             <WrapLayout row="1">
-                <Button text="rotate" @tap="onRotate"></Button>
+                <Button text="rotateLeft" @tap="onRotateLeft"></Button>
+                <Button text="rotateRight" @tap="onRotateRight"></Button>
                 <Button text="stretch" @tap="onStretch"></Button>
                 <Button text="Set 1" @tap="onSeOpacityTo1"></Button>
                 <Button text="Set 0.5" @tap="onSeOpacityTo05"></Button>
@@ -44,9 +45,9 @@ export default {
         };
     },
     methods: {
-        async onRotate() {
+        async onRotateLeft() {
             const imageView = this.$refs.opacityImg.nativeView as Img;
-            const imageRotation = (imageView.imageRotation + 90) % 360;
+            const imageRotation = (imageView.imageRotation - 90) % 360;
             console.log('onRotate', imageView.imageRotation, imageRotation);
             try {
                 await imageView.animate({
@@ -56,6 +57,21 @@ export default {
                 imageView.imageRotation = imageRotation;
             } catch (err) {
                 imageView.imageRotation = imageRotation;
+            }
+        },
+        async onRotateRight() {
+            const imageView = this.$refs.opacityImg.nativeView as Img;
+            const imageRotation = (imageView.imageRotation + 90) % 360;
+            console.log('onRotate', imageView.imageRotation, imageRotation);
+            try {
+                await imageView.animate({
+                    duration: 200,
+                    imageRotation
+                } as any);
+            } catch (err) {
+            } finally {
+                imageView.imageRotation = imageRotation;
+
             }
         },
         async onStretch() {
