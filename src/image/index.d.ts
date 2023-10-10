@@ -203,6 +203,10 @@ export class Img extends View {
     alwaysFade: boolean;
     noCache: boolean;
     tintColor: Color;
+
+    /**
+     * Android: custom imageRotation
+     */
     imageRotation: number;
 }
 
