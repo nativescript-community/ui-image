@@ -144,7 +144,8 @@ public class ScalingUtils {
       float focusY) {
       float sX = (float) parentRect.width() / (float) childWidth;
       float sY = (float) parentRect.height() / (float) childHeight;
-      float rotationDelta = (90 - (_imageRotation % 180))/90.0f;
+      // add 360 to ensure we get positive value
+      float rotationDelta = (90 - ((_imageRotation + 360) % 180))/90.0f;
       if (rotationDelta != 1) {
           float destSX = (float) parentRect.width() / (float) childHeight;
           float destSY = (float) parentRect.height() / (float) childWidth;
