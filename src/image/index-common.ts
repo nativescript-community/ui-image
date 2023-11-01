@@ -219,7 +219,18 @@ export const loadModeProperty = new Property<ImageBase, 'sync' | 'async'>({
 export const clipToBoundsProperty = new Property<ImageBase, boolean>({ name: 'clipToBounds', defaultValue: true, valueConverter: booleanConverter });
 export const animatedImageViewProperty = new Property<ImageBase, boolean>({ name: 'animatedImageView', defaultValue: false, valueConverter: booleanConverter });
 
-export class ImageBase extends View {
+export const needRequestImage = function (target: any, propertyKey: string | Symbol, descriptor: PropertyDescriptor) {
+    const originalMethod = descriptor.value;
+    descriptor.value = function (...args: any[]) {
+        if (!this.mCanRequestImage) {
+            this.mNeedRequestImage = true;
+            return;
+        }
+        return originalMethod.apply(this, args);
+    };
+};
+
+export abstract class ImageBase extends View {
     public static finalImageSetEvent: string = 'finalImageSet';
     public static failureEvent: string = 'failure';
     public static intermediateImageFailedEvent: string = 'intermediateImageFailed';
@@ -263,6 +274,21 @@ export class ImageBase extends View {
 
     get nativeImageViewProtected() {
         return this.nativeViewProtected;
+    }
+
+    mCanRequestImage = true;
+    mNeedRequestImage = false;
+    protected abstract initImage();
+    public onResumeNativeUpdates(): void {
+        // {N} suspends properties update on `_suspendNativeUpdates`. So we only need to do this in onResumeNativeUpdates
+        this.mCanRequestImage = false;
+        super.onResumeNativeUpdates();
+        this.mCanRequestImage = true;
+
+        if (this.mNeedRequestImage) {
+            this.mNeedRequestImage = false;
+            this.initImage();
+        }
     }
 
     protected handleImageProgress(value: number, totalSize?: number) {}

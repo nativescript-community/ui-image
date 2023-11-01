@@ -1,14 +1,11 @@
 import { Img } from '@nativescript-community/ui-image';
 import { applyMixins, colorMatrixProperty, cssProperty } from './index-common';
-import { Image } from '@nativescript/core';
 
 declare module '@nativescript-community/ui-image' {
-    interface Img {}
-}
-
-interface ImgAugmented extends Img {
-    colorMatrix: number[];
-    applyColorFilter();
+    interface Img {
+        mCIFilter: CIFilter;
+        initImage();
+    }
 }
 
 const FloatConstructor = interop.sizeof(interop.types.id) === 4 ? Float32Array : Float64Array;
@@ -16,21 +13,32 @@ const FloatConstructor = interop.sizeof(interop.types.id) === 4 ? Float32Array :
 class ImgExtended {
     nativeImageViewProtected: SDAnimatedImageView | UIImageView;
     @cssProperty colorMatrix: number[];
-    _filter: CIFilter;
+    mCIFilter: CIFilter;
+    mCanRequestImage: boolean;
+    mNeedRequestImage: boolean;
     [colorMatrixProperty.setNative](value: number[]) {
         if (value) {
-            if (!this._filter) {
-                this._filter = CIFilter.filterWithName('CIColorMatrix');
+            if (!this.mCIFilter) {
+                this.mCIFilter = CIFilter.filterWithName('CIColorMatrix');
             }
-            this._filter.setValueForKey(CIVector.vectorWithValuesCount(new FloatConstructor(value.slice(0, 4)).buffer as any, 4), 'inputRVector');
-            this._filter.setValueForKey(CIVector.vectorWithValuesCount(new FloatConstructor(value.slice(5, 9)).buffer as any, 4), 'inputGVector');
-            this._filter.setValueForKey(CIVector.vectorWithValuesCount(new FloatConstructor(value.slice(10, 14)).buffer as any, 4), 'inputBVector');
-            this._filter.setValueForKey(CIVector.vectorWithValuesCount(new FloatConstructor(value.slice(15, 19)).buffer as any, 4), 'inputAVector');
-            this._filter.setValueForKey(CIVector.vectorWithValuesCount(new FloatConstructor([value[4], value[9], value[14], value[19]]).buffer as any, 4), 'inputBiasVector');
+            this.mCIFilter.setValueForKey(CIVector.vectorWithValuesCount(new FloatConstructor(value.slice(0, 4)).buffer as any, 4), 'inputRVector');
+            this.mCIFilter.setValueForKey(CIVector.vectorWithValuesCount(new FloatConstructor(value.slice(5, 9)).buffer as any, 4), 'inputGVector');
+            this.mCIFilter.setValueForKey(CIVector.vectorWithValuesCount(new FloatConstructor(value.slice(10, 14)).buffer as any, 4), 'inputBVector');
+            this.mCIFilter.setValueForKey(CIVector.vectorWithValuesCount(new FloatConstructor(value.slice(15, 19)).buffer as any, 4), 'inputAVector');
+            this.mCIFilter.setValueForKey(CIVector.vectorWithValuesCount(new FloatConstructor([value[4], value[9], value[14], value[19]]).buffer as any, 4), 'inputBiasVector');
+            this.mCIFilter.setName(JSON.stringify(value));
         } else {
-            this._filter = null;
+            this.mCIFilter = null;
         }
-        this['applyColorFilter']();
+        if (this instanceof Img) {
+            if (!this.mCanRequestImage) {
+                this.mNeedRequestImage = true;
+            } else {
+                (this as Img).initImage();
+            }
+        } else {
+            (this as any as ImgExtended3).applyColorFilter();
+        }
     }
 }
 class ImgExtended2 {
@@ -43,12 +51,13 @@ class ImgExtended3 {
     nativeImageViewProtected: SDAnimatedImageView | UIImageView;
     nativeViewProtected: SDAnimatedImageView | UIImageView;
     _oldImage: UIImage;
-    _filter: CIFilter;
+    mCIFilter: CIFilter;
 
     filteredImage(image: UIImage, filter: CIFilter) {
+        console.log('filteredImage', image, filter);
         if (image !== null && filter !== null) {
             const tmp = CIImage.alloc().initWithImage(image);
-            this._filter.setValueForKey(tmp, 'inputImage');
+            this.mCIFilter.setValueForKey(tmp, 'inputImage');
 
             const outputRect = tmp.extent;
             const context = CIContext.contextWithOptions(null);
@@ -64,17 +73,24 @@ class ImgExtended3 {
             if (!this._oldImage) {
                 this._oldImage = image;
             }
-            return this.filteredImage(this._oldImage, this._filter);
+            return this.filteredImage(this._oldImage, this.mCIFilter);
         }
         return null;
     }
     applyColorFilter() {
         const nativeView = this.nativeImageViewProtected || this.nativeViewProtected;
-        nativeView.image = this._applyColorFilter(nativeView.image);
+        if (nativeView.image) {
+            nativeView.image = this._applyColorFilter(nativeView.image);
+        }
     }
     public _setNativeImage(superCall, ...args) {
+        // we only need to do that with N Image, Img will use a transformer
+        if (this instanceof Img) {
+            superCall.apply(this, args);
+            return;
+        }
         this._oldImage = args[0];
-        if (this._filter) {
+        if (this.mCIFilter) {
             args[0] = this._applyColorFilter(args[0]);
         }
         superCall.apply(this, args);
@@ -82,18 +98,21 @@ class ImgExtended3 {
 }
 
 let mixinInstalled = false;
-export function overrideImgBase() {
+export function overrideImgBase(overrideNImage = true) {
     applyMixins(Img, [ImgExtended], { override: true });
     applyMixins(Img, [ImgExtended2]);
     applyMixins(Img, [ImgExtended3], { callWithSuper: true });
-    applyMixins(Image, [ImgExtended], { override: true });
-    applyMixins(Image, [ImgExtended2]);
-    applyMixins(Image, [ImgExtended3], { callWithSuper: true });
+    if (overrideNImage) {
+        const Image = require('@nativescript/core').Image;
+        applyMixins(Image, [ImgExtended], { override: true });
+        applyMixins(Image, [ImgExtended2]);
+        applyMixins(Image, [ImgExtended3], { callWithSuper: true });
+    }
 }
 
-export function installMixins() {
+export function installMixins(overrideNImage = true) {
     if (!mixinInstalled) {
         mixinInstalled = true;
-        overrideImgBase();
+        overrideImgBase(overrideNImage);
     }
 }

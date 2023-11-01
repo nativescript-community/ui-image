@@ -19,6 +19,7 @@ import {
     failureImageUriProperty,
     imageRotationProperty,
     lowerResSrcProperty,
+    needRequestImage,
     placeholderImageUriProperty,
     progressBarColorProperty,
     roundAsCircleProperty,
@@ -344,24 +345,11 @@ export class FailureEventData extends EventData {
     }
 }
 
-export const needRequestImage = function (target: any, propertyKey: string | Symbol, descriptor: PropertyDescriptor) {
-    const originalMethod = descriptor.value;
-    descriptor.value = function (...args: any[]) {
-        if (!this._canRequestImage) {
-            this._needRequestImage = true;
-            // we need to ensure a hierarchy is set or the default aspect ratio wont be set
-            // because aspectFit is the default (wanted) but then we wont go into stretchProperty.setNative
-            // this._needUpdateHierarchy = true;
-            return;
-        }
-        return originalMethod.apply(this, args);
-    };
-};
 export const needUpdateHierarchy = function (target: any, propertyKey: string | Symbol, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
     descriptor.value = function (...args: any[]) {
-        if (!this._canUpdateHierarchy) {
-            this._needUpdateHierarchy = true;
+        if (!this.mCanUpdateHierarchy) {
+            this.mNeedUpdateHierarchy = true;
             return;
         }
         return originalMethod.apply(this, args);
@@ -374,24 +362,16 @@ export class Img extends ImageBase {
     nativeImageViewProtected: com.nativescript.image.DraweeView;
     isLoading = false;
 
-    _canRequestImage = true;
-    _canUpdateHierarchy = true;
-    _needUpdateHierarchy = false;
-    _needRequestImage = false;
+    mCanUpdateHierarchy = true;
+    mNeedUpdateHierarchy = false;
     public onResumeNativeUpdates(): void {
         // {N} suspends properties update on `_suspendNativeUpdates`. So we only need to do this in onResumeNativeUpdates
-        this._canRequestImage = false;
-        this._canUpdateHierarchy = false;
+        this.mCanUpdateHierarchy = false;
         super.onResumeNativeUpdates();
-        this._canUpdateHierarchy = true;
-        this._canRequestImage = true;
-        if (this._needUpdateHierarchy) {
-            this._needUpdateHierarchy = false;
+        this.mCanUpdateHierarchy = true;
+        if (this.mNeedUpdateHierarchy) {
+            this.mNeedUpdateHierarchy = false;
             this.updateHierarchy();
-        }
-        if (this._needRequestImage) {
-            this._needRequestImage = false;
-            this.initImage();
         }
     }
     public createNativeView() {
@@ -548,7 +528,6 @@ export class Img extends ImageBase {
     }
 
     // [ImageBase.blendingModeProperty.setNative](value: string) {
-    //     console.log('blendingModeProperty', value);
     //     switch (value) {
     //         case 'multiply':
     //             (this.nativeImageViewProtected as any).setXfermode(android.graphics.PorterDuff.Mode.MULTIPLY);
@@ -565,7 +544,7 @@ export class Img extends ImageBase {
 
     controllerListener: com.facebook.drawee.controller.ControllerListener<com.facebook.imagepipeline.image.ImageInfo>;
 
-    private async initImage() {
+    protected async initImage() {
         const view = this.nativeViewProtected;
         if (view) {
             // this.nativeImageViewProtected.setImageURI(null);
@@ -770,8 +749,8 @@ export class Img extends ImageBase {
     }
 
     private updateHierarchy() {
-        if (!this._canUpdateHierarchy) {
-            this._needUpdateHierarchy = true;
+        if (!this.mCanUpdateHierarchy) {
+            this.mNeedUpdateHierarchy = true;
             return;
         }
         if (this.nativeImageViewProtected) {
@@ -830,7 +809,7 @@ export class Img extends ImageBase {
             }
 
             this.nativeImageViewProtected.setHierarchy(builder.build());
-            if (!this._needRequestImage) {
+            if (!this.mNeedRequestImage) {
                 this.nativeImageViewProtected.setController(this.nativeImageViewProtected.getController());
             }
         }

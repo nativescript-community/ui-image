@@ -97,42 +97,40 @@ export function initialize(config?: ImagePipelineConfigSetting): void {
 export function shutDown(): void {}
 
 export class ImagePipeline {
-    private _ios: SDImageCache;
-    constructor() {
-        this._ios = SDImageCache.sharedImageCache;
-    }
+    private mIos: SDImageCache = SDImageCache.sharedImageCache;
+    constructor() {}
 
     isInDiskCache(uri: string): boolean {
-        return this._ios.diskImageDataExistsWithKey(getUri(uri).absoluteString);
+        return this.mIos.diskImageDataExistsWithKey(getUri(uri).absoluteString);
     }
 
     isInBitmapMemoryCache(uri: string): boolean {
-        return this._ios.imageFromMemoryCacheForKey(getUri(uri).absoluteString) !== null;
+        return this.mIos.imageFromMemoryCacheForKey(getUri(uri).absoluteString) !== null;
     }
 
     evictFromMemoryCache(uri: string): void {
-        this._ios.removeImageFromMemoryForKey(getUri(uri).absoluteString);
+        this.mIos.removeImageFromMemoryForKey(getUri(uri).absoluteString);
     }
 
     evictFromDiskCache(uri: string): void {
-        this._ios.removeImageFromDiskForKey(getUri(uri).absoluteString);
+        this.mIos.removeImageFromDiskForKey(getUri(uri).absoluteString);
     }
 
     evictFromCache(uri: string): void {
-        this._ios.removeImageForKeyWithCompletion(getUri(uri).absoluteString, null);
+        this.mIos.removeImageForKeyWithCompletion(getUri(uri).absoluteString, null);
     }
 
     clearCaches() {
-        this._ios.clearMemory();
-        this._ios.clearDiskOnCompletion(null);
+        this.mIos.clearMemory();
+        this.mIos.clearDiskOnCompletion(null);
     }
 
     clearMemoryCaches() {
-        this._ios.clearMemory();
+        this.mIos.clearMemory();
     }
 
     clearDiskCaches() {
-        this._ios.clearDiskOnCompletion(null);
+        this.mIos.clearDiskOnCompletion(null);
     }
 
     prefetchToDiskCache(uri: string): Promise<void> {
@@ -159,9 +157,23 @@ export class ImagePipeline {
     }
 
     get ios() {
-        return this._ios;
+        return this.mIos;
     }
 }
+
+export const needRequestImage = function (target: any, propertyKey: string | Symbol, descriptor: PropertyDescriptor) {
+    const originalMethod = descriptor.value;
+    descriptor.value = function (...args: any[]) {
+        if (!this.mCanRequestImage) {
+            this.mNeedRequestImage = true;
+            // we need to ensure a hierarchy is set or the default aspect ratio wont be set
+            // because aspectFit is the default (wanted) but then we wont go into stretchProperty.setNative
+            // this.mNeedUpdateHierarchy = true;
+            return;
+        }
+        return originalMethod.apply(this, args);
+    };
+};
 
 export function getImagePipeline(): ImagePipeline {
     const imagePineLine = new ImagePipeline();
@@ -203,7 +215,8 @@ export class Img extends ImageBase {
     //@ts-ignore
     nativeImageViewProtected: SDAnimatedImageView | UIImageView;
     isLoading = false;
-    private _imageSourceAffectsLayout: boolean = true;
+    protected mImageSourceAffectsLayout: boolean = true;
+    protected mCIFilter: CIFilter;
     public createNativeView() {
         const result = this.animatedImageView ? SDAnimatedImageView.new() : UIImageView.new();
         result.contentMode = UIViewContentMode.ScaleAspectFit;
@@ -229,7 +242,7 @@ export class Img extends ImageBase {
 
         const finiteWidth: boolean = widthMode === layout.EXACTLY;
         const finiteHeight: boolean = heightMode === layout.EXACTLY;
-        this._imageSourceAffectsLayout = !finiteWidth || !finiteHeight;
+        this.mImageSourceAffectsLayout = !finiteWidth || !finiteHeight;
         if (Trace.isEnabled()) {
             CLog(CLogTypes.info, 'onMeasure', this.src, widthMeasureSpec, heightMeasureSpec, width, height, this.aspectRatio, image && image.imageOrientation);
         }
@@ -253,6 +266,7 @@ export class Img extends ImageBase {
         }
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
+
     public updateImageUri() {
         const imagePipeLine = getImagePipeline();
         const src = this.src;
@@ -268,7 +282,7 @@ export class Img extends ImageBase {
     }
 
     public _setNativeImage(nativeImage: UIImage, animated = true) {
-        if (animated) {
+        if (animated && this.fadeDuration) {
             // switch (this.transition) {
             //     case 'fade':
             this.nativeImageViewProtected.alpha = 0.0;
@@ -295,8 +309,8 @@ export class Img extends ImageBase {
             this.nativeImageViewProtected.image = nativeImage;
         }
 
-        if (this._imageSourceAffectsLayout) {
-            this._imageSourceAffectsLayout = false;
+        if (this.mImageSourceAffectsLayout) {
+            this.mImageSourceAffectsLayout = false;
             this.requestLayout();
         }
     }
@@ -315,26 +329,20 @@ export class Img extends ImageBase {
         }
 
         if (error) {
-            const args = {
+            this.notify({
                 eventName: Img.failureEvent,
-                object: this,
                 error
-            };
-
-            this.notify(args);
+            });
             if (this.failureImageUri) {
                 image = this.getUIImage(this.failureImageUri);
                 this._setNativeImage(image, animate);
             }
         } else if (image) {
-            const args = {
+            this.notify({
                 eventName: ImageBase.finalImageSetEvent,
-                object: this,
                 imageInfo: new ImageInfo(image.size.width, image.size.height),
                 ios: image
-            } as FinalEventData;
-
-            this.notify(args);
+            } as FinalEventData);
         }
         this.handleImageProgress(1);
     };
@@ -364,14 +372,10 @@ export class Img extends ImageBase {
             image = imagePath;
         }
 
-        if (image) {
-            image = image.ios;
-        }
-
-        return image;
+        return image?.ios;
     }
 
-    private async initImage() {
+    protected async initImage() {
         if (this.nativeViewProtected) {
             const src = this.src;
             if (src instanceof Promise) {
@@ -416,7 +420,7 @@ export class Img extends ImageBase {
                 if (this.progressiveRenderingEnabled === true) {
                     options = options | SDWebImageOptions.ProgressiveLoad;
                 }
-                if (this.decodeWidth && this.decodeHeight) {
+                if (this.decodeWidth || this.decodeHeight) {
                     //@ts-ignore
                     transformers.push(NSImageDecodeSizeTransformer.transformerWithDecodeWidthDecodeHeight(this.decodeWidth, this.decodeHeight));
                 }
@@ -441,6 +445,9 @@ export class Img extends ImageBase {
                         )
                     );
                 }
+                if (this.mCIFilter) {
+                    transformers.push(SDImageFilterTransformer.transformerWithFilter(this.mCIFilter));
+                }
                 if (transformers.length > 0) {
                     if (this.animatedImageView) {
                         // as we use SDAnimatedImageView  all images are loaded as SDAnimatedImage;
@@ -463,10 +470,12 @@ export class Img extends ImageBase {
             }
         }
     }
+    @needRequestImage
     [srcProperty.setNative](value) {
         this.initImage();
     }
     placeholderImage: UIImage;
+    @needRequestImage
     [placeholderImageUriProperty.setNative]() {
         this.placeholderImage = this.getUIImage(this.placeholderImageUri);
         this.initImage();
@@ -483,7 +492,6 @@ export class Img extends ImageBase {
         this.nativeImageViewProtected.contentMode = getUIImageScaleType(value);
     }
     // [ImageBase.blendingModeProperty.setNative](value: string) {
-    //     console.log('blendingModeProperty', value);
     //     switch (value) {
     //         case 'multiply':
     //            this.nativeImageViewProtected.layer.compositingFilter = 'multiply';
