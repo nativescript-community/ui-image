@@ -358,6 +358,12 @@ export class ImagePipeline {
     isInBitmapMemoryCache(uri: string): boolean;
 
     /**
+     * Returns the actual cache key for url + context
+     * this is an iOS feature because imageView properties are used for the cache key
+     */
+    getCacheKey(uri: string, context): string;
+
+    /**
      * Returns whether the image is stored in the disk cache.
      */
     isInDiskCache(uri: string): boolean;

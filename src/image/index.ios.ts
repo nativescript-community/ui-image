@@ -100,6 +100,10 @@ export class ImagePipeline {
     private mIos: SDImageCache = SDImageCache.sharedImageCache;
     constructor() {}
 
+    getCacheKey(uri: string, context) {
+        return SDWebImageManager.sharedManager.cacheKeyForURLContext(NSURL.URLWithString(uri), context);
+    }
+
     isInDiskCache(uri: string): boolean {
         return this.mIos.diskImageDataExistsWithKey(getUri(uri).absoluteString);
     }
@@ -117,7 +121,10 @@ export class ImagePipeline {
     }
 
     evictFromCache(uri: string): void {
-        this.mIos.removeImageForKeyWithCompletion(getUri(uri).absoluteString, null);
+        const key = getUri(uri).absoluteString;
+        this.mIos.removeImageFromDiskForKey(key);
+        this.mIos.removeImageFromMemoryForKey(key);
+        // this.mIos.removeImageForKeyWithCompletion(getUri(uri).absoluteString, null);
     }
 
     clearCaches() {
@@ -401,17 +408,18 @@ export class Img extends ImageBase {
                 }
 
                 const uri = getUri(src);
-                if (this.noCache) {
-                    const key = uri.absoluteString;
-                    const imagePipeLine = getImagePipeline();
-                    const isInCache = imagePipeLine.isInBitmapMemoryCache(key);
-                    if (isInCache) {
-                        imagePipeLine.evictFromCache(key);
-                    }
-                }
                 this.isLoading = true;
                 let options = SDWebImageOptions.ScaleDownLargeImages | SDWebImageOptions.AvoidAutoSetImage;
 
+                if (this.noCache) {
+                    // const key = uri.absoluteString;
+                    // const imagePipeLine = getImagePipeline();
+                    // const isInCache = imagePipeLine.isInBitmapMemoryCache(key);
+                    // if (isInCache) {
+                    //     imagePipeLine.evictFromCache(key);
+                    // }
+                    options = options | SDWebImageOptions.FromLoaderOnly;
+                }
                 if (this.alwaysFade === true) {
                     options |= SDWebImageOptions.ForceTransition;
                 }

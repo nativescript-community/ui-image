@@ -130,6 +130,11 @@ export class ImagePipeline {
         return android.net.Uri.parse(value);
     }
 
+    getCacheKey(uri: string, context) {
+        // iOS only
+        return uri;
+    }
+
     isInDiskCache(uri: string | android.net.Uri): boolean {
         return this._android.isInDiskCacheSync(this.toUri(uri));
     }
