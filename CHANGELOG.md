@@ -3,17 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [4.3.20](https://github.com/@nativescript-community/ui-image/compare/v4.3.19...v4.3.20) (2023-11-03)
+## [4.3.21](https://github.com/@nativescript-community/ui-image/compare/v4.3.20...v4.3.21) (2023-11-09)
 
+### Bug Fixes
+
+* **zoomimage:** android regression ([e5558f2](https://github.com/@nativescript-community/ui-image/commit/e5558f207de7d4d692f4e107e0ea7bb96c94a3eb))
+
+## [4.3.20](https://github.com/@nativescript-community/ui-image/compare/v4.3.19...v4.3.20) (2023-11-03)
 
 ### Bug Fixes
 
 * cache improvements ([a87ae92](https://github.com/@nativescript-community/ui-image/commit/a87ae92552f3a72c71004ff1902c370e727dba5e))
 * **ios:** improved colorMatrix handling. Should be faster ([c2bf9c0](https://github.com/@nativescript-community/ui-image/commit/c2bf9c0eb82cadcacbed2e968b5e65a95df37499))
-
-
-
-
 
 ## [4.3.19](https://github.com/@nativescript-community/ui-image/compare/v4.3.18...v4.3.19) (2023-10-10)
 
