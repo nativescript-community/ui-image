@@ -2,7 +2,7 @@ export * from './index-common';
 import { ZoomImageBase, maxZoomScaleProperty, minZoomScaleProperty, zoomScaleProperty } from './index-common';
 
 export class ZoomImg extends ZoomImageBase {
-    _needUpdateHierarchy = true;
+    mNeedUpdateHierarchy = true;
     //@ts-ignore
     nativeViewProtected: com.facebook.samples.zoomable.ZoomableDraweeView;
     //@ts-ignore
