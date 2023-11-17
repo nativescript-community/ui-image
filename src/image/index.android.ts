@@ -1,6 +1,7 @@
 export * from './index-common';
 import { Application, Background, Color, ImageAsset, ImageSource, Trace, Utils, backgroundInternalProperty, knownFolders, path } from '@nativescript/core';
 import { isString } from '@nativescript/core/utils/types';
+import { layout } from '@nativescript/core/utils/layout-helper';
 import {
     AnimatedImage,
     CLog,
@@ -350,7 +351,27 @@ export class FailureEventData extends EventData {
     }
 }
 
-export const needUpdateHierarchy = function (target: any, propertyKey: string | Symbol, descriptor: PropertyDescriptor) {
+export const needUpdateHierarchy = function (targetOrNeedsLayout: any, propertyKey?: string | Symbol, descriptor?: PropertyDescriptor): any {
+    if (typeof targetOrNeedsLayout === 'boolean') {
+		return function(target2: any, propertyKey: string | Symbol, descriptor: PropertyDescriptor) {
+            const originalMethod = descriptor.value;
+            descriptor.value = function (...args: any[]) {
+                if (!this.mCanUpdateHierarchy) {
+                    this.mNeedUpdateHierarchy = true;
+                    if (this.isLoaded && targetOrNeedsLayout) {
+                        const layoutParams = (this.nativeViewProtected as com.nativescript.image.DraweeView)?.getLayoutParams();
+                        if (layoutParams) {
+                        if (layout.getMeasureSpecMode(layoutParams.height)  !== layout.EXACTLY || layout.getMeasureSpecMode(layoutParams.width)  !== layout.EXACTLY ) {
+                                this.mNeedUpdateLayout = true;
+                            }
+                        }
+                    }
+                    return;
+                }
+                return originalMethod.apply(this, args);
+            };
+        }
+	}
     const originalMethod = descriptor.value;
     descriptor.value = function (...args: any[]) {
         if (!this.mCanUpdateHierarchy) {
@@ -369,6 +390,7 @@ export class Img extends ImageBase {
 
     mCanUpdateHierarchy = true;
     mNeedUpdateHierarchy = false;
+    mNeedUpdateLayout = false;
     public onResumeNativeUpdates(): void {
         // {N} suspends properties update on `_suspendNativeUpdates`. So we only need to do this in onResumeNativeUpdates
         this.mCanUpdateHierarchy = false;
@@ -377,6 +399,10 @@ export class Img extends ImageBase {
         if (this.mNeedUpdateHierarchy) {
             this.mNeedUpdateHierarchy = false;
             this.updateHierarchy();
+        }
+        if (this.mNeedUpdateLayout) {
+            this.mNeedUpdateLayout = false;
+            this.nativeViewProtected.requestLayout();
         }
     }
     public createNativeView() {
@@ -475,7 +501,7 @@ export class Img extends ImageBase {
     [roundTopLeftRadiusProperty.setNative]() {
         this.updateHierarchy();
     }
-    @needUpdateHierarchy
+    @needUpdateHierarchy(true)
     [imageRotationProperty.setNative](value) {
         const scaleType = this.nativeImageViewProtected.getHierarchy().getActualImageScaleType();
         scaleType['setImageRotation']?.(value);
@@ -889,7 +915,7 @@ class GenericDraweeHierarchyBuilder {
     private nativeBuilder: com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 
     constructor() {
-        const res = Utils.ad.getApplicationContext().getResources();
+        const res = Utils.android.getApplicationContext().getResources();
         this.nativeBuilder = new com.facebook.drawee.generic.GenericDraweeHierarchyBuilder(res);
     }
 

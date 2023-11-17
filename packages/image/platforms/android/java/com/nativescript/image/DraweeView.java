@@ -26,6 +26,7 @@ import android.graphics.PorterDuffXfermode;
 import android.view.ViewOutlineProvider;
 
 import org.nativescript.widgets.BorderDrawable;
+import com.nativescript.image.ScalingUtils.AbstractScaleType;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -159,18 +160,33 @@ public class DraweeView extends SimpleDraweeView {
         int width = MeasureSpec.getSize(widthMeasureSpec);
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         int height = MeasureSpec.getSize(heightMeasureSpec);
-        final float aspectRatio = this.getAspectRatio();
+        float aspectRatio = this.getAspectRatio();
         if (aspectRatio > 0) {
             boolean finiteWidth = widthMode == android.view.View.MeasureSpec.EXACTLY;
             boolean finiteHeight = heightMode == android.view.View.MeasureSpec.EXACTLY;
+            Object scaleType = getHierarchy().getActualImageScaleType();
+            if (scaleType instanceof AbstractScaleType) {
+                final float rotation = ((AbstractScaleType)scaleType).getImageRotation();
+                if (Math.abs(rotation) % 180 != 0) {
+                    aspectRatio = 1.0f / aspectRatio;
+                }
+            }
             if (imageWidth != 0 && imageHeight != 0) {
-                if (!finiteWidth) {
+                if (!finiteWidth && finiteHeight) {
                     widthMeasureSpec = android.view.View.MeasureSpec.makeMeasureSpec((int) (height * aspectRatio),
                             android.view.View.MeasureSpec.EXACTLY);
-                }
-                if (!finiteHeight) {
+                } else if (!finiteHeight && finiteWidth) {
                     heightMeasureSpec = android.view.View.MeasureSpec.makeMeasureSpec((int) (width / aspectRatio),
                             android.view.View.MeasureSpec.EXACTLY);
+                } else if (!finiteWidth &&  !finiteHeight ) {
+                    float viewRatio = width / (float)height;
+                    if (viewRatio < aspectRatio) {
+                        widthMeasureSpec = android.view.View.MeasureSpec.makeMeasureSpec((int) width, android.view.View.MeasureSpec.EXACTLY);
+                        heightMeasureSpec = android.view.View.MeasureSpec.makeMeasureSpec((int) (width / aspectRatio), android.view.View.MeasureSpec.EXACTLY);
+                    } else {
+                        widthMeasureSpec = android.view.View.MeasureSpec.makeMeasureSpec((int) (height * aspectRatio), android.view.View.MeasureSpec.EXACTLY);
+                        heightMeasureSpec = android.view.View.MeasureSpec.makeMeasureSpec((int) height, android.view.View.MeasureSpec.EXACTLY);
+                    }
                 }
             }
         }

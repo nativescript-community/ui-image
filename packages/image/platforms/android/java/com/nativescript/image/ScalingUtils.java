@@ -123,6 +123,10 @@ public class ScalingUtils {
     public void setImageMatrix(Matrix matrix) {
         _imageMatrix = matrix;
     }
+
+    public float getImageRotation() {
+        return _imageRotation;
+    }
     public void setImageRotation(float rotation) {
         _imageRotation = rotation;
     }
