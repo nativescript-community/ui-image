@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.23](https://github.com/@nativescript-community/ui-image/compare/v4.3.22...v4.3.23) (2023-11-22)
+
+### Bug Fixes
+
+* aspectFill not working ([096ccc5](https://github.com/@nativescript-community/ui-image/commit/096ccc583b1007971a9ddd961d894ff4edf4b9b6))
+* **ios:** updated native dep ([e6cc5f5](https://github.com/@nativescript-community/ui-image/commit/e6cc5f5e0d42f048acbf37d0f8b936f138326b78))
+
+### Features
+
+* cacheKey support ([66cbf3c](https://github.com/@nativescript-community/ui-image/commit/66cbf3c4b4f4863ac66b97c1dfab6af19ec528a3))
+
 ## [4.3.22](https://github.com/@nativescript-community/ui-image/compare/v4.3.21...v4.3.22) (2023-11-17)
 
 ### Bug Fixes

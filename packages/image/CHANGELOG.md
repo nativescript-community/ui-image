@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.23](https://github.com/nativescript-community/ui-image/compare/v4.3.22...v4.3.23) (2023-11-22)
+
+### Bug Fixes
+
+* **ios:** updated native dep ([e6cc5f5](https://github.com/nativescript-community/ui-image/commit/e6cc5f5e0d42f048acbf37d0f8b936f138326b78))
+
 ## [4.3.22](https://github.com/nativescript-community/ui-image/compare/v4.3.21...v4.3.22) (2023-11-17)
 
 ### Bug Fixes
