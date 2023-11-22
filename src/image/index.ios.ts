@@ -265,11 +265,19 @@ export class Img extends ImageBase {
             const ratio = this.aspectRatio || imgRatio;
             // const scale = this.computeScaleFactor(width, height, finiteWidth, finiteHeight, nativeWidth, nativeHeight, this.aspectRatio || imgRatio );
 
-            if (!finiteWidth) {
+            if (!finiteWidth && finiteHeight) {
                 widthMeasureSpec = layout.makeMeasureSpec(height * ratio, layout.EXACTLY);
-            }
-            if (!finiteHeight) {
+            } else if (!finiteHeight && finiteWidth) {
                 heightMeasureSpec = layout.makeMeasureSpec(width / ratio, layout.EXACTLY);
+            } else if (!finiteWidth &&  !finiteHeight ) {
+                const viewRatio = width / height;
+                if (viewRatio < ratio) {
+                    widthMeasureSpec = layout.makeMeasureSpec(width, layout.EXACTLY);
+                    heightMeasureSpec = layout.makeMeasureSpec((width / ratio), layout.EXACTLY);
+                } else {
+                    widthMeasureSpec = layout.makeMeasureSpec( (height * ratio), layout.EXACTLY);
+                    heightMeasureSpec = layout.makeMeasureSpec( height, layout.EXACTLY);
+                }
             }
 
             if (Trace.isEnabled()) {
