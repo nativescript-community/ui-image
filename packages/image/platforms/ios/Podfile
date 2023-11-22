@@ -1,2 +1,2 @@
-pod 'SDWebImage', '>= 5.13.0'
+pod 'SDWebImage', '>= 5.18.5.0'
 pod 'SDWebImagePhotosPlugin'
