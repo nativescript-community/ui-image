@@ -208,6 +208,8 @@ export class Img extends View {
      * Android: custom imageRotation
      */
     imageRotation: number;
+
+    cacheKey: string;
 }
 
 /**

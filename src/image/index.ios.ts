@@ -104,24 +104,24 @@ export class ImagePipeline {
         return SDWebImageManager.sharedManager.cacheKeyForURLContext(NSURL.URLWithString(uri), context);
     }
 
-    isInDiskCache(uri: string): boolean {
-        return this.mIos.diskImageDataExistsWithKey(getUri(uri).absoluteString);
+    isInDiskCache(key: string): boolean {
+        return this.mIos.diskImageDataExistsWithKey(key);
     }
 
-    isInBitmapMemoryCache(uri: string): boolean {
-        return this.mIos.imageFromMemoryCacheForKey(getUri(uri).absoluteString) !== null;
+    isInBitmapMemoryCache(key: string): boolean {
+        return this.mIos.imageFromMemoryCacheForKey(key) !== null;
     }
 
-    evictFromMemoryCache(uri: string): void {
-        this.mIos.removeImageFromMemoryForKey(getUri(uri).absoluteString);
+    evictFromMemoryCache(key: string): void {
+        this.mIos.removeImageFromMemoryForKey(key);
     }
 
-    evictFromDiskCache(uri: string): void {
-        this.mIos.removeImageFromDiskForKey(getUri(uri).absoluteString);
+    evictFromDiskCache(key: string): void {
+        this.mIos.removeImageFromDiskForKey(key);
     }
 
-    evictFromCache(uri: string): void {
-        const key = getUri(uri).absoluteString;
+    evictFromCache(key: string): void {
+        // const key = getUri(uri).absoluteString;
         this.mIos.removeImageFromDiskForKey(key);
         this.mIos.removeImageFromMemoryForKey(key);
         // this.mIos.removeImageForKeyWithCompletion(getUri(uri).absoluteString, null);
@@ -222,6 +222,11 @@ export class Img extends ImageBase {
     //@ts-ignore
     nativeImageViewProtected: SDAnimatedImageView | UIImageView;
     isLoading = false;
+    mCacheKey:string
+
+    get cacheKey() {
+        return this.mCacheKey
+    }
     protected mImageSourceAffectsLayout: boolean = true;
     protected mCIFilter: CIFilter;
     public createNativeView() {
@@ -278,13 +283,15 @@ export class Img extends ImageBase {
         const imagePipeLine = getImagePipeline();
         const src = this.src;
         if (!(src instanceof ImageSource)) {
-            const uri = getUri(src).absoluteString;
-            const isInCache = imagePipeLine.isInBitmapMemoryCache(uri);
-            if (isInCache) {
-                imagePipeLine.evictFromCache(uri);
-            }
+            const cachekKey  = this.mCacheKey || getUri(src).absoluteString;
+            // const isInCache = imagePipeLine.isInBitmapMemoryCache(cachekKey);
+            // if (isInCache) {
+                imagePipeLine.evictFromCache(cachekKey);
+            // }
         }
         this.src = null;
+        // ensure we clear the image as 
+        this._setNativeImage(null, false);
         this.src = src;
     }
 
@@ -315,9 +322,8 @@ export class Img extends ImageBase {
         } else {
             this.nativeImageViewProtected.image = nativeImage;
         }
-
         if (this.mImageSourceAffectsLayout) {
-            this.mImageSourceAffectsLayout = false;
+            // this.mImageSourceAffectsLayout = false;
             this.requestLayout();
         }
     }
@@ -463,6 +469,7 @@ export class Img extends ImageBase {
                     }
                     context.setValueForKey(SDImagePipelineTransformer.transformerWithTransformers(transformers), SDWebImageContextImageTransformer);
                 }
+                this.mCacheKey = SDWebImageManager.sharedManager.cacheKeyForURLContext(uri, context)
                 this.nativeImageViewProtected.sd_setImageWithURLPlaceholderImageOptionsContextProgressCompleted(
                     uri,
                     this.placeholderImage,

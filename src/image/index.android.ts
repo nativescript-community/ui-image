@@ -416,16 +416,22 @@ export class Img extends ImageBase {
         this.controllerListener = null;
         // this.nativeImageViewProtected.setImageURI(null, null);
     }
-
+    get cacheKey() {
+        const src = this.src;
+        if (src && !(src instanceof ImageSource)) {
+            return getUri(src)
+        }
+        return undefined;
+    }
     public updateImageUri() {
         const imagePipeLine = getImagePipeline();
+        const cacheKey = this.cacheKey;
         const src = this.src;
-        if (!(src instanceof ImageSource)) {
-            const uri = getUri(src);
-            const isInCache = imagePipeLine.isInBitmapMemoryCache(uri);
-            if (isInCache) {
-                imagePipeLine.evictFromCache(uri);
-            }
+        if (cacheKey) {
+            // const isInCache = imagePipeLine.isInBitmapMemoryCache(uri);
+            // // if (isInCache) {
+                imagePipeLine.evictFromCache(cacheKey);
+            // }
         }
         this.src = null;
         this.src = src;
