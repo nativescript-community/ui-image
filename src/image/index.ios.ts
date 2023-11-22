@@ -255,9 +255,9 @@ export class Img extends ImageBase {
         const finiteWidth: boolean = widthMode === layout.EXACTLY;
         const finiteHeight: boolean = heightMode === layout.EXACTLY;
         this.mImageSourceAffectsLayout = !finiteWidth || !finiteHeight;
-        if (Trace.isEnabled()) {
-            CLog(CLogTypes.info, 'onMeasure', this.src, widthMeasureSpec, heightMeasureSpec, width, height, this.aspectRatio, image && image.imageOrientation);
-        }
+        // if (Trace.isEnabled()) {
+        //     CLog(CLogTypes.info, 'onMeasure', this.src, widthMeasureSpec, heightMeasureSpec, width, height, this.aspectRatio, image && image.imageOrientation);
+        // }
         if (image || this.aspectRatio > 0) {
             const nativeWidth = image ? layout.toDevicePixels(image.size.width) : 0;
             const nativeHeight = image ? layout.toDevicePixels(image.size.height) : 0;
@@ -281,7 +281,7 @@ export class Img extends ImageBase {
             }
 
             if (Trace.isEnabled()) {
-                CLog(CLogTypes.info, 'onMeasure scale', this.src, this.aspectRatio, finiteWidth, finiteHeight, width, height, nativeWidth, nativeHeight, widthMeasureSpec, heightMeasureSpec);
+                CLog(CLogTypes.info, 'onMeasure', this.src, this.aspectRatio, finiteWidth, finiteHeight, width, height, nativeWidth, nativeHeight, widthMeasureSpec, heightMeasureSpec);
             }
         }
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
