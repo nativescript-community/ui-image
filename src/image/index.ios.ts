@@ -12,6 +12,7 @@ import {
     ScaleType,
     Stretch,
     failureImageUriProperty,
+    imageRotationProperty,
     placeholderImageUriProperty,
     srcProperty,
     stretchProperty
@@ -456,6 +457,9 @@ export class Img extends ImageBase {
                     //@ts-ignore
                     transformers.push(NSImageRoundAsCircleTransformer.transformer());
                 }
+                if (this.imageRotation !== 0 && !isNaN(this.imageRotation)) {
+                    transformers.push(SDImageRotationTransformer.transformerWithAngleFitSize(this.imageRotation *(Math.PI/180), true));
+                }
                 if (this.roundBottomLeftRadius || this.roundBottomRightRadius || this.roundTopLeftRadius || this.roundTopRightRadius) {
                     transformers.push(
                         //@ts-ignore
@@ -495,6 +499,10 @@ export class Img extends ImageBase {
     }
     @needRequestImage
     [srcProperty.setNative](value) {
+        this.initImage();
+    }
+    @needRequestImage
+    [imageRotationProperty.setNative](value) {
         this.initImage();
     }
     placeholderImage: UIImage;
