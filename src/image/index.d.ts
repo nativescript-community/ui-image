@@ -55,7 +55,7 @@ export class Img extends View {
     /**
      * Removes all images with the specified Uri from the memory or/and disk and reinitialize the 'src'.
      */
-    updateImageUri(): void;
+    async updateImageUri();
 
     /**
      * Start image animation
@@ -378,12 +378,12 @@ export class ImagePipeline {
     /**
      * Removes all images with the specified Uri from disk cache.
      */
-    evictFromDiskCache(uri: string): void;
+    async evictFromDiskCache(uri: string): void;
 
     /**
      * Removes all images with the specified Uri from all the caches (memory and disk).
      */
-    evictFromCache(uri: string): void;
+    async evictFromCache(uri: string): void;
 
     /**
      * Clear all the caches (memory and disk).

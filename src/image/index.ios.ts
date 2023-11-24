@@ -19,7 +19,10 @@ import {
 } from './index-common';
 
 export class ImageInfo implements ImageInfoBase {
-    constructor(private width: number, private height: number) {}
+    constructor(
+        private width: number,
+        private height: number
+    ) {}
 
     getHeight(): number {
         return this.height;
@@ -117,15 +120,16 @@ export class ImagePipeline {
         this.mIos.removeImageFromMemoryForKey(key);
     }
 
-    evictFromDiskCache(key: string): void {
-        this.mIos.removeImageFromDiskForKey(key);
+    async evictFromDiskCache(key: string) {
+        return new Promise<void>((resolve) => {
+            this.mIos.removeImageForKeyCacheTypeCompletion(key, SDImageCacheType.Disk, resolve);
+        });
     }
 
-    evictFromCache(key: string): void {
-        // const key = getUri(uri).absoluteString;
-        this.mIos.removeImageFromDiskForKey(key);
-        this.mIos.removeImageFromMemoryForKey(key);
-        // this.mIos.removeImageForKeyWithCompletion(getUri(uri).absoluteString, null);
+    async evictFromCache(key: string) {
+        return new Promise<void>((resolve) => {
+            this.mIos.removeImageForKeyCacheTypeCompletion(key, SDImageCacheType.All, resolve);
+        });
     }
 
     clearCaches() {
@@ -223,10 +227,10 @@ export class Img extends ImageBase {
     //@ts-ignore
     nativeImageViewProtected: SDAnimatedImageView | UIImageView;
     isLoading = false;
-    mCacheKey:string
+    mCacheKey: string;
 
     get cacheKey() {
-        return this.mCacheKey
+        return this.mCacheKey;
     }
     protected mImageSourceAffectsLayout: boolean = true;
     protected mCIFilter: CIFilter;
@@ -270,14 +274,14 @@ export class Img extends ImageBase {
                 widthMeasureSpec = layout.makeMeasureSpec(height * ratio, layout.EXACTLY);
             } else if (!finiteHeight && finiteWidth) {
                 heightMeasureSpec = layout.makeMeasureSpec(width / ratio, layout.EXACTLY);
-            } else if (!finiteWidth &&  !finiteHeight ) {
+            } else if (!finiteWidth && !finiteHeight) {
                 const viewRatio = width / height;
                 if (viewRatio < ratio) {
                     widthMeasureSpec = layout.makeMeasureSpec(width, layout.EXACTLY);
-                    heightMeasureSpec = layout.makeMeasureSpec((width / ratio), layout.EXACTLY);
+                    heightMeasureSpec = layout.makeMeasureSpec(width / ratio, layout.EXACTLY);
                 } else {
-                    widthMeasureSpec = layout.makeMeasureSpec( (height * ratio), layout.EXACTLY);
-                    heightMeasureSpec = layout.makeMeasureSpec( height, layout.EXACTLY);
+                    widthMeasureSpec = layout.makeMeasureSpec(height * ratio, layout.EXACTLY);
+                    heightMeasureSpec = layout.makeMeasureSpec(height, layout.EXACTLY);
                 }
             }
 
@@ -288,18 +292,18 @@ export class Img extends ImageBase {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
-    public updateImageUri() {
+    public async updateImageUri() {
         const imagePipeLine = getImagePipeline();
         const src = this.src;
         if (!(src instanceof ImageSource)) {
-            const cachekKey  = this.mCacheKey || getUri(src).absoluteString;
+            const cachekKey = this.mCacheKey || getUri(src).absoluteString;
             // const isInCache = imagePipeLine.isInBitmapMemoryCache(cachekKey);
             // if (isInCache) {
-                imagePipeLine.evictFromCache(cachekKey);
+            await imagePipeLine.evictFromCache(cachekKey);
             // }
         }
         this.src = null;
-        // ensure we clear the image as 
+        // ensure we clear the image as
         this._setNativeImage(null, false);
         this.src = src;
     }
@@ -458,7 +462,7 @@ export class Img extends ImageBase {
                     transformers.push(NSImageRoundAsCircleTransformer.transformer());
                 }
                 if (this.imageRotation !== 0 && !isNaN(this.imageRotation)) {
-                    transformers.push(SDImageRotationTransformer.transformerWithAngleFitSize(-this.imageRotation *(Math.PI/180), true));
+                    transformers.push(SDImageRotationTransformer.transformerWithAngleFitSize(-this.imageRotation * (Math.PI / 180), true));
                 }
                 if (this.roundBottomLeftRadius || this.roundBottomRightRadius || this.roundTopLeftRadius || this.roundTopRightRadius) {
                     transformers.push(
@@ -481,7 +485,7 @@ export class Img extends ImageBase {
                     }
                     context.setValueForKey(SDImagePipelineTransformer.transformerWithTransformers(transformers), SDWebImageContextImageTransformer);
                 }
-                this.mCacheKey = SDWebImageManager.sharedManager.cacheKeyForURLContext(uri, context)
+                this.mCacheKey = SDWebImageManager.sharedManager.cacheKeyForURLContext(uri, context);
                 this.nativeImageViewProtected.sd_setImageWithURLPlaceholderImageOptionsContextProgressCompleted(
                     uri,
                     this.placeholderImage,

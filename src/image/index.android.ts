@@ -38,7 +38,7 @@ let initialized = false;
 let initializeConfig: ImagePipelineConfigSetting;
 export function initialize(config?: ImagePipelineConfigSetting): void {
     if (!initialized) {
-        const context = Utils.ad.getApplicationContext();
+        const context = Utils.android.getApplicationContext();
         if (!context) {
             initializeConfig = config;
             return;
@@ -102,7 +102,7 @@ function getUri(src: string | ImageAsset, asNative = true) {
     if (Utils.isFileOrResourcePath(imagePath)) {
         if (imagePath.indexOf(Utils.RESOURCE_PREFIX) === 0) {
             const resName = imagePath.substring(Utils.RESOURCE_PREFIX.length);
-            const identifier = Utils.ad.resources.getDrawableId(resName);
+            const identifier = Utils.android.resources.getDrawableId(resName);
             if (0 < identifier) {
                 const netUri = new android.net.Uri.Builder().scheme(com.facebook.common.util.UriUtil.LOCAL_RESOURCE_SCHEME).path(java.lang.String.valueOf(identifier)).build();
                 if (asNative) {
@@ -148,11 +148,11 @@ export class ImagePipeline {
         this._android.evictFromMemoryCache(this.toUri(uri));
     }
 
-    evictFromDiskCache(uri: string | android.net.Uri): void {
+    async evictFromDiskCache(uri: string | android.net.Uri) {
         this._android.evictFromDiskCache(this.toUri(uri));
     }
 
-    evictFromCache(uri: string | android.net.Uri): void {
+    async evictFromCache(uri: string | android.net.Uri) {
         this._android.evictFromCache(this.toUri(uri));
     }
 
@@ -353,7 +353,7 @@ export class FailureEventData extends EventData {
 
 export const needUpdateHierarchy = function (targetOrNeedsLayout: any, propertyKey?: string | Symbol, descriptor?: PropertyDescriptor): any {
     if (typeof targetOrNeedsLayout === 'boolean') {
-		return function(target2: any, propertyKey: string | Symbol, descriptor: PropertyDescriptor) {
+        return function (target2: any, propertyKey: string | Symbol, descriptor: PropertyDescriptor) {
             const originalMethod = descriptor.value;
             descriptor.value = function (...args: any[]) {
                 if (!this.mCanUpdateHierarchy) {
@@ -361,7 +361,7 @@ export const needUpdateHierarchy = function (targetOrNeedsLayout: any, propertyK
                     if (this.isLoaded && targetOrNeedsLayout) {
                         const layoutParams = (this.nativeViewProtected as com.nativescript.image.DraweeView)?.getLayoutParams();
                         if (layoutParams) {
-                        if (layout.getMeasureSpecMode(layoutParams.height)  !== layout.EXACTLY || layout.getMeasureSpecMode(layoutParams.width)  !== layout.EXACTLY ) {
+                            if (layout.getMeasureSpecMode(layoutParams.height) !== layout.EXACTLY || layout.getMeasureSpecMode(layoutParams.width) !== layout.EXACTLY) {
                                 this.mNeedUpdateLayout = true;
                             }
                         }
@@ -370,8 +370,8 @@ export const needUpdateHierarchy = function (targetOrNeedsLayout: any, propertyK
                 }
                 return originalMethod.apply(this, args);
             };
-        }
-	}
+        };
+    }
     const originalMethod = descriptor.value;
     descriptor.value = function (...args: any[]) {
         if (!this.mCanUpdateHierarchy) {
@@ -445,18 +445,18 @@ export class Img extends ImageBase {
     get cacheKey() {
         const src = this.src;
         if (src && !(src instanceof ImageSource)) {
-            return getUri(src)
+            return getUri(src);
         }
         return undefined;
     }
-    public updateImageUri() {
+    public async updateImageUri() {
         const imagePipeLine = getImagePipeline();
         const cacheKey = this.cacheKey;
         const src = this.src;
         if (cacheKey) {
             // const isInCache = imagePipeLine.isInBitmapMemoryCache(uri);
             // // if (isInCache) {
-                imagePipeLine.evictFromCache(cacheKey);
+            await imagePipeLine.evictFromCache(cacheKey);
             // }
         }
         this.src = null;
@@ -593,7 +593,7 @@ export class Img extends ImageBase {
             if (src) {
                 let drawable: android.graphics.drawable.BitmapDrawable;
                 if (src instanceof ImageSource) {
-                    drawable = new android.graphics.drawable.BitmapDrawable(Utils.ad.getApplicationContext().getResources(), src.android as android.graphics.Bitmap);
+                    drawable = new android.graphics.drawable.BitmapDrawable(Utils.android.getApplicationContext().getResources(), src.android as android.graphics.Bitmap);
                     this.updateViewSize(src.android);
                 } else if (Utils.isFontIconURI(src as string)) {
                     const fontIconCode = (src as string).split('//')[1];
@@ -601,7 +601,10 @@ export class Img extends ImageBase {
                         // support sync mode only
                         const font = this.style.fontInternal;
                         const color = this.style.color;
-                        drawable = new android.graphics.drawable.BitmapDrawable(Utils.ad.getApplicationContext().getResources(), ImageSource.fromFontIconCodeSync(fontIconCode, font, color).android);
+                        drawable = new android.graphics.drawable.BitmapDrawable(
+                            Utils.android.getApplicationContext().getResources(),
+                            ImageSource.fromFontIconCodeSync(fontIconCode, font, color).android
+                        );
                     }
                 }
                 if (drawable) {
@@ -791,9 +794,9 @@ export class Img extends ImageBase {
             return;
         }
         if (this.nativeImageViewProtected) {
-            let failureImageDrawable: android.graphics.drawable.BitmapDrawable;
-            let placeholderImageDrawable: android.graphics.drawable.BitmapDrawable;
-            let backgroundDrawable: android.graphics.drawable.BitmapDrawable;
+            let failureImageDrawable: android.graphics.drawable.BitmapDrawable | number;
+            let placeholderImageDrawable: android.graphics.drawable.BitmapDrawable | number;
+            let backgroundDrawable: android.graphics.drawable.BitmapDrawable | number;
             if (this.failureImageUri) {
                 failureImageDrawable = this.getDrawable(this.failureImageUri);
             }
@@ -861,7 +864,7 @@ export class Img extends ImageBase {
                     // support sync mode only
                     const font = this.style.fontInternal;
                     const color = this.style.color;
-                    drawable = new android.graphics.drawable.BitmapDrawable(Utils.ad.getApplicationContext().getResources(), ImageSource.fromFontIconCodeSync(fontIconCode, font, color).android);
+                    drawable = new android.graphics.drawable.BitmapDrawable(Utils.android.getApplicationContext().getResources(), ImageSource.fromFontIconCodeSync(fontIconCode, font, color).android);
                 }
             } else if (Utils.isFileOrResourcePath(path)) {
                 if (path.indexOf(Utils.RESOURCE_PREFIX) === 0) {
@@ -871,7 +874,7 @@ export class Img extends ImageBase {
                 }
             }
         } else {
-            drawable = new android.graphics.drawable.BitmapDrawable(Utils.ad.getApplicationContext().getResources(), path.android);
+            drawable = new android.graphics.drawable.BitmapDrawable(Utils.android.getApplicationContext().getResources(), path.android);
         }
 
         return drawable;
@@ -881,16 +884,19 @@ export class Img extends ImageBase {
         const img = ImageSource.fromFileSync(localFilePath);
         let drawable: android.graphics.drawable.BitmapDrawable = null;
         if (img) {
-            drawable = new android.graphics.drawable.BitmapDrawable(Utils.ad.getApplicationContext().getResources(), img.android);
+            drawable = new android.graphics.drawable.BitmapDrawable(Utils.android.getApplicationContext().getResources(), img.android);
         }
 
         return drawable;
     }
 
     private getDrawableFromResource(resourceName: string) {
-        const identifier = Utils.ad.getApplication().getResources().getIdentifier(resourceName.substr(Utils.RESOURCE_PREFIX.length), 'drawable', Utils.ad.getApplication().getPackageName());
+        const application = Utils.android.getApplication();
+        const resources = application.getResources();
+        const identifier = resources.getIdentifier(resourceName.substring(Utils.RESOURCE_PREFIX.length), 'drawable', application.getPackageName());
         // we return the identifier to allow Fresco to handle memory / caching
         return identifier;
+        // return Utils.android.getApplicationContext().getDrawable(identifier);
     }
 
     startAnimating() {
