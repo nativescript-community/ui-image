@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.27](https://github.com/@nativescript-community/ui-image/compare/v4.3.26...v4.3.27) (2023-11-24)
+
+### Bug Fixes
+
+* `updateImageUri` and `evictFromDiskCache` and `evictFromCache` are now async ([ea183ed](https://github.com/@nativescript-community/ui-image/commit/ea183ed9faab3f0dd857e0d29dada5932e79838f))
+
 ## [4.3.26](https://github.com/@nativescript-community/ui-image/compare/v4.3.25...v4.3.26) (2023-11-24)
 
 ### Bug Fixes
