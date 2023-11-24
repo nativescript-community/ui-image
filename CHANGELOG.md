@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.26](https://github.com/@nativescript-community/ui-image/compare/v4.3.25...v4.3.26) (2023-11-24)
+
+### Bug Fixes
+
+* **ios:** imageRotation to behave like android (90 = rotation right) ([f6674c8](https://github.com/@nativescript-community/ui-image/commit/f6674c8f635c2c900decd851e804fb51ed1d02c4))
+
 ## [4.3.25](https://github.com/@nativescript-community/ui-image/compare/v4.3.24...v4.3.25) (2023-11-23)
 
 **Note:** Version bump only for package ui-image
