@@ -458,7 +458,7 @@ export class Img extends ImageBase {
                     transformers.push(NSImageRoundAsCircleTransformer.transformer());
                 }
                 if (this.imageRotation !== 0 && !isNaN(this.imageRotation)) {
-                    transformers.push(SDImageRotationTransformer.transformerWithAngleFitSize(this.imageRotation *(Math.PI/180), true));
+                    transformers.push(SDImageRotationTransformer.transformerWithAngleFitSize(-this.imageRotation *(Math.PI/180), true));
                 }
                 if (this.roundBottomLeftRadius || this.roundBottomRightRadius || this.roundTopLeftRadius || this.roundTopRightRadius) {
                     transformers.push(
