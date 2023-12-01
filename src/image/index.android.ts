@@ -845,7 +845,7 @@ export class Img extends ImageBase {
             const bottomRightRadius = this.roundBottomRightRadius || 0;
             const bottomLeftRadius = this.roundBottomLeftRadius || 0;
             if (topLeftRadius || topRightRadius || bottomRightRadius || bottomLeftRadius) {
-                builder.setCornersRadii(topLeftRadius, topRightRadius, bottomRightRadius, bottomLeftRadius);
+                builder.setCornersRadii(Utils.layout.toDevicePixels(topLeftRadius) , Utils.layout.toDevicePixels(topRightRadius), Utils.layout.toDevicePixels(bottomRightRadius),Utils.layout.toDevicePixels(bottomLeftRadius));
             }
 
             this.nativeImageViewProtected.setHierarchy(builder.build());
