@@ -430,6 +430,11 @@ export class Img extends ImageBase {
                 this.isLoading = true;
                 let options = SDWebImageOptions.ScaleDownLargeImages | SDWebImageOptions.AvoidAutoSetImage;
 
+                if (this.placeholderImageUri) {
+                    this.placeholderImage = this.getUIImage(this.placeholderImageUri);
+                    this._setNativeImage(this.placeholderImage, animate);
+                }
+                
                 if (this.noCache) {
                     // const key = uri.absoluteString;
                     // const imagePipeLine = getImagePipeline();
@@ -512,8 +517,8 @@ export class Img extends ImageBase {
     placeholderImage: UIImage;
     @needRequestImage
     [placeholderImageUriProperty.setNative]() {
-        this.placeholderImage = this.getUIImage(this.placeholderImageUri);
-        this.initImage();
+        // this.placeholderImage = this.getUIImage(this.placeholderImageUri);
+        // this.initImage();
     }
 
     [failureImageUriProperty.setNative]() {
