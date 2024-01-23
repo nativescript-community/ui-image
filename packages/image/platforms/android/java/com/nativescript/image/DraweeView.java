@@ -123,34 +123,40 @@ public class DraweeView extends SimpleDraweeView {
         mLegacyVisibilityHandlingEnabled = legacyVisibilityHandlingEnabled;
     }
 
-	// private final Rect outlineRect = new RectF();
-    public void updateOutlineProvider() {
+	public void updateOutlineProvider() {
         Drawable drawable = getBackground();
-        isUsingOutlineProvider = false;
-        if (android.os.Build.VERSION.SDK_INT >= 21 && drawable instanceof BorderDrawable && (android.os.Build.VERSION.SDK_INT >= 33 || ((BorderDrawable)drawable).hasUniformBorderRadius())) {
-            setOutlineProvider(new ViewOutlineProvider() {
-                @Override
-                public void getOutline(View view, Outline outline) {
-                    Drawable drawable = getBackground();
-                    if (drawable instanceof BorderDrawable) {
-                        BorderDrawable borderDrawable = (BorderDrawable) drawable;
-                        // that if test is only needed until N BorderDrawable is updated to do it
-                        if (borderDrawable.hasUniformBorderRadius()) {
-			                // outlineRect.set(borderDrawable.getBounds());
-                            outline.setRoundRect(borderDrawable.getBounds(), borderDrawable.getBorderBottomLeftRadius());
+        if (android.os.Build.VERSION.SDK_INT >= 21) {
+            // we try to support N setting outline provider now
+            if (!isUsingOutlineProvider && getOutlineProvider() != null) {
+                // already handled somewhere else
+                return;
+            }
+            if (drawable instanceof BorderDrawable && (android.os.Build.VERSION.SDK_INT >= 33 || ((BorderDrawable)drawable).hasUniformBorderRadius())) {
+                setOutlineProvider(new ViewOutlineProvider() {
+                    @Override
+                    public void getOutline(View view, Outline outline) {
+                        Drawable drawable = getBackground();
+                        if (drawable instanceof BorderDrawable) {
+                            BorderDrawable borderDrawable = (BorderDrawable) drawable;
+                            // that if test is only needed until N BorderDrawable is updated to do it
+                            if (borderDrawable.hasUniformBorderRadius()) {
+                                // outlineRect.set(borderDrawable.getBounds());
+                                outline.setRoundRect(borderDrawable.getBounds(), borderDrawable.getBorderBottomLeftRadius());
+                            } else {
+                                drawable.getOutline(outline);
+                            }
                         } else {
-                            drawable.getOutline(outline);
+                            outline.setRect(100, 100, view.getWidth() - 200, view.getHeight() - 200);
                         }
-                    } else {
-                        outline.setRect(100, 100, view.getWidth() - 200, view.getHeight() - 200);
                     }
-                }
-            });
-            setClipToOutline(true);
-            isUsingOutlineProvider = true;
-        } else if (android.os.Build.VERSION.SDK_INT >= 21) {
-            setOutlineProvider(null);
-            setClipToOutline(false);
+                });
+                setClipToOutline(true);
+                isUsingOutlineProvider = true;
+            // } else if (android.os.Build.VERSION.SDK_INT >= 21) {
+            //     isUsingOutlineProvider = false;
+            //     setOutlineProvider(null);
+            //     setClipToOutline(false);
+            }
         }
     }
 
@@ -293,6 +299,22 @@ public class DraweeView extends SimpleDraweeView {
         }
         
         ImageRequest request = requestBuilder.build();
+
+        // if (object != null && object.optBoolean("async") == false) {
+        //     DataSource<CloseableReference<CloseableImage>> dataSource =
+        //         imagePipeline.fetchImageFromBitmapCache(imageRequest, uri.toString());
+        //     try {
+        //     CloseableReference<CloseableImage> result = DataSources.waitForFinalResult(dataSource);
+        //     if (result != null) {
+        //         // Do something with the image, but do not keep the reference to it!
+        //         // The image may get recycled as soon as the reference gets closed below.
+        //         // If you need to keep a reference to the image, read the following sections.
+        //     }
+        //     } finally {
+        //         dataSource.close();
+        //     }
+        // }
+
         PipelineDraweeControllerBuilder builder = com.facebook.drawee.backends.pipeline.Fresco.newDraweeControllerBuilder();
         builder.setImageRequest(request);
         builder.setCallerContext(uri.toString());
