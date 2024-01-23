@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.28](https://github.com/@nativescript-community/ui-image/compare/v4.3.27...v4.3.28) (2024-01-23)
+
+### Bug Fixes
+
+* **android:** `roundBottomLeftRadius` and others were not transform  to pixel size ([163c4cc](https://github.com/@nativescript-community/ui-image/commit/163c4cc092ae96eee3a5efa2b53a4c4a505764bf))
+* **android:** improvement for future N ([f8e10f5](https://github.com/@nativescript-community/ui-image/commit/f8e10f56945dbb76800d9fd90f2c6bd40966423f))
+* **android:** wrong unit for roundTopLeftRadius and others ([d6460d9](https://github.com/@nativescript-community/ui-image/commit/d6460d94738d9bfa1e9058b9e046fd4d56514a8d))
+
 ## [4.3.27](https://github.com/@nativescript-community/ui-image/compare/v4.3.26...v4.3.27) (2023-11-24)
 
 ### Bug Fixes
