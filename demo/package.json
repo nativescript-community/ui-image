@@ -4,21 +4,18 @@
     "readme": "NativeScript Application",
     "repository": "<fill-your-repository-here>",
     "dependencies": {
-        "@nativescript-community/ui-image": "../plugin",
-        "@nativescript/core": "7.0.9",
-        "@nativescript/webpack": "3.0.5",
-        "@nativescript-community/ui-collectionview": "4.0.1",
+        "@nativescript-community/ui-collectionview": "5.3.15",
+        "@nativescript-community/ui-image": "*",
+        "@nativescript/core": "8.6.2",
+        "@nativescript/webpack": "5.0.18",
         "nativescript-theme-core": "^2.0.24"
     },
     "devDependencies": {
-        "@babel/core": "~7.5.5",
-        "@nativescript/android": "7.0.0",
-        "@nativescript/ios": "7.0.0",
-        "@nativescript/types": "7.0.0",
-        "babel-loader": "~8.0.6",
-        "node-sass": "^4.12.0",
-        "tslint": "~5.20.0",
-        "typescript": "3.9.7"
+        "@babel/core": "~7.23.9",
+        "@nativescript/android": "8.6.2",
+        "@nativescript/ios": "8.6.3",
+        "@nativescript/types": "8.6.1",
+        "typescript": "5.3.3"
     },
     "scripts": {
         "build.plugin": "cd ../src && npm run build",
