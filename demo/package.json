@@ -3,6 +3,7 @@
     "license": "SEE LICENSE IN <your-license-filename>",
     "readme": "NativeScript Application",
     "repository": "<fill-your-repository-here>",
+    "private": true,
     "dependencies": {
         "@nativescript-community/ui-collectionview": "5.3.15",
         "@nativescript-community/ui-image": "*",
