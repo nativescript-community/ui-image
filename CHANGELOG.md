@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.29](https://github.com/@nativescript-community/ui-image/compare/v4.3.28...v4.3.29) (2024-02-02)
+
+### Bug Fixes
+
+* **ios:** npm release fix ([68a75fe](https://github.com/@nativescript-community/ui-image/commit/68a75fe83488c83d897b0358b580563390d027a3))
+
 ## [4.3.28](https://github.com/@nativescript-community/ui-image/compare/v4.3.27...v4.3.28) (2024-01-23)
 
 ### Bug Fixes
