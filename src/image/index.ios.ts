@@ -454,7 +454,7 @@ export class Img extends ImageBase {
                 }
                 if (this.decodeWidth || this.decodeHeight) {
                     //@ts-ignore
-                    transformers.push(NSImageDecodeSizeTransformer.transformerWithDecodeWidthDecodeHeight(this.decodeWidth, this.decodeHeight));
+                    transformers.push(NSImageDecodeSizeTransformer.transformerWithDecodeWidthDecodeHeight(this.decodeWidth || this.decodeHeight, this.decodeHeight || this.decodeWidth));
                 }
                 if (this.tintColor) {
                     transformers.push(SDImageTintTransformer.transformerWithColor(this.tintColor.ios));

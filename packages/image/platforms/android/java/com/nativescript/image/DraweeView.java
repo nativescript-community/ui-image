@@ -288,8 +288,8 @@ public class DraweeView extends SimpleDraweeView {
             int decodeWidth = object.optInt("decodeWidth");
             int decodeHeight = object.optInt("decodeHeight");
 
-            if (decodeWidth > 0 && decodeHeight > 0) {
-                requestBuilder = requestBuilder.setResizeOptions(new com.facebook.imagepipeline.common.ResizeOptions(decodeWidth, decodeHeight));
+            if (decodeWidth > 0 || decodeHeight > 0) {
+                requestBuilder = requestBuilder.setResizeOptions(new com.facebook.imagepipeline.common.ResizeOptions(decodeWidth > 0 ? decodeWidth : decodeHeight, decodeHeight  > 0 ? decodeHeight : decodeWidth));
             }
             int blurRadius = object.optInt("blurRadius", 0);
             if (blurRadius > 0) {
