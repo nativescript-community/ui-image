@@ -25,20 +25,18 @@
     if (!image) {
         return nil;
     }
-    CGFloat widthRatio = 1.0f;
-    CGFloat heightRatio = 1.0f;
+    CGFloat ratio = 1.0f;
 
     CGFloat width = (CGFloat)image.size.width;
     CGFloat height = (CGFloat)image.size.height;
     if (self.decodeWidth && self.decodeHeight) {
-        widthRatio = self.decodeWidth / width;
-        heightRatio = self.decodeHeight / height;
+        ratio =  MIN(self.decodeWidth / width, self.decodeHeight / height);
     } else if (self.decodeWidth > 0) {
-        widthRatio = self.decodeWidth / width;
+        ratio = self.decodeWidth / width;
     } else {
-        heightRatio = self.decodeHeight / height;
+        ratio = self.decodeHeight / height;
     }
-    return [image sd_resizedImageWithSize:CGSizeMake(width * widthRatio, height * heightRatio) scaleMode:2];
+    return [image sd_resizedImageWithSize:CGSizeMake(width * ratio, height * ratio) scaleMode:2];
 }
 
 @end
