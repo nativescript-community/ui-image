@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.31](https://github.com/nativescript-community/ui-image/compare/v4.3.30...v4.3.31) (2024-02-23)
+
+### Bug Fixes
+
+* **image,ios:** fix for decodeWidth/decodeHeight ([d056b89](https://github.com/nativescript-community/ui-image/commit/d056b8952fdef091dad458742a344ab3f280b6b3))
+
 ## [4.3.30](https://github.com/nativescript-community/ui-image/compare/v4.3.29...v4.3.30) (2024-02-16)
 
 ### Bug Fixes
