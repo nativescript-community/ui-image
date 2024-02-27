@@ -8,7 +8,7 @@
     "scripts": {
         "build": "npm run tsc && npm run readme",
         "build.all": "npm run build && npm run build.angular",
-        "build.angular": "ng-packagr -p ../../src/zoomimage/angular/ng-package.json -c ../../src/zoomimage/angular/tsconfig.json",
+        "build.angular": "ng-packagr -p ../../src/zoomimage/angular/ng-package.json -c ../../src/zoomimage/angular/tsconfig.json && rm angular/.npmignore",
         "readme": "readme generate -c ../../tools/readme/blueprint.json",
         "tsc": "cpy '**/*.d.ts' '../../packages/zoomimage' --parents --cwd=../../src/zoomimage && tsc -skipLibCheck -d",
         "clean": "rimraf ./*.d.ts ./*.js ./*.js.map"
