@@ -229,6 +229,8 @@ export class Img extends ImageBase {
     isLoading = false;
     mCacheKey: string;
 
+    contextOptions = null
+
     get cacheKey() {
         return this.mCacheKey;
     }
@@ -302,10 +304,10 @@ export class Img extends ImageBase {
             await imagePipeLine.evictFromCache(cachekKey);
             // }
         }
-        this.src = null;
+        // this.src = null;
         // ensure we clear the image as
         this._setNativeImage(null, false);
-        this.src = src;
+        this.initImage();
     }
 
     public _setNativeImage(nativeImage: UIImage, animated = true) {
@@ -489,6 +491,13 @@ export class Img extends ImageBase {
                         options |= SDWebImageOptions.TransformAnimatedImage;
                     }
                     context.setValueForKey(SDImagePipelineTransformer.transformerWithTransformers(transformers), SDWebImageContextImageTransformer);
+                    // context.setValueForKey(SDImageCacheType.Memory, SDWebImageContextOriginalStoreCacheType);
+                }
+                if (this.contextOptions && typeof this.contextOptions === 'object') {                    
+                    Object.keys(this.contextOptions).forEach(k=>{
+                        let value = this.contextOptions[k];
+                        context.setValueForKey(value, k);
+                    })
                 }
                 this.mCacheKey = SDWebImageManager.sharedManager.cacheKeyForURLContext(uri, context);
                 this.nativeImageViewProtected.sd_setImageWithURLPlaceholderImageOptionsContextProgressCompleted(

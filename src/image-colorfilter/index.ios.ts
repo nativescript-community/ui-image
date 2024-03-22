@@ -54,7 +54,6 @@ class ImgExtended3 {
     mCIFilter: CIFilter;
 
     filteredImage(image: UIImage, filter: CIFilter) {
-        console.log('filteredImage', image, filter);
         if (image !== null && filter !== null) {
             const tmp = CIImage.alloc().initWithImage(image);
             this.mCIFilter.setValueForKey(tmp, 'inputImage');
