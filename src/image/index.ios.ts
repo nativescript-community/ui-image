@@ -10,6 +10,7 @@ import {
     ImageInfo as ImageInfoBase,
     ImagePipelineConfigSetting,
     ScaleType,
+    SrcType,
     Stretch,
     failureImageUriProperty,
     imageRotationProperty,
@@ -295,17 +296,17 @@ export class Img extends ImageBase {
     public async updateImageUri() {
         const imagePipeLine = getImagePipeline();
         const src = this.src;
-        if (!(src instanceof ImageSource)) {
-            const cachekKey = this.mCacheKey || getUri(src).absoluteString;
+        const srcType = typeof src;
+        if (src && (srcType === 'string' || src instanceof ImageAsset)) {
+            const cachekKey = this.mCacheKey || getUri(src as string | ImageAsset).absoluteString;
             // const isInCache = imagePipeLine.isInBitmapMemoryCache(cachekKey);
             // if (isInCache) {
             await imagePipeLine.evictFromCache(cachekKey);
             // }
         }
-        this.src = null;
         // ensure we clear the image as
         this._setNativeImage(null, false);
-        this.src = src;
+        this.initImage();
     }
 
     public _setNativeImage(nativeImage: UIImage, animated = true) {
@@ -402,10 +403,21 @@ export class Img extends ImageBase {
     }
 
     protected async initImage() {
+        // this.nativeImageViewProtected.setImageURI(null);
+        this.handleImageSrc(this.src);
+    }
+
+    protected async handleImageSrc(src: SrcType) {
         if (this.nativeViewProtected) {
-            const src = this.src;
             if (src instanceof Promise) {
-                this.src = await src;
+                this.handleImageSrc(await src);
+                return;
+            } else if (typeof src === 'function') {
+                const newSrc = src();
+                if (newSrc instanceof Promise) {
+                    await newSrc;
+                }
+                this.handleImageSrc(newSrc);
                 return;
             }
             if (src) {
@@ -426,7 +438,7 @@ export class Img extends ImageBase {
                     }
                 }
 
-                const uri = getUri(src);
+                const uri = getUri(src as string | ImageAsset);
                 this.isLoading = true;
                 let options = SDWebImageOptions.ScaleDownLargeImages | SDWebImageOptions.AvoidAutoSetImage;
 

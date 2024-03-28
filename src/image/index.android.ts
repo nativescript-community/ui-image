@@ -444,8 +444,9 @@ export class Img extends ImageBase {
     }
     get cacheKey() {
         const src = this.src;
-        if (src && !(src instanceof ImageSource)) {
-            return getUri(src);
+        const srcType = typeof src;
+        if (src && (srcType === 'string' || src instanceof ImageAsset)) {
+            return getUri(src as string | ImageAsset);
         }
         return undefined;
     }
@@ -459,8 +460,8 @@ export class Img extends ImageBase {
             await imagePipeLine.evictFromCache(cacheKey);
             // }
         }
-        this.src = null;
-        this.src = src;
+        this.handleImageSrc(null);
+        this.initImage();
     }
 
     @needUpdateHierarchy
@@ -581,13 +582,18 @@ export class Img extends ImageBase {
 
     controllerListener: com.facebook.drawee.controller.ControllerListener<com.facebook.imagepipeline.image.ImageInfo>;
 
-    protected async initImage() {
+    protected async handleImageSrc(src: SrcType) {
         const view = this.nativeViewProtected;
         if (view) {
-            // this.nativeImageViewProtected.setImageURI(null);
-            const src = this.src;
             if (src instanceof Promise) {
-                this.src = await src;
+                this.handleImageSrc(await src);
+                return;
+            } else if (typeof src === 'function') {
+                const newSrc = src();
+                if (newSrc instanceof Promise) {
+                    await newSrc;
+                }
+                this.handleImageSrc(newSrc);
                 return;
             }
             if (src) {
@@ -786,6 +792,11 @@ export class Img extends ImageBase {
                 this.nativeImageViewProtected.setImageBitmap(null);
             }
         }
+    }
+
+    protected async initImage() {
+        // this.nativeImageViewProtected.setImageURI(null);
+        this.handleImageSrc(this.src);
     }
 
     private updateHierarchy() {

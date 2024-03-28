@@ -230,6 +230,8 @@ export const needRequestImage = function (target: any, propertyKey: string | Sym
     };
 };
 
+export type BasicSrcType = string | ImageSource | ImageAsset;
+export type SrcType = BasicSrcType | (() => BasicSrcType | PromiseLike<BasicSrcType>) | PromiseLike<BasicSrcType>;
 export abstract class ImageBase extends View {
     public static finalImageSetEvent: string = 'finalImageSet';
     public static failureEvent: string = 'failure';
@@ -238,7 +240,7 @@ export abstract class ImageBase extends View {
     public static releaseEvent: string = 'release';
     public static submitEvent: string = 'submit';
 
-    public src: string | ImageSource | ImageAsset;
+    public src: SrcType;
     public lowerResSrc: string;
     public placeholderImageUri: string;
     public failureImageUri: string;
