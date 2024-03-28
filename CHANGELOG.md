@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.36](https://github.com/@nativescript-community/ui-image/compare/v4.3.35...v4.3.36) (2024-03-28)
+
+### Bug Fixes
+
+* `ImagePipeline.getCacheKey` working correctly on iOS / Android ([a7492a4](https://github.com/@nativescript-community/ui-image/commit/a7492a4b036dcc07cc24dfb63db20a420aa11734))
+
 ## [4.3.35](https://github.com/@nativescript-community/ui-image/compare/v4.3.34...v4.3.35) (2024-03-22)
 
 ### Bug Fixes
