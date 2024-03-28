@@ -3221,7 +3221,7 @@ __metadata:
 
 "@nativescript-community/plugin-seed-tools@file:tools::locator=root-workspace-0b6124%40workspace%3A.":
   version: 1.0.0
-  resolution: "@nativescript-community/plugin-seed-tools@file:tools#tools::hash=f9b21a&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "@nativescript-community/plugin-seed-tools@file:tools#tools::hash=067739&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@angular/animations": "npm:~17.2.1"
     "@angular/common": "npm:~17.2.1"
@@ -3287,7 +3287,7 @@ __metadata:
     vue: "npm:^2.7.16"
     yargs: "npm:^17.7.2"
     zone.js: "npm:~0.14.4"
-  checksum: d42104880abb24ef3220b65034bc0ecabcf3f9056bce20a353b4a236342d7d9ccfa955deae8a93a5695df52983e9d2c468954d80692ed7dc6990ee6bba644d40
+  checksum: 0f453be50e3df17907f3794fc5486baff0385eb0c513aab5b16475d5c03f173ecf7578f592bc3738a6ee10c5d4f91a28e6c858adabbc669b88d49b0b999ef1f4
   languageName: node
   linkType: hard
 
@@ -3312,11 +3312,11 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@nativescript-community/ui-image-colorfilter@workspace:packages/image-colorfilter"
   dependencies:
-    "@nativescript-community/ui-image": "npm:^4.3.32"
+    "@nativescript-community/ui-image": "npm:^4.3.34"
   languageName: unknown
   linkType: soft
 
-"@nativescript-community/ui-image@npm:*, @nativescript-community/ui-image@npm:^4.3.32, @nativescript-community/ui-image@workspace:packages/image":
+"@nativescript-community/ui-image@npm:*, @nativescript-community/ui-image@npm:^4.3.34, @nativescript-community/ui-image@workspace:packages/image":
   version: 0.0.0-use.local
   resolution: "@nativescript-community/ui-image@workspace:packages/image"
   languageName: unknown
@@ -3326,7 +3326,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@nativescript-community/ui-zoomimage@workspace:packages/zoomimage"
   dependencies:
-    "@nativescript-community/ui-image": "npm:^4.3.32"
+    "@nativescript-community/ui-image": "npm:^4.3.34"
   languageName: unknown
   linkType: soft
 
