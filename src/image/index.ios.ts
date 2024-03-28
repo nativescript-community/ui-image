@@ -271,6 +271,8 @@ export class Img extends ImageBase {
     isLoading = false;
     mCacheKey: string;
 
+    contextOptions = null;
+
     get cacheKey() {
         return this.mCacheKey;
     }
@@ -345,6 +347,7 @@ export class Img extends ImageBase {
             await imagePipeLine.evictFromCache(cachekKey);
             // }
         }
+        // this.src = null;
         // ensure we clear the image as
         this._setNativeImage(null, false);
         this.initImage();
@@ -507,6 +510,13 @@ export class Img extends ImageBase {
                 if (this.animatedImageView) {
                     // as we use SDAnimatedImageView  all images are loaded as SDAnimatedImage;
                     options |= SDWebImageOptions.TransformAnimatedImage;
+                }
+
+                if (this.contextOptions && typeof this.contextOptions === 'object') {
+                    Object.keys(this.contextOptions).forEach((k) => {
+                        const value = this.contextOptions[k];
+                        context.setValueForKey(value, k);
+                    });
                 }
                 this.mCacheKey = SDWebImageManager.sharedManager.cacheKeyForURLContext(uri, context);
                 this.nativeImageViewProtected.sd_setImageWithURLPlaceholderImageOptionsContextProgressCompleted(
