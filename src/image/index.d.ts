@@ -363,7 +363,7 @@ export class ImagePipeline {
      * Returns the actual cache key for url + context
      * this is an iOS feature because imageView properties are used for the cache key
      */
-    getCacheKey(uri: string, context): string;
+    getCacheKey(uri: string, options: Partial<Img>): string;
 
     /**
      * Returns whether the image is stored in the disk cache.

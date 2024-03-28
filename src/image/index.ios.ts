@@ -101,11 +101,52 @@ export function initialize(config?: ImagePipelineConfigSetting): void {
 }
 export function shutDown(): void {}
 
+function getContextFromOptions(options: Partial<Img>) {
+    const context: NSDictionary<string, any> = NSMutableDictionary.dictionary();
+    const transformers = [];
+    if (options.decodeWidth || options.decodeHeight) {
+        //@ts-ignore
+        transformers.push(NSImageDecodeSizeTransformer.transformerWithDecodeWidthDecodeHeight(options.decodeWidth || options.decodeHeight, options.decodeHeight || options.decodeWidth));
+    }
+    if (options.tintColor) {
+        transformers.push(SDImageTintTransformer.transformerWithColor(options.tintColor.ios));
+    }
+    if (options.blurRadius) {
+        transformers.push(SDImageBlurTransformer.transformerWithRadius(options.blurRadius));
+    }
+    if (options.roundAsCircle === true) {
+        //@ts-ignore
+        transformers.push(NSImageRoundAsCircleTransformer.transformer());
+    }
+    if (options.imageRotation !== 0 && !isNaN(options.imageRotation)) {
+        transformers.push(SDImageRotationTransformer.transformerWithAngleFitSize(-options.imageRotation * (Math.PI / 180), true));
+    }
+    if (options.roundBottomLeftRadius || options.roundBottomRightRadius || options.roundTopLeftRadius || options.roundTopRightRadius) {
+        transformers.push(
+            //@ts-ignore
+            NSImageRoundCornerTransformer.transformerWithTopLefRadiusTopRightRadiusBottomRightRadiusBottomLeftRadius(
+                layout.toDeviceIndependentPixels(options.roundTopLeftRadius),
+                layout.toDeviceIndependentPixels(options.roundTopRightRadius),
+                layout.toDeviceIndependentPixels(options.roundBottomRightRadius),
+                layout.toDeviceIndependentPixels(options.roundBottomLeftRadius)
+            )
+        );
+    }
+    if (options.mCIFilter) {
+        transformers.push(SDImageFilterTransformer.transformerWithFilter(options.mCIFilter));
+    }
+    if (transformers.length > 0) {
+        context.setValueForKey(SDImagePipelineTransformer.transformerWithTransformers(transformers), SDWebImageContextImageTransformer);
+    }
+    return context;
+}
+
 export class ImagePipeline {
     private mIos: SDImageCache = SDImageCache.sharedImageCache;
     constructor() {}
 
-    getCacheKey(uri: string, context) {
+    getCacheKey(uri: string, options: Partial<Img>) {
+        const context = getContextFromOptions(options);
         return SDWebImageManager.sharedManager.cacheKeyForURLContext(NSURL.URLWithString(uri), context);
     }
 
@@ -234,7 +275,7 @@ export class Img extends ImageBase {
         return this.mCacheKey;
     }
     protected mImageSourceAffectsLayout: boolean = true;
-    protected mCIFilter: CIFilter;
+    mCIFilter: CIFilter;
     public createNativeView() {
         const result = this.animatedImageView ? SDAnimatedImageView.new() : UIImageView.new();
         result.contentMode = UIViewContentMode.ScaleAspectFit;
@@ -446,7 +487,7 @@ export class Img extends ImageBase {
                     this.placeholderImage = this.getUIImage(this.placeholderImageUri);
                     this._setNativeImage(this.placeholderImage, animate);
                 }
-                
+
                 if (this.noCache) {
                     // const key = uri.absoluteString;
                     // const imagePipeLine = getImagePipeline();
@@ -459,48 +500,13 @@ export class Img extends ImageBase {
                 if (this.alwaysFade === true) {
                     options |= SDWebImageOptions.ForceTransition;
                 }
-                const context: NSDictionary<string, any> = NSMutableDictionary.dictionary();
-                const transformers = [];
                 if (this.progressiveRenderingEnabled === true) {
                     options = options | SDWebImageOptions.ProgressiveLoad;
                 }
-                if (this.decodeWidth || this.decodeHeight) {
-                    //@ts-ignore
-                    transformers.push(NSImageDecodeSizeTransformer.transformerWithDecodeWidthDecodeHeight(this.decodeWidth || this.decodeHeight, this.decodeHeight || this.decodeWidth));
-                }
-                if (this.tintColor) {
-                    transformers.push(SDImageTintTransformer.transformerWithColor(this.tintColor.ios));
-                }
-                if (this.blurRadius) {
-                    transformers.push(SDImageBlurTransformer.transformerWithRadius(this.blurRadius));
-                }
-                if (this.roundAsCircle === true) {
-                    //@ts-ignore
-                    transformers.push(NSImageRoundAsCircleTransformer.transformer());
-                }
-                if (this.imageRotation !== 0 && !isNaN(this.imageRotation)) {
-                    transformers.push(SDImageRotationTransformer.transformerWithAngleFitSize(-this.imageRotation * (Math.PI / 180), true));
-                }
-                if (this.roundBottomLeftRadius || this.roundBottomRightRadius || this.roundTopLeftRadius || this.roundTopRightRadius) {
-                    transformers.push(
-                        //@ts-ignore
-                        NSImageRoundCornerTransformer.transformerWithTopLefRadiusTopRightRadiusBottomRightRadiusBottomLeftRadius(
-                            layout.toDeviceIndependentPixels(this.roundTopLeftRadius),
-                            layout.toDeviceIndependentPixels(this.roundTopRightRadius),
-                            layout.toDeviceIndependentPixels(this.roundBottomRightRadius),
-                            layout.toDeviceIndependentPixels(this.roundBottomLeftRadius)
-                        )
-                    );
-                }
-                if (this.mCIFilter) {
-                    transformers.push(SDImageFilterTransformer.transformerWithFilter(this.mCIFilter));
-                }
-                if (transformers.length > 0) {
-                    if (this.animatedImageView) {
-                        // as we use SDAnimatedImageView  all images are loaded as SDAnimatedImage;
-                        options |= SDWebImageOptions.TransformAnimatedImage;
-                    }
-                    context.setValueForKey(SDImagePipelineTransformer.transformerWithTransformers(transformers), SDWebImageContextImageTransformer);
+                const context = getContextFromOptions(this);
+                if (this.animatedImageView) {
+                    // as we use SDAnimatedImageView  all images are loaded as SDAnimatedImage;
+                    options |= SDWebImageOptions.TransformAnimatedImage;
                 }
                 this.mCacheKey = SDWebImageManager.sharedManager.cacheKeyForURLContext(uri, context);
                 this.nativeImageViewProtected.sd_setImageWithURLPlaceholderImageOptionsContextProgressCompleted(

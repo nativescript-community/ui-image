@@ -12,6 +12,7 @@ import {
     ImageInfo as ImageInfoBase,
     ImagePipelineConfigSetting,
     ScaleType,
+    SrcType,
     aspectRatioProperty,
     backgroundUriProperty,
     blurDownSamplingProperty,
@@ -453,7 +454,6 @@ export class Img extends ImageBase {
     public async updateImageUri() {
         const imagePipeLine = getImagePipeline();
         const cacheKey = this.cacheKey;
-        const src = this.src;
         if (cacheKey) {
             // const isInCache = imagePipeLine.isInBitmapMemoryCache(uri);
             // // if (isInCache) {
