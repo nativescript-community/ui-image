@@ -1,3 +1,4 @@
-import { Img } from '@nativescript-community/ui-image';
+import { ZoomImageBase } from './index-common';
 
-export class ZoomImg extends Img {}
+export class ZoomImg extends ZoomImageBase {
+}

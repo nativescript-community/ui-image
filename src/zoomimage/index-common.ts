@@ -3,10 +3,11 @@ import { Property } from '@nativescript/core';
 
 export { initialize };
 
-export class ZoomImageBase extends Img {
+export abstract class ZoomImageBase extends Img {
     zoomScale: number;
     minZoom: number;
     maxZoom: number;
+    abstract setZoom(scale: number, animated?: boolean, point?: { x; y });
 }
 
 export const zoomScaleProperty = new Property<ZoomImageBase, number>({
