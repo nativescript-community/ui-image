@@ -32,8 +32,10 @@ import {
     showProgressBarProperty,
     srcProperty,
     stretchProperty,
-    tintColorProperty
+    tintColorProperty,
+    wrapNativeException
 } from './index-common';
+import { FailureEventData } from '@nativescript-community/ui-image';
 
 let initialized = false;
 let initializeConfig: ImagePipelineConfigSetting;
@@ -337,18 +339,6 @@ export class IntermediateEventData extends EventData {
 
     set imageInfo(value: ImageInfo) {
         this._imageInfo = value;
-    }
-}
-
-export class FailureEventData extends EventData {
-    private _error: ImageError;
-
-    get error(): ImageError {
-        return this._error;
-    }
-
-    set error(value: ImageError) {
-        this._error = value;
     }
 }
 
@@ -668,7 +658,7 @@ export class Img extends ImageBase {
                                     const imageError = new ImageError(throwable);
                                     nativeView.notify({
                                         eventName,
-                                        error: imageError
+                                        error: wrapNativeException(throwable)
                                     } as FailureEventData);
                                 }
                             }
@@ -681,10 +671,9 @@ export class Img extends ImageBase {
                             if (nativeView) {
                                 const eventName = ImageBase.intermediateImageFailedEvent;
                                 if (nativeView.hasListeners(eventName)) {
-                                    const imageError = new ImageError(throwable);
                                     nativeView.notify({
                                         eventName,
-                                        error: imageError
+                                        error: wrapNativeException(throwable)
                                     } as FailureEventData);
                                 }
                             }

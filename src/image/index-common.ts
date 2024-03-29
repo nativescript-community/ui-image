@@ -103,6 +103,30 @@ export interface ImageError {
     toString(): string;
 }
 
+export function wrapNativeException(ex, errorType = typeof ex) {
+    if (typeof ex === 'string') {
+        return new Error(ex);
+    }
+    if (!(ex instanceof Error)) {
+        if (__ANDROID__) {
+            const err = new Error(ex.toString());
+            err['nativeException'] = ex;
+            //@ts-ignore
+            err['stackTrace'] = com.tns.NativeScriptException.getStackTraceAsString(ex);
+            return err;
+        }
+        if (__IOS__) {
+            const err = new Error(ex.localizedDescription);
+            err['nativeException'] = ex;
+            err['code'] = ex.code;
+            err['domain'] = ex.domain;
+            // TODO: we loose native stack. see how to get it
+            return err;
+        }
+    }
+    return ex;
+}
+
 export interface ImagePipelineConfigSetting {
     isDownsampleEnabled?: boolean;
     leakTracker?: any;

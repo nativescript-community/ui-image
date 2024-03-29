@@ -16,8 +16,10 @@ import {
     imageRotationProperty,
     placeholderImageUriProperty,
     srcProperty,
-    stretchProperty
+    stretchProperty,
+    wrapNativeException
 } from './index-common';
+import { FailureEventData } from '@nativescript-community/ui-image';
 
 export class ImageInfo implements ImageInfoBase {
     constructor(
@@ -402,8 +404,8 @@ export class Img extends ImageBase {
         if (error) {
             this.notify({
                 eventName: Img.failureEvent,
-                error
-            });
+                error: wrapNativeException(error)
+            } as FailureEventData);
             if (this.failureImageUri) {
                 image = this.getUIImage(this.failureImageUri);
                 this._setNativeImage(image, animate);
