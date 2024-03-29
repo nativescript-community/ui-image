@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.39](https://github.com/@nativescript-community/ui-image/compare/v4.3.38...v4.3.39) (2024-03-29)
+
+### Bug Fixes
+
+* **zoomimage:** typings fix ([05b4b85](https://github.com/@nativescript-community/ui-image/commit/05b4b85cf3eafe1a9bfabb6de1e09d7633422ed7))
+
 ## [4.3.38](https://github.com/@nativescript-community/ui-image/compare/v4.3.37...v4.3.38) (2024-03-29)
 
 ### Bug Fixes
