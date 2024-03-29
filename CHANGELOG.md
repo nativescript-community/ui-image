@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.38](https://github.com/@nativescript-community/ui-image/compare/v4.3.37...v4.3.38) (2024-03-29)
+
+### Bug Fixes
+
+* **image:** better error handling ([6018d0a](https://github.com/@nativescript-community/ui-image/commit/6018d0ad65f9ba8aec45a90dfc1798d2851404cb))
+
 ## [4.3.37](https://github.com/@nativescript-community/ui-image/compare/v4.3.36...v4.3.37) (2024-03-29)
 
 ### Bug Fixes
