@@ -3,9 +3,7 @@ import { ZoomImageBase, maxZoomScaleProperty, minZoomScaleProperty, zoomScalePro
 
 export class ZoomImg extends ZoomImageBase {
     mNeedUpdateHierarchy = true;
-    //@ts-ignore
     nativeViewProtected: com.facebook.samples.zoomable.ZoomableDraweeView;
-    //@ts-ignore
     nativeImageViewProtected: com.facebook.samples.zoomable.ZoomableDraweeView;
     public createNativeView() {
         //@ts-ignore
@@ -16,19 +14,25 @@ export class ZoomImg extends ZoomImageBase {
         view.setTapListener(new com.facebook.samples.zoomable.DoubleTapGestureListener(view));
         return view;
     }
+    getController() {
+        return this.nativeViewProtected?.getZoomableController() as com.facebook.samples.zoomable.DefaultZoomableController;
+    }
 
     [zoomScaleProperty.setNative](scale: number) {
         //possible?
         // if (this.nativeViewProtected) {
         //     this.nativeViewProtected.getZoomableController().setMinScaleFactor(scale);
         // }
+        this.getController().zoomToPoint(scale, new android.graphics.PointF(0, 0), new android.graphics.PointF(0, 0));
     }
-
+    setZoom(scale: number, animated = true, point: { x; y } = { x: 0, y: 0 }) {
+        this.getController().zoomToPoint(scale, new android.graphics.PointF(point.x, point.y), new android.graphics.PointF(0, 0));
+    }
     [minZoomScaleProperty.setNative](scale: number) {
-        this.nativeViewProtected.getZoomableController().setMinScaleFactor(scale);
+        this.getController().setMinScaleFactor(scale);
     }
 
     [maxZoomScaleProperty.setNative](scale: number) {
-        this.nativeViewProtected.getZoomableController().setMaxScaleFactor(scale);
+        this.getController().setMaxScaleFactor(scale);
     }
 }
