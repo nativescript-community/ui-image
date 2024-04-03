@@ -18,18 +18,27 @@ export class UIZoomImgScrollViewDelegateImpl extends NSObject implements UIScrol
 }
 
 export class ZoomImg extends ZoomImageBase {
-    nativeViewProtected: UIScrollView;
+    nativeViewProtected: ImageScrollView;
     _image: SDAnimatedImageView | UIImageView;
     private delegate: UIZoomImgScrollViewDelegateImpl;
     public createNativeView() {
         this._image = super.createNativeView() as any;
         this._image.clipsToBounds = true;
-        const nativeView = UIScrollView.new();
-        nativeView.addSubview(this._image);
+
+        const nativeView = ImageScrollView.new();
+        nativeView.zoomView = this._image;
+        // const nativeView = UIScrollView.new();
+        // nativeView.addSubview(this._image);
         nativeView.zoomScale = this.zoomScale;
         nativeView.minimumZoomScale = this.minZoom;
         nativeView.maximumZoomScale = this.maxZoom;
         return nativeView;
+    }
+
+    _setNativeImage(nativeImage, animated = true) {
+        //@ts-ignore
+        super._setNativeImage(nativeImage, animated);
+        this.nativeViewProtected.updateForImage(nativeImage.size);
     }
     get nativeImageViewProtected() {
         return this._image;
