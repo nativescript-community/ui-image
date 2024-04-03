@@ -103,6 +103,30 @@ export interface ImageError {
     toString(): string;
 }
 
+export function wrapNativeException(ex, errorType = typeof ex) {
+    if (typeof ex === 'string') {
+        return new Error(ex);
+    }
+    if (!(ex instanceof Error)) {
+        if (__ANDROID__) {
+            const err = new Error(ex.toString());
+            err['nativeException'] = ex;
+            //@ts-ignore
+            err['stackTrace'] = com.tns.NativeScriptException.getStackTraceAsString(ex);
+            return err;
+        }
+        if (__IOS__) {
+            const err = new Error(ex.localizedDescription);
+            err['nativeException'] = ex;
+            err['code'] = ex.code;
+            err['domain'] = ex.domain;
+            // TODO: we loose native stack. see how to get it
+            return err;
+        }
+    }
+    return ex;
+}
+
 export interface ImagePipelineConfigSetting {
     isDownsampleEnabled?: boolean;
     leakTracker?: any;
@@ -230,6 +254,8 @@ export const needRequestImage = function (target: any, propertyKey: string | Sym
     };
 };
 
+export type BasicSrcType = string | ImageSource | ImageAsset;
+export type SrcType = BasicSrcType | (() => BasicSrcType | PromiseLike<BasicSrcType>) | PromiseLike<BasicSrcType>;
 export abstract class ImageBase extends View {
     public static finalImageSetEvent: string = 'finalImageSet';
     public static failureEvent: string = 'failure';
@@ -238,7 +264,7 @@ export abstract class ImageBase extends View {
     public static releaseEvent: string = 'release';
     public static submitEvent: string = 'submit';
 
-    public src: string | ImageSource | ImageAsset;
+    public src: SrcType;
     public lowerResSrc: string;
     public placeholderImageUri: string;
     public failureImageUri: string;

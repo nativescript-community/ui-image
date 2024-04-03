@@ -12,6 +12,7 @@ import {
     ImageInfo as ImageInfoBase,
     ImagePipelineConfigSetting,
     ScaleType,
+    SrcType,
     aspectRatioProperty,
     backgroundUriProperty,
     blurDownSamplingProperty,
@@ -31,8 +32,10 @@ import {
     showProgressBarProperty,
     srcProperty,
     stretchProperty,
-    tintColorProperty
+    tintColorProperty,
+    wrapNativeException
 } from './index-common';
+import { FailureEventData } from '@nativescript-community/ui-image';
 
 let initialized = false;
 let initializeConfig: ImagePipelineConfigSetting;
@@ -339,18 +342,6 @@ export class IntermediateEventData extends EventData {
     }
 }
 
-export class FailureEventData extends EventData {
-    private _error: ImageError;
-
-    get error(): ImageError {
-        return this._error;
-    }
-
-    set error(value: ImageError) {
-        this._error = value;
-    }
-}
-
 export const needUpdateHierarchy = function (targetOrNeedsLayout: any, propertyKey?: string | Symbol, descriptor?: PropertyDescriptor): any {
     if (typeof targetOrNeedsLayout === 'boolean') {
         return function (target2: any, propertyKey: string | Symbol, descriptor: PropertyDescriptor) {
@@ -444,23 +435,23 @@ export class Img extends ImageBase {
     }
     get cacheKey() {
         const src = this.src;
-        if (src && !(src instanceof ImageSource)) {
-            return getUri(src);
+        const srcType = typeof src;
+        if (src && (srcType === 'string' || src instanceof ImageAsset)) {
+            return getUri(src as string | ImageAsset);
         }
         return undefined;
     }
     public async updateImageUri() {
         const imagePipeLine = getImagePipeline();
         const cacheKey = this.cacheKey;
-        const src = this.src;
         if (cacheKey) {
             // const isInCache = imagePipeLine.isInBitmapMemoryCache(uri);
             // // if (isInCache) {
             await imagePipeLine.evictFromCache(cacheKey);
             // }
         }
-        this.src = null;
-        this.src = src;
+        this.handleImageSrc(null);
+        this.initImage();
     }
 
     @needUpdateHierarchy
@@ -581,13 +572,18 @@ export class Img extends ImageBase {
 
     controllerListener: com.facebook.drawee.controller.ControllerListener<com.facebook.imagepipeline.image.ImageInfo>;
 
-    protected async initImage() {
+    protected async handleImageSrc(src: SrcType) {
         const view = this.nativeViewProtected;
         if (view) {
-            // this.nativeImageViewProtected.setImageURI(null);
-            const src = this.src;
             if (src instanceof Promise) {
-                this.src = await src;
+                this.handleImageSrc(await src);
+                return;
+            } else if (typeof src === 'function') {
+                const newSrc = src();
+                if (newSrc instanceof Promise) {
+                    await newSrc;
+                }
+                this.handleImageSrc(newSrc);
                 return;
             }
             if (src) {
@@ -662,7 +658,7 @@ export class Img extends ImageBase {
                                     const imageError = new ImageError(throwable);
                                     nativeView.notify({
                                         eventName,
-                                        error: imageError
+                                        error: wrapNativeException(throwable)
                                     } as FailureEventData);
                                 }
                             }
@@ -675,10 +671,9 @@ export class Img extends ImageBase {
                             if (nativeView) {
                                 const eventName = ImageBase.intermediateImageFailedEvent;
                                 if (nativeView.hasListeners(eventName)) {
-                                    const imageError = new ImageError(throwable);
                                     nativeView.notify({
                                         eventName,
-                                        error: imageError
+                                        error: wrapNativeException(throwable)
                                     } as FailureEventData);
                                 }
                             }
@@ -786,6 +781,11 @@ export class Img extends ImageBase {
                 this.nativeImageViewProtected.setImageBitmap(null);
             }
         }
+    }
+
+    protected async initImage() {
+        // this.nativeImageViewProtected.setImageURI(null);
+        this.handleImageSrc(this.src);
     }
 
     private updateHierarchy() {

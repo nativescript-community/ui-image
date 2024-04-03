@@ -314,21 +314,11 @@ export class IntermediateEventData {
 /**
  * Instances of this class are provided to the handlers of the {@link failure} and {@link intermediateImageFailed}.
  */
-export class FailureEventData {
-    /**
-     * Returns the name of the event that has been fired.
-     */
-    eventName: string;
-
-    /**
-     * The object that fires the event.
-     */
-    object: any;
-
+export class FailureEventData extends EventData {
     /**
      * An object containing information about the status of the event.
      */
-    error: ImageError;
+    error: Error;
 }
 
 /**
@@ -363,7 +353,7 @@ export class ImagePipeline {
      * Returns the actual cache key for url + context
      * this is an iOS feature because imageView properties are used for the cache key
      */
-    getCacheKey(uri: string, context): string;
+    getCacheKey(uri: string, options: Partial<Img>): string;
 
     /**
      * Returns whether the image is stored in the disk cache.

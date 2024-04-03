@@ -65,6 +65,11 @@ export class ZoomImg extends ZoomImageBase {
             this.nativeViewProtected.zoomScale = scale;
         }
     }
+    setZoom(scale: number, animated = true, point: { x; y } = { x: 0, y: 0 }) {
+        if (this.nativeViewProtected) {
+            this.nativeViewProtected.setZoomScaleAnimated(scale, animated);
+        }
+    }
 
     [minZoomScaleProperty.setNative](scale: number) {
         if (this.nativeViewProtected) {

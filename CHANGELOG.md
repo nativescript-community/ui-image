@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.39](https://github.com/@nativescript-community/ui-image/compare/v4.3.38...v4.3.39) (2024-03-29)
+
+### Bug Fixes
+
+* **zoomimage:** typings fix ([05b4b85](https://github.com/@nativescript-community/ui-image/commit/05b4b85cf3eafe1a9bfabb6de1e09d7633422ed7))
+
+## [4.3.38](https://github.com/@nativescript-community/ui-image/compare/v4.3.37...v4.3.38) (2024-03-29)
+
+### Bug Fixes
+
+* **image:** better error handling ([6018d0a](https://github.com/@nativescript-community/ui-image/commit/6018d0ad65f9ba8aec45a90dfc1798d2851404cb))
+
+## [4.3.37](https://github.com/@nativescript-community/ui-image/compare/v4.3.36...v4.3.37) (2024-03-29)
+
+### Bug Fixes
+
+* **zoomimage:** improvements ([535e433](https://github.com/@nativescript-community/ui-image/commit/535e4337d41946093da2f2d169f568036d6eee5f))
+
+## [4.3.36](https://github.com/@nativescript-community/ui-image/compare/v4.3.35...v4.3.36) (2024-03-28)
+
+### Bug Fixes
+
+* `ImagePipeline.getCacheKey` working correctly on iOS / Android ([a7492a4](https://github.com/@nativescript-community/ui-image/commit/a7492a4b036dcc07cc24dfb63db20a420aa11734))
+
 ## [4.3.35](https://github.com/@nativescript-community/ui-image/compare/v4.3.34...v4.3.35) (2024-03-22)
 
 ### Bug Fixes
