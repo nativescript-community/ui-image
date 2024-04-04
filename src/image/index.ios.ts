@@ -13,6 +13,7 @@ import {
     SrcType,
     Stretch,
     failureImageUriProperty,
+    headersProperty,
     imageRotationProperty,
     placeholderImageUriProperty,
     srcProperty,
@@ -274,6 +275,7 @@ export class Img extends ImageBase {
     mCacheKey: string;
 
     contextOptions = null;
+    headers: Map<string, string> = new Map<string, string>();
 
     get cacheKey() {
         return this.mCacheKey;
@@ -520,6 +522,20 @@ export class Img extends ImageBase {
                         context.setValueForKey(value, k);
                     });
                 }
+
+                if (this.headers.size > 0) {
+                    const requestModifier = SDWebImageDownloaderRequestModifier.requestModifierWithBlock((request: NSURLRequest): NSURLRequest => {
+                        const newRequest = request.mutableCopy() as NSMutableURLRequest;
+                        this.headers.forEach((value, key) => {
+                            newRequest.addValueForHTTPHeaderField(value, key);
+                        });
+
+                        return newRequest.copy();
+                    });
+
+                    context.setValueForKey(requestModifier, SDWebImageContextDownloadRequestModifier);
+                }
+
                 this.mCacheKey = SDWebImageManager.sharedManager.cacheKeyForURLContext(uri, context);
                 this.nativeImageViewProtected.sd_setImageWithURLPlaceholderImageOptionsContextProgressCompleted(
                     uri,
@@ -549,6 +565,14 @@ export class Img extends ImageBase {
     [placeholderImageUriProperty.setNative]() {
         // this.placeholderImage = this.getUIImage(this.placeholderImageUri);
         // this.initImage();
+    }
+
+    [headersProperty.getDefault](): Map<string, string> {
+        return new Map<string, string>();
+    }
+
+    [headersProperty.setNative](value) {
+        this.headers = value;
     }
 
     [failureImageUriProperty.setNative]() {

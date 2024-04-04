@@ -156,6 +156,7 @@ export class EventData implements IEventData {
 export type Stretch = 'none' | 'fill' | 'aspectFill' | 'aspectFit';
 
 export const srcProperty = new Property<ImageBase, string | ImageSource | ImageAsset>({ name: 'src' });
+export const headersProperty = new Property<ImageBase, Map<string, string>>({ name: 'headers' });
 export const lowerResSrcProperty = new Property<ImageBase, string>({ name: 'lowerResSrc' });
 export const placeholderImageUriProperty = new Property<ImageBase, string>({ name: 'placeholderImageUri' });
 export const failureImageUriProperty = new Property<ImageBase, string>({ name: 'failureImageUri' });
@@ -394,6 +395,7 @@ export abstract class ImageBase extends View {
     }
 }
 srcProperty.register(ImageBase);
+headersProperty.register(ImageBase);
 lowerResSrcProperty.register(ImageBase);
 placeholderImageUriProperty.register(ImageBase);
 failureImageUriProperty.register(ImageBase);
