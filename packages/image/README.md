@@ -439,6 +439,13 @@ Number value used as the downsampled width of the imageModule drawable.
 <@nativescript-community/ui-image:Img decodeHeight="100"/>
 ```
 
+- **headers** (iOS only)
+
+Object that defines custom request headers to be sent with the image download request.
+
+```xml
+<@nativescript-community/ui-image:Img headers="{Authorization: 'bearer abcdefghijk'}"/>
+```
 
 - **progressiveRenderingEnabled**
 

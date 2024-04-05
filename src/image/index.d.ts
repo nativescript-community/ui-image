@@ -195,6 +195,11 @@ export class Img extends View {
     decodeHeight: number;
 
     /**
+     * IOS: add custom headers to the image download request
+     */
+    headers: Record<string, string>;
+
+    /**
      * IOS: if you want to show animated images you need to set this to true
      */
     animatedImageView: boolean;
