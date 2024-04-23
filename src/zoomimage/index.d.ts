@@ -1,4 +1,3 @@
 import { ZoomImageBase } from './index-common';
-
-export class ZoomImg extends ZoomImageBase {
-}
+export { initialize } from './index-common';
+export class ZoomImg extends ZoomImageBase {}
