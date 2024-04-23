@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.41](https://github.com/nativescript-community/ui-image/compare/v4.3.40...v4.3.41) (2024-04-23)
+
+### Bug Fixes
+
+* **android:** upgraded native fresco versions ([bbed71b](https://github.com/nativescript-community/ui-image/commit/bbed71b73b3625811fe089ac909149e723edabb4))
+
 ## [4.3.40](https://github.com/nativescript-community/ui-image/compare/v4.3.39...v4.3.40) (2024-04-03)
 
 **Note:** Version bump only for package @nativescript-community/ui-image
