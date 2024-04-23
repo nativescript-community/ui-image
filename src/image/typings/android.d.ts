@@ -20,6 +20,9 @@ declare namespace com {
             class BaseDataSubscriber extends facebook.datasource.BaseDataSubscriber<any> {
                 public constructor(listener: BaseDataSubscriberListener);
             }
+            class OkHttpNetworkFetcher extends facebook.imagepipeline.backends.okhttp3.OkHttpNetworkFetcher {
+
+            }
         }
     }
 }

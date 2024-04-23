@@ -47,24 +47,27 @@ export function initialize(config?: ImagePipelineConfigSetting): void {
             return;
         }
         let builder: com.facebook.imagepipeline.core.ImagePipelineConfig.Builder;
-        const useOkhttp = config?.useOkhttp;
+        const useOkhttp = config?.useOkhttp !== false;
         if (useOkhttp) {
             //@ts-ignore
+            let client: okhttp3.OkHttpClient;
+            //@ts-ignore
             if (useOkhttp instanceof okhttp3.OkHttpClient) {
-                builder = com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory.newBuilder(context, useOkhttp);
+                client = useOkhttp;
             } else {
                 //@ts-ignore
-                builder = com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory.newBuilder(context, new okhttp3.OkHttpClient());
+                client = new okhttp3.OkHttpClient();
             }
+            builder = com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory.newBuilder(context, client);
+            builder.setNetworkFetcher(new com.nativescript.image.OkHttpNetworkFetcher(client));
         } else {
             builder = com.facebook.imagepipeline.core.ImagePipelineConfig.newBuilder(context);
         }
-        if (config?.isDownsampleEnabled) {
-            builder.setDownsampleEnabled(true);
-        }
+        builder.setDownsampleEnabled(config?.isDownsampleEnabled === true);
         if (config?.leakTracker) {
             builder.setCloseableReferenceLeakTracker(config.leakTracker);
         }
+
         // builder.experiment().setNativeCodeDisabled(true);
         const imagePipelineConfig = builder.build();
         com.facebook.drawee.backends.pipeline.Fresco.initialize(context, imagePipelineConfig);
@@ -833,7 +836,7 @@ export class Img extends ImageBase {
             }
 
             if (this.showProgressBar) {
-                builder.setProgressBarImage(this.progressBarColor, this.stretch);
+                builder.setProgressBarImage(this.progressBarColor?.hex, this.stretch);
             }
 
             if (this.roundAsCircle) {

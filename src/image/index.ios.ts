@@ -525,9 +525,9 @@ export class Img extends ImageBase {
                 this.mCacheKey = SDWebImageManager.sharedManager.cacheKeyForURLContext(uri, context);
                 if (this.showProgressBar) {
                     try {
-                        if (this.progressBarColor && Color.isValid(this.progressBarColor)) {
+                        if (this.progressBarColor) {
                             const indicator = new SDWebImageActivityIndicator();
-                            indicator.indicatorView.color = new Color(this.progressBarColor).ios;
+                            indicator.indicatorView.color = this.progressBarColor.ios;
                             this.nativeImageViewProtected.sd_imageIndicator = indicator;
                         } else {
                             this.nativeImageViewProtected.sd_imageIndicator = SDWebImageActivityIndicator.grayIndicator;

@@ -282,7 +282,7 @@ export abstract class ImageBase extends View {
     public progressiveRenderingEnabled: boolean;
     public localThumbnailPreviewsEnabled: boolean;
     public showProgressBar: boolean;
-    public progressBarColor: string;
+    public progressBarColor: Color;
     public roundAsCircle: boolean;
     public roundBottomRightRadius: number;
     public roundTopLeftRadius: number;

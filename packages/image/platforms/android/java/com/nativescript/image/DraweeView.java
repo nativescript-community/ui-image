@@ -275,7 +275,8 @@ public class DraweeView extends SimpleDraweeView {
         if (jsonOptions.length() > 2) {
             try {
                 object = new JSONObject(jsonOptions);
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
         if (object != null) {
@@ -297,8 +298,8 @@ public class DraweeView extends SimpleDraweeView {
                 requestBuilder = requestBuilder.setPostprocessor(new com.nativescript.image.ScalingBlurPostprocessor(2, blurRadius, blurDownSampling));
             }
         }
-        
-        ImageRequest request = requestBuilder.build();
+        // ImageRequest request = requestBuilder.build();
+        ImageRequest request = NetworkImageRequest.fromBuilderWithHeaders(requestBuilder, object.optJSONObject("headers"));
 
         // if (object != null && object.optBoolean("async") == false) {
         //     DataSource<CloseableReference<CloseableImage>> dataSource =
