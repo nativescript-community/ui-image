@@ -13,6 +13,7 @@ import {
     SrcType,
     Stretch,
     failureImageUriProperty,
+    headersProperty,
     imageRotationProperty,
     placeholderImageUriProperty,
     progressBarColorProperty,
@@ -276,6 +277,7 @@ export class Img extends ImageBase {
     mCacheKey: string;
 
     contextOptions = null;
+    headers: Map<string, string> = new Map<string, string>();
 
     get cacheKey() {
         return this.mCacheKey;
@@ -522,6 +524,20 @@ export class Img extends ImageBase {
                         context.setValueForKey(value, k);
                     });
                 }
+
+                if (this.headers.size > 0) {
+                    const requestModifier = SDWebImageDownloaderRequestModifier.requestModifierWithBlock((request: NSURLRequest): NSURLRequest => {
+                        const newRequest = request.mutableCopy() as NSMutableURLRequest;
+                        this.headers.forEach((value, key) => {
+                            newRequest.addValueForHTTPHeaderField(value, key);
+                        });
+
+                        return newRequest.copy();
+                    });
+
+                    context.setValueForKey(requestModifier, SDWebImageContextDownloadRequestModifier);
+                }
+
                 this.mCacheKey = SDWebImageManager.sharedManager.cacheKeyForURLContext(uri, context);
                 if (this.showProgressBar) {
                     try {
@@ -571,6 +587,14 @@ export class Img extends ImageBase {
 
     [progressBarColorProperty.setNative](value) {
         this.progressBarColor = value;
+    }
+
+    [headersProperty.getDefault](): Map<string, string> {
+        return new Map<string, string>();
+    }
+
+    [headersProperty.setNative](value) {
+        this.headers = value;
     }
 
     [failureImageUriProperty.setNative]() {
