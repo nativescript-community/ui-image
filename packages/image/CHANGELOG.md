@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.4.0](https://github.com/nativescript-community/ui-image/compare/v4.3.41...v4.4.0) (2024-04-23)
+
+### Features
+
+* **image:** add progress indicator for ios ([11b894a](https://github.com/nativescript-community/ui-image/commit/11b894a787afae629ba53038bbbcad4e1a48fc54))
+
 ## [4.3.41](https://github.com/nativescript-community/ui-image/compare/v4.3.40...v4.3.41) (2024-04-23)
 
 ### Bug Fixes
