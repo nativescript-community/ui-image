@@ -2,6 +2,9 @@
     "name": "@nativescript-community/template-snippet",
     "private": true,
     "version": "0.0.1",
+    "scripts": {
+        "start-server":"node server_test/index.js"
+    },
     "dependencies": {
         "@nativescript-community/ui-image": "*",
         "@nativescript-community/ui-image-colorfilter": "*",
