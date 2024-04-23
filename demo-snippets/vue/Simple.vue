@@ -6,7 +6,7 @@
 
         <GridLayout rows="300, auto, auto, auto, auto, auto">
             <StackLayout orientation="horizontal">
-                <NSImg  backgroundColor="yellow" height="500" ref="opacityImg" borderRadius="10" width="50%" src="~/assets/images/dessert.jpg" stretch="aspectFit" />
+                <NSImg :showProgressBar="true" progressBarColor="green" backgroundColor="yellow" height="500" ref="opacityImg" borderRadius="10" width="50%" src="https://images.pexels.com/photos/842711/pexels-photo-842711.jpeg" stretch="aspectFit" />
                 <NSImg backgroundColor="red" width="50%" height="100" verticalAlignment="center" borderRadius="100" :src="imgSource"> </NSImg>
             </StackLayout>
             <WrapLayout row="1">
