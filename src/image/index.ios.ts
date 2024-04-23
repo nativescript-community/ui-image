@@ -524,7 +524,7 @@ export class Img extends ImageBase {
                 }
                 this.mCacheKey = SDWebImageManager.sharedManager.cacheKeyForURLContext(uri, context);
                 if (this.showProgressBar) {
-                    try{
+                    try {
                         if (this.progressBarColor && Color.isValid(this.progressBarColor)) {
                             const indicator = new SDWebImageActivityIndicator();
                             indicator.indicatorView.color = new Color(this.progressBarColor).ios;
@@ -532,9 +532,8 @@ export class Img extends ImageBase {
                         } else {
                             this.nativeImageViewProtected.sd_imageIndicator = SDWebImageActivityIndicator.grayIndicator;
                         }
-                    }
-                    catch(ex) {
-                        console.error(ex)
+                    } catch (ex) {
+                        console.error(ex);
                     }
                 }
 
@@ -563,21 +562,11 @@ export class Img extends ImageBase {
     }
     placeholderImage: UIImage;
     @needRequestImage
-    [placeholderImageUriProperty.setNative]() {
-        // this.placeholderImage = this.getUIImage(this.placeholderImageUri);
-        // this.initImage();
-    }
+    [placeholderImageUriProperty.setNative]() {}
 
-    [showProgressBarProperty.getDefault](): boolean {
-        return false;
-    }
-
+    @needRequestImage
     [showProgressBarProperty.setNative](value) {
         this.showProgressBar = value;
-    }
-
-    [progressBarColorProperty.getDefault](): string {
-        return "";
     }
 
     [progressBarColorProperty.setNative](value) {
