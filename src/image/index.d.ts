@@ -195,7 +195,7 @@ export class Img extends View {
     decodeHeight: number;
 
     /**
-     * IOS: add custom headers to the image download request
+     * add custom headers to the image download request
      */
     headers: Record<string, string>;
 

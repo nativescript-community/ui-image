@@ -2,6 +2,7 @@ package com.nativescript.image;
 
 import android.net.Uri;
 import android.os.SystemClock;
+import android.util.Log;
 import com.facebook.imagepipeline.producers.NetworkFetcher;
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,8 +35,8 @@ class OkHttpNetworkFetcher extends com.facebook.imagepipeline.backends.okhttp3.O
       final NetworkFetcher.Callback callback) {
     fetchState.submitTime = SystemClock.elapsedRealtime();
     final Uri uri = fetchState.getUri();
-    Map<String, String> requestHeaders = null;
-    if (fetchState.getContext().getImageRequest() instanceof NetworkImageRequest) {
+      Map<String, String> requestHeaders = null;
+      if (fetchState.getContext().getImageRequest() instanceof NetworkImageRequest) {
       NetworkImageRequest networkImageRequest =
           (NetworkImageRequest) fetchState.getContext().getImageRequest();
       requestHeaders = networkImageRequest.getHeaders();
@@ -45,7 +46,6 @@ class OkHttpNetworkFetcher extends com.facebook.imagepipeline.backends.okhttp3.O
     }
     final Request request =
         new Request.Builder()
-            .cacheControl(new CacheControl.Builder().noStore().build())
             .url(uri.toString())
             .headers(Headers.of(requestHeaders))
             .get()

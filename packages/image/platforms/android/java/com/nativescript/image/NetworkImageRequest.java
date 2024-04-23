@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Iterator;
 
+import android.util.Log;
+
 /** Extended ImageRequest with request headers */
 public class NetworkImageRequest extends ImageRequest {
 

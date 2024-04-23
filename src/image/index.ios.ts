@@ -277,7 +277,6 @@ export class Img extends ImageBase {
     mCacheKey: string;
 
     contextOptions = null;
-    headers: Map<string, string> = new Map<string, string>();
 
     get cacheKey() {
         return this.mCacheKey;
@@ -525,11 +524,11 @@ export class Img extends ImageBase {
                     });
                 }
 
-                if (this.headers.size > 0) {
+                if (this.headers) {
                     const requestModifier = SDWebImageDownloaderRequestModifier.requestModifierWithBlock((request: NSURLRequest): NSURLRequest => {
                         const newRequest = request.mutableCopy() as NSMutableURLRequest;
-                        this.headers.forEach((value, key) => {
-                            newRequest.addValueForHTTPHeaderField(value, key);
+                        Object.keys(this.headers).forEach((k) => {
+                            newRequest.addValueForHTTPHeaderField(this.headers[k], k);
                         });
 
                         return newRequest.copy();
@@ -589,12 +588,8 @@ export class Img extends ImageBase {
         this.progressBarColor = value;
     }
 
-    [headersProperty.getDefault](): Map<string, string> {
-        return new Map<string, string>();
-    }
-
+    @needRequestImage
     [headersProperty.setNative](value) {
-        this.headers = value;
     }
 
     [failureImageUriProperty.setNative]() {

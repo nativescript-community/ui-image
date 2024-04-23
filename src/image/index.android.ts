@@ -19,6 +19,7 @@ import {
     blurRadiusProperty,
     fadeDurationProperty,
     failureImageUriProperty,
+    headersProperty,
     imageRotationProperty,
     lowerResSrcProperty,
     needRequestImage,
@@ -553,6 +554,11 @@ export class Img extends ImageBase {
         this.initImage();
     }
 
+    @needRequestImage
+    [headersProperty.setNative](value) {
+        this.initImage();
+    }
+
     [backgroundInternalProperty.setNative](value: Background) {
         super[backgroundInternalProperty.setNative](value);
         this.nativeViewProtected.setClipToOutline(value?.hasBorderRadius());
@@ -735,7 +741,8 @@ export class Img extends ImageBase {
                     lowerResSrc: this.lowerResSrc ? getUri(this.lowerResSrc, false) : undefined,
                     blurDownSampling: this.blurDownSampling,
                     autoPlayAnimations: this.autoPlayAnimations,
-                    tapToRetryEnabled: this.tapToRetryEnabled
+                    tapToRetryEnabled: this.tapToRetryEnabled,
+                    headers: this.headers
                 });
                 view.setUri(uri, options, this.controllerListener);
                 // const async = this.loadMode === 'async';

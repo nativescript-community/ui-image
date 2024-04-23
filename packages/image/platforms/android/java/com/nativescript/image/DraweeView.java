@@ -272,6 +272,7 @@ public class DraweeView extends SimpleDraweeView {
     public void setUri(android.net.Uri uri, String jsonOptions, com.facebook.drawee.controller.ControllerListener listener) {
     ImageRequestBuilder requestBuilder = ImageRequestBuilder.newBuilderWithSource(uri).setRotationOptions( com.facebook.imagepipeline.common.RotationOptions.autoRotate());
         JSONObject object = null;
+        JSONObject headers = null;
         if (jsonOptions.length() > 2) {
             try {
                 object = new JSONObject(jsonOptions);
@@ -297,9 +298,9 @@ public class DraweeView extends SimpleDraweeView {
                 int blurDownSampling = object.optInt("blurDownSampling", 1);
                 requestBuilder = requestBuilder.setPostprocessor(new com.nativescript.image.ScalingBlurPostprocessor(2, blurRadius, blurDownSampling));
             }
+            headers = object.optJSONObject("headers");
         }
-        // ImageRequest request = requestBuilder.build();
-        ImageRequest request = NetworkImageRequest.fromBuilderWithHeaders(requestBuilder, object.optJSONObject("headers"));
+        ImageRequest request = NetworkImageRequest.fromBuilderWithHeaders(requestBuilder, headers);
 
         // if (object != null && object.optBoolean("async") == false) {
         //     DataSource<CloseableReference<CloseableImage>> dataSource =
