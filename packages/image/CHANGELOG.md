@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.5.0](https://github.com/nativescript-community/ui-image/compare/v4.4.0...v4.5.0) (2024-04-23)
+
+### Features
+
+* **image:** headers property support. Thanks to @Logikgate ([8704ee7](https://github.com/nativescript-community/ui-image/commit/8704ee7dcd17518f1e330b57103eab23b514aac2))
+
 ## [4.4.0](https://github.com/nativescript-community/ui-image/compare/v4.3.41...v4.4.0) (2024-04-23)
 
 ### Features
