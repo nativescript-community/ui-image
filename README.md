@@ -462,7 +462,7 @@ Boolean value used for enabling or disabling the streaming of progressive JPEG i
 <@nativescript-community/ui-image:Img progressiveRenderingEnabled="true"/>
 ```
 
-- **showProgressBar**  (Android only)
+- **showProgressBar**
 
 Boolean value used for showing or hiding the progress bar.
 
@@ -470,7 +470,7 @@ Boolean value used for showing or hiding the progress bar.
 <@nativescript-community/ui-image:Img showProgressBar="true"/>
 ```
 
-- **progressBarColor**  (Android only)
+- **progressBarColor**
 
 String value used for setting the color of the progress bar. You can set it to hex values ("*#FF0000*") and/or predefined colors ("*green*").
 
