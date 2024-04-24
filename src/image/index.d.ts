@@ -450,5 +450,7 @@ export enum ScaleType {
  */
 export interface ImagePipelineConfigSetting {
     isDownsampleEnabled?: boolean;
+    leakTracker?: any; // Android only
+    useOkhttp?: boolean; // Android only
 }
 export const ImageViewTraceCategory;
