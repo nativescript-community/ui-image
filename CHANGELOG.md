@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.5.1](https://github.com/@nativescript-community/ui-image/compare/v4.5.0...v4.5.1) (2024-04-25)
+
+### Bug Fixes
+
+* **image:** android production build fix with native-api-usage ([51fa2bc](https://github.com/@nativescript-community/ui-image/commit/51fa2bcf054d18edccd72c6c7cbda59d0149274c))
+
 ## [4.5.0](https://github.com/@nativescript-community/ui-image/compare/v4.4.0...v4.5.0) (2024-04-23)
 
 ### Features
