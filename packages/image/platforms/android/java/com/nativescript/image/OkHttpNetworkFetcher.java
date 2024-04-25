@@ -13,7 +13,7 @@ import okhttp3.Headers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 
-class OkHttpNetworkFetcher extends com.facebook.imagepipeline.backends.okhttp3.OkHttpNetworkFetcher {
+public class OkHttpNetworkFetcher extends com.facebook.imagepipeline.backends.okhttp3.OkHttpNetworkFetcher {
 
   private static final String TAG = "OkHttpNetworkFetcher";
 
