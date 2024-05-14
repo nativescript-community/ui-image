@@ -1,6 +1,5 @@
-import { Img } from '@nativescript-community/ui-image';
+import { Img, registerPluginGetContextFromOptions } from '@nativescript-community/ui-image';
 import { applyMixins, colorMatrixProperty, cssProperty } from './index-common';
-import { registerPluginGetContextFromOptions } from '@nativescript-community/ui-image';
 
 declare module '@nativescript-community/ui-image' {
     interface Img {
@@ -12,8 +11,7 @@ declare module '@nativescript-community/ui-image' {
 
 const FloatConstructor = interop.sizeof(interop.types.id) === 4 ? Float32Array : Float64Array;
 
-
-function filterFromMatrix(matrix: number[], ciFilter:CIFilter = CIFilter.filterWithName('CIColorMatrix') ) {
+function filterFromMatrix(matrix: number[], ciFilter: CIFilter = CIFilter.filterWithName('CIColorMatrix')) {
     ciFilter.setValueForKey(CIVector.vectorWithValuesCount(new FloatConstructor(matrix.slice(0, 4)).buffer as any, 4), 'inputRVector');
     ciFilter.setValueForKey(CIVector.vectorWithValuesCount(new FloatConstructor(matrix.slice(5, 9)).buffer as any, 4), 'inputGVector');
     ciFilter.setValueForKey(CIVector.vectorWithValuesCount(new FloatConstructor(matrix.slice(10, 14)).buffer as any, 4), 'inputBVector');
@@ -22,11 +20,11 @@ function filterFromMatrix(matrix: number[], ciFilter:CIFilter = CIFilter.filterW
     ciFilter.setName(JSON.stringify(matrix));
 }
 registerPluginGetContextFromOptions((context, transformers, options: Partial<Img>) => {
-    const ciFilter  = options.mCIFilter ?? (options.colorMatrix? filterFromMatrix(options.colorMatrix) : undefined);
+    const ciFilter = options.mCIFilter ?? (options.colorMatrix ? filterFromMatrix(options.colorMatrix) : undefined);
     if (ciFilter) {
         transformers.push(SDImageFilterTransformer.transformerWithFilter(ciFilter));
     }
-})
+});
 
 class ImgExtended {
     nativeImageViewProtected: SDAnimatedImageView | UIImageView;
