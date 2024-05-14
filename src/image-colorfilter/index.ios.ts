@@ -22,7 +22,6 @@ function filterFromMatrix(matrix: number[], ciFilter:CIFilter = CIFilter.filterW
     ciFilter.setName(JSON.stringify(matrix));
 }
 registerPluginGetContextFromOptions((context, transformers, options: Partial<Img>) => {
-    console.log('colorFilter GetContextFromOptions')
     const ciFilter  = options.mCIFilter ?? (options.colorMatrix? filterFromMatrix(options.colorMatrix) : undefined);
     if (ciFilter) {
         transformers.push(SDImageFilterTransformer.transformerWithFilter(ciFilter));

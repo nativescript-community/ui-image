@@ -350,6 +350,12 @@ export interface AnimatedImage {
  */
 export class ImagePipeline {
     /**
+     * iOS: set this to true to enable complex cache handling
+     * this is necessary when you use colorMatrix, decodeWidth,...
+     * and when you change images on drive requiring cache image eviction
+     */
+    static iosComplexCacheEviction: boolean;
+    /**
      * Returns whether the image is stored in the bitmap memory cache.
      */
     isInBitmapMemoryCache(uri: string): boolean;
@@ -455,6 +461,6 @@ export interface ImagePipelineConfigSetting {
 }
 export const ImageViewTraceCategory;
 
-export type GetContextFromOptionsCallback = (context: NSDictionary<string, any>, transformers:any[], options: Partial<Img>)=>void
+export type GetContextFromOptionsCallback = (context: NSDictionary<string, any>, transformers: any[], options: Partial<Img>) => void;
 
 declare function registerPluginGetContextFromOptions(callback: GetContextFromOptionsCallback); // iOS only for plugins
