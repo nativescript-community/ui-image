@@ -38,7 +38,9 @@ export class ZoomImg extends ZoomImageBase {
     _setNativeImage(nativeImage, animated = true) {
         //@ts-ignore
         super._setNativeImage(nativeImage, animated);
-        this.nativeViewProtected.updateForImage(nativeImage.size);
+        if (nativeImage) {
+            this.nativeViewProtected.updateForImage(nativeImage.size);
+        }
     }
     get nativeImageViewProtected() {
         return this._image;
