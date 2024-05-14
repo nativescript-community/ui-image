@@ -105,7 +105,7 @@ export declare abstract class ImageBase extends View {
     progressiveRenderingEnabled: boolean;
     localThumbnailPreviewsEnabled: boolean;
     showProgressBar: boolean;
-    progressBarColor: string;
+    progressBarColor: Color | string;
     roundAsCircle: boolean;
     roundBottomRightRadius: number;
     roundTopLeftRadius: number;

@@ -127,7 +127,7 @@ export class Img extends View {
     /**
      * String value used for setting the color of the progress bar. Can be set to hex values ("#FF0000"") and predefined colors ("green").
      */
-    progressBarColor: string;
+    progressBarColor: Color | string;
 
     /**
      * Boolean value used for determining if the image should be rounded as a circle.
