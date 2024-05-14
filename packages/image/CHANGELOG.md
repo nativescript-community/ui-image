@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.5.1](https://github.com/nativescript-community/ui-image/compare/v4.5.0...v4.5.1) (2024-04-25)
+
+### Bug Fixes
+
+* **image:** android production build fix with native-api-usage ([51fa2bc](https://github.com/nativescript-community/ui-image/commit/51fa2bcf054d18edccd72c6c7cbda59d0149274c))
+
+## [4.5.0](https://github.com/nativescript-community/ui-image/compare/v4.4.0...v4.5.0) (2024-04-23)
+
+### Features
+
+* **image:** headers property support. Thanks to @Logikgate ([8704ee7](https://github.com/nativescript-community/ui-image/commit/8704ee7dcd17518f1e330b57103eab23b514aac2))
+
+## [4.4.0](https://github.com/nativescript-community/ui-image/compare/v4.3.41...v4.4.0) (2024-04-23)
+
+### Features
+
+* **image:** add progress indicator for ios ([11b894a](https://github.com/nativescript-community/ui-image/commit/11b894a787afae629ba53038bbbcad4e1a48fc54))
+
+## [4.3.41](https://github.com/nativescript-community/ui-image/compare/v4.3.40...v4.3.41) (2024-04-23)
+
+### Bug Fixes
+
+* **android:** upgraded native fresco versions ([bbed71b](https://github.com/nativescript-community/ui-image/commit/bbed71b73b3625811fe089ac909149e723edabb4))
+
 ## [4.3.40](https://github.com/nativescript-community/ui-image/compare/v4.3.39...v4.3.40) (2024-04-03)
 
 **Note:** Version bump only for package @nativescript-community/ui-image

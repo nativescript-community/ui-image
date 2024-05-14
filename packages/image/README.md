@@ -439,6 +439,13 @@ Number value used as the downsampled width of the imageModule drawable.
 <@nativescript-community/ui-image:Img decodeHeight="100"/>
 ```
 
+- **headers**
+
+Object that defines custom request headers to be sent with the image download request.
+
+```xml
+<@nativescript-community/ui-image:Img headers="{Authorization: 'bearer abcdefghijk'}"/>
+```
 
 - **progressiveRenderingEnabled**
 
@@ -448,7 +455,7 @@ Boolean value used for enabling or disabling the streaming of progressive JPEG i
 <@nativescript-community/ui-image:Img progressiveRenderingEnabled="true"/>
 ```
 
-- **showProgressBar**  (Android only)
+- **showProgressBar**
 
 Boolean value used for showing or hiding the progress bar.
 
@@ -456,7 +463,7 @@ Boolean value used for showing or hiding the progress bar.
 <@nativescript-community/ui-image:Img showProgressBar="true"/>
 ```
 
-- **progressBarColor**  (Android only)
+- **progressBarColor**
 
 String value used for setting the color of the progress bar. You can set it to hex values ("*#FF0000*") and/or predefined colors ("*green*").
 

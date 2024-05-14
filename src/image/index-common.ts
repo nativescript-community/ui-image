@@ -1,9 +1,16 @@
 import { Color, CoreTypes, Length, Property, ShorthandProperty, Trace, View, booleanConverter } from '@nativescript/core';
 import { EventData as IEventData } from '@nativescript/core/data/observable';
+// import { colorConverter } from '@nativescript/core/ui/styling/style-properties';
 import { ImageAsset } from '@nativescript/core/image-asset';
 import { ImageSource } from '@nativescript/core/image-source';
 import { isAndroid } from '@nativescript/core/platform';
 
+export function colorConverter(v: string | Color): Color {
+    if (!v || v instanceof Color) {
+        return v as Color;
+    }
+    return new Color(v);
+}
 function isNonNegativeFiniteNumber(value: number): boolean {
     return isFinite(value) && !isNaN(value) && value >= 0;
 }
@@ -156,6 +163,7 @@ export class EventData implements IEventData {
 export type Stretch = 'none' | 'fill' | 'aspectFill' | 'aspectFit';
 
 export const srcProperty = new Property<ImageBase, string | ImageSource | ImageAsset>({ name: 'src' });
+export const headersProperty = new Property<ImageBase, Record<string, string>>({ name: 'headers' });
 export const lowerResSrcProperty = new Property<ImageBase, string>({ name: 'lowerResSrc' });
 export const placeholderImageUriProperty = new Property<ImageBase, string>({ name: 'placeholderImageUri' });
 export const failureImageUriProperty = new Property<ImageBase, string>({ name: 'failureImageUri' });
@@ -163,8 +171,8 @@ export const stretchProperty = new Property<ImageBase, string>({ name: 'stretch'
 export const backgroundUriProperty = new Property<ImageBase, string>({ name: 'backgroundUri' });
 export const progressiveRenderingEnabledProperty = new Property<ImageBase, boolean>({ name: 'progressiveRenderingEnabled', valueConverter: booleanConverter });
 export const localThumbnailPreviewsEnabledProperty = new Property<ImageBase, boolean>({ name: 'localThumbnailPreviewsEnabled', valueConverter: booleanConverter });
-export const showProgressBarProperty = new Property<ImageBase, boolean>({ name: 'showProgressBar', valueConverter: booleanConverter });
-export const progressBarColorProperty = new Property<ImageBase, string>({ name: 'progressBarColor', defaultValue: undefined });
+export const showProgressBarProperty = new Property<ImageBase, boolean>({ name: 'showProgressBar', valueConverter: booleanConverter, defaultValue: false });
+export const progressBarColorProperty = new Property<ImageBase, Color>({ name: 'progressBarColor', valueConverter: colorConverter });
 export const roundAsCircleProperty = new Property<ImageBase, boolean>({ name: 'roundAsCircle', valueConverter: booleanConverter, affectsLayout: isAndroid });
 export const blurRadiusProperty = new Property<ImageBase, number>({ name: 'blurRadius', valueConverter: (v) => parseFloat(v) });
 export const blurDownSamplingProperty = new Property<ImageBase, number>({ name: 'blurDownSampling', valueConverter: (v) => parseFloat(v) });
@@ -275,7 +283,7 @@ export abstract class ImageBase extends View {
     public progressiveRenderingEnabled: boolean;
     public localThumbnailPreviewsEnabled: boolean;
     public showProgressBar: boolean;
-    public progressBarColor: string;
+    public progressBarColor: Color;
     public roundAsCircle: boolean;
     public roundBottomRightRadius: number;
     public roundTopLeftRadius: number;
@@ -293,6 +301,7 @@ export abstract class ImageBase extends View {
     public alwaysFade: boolean;
     public noCache: boolean;
     public tintColor: Color;
+    headers: Record<string, string>;
 
     public readonly isLoading: boolean;
 
@@ -394,6 +403,7 @@ export abstract class ImageBase extends View {
     }
 }
 srcProperty.register(ImageBase);
+headersProperty.register(ImageBase);
 lowerResSrcProperty.register(ImageBase);
 placeholderImageUriProperty.register(ImageBase);
 failureImageUriProperty.register(ImageBase);

@@ -1,5 +1,5 @@
 export * from './index-common';
-import { ImageAsset, ImageSource, Screen, Trace, Utils, knownFolders, path } from '@nativescript/core';
+import { Color, ImageAsset, ImageSource, Screen, Trace, Utils, knownFolders, path } from '@nativescript/core';
 import { layout } from '@nativescript/core/utils/layout-helper';
 import { isString } from '@nativescript/core/utils/types';
 import {
@@ -13,8 +13,11 @@ import {
     SrcType,
     Stretch,
     failureImageUriProperty,
+    headersProperty,
     imageRotationProperty,
     placeholderImageUriProperty,
+    progressBarColorProperty,
+    showProgressBarProperty,
     srcProperty,
     stretchProperty,
     wrapNativeException
@@ -521,7 +524,35 @@ export class Img extends ImageBase {
                         context.setValueForKey(value, k);
                     });
                 }
+
+                if (this.headers) {
+                    const requestModifier = SDWebImageDownloaderRequestModifier.requestModifierWithBlock((request: NSURLRequest): NSURLRequest => {
+                        const newRequest = request.mutableCopy() as NSMutableURLRequest;
+                        Object.keys(this.headers).forEach((k) => {
+                            newRequest.addValueForHTTPHeaderField(this.headers[k], k);
+                        });
+
+                        return newRequest.copy();
+                    });
+
+                    context.setValueForKey(requestModifier, SDWebImageContextDownloadRequestModifier);
+                }
+
                 this.mCacheKey = SDWebImageManager.sharedManager.cacheKeyForURLContext(uri, context);
+                if (this.showProgressBar) {
+                    try {
+                        if (this.progressBarColor) {
+                            const indicator = new SDWebImageActivityIndicator();
+                            indicator.indicatorView.color = this.progressBarColor.ios;
+                            this.nativeImageViewProtected.sd_imageIndicator = indicator;
+                        } else {
+                            this.nativeImageViewProtected.sd_imageIndicator = SDWebImageActivityIndicator.grayIndicator;
+                        }
+                    } catch (ex) {
+                        console.error(ex);
+                    }
+                }
+
                 this.nativeImageViewProtected.sd_setImageWithURLPlaceholderImageOptionsContextProgressCompleted(
                     uri,
                     this.placeholderImage,
@@ -547,9 +578,19 @@ export class Img extends ImageBase {
     }
     placeholderImage: UIImage;
     @needRequestImage
-    [placeholderImageUriProperty.setNative]() {
-        // this.placeholderImage = this.getUIImage(this.placeholderImageUri);
-        // this.initImage();
+    [placeholderImageUriProperty.setNative]() {}
+
+    @needRequestImage
+    [showProgressBarProperty.setNative](value) {
+        this.showProgressBar = value;
+    }
+
+    [progressBarColorProperty.setNative](value) {
+        this.progressBarColor = value;
+    }
+
+    @needRequestImage
+    [headersProperty.setNative](value) {
     }
 
     [failureImageUriProperty.setNative]() {

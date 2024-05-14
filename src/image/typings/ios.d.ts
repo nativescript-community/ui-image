@@ -6,6 +6,8 @@ declare namespace NSURL {
     export function sd_URLWithAssetLocalIdentifier(identifier: string): NSURL;
 }
 declare interface UIImageView {
+    sd_imageIndicator: SDWebImageIndicator;
+
     sd_setHighlightedImageWithURL(url: NSURL): void;
 
     sd_setHighlightedImageWithURLCompleted(url: NSURL, completedBlock: (p1: UIImage, p2: NSError, p3: SDImageCacheType, p4: NSURL) => void): void;

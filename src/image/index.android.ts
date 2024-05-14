@@ -19,6 +19,7 @@ import {
     blurRadiusProperty,
     fadeDurationProperty,
     failureImageUriProperty,
+    headersProperty,
     imageRotationProperty,
     lowerResSrcProperty,
     needRequestImage,
@@ -47,24 +48,27 @@ export function initialize(config?: ImagePipelineConfigSetting): void {
             return;
         }
         let builder: com.facebook.imagepipeline.core.ImagePipelineConfig.Builder;
-        const useOkhttp = config?.useOkhttp;
+        const useOkhttp = config?.useOkhttp !== false;
         if (useOkhttp) {
             //@ts-ignore
+            let client: okhttp3.OkHttpClient;
+            //@ts-ignore
             if (useOkhttp instanceof okhttp3.OkHttpClient) {
-                builder = com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory.newBuilder(context, useOkhttp);
+                client = useOkhttp;
             } else {
                 //@ts-ignore
-                builder = com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory.newBuilder(context, new okhttp3.OkHttpClient());
+                client = new okhttp3.OkHttpClient();
             }
+            builder = com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory.newBuilder(context, client);
+            builder.setNetworkFetcher(new com.nativescript.image.OkHttpNetworkFetcher(client));
         } else {
             builder = com.facebook.imagepipeline.core.ImagePipelineConfig.newBuilder(context);
         }
-        if (config?.isDownsampleEnabled) {
-            builder.setDownsampleEnabled(true);
-        }
+        builder.setDownsampleEnabled(config?.isDownsampleEnabled === true);
         if (config?.leakTracker) {
             builder.setCloseableReferenceLeakTracker(config.leakTracker);
         }
+
         // builder.experiment().setNativeCodeDisabled(true);
         const imagePipelineConfig = builder.build();
         com.facebook.drawee.backends.pipeline.Fresco.initialize(context, imagePipelineConfig);
@@ -550,6 +554,11 @@ export class Img extends ImageBase {
         this.initImage();
     }
 
+    @needRequestImage
+    [headersProperty.setNative](value) {
+        this.initImage();
+    }
+
     [backgroundInternalProperty.setNative](value: Background) {
         super[backgroundInternalProperty.setNative](value);
         this.nativeViewProtected.setClipToOutline(value?.hasBorderRadius());
@@ -732,7 +741,8 @@ export class Img extends ImageBase {
                     lowerResSrc: this.lowerResSrc ? getUri(this.lowerResSrc, false) : undefined,
                     blurDownSampling: this.blurDownSampling,
                     autoPlayAnimations: this.autoPlayAnimations,
-                    tapToRetryEnabled: this.tapToRetryEnabled
+                    tapToRetryEnabled: this.tapToRetryEnabled,
+                    headers: this.headers
                 });
                 view.setUri(uri, options, this.controllerListener);
                 // const async = this.loadMode === 'async';
@@ -833,7 +843,7 @@ export class Img extends ImageBase {
             }
 
             if (this.showProgressBar) {
-                builder.setProgressBarImage(this.progressBarColor, this.stretch);
+                builder.setProgressBarImage(this.progressBarColor?.hex, this.stretch);
             }
 
             if (this.roundAsCircle) {

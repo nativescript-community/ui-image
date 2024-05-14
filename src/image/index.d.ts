@@ -195,6 +195,11 @@ export class Img extends View {
     decodeHeight: number;
 
     /**
+     * add custom headers to the image download request
+     */
+    headers: Record<string, string>;
+
+    /**
      * IOS: if you want to show animated images you need to set this to true
      */
     animatedImageView: boolean;
@@ -445,6 +450,8 @@ export enum ScaleType {
  */
 export interface ImagePipelineConfigSetting {
     isDownsampleEnabled?: boolean;
+    leakTracker?: any; // Android only
+    useOkhttp?: boolean; // Android only
 }
 export const ImageViewTraceCategory;
 
