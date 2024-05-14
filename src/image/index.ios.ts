@@ -19,7 +19,7 @@ import {
     stretchProperty,
     wrapNativeException
 } from './index-common';
-import { FailureEventData } from '@nativescript-community/ui-image';
+import { FailureEventData, GetContextFromOptionsCallback } from '@nativescript-community/ui-image';
 
 export class ImageInfo implements ImageInfoBase {
     constructor(
@@ -103,6 +103,10 @@ export function initialize(config?: ImagePipelineConfigSetting): void {
 }
 export function shutDown(): void {}
 
+let pluginsGetContextFromOptions = new Set<GetContextFromOptionsCallback>();
+export function registerPluginGetContextFromOptions(callback: GetContextFromOptionsCallback) {
+    pluginsGetContextFromOptions.add(callback)
+}
 function getContextFromOptions(options: Partial<Img>) {
     const context: NSDictionary<string, any> = NSMutableDictionary.dictionary();
     const transformers = [];
@@ -134,12 +138,10 @@ function getContextFromOptions(options: Partial<Img>) {
             )
         );
     }
-    if (options.mCIFilter) {
-        transformers.push(SDImageFilterTransformer.transformerWithFilter(options.mCIFilter));
-    }
     if (transformers.length > 0) {
         context.setValueForKey(SDImagePipelineTransformer.transformerWithTransformers(transformers), SDWebImageContextImageTransformer);
     }
+    pluginsGetContextFromOptions.forEach(c=>c(context, transformers, options));
     return context;
 }
 
@@ -279,7 +281,6 @@ export class Img extends ImageBase {
         return this.mCacheKey;
     }
     protected mImageSourceAffectsLayout: boolean = true;
-    mCIFilter: CIFilter;
     public createNativeView() {
         const result = this.animatedImageView ? SDAnimatedImageView.new() : UIImageView.new();
         result.contentMode = UIViewContentMode.ScaleAspectFit;

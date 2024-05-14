@@ -74,7 +74,7 @@ export class Img extends View {
     /**
      * String value used for the image URI.
      */
-    src: string | ImageSource | ImageAsset | Promise<string | ImageSource | ImageAsset>;
+    src: SrcType;
 
     /**
      * String value used for the lower res image URI.
@@ -447,3 +447,7 @@ export interface ImagePipelineConfigSetting {
     isDownsampleEnabled?: boolean;
 }
 export const ImageViewTraceCategory;
+
+export type GetContextFromOptionsCallback = (context: NSDictionary<string, any>, transformers:any[], options: Partial<Img>)=>void
+
+declare function registerPluginGetContextFromOptions(callback: GetContextFromOptionsCallback); // iOS only for plugins
