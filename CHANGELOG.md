@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.5.2](https://github.com/@nativescript-community/ui-image/compare/v4.5.1...v4.5.2) (2024-05-14)
+
+### Bug Fixes
+
+* **image:** ios added `ImagePipeline.iosComplexCacheEviction` ([3ec2029](https://github.com/@nativescript-community/ui-image/commit/3ec2029412fbf07517adbd1dec6ac24d1ae38085))
+* **zoomimage:** error fix when setting image to null ([8b3bf20](https://github.com/@nativescript-community/ui-image/commit/8b3bf206f65b0504f9f953f3a72157158ce94b58))
+
 ## [4.5.1](https://github.com/@nativescript-community/ui-image/compare/v4.5.0...v4.5.1) (2024-04-25)
 
 ### Bug Fixes
