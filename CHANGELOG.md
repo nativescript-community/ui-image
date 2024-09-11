@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.5.3](https://github.com/@nativescript-community/ui-image/compare/v4.5.2...v4.5.3) (2024-09-11)
+
+### Bug Fixes
+
+* **image:** ios fix for when ZoomImage is used inside a pager ([db6ed69](https://github.com/@nativescript-community/ui-image/commit/db6ed6958473c48ad799ef7154f58a9cf3841a3a))
+
 ## [4.5.2](https://github.com/@nativescript-community/ui-image/compare/v4.5.1...v4.5.2) (2024-05-14)
 
 ### Bug Fixes
