@@ -128,6 +128,29 @@ function getUri(src: string | ImageAsset, asNative = true) {
     return asNative ? android.net.Uri.parse(uri) : uri;
 }
 
+function isVectorDrawable(context: android.content.Context, resId: number) {
+    const resources = context.getResources();
+    // VectorDrawable resources are usually stored as "drawable" in XML format
+    const value = new android.util.TypedValue();
+    resources.getValue(resId, value, true);
+    if (value.string.toString().endsWith('.xml')) {
+        // It's most likely a VectorDrawable
+        return true;
+    }
+    // If it's not a vector, it's probably a BitmapDrawable or another type
+    return false;
+}
+function getBitmapFromVectorDrawable(context: android.content.Context, drawableId) {
+    const drawable = Utils.android.getApplicationContext().getDrawable(drawableId);
+    const bitmap = android.graphics.Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), android.graphics.Bitmap.Config.ARGB_8888);
+    const canvas = new android.graphics.Canvas(bitmap);
+    drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+    drawable.draw(canvas);
+    console.log('getBitmapFromVectorDrawable', bitmap, bitmap.getWidth(), bitmap.getHeight);
+
+    return new android.graphics.drawable.BitmapDrawable(context.getResources(), bitmap);
+}
+
 export class ImagePipeline {
     private _android: com.facebook.imagepipeline.core.ImagePipeline;
 
@@ -596,21 +619,30 @@ export class Img extends ImageBase {
                 return;
             }
             if (src) {
-                let drawable: android.graphics.drawable.BitmapDrawable;
-                if (src instanceof ImageSource) {
+                let drawable: android.graphics.drawable.Drawable;
+                if (typeof src === 'string') {
+                    // disabled for now: loading vector drawables
+                    // if (src.indexOf(Utils.RESOURCE_PREFIX) === 0) {
+                    //     const identifier = Utils.android.resources.getDrawableId(src.substring(Utils.RESOURCE_PREFIX.length));
+                    //     if (identifier >= 0 && isVectorDrawable(this._context, identifier)) {
+                    //         drawable = getBitmapFromVectorDrawable(this._context, identifier);
+                    //     }
+                    // } else 
+                    if (Utils.isFontIconURI(src)) {
+                        const fontIconCode = src.split('//')[1];
+                        if (fontIconCode !== undefined) {
+                            // support sync mode only
+                            const font = this.style.fontInternal;
+                            const color = this.style.color;
+                            drawable = new android.graphics.drawable.BitmapDrawable(
+                                Utils.android.getApplicationContext().getResources(),
+                                ImageSource.fromFontIconCodeSync(fontIconCode, font, color).android
+                            );
+                        }
+                    }
+                } else if (src instanceof ImageSource) {
                     drawable = new android.graphics.drawable.BitmapDrawable(Utils.android.getApplicationContext().getResources(), src.android as android.graphics.Bitmap);
                     this.updateViewSize(src.android);
-                } else if (Utils.isFontIconURI(src as string)) {
-                    const fontIconCode = (src as string).split('//')[1];
-                    if (fontIconCode !== undefined) {
-                        // support sync mode only
-                        const font = this.style.fontInternal;
-                        const color = this.style.color;
-                        drawable = new android.graphics.drawable.BitmapDrawable(
-                            Utils.android.getApplicationContext().getResources(),
-                            ImageSource.fromFontIconCodeSync(fontIconCode, font, color).android
-                        );
-                    }
                 }
                 if (drawable) {
                     const hierarchy: com.facebook.drawee.generic.GenericDraweeHierarchy = this.nativeImageViewProtected.getHierarchy();
