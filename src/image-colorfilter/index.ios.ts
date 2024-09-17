@@ -1,14 +1,30 @@
-import { Img } from '@nativescript-community/ui-image';
+import { Img, registerPluginGetContextFromOptions } from '@nativescript-community/ui-image';
 import { applyMixins, colorMatrixProperty, cssProperty } from './index-common';
 
 declare module '@nativescript-community/ui-image' {
     interface Img {
         mCIFilter: CIFilter;
+        colorMatrix: number[];
         initImage();
     }
 }
 
 const FloatConstructor = interop.sizeof(interop.types.id) === 4 ? Float32Array : Float64Array;
+
+function filterFromMatrix(matrix: number[], ciFilter: CIFilter = CIFilter.filterWithName('CIColorMatrix')) {
+    ciFilter.setValueForKey(CIVector.vectorWithValuesCount(new FloatConstructor(matrix.slice(0, 4)).buffer as any, 4), 'inputRVector');
+    ciFilter.setValueForKey(CIVector.vectorWithValuesCount(new FloatConstructor(matrix.slice(5, 9)).buffer as any, 4), 'inputGVector');
+    ciFilter.setValueForKey(CIVector.vectorWithValuesCount(new FloatConstructor(matrix.slice(10, 14)).buffer as any, 4), 'inputBVector');
+    ciFilter.setValueForKey(CIVector.vectorWithValuesCount(new FloatConstructor(matrix.slice(15, 19)).buffer as any, 4), 'inputAVector');
+    ciFilter.setValueForKey(CIVector.vectorWithValuesCount(new FloatConstructor([matrix[4], matrix[9], matrix[14], matrix[19]]).buffer as any, 4), 'inputBiasVector');
+    ciFilter.setName(JSON.stringify(matrix));
+}
+registerPluginGetContextFromOptions((context, transformers, options: Partial<Img>) => {
+    const ciFilter = options.mCIFilter ?? (options.colorMatrix ? filterFromMatrix(options.colorMatrix) : undefined);
+    if (ciFilter) {
+        transformers.push(SDImageFilterTransformer.transformerWithFilter(ciFilter));
+    }
+});
 
 class ImgExtended {
     nativeImageViewProtected: SDAnimatedImageView | UIImageView;
@@ -21,12 +37,7 @@ class ImgExtended {
             if (!this.mCIFilter) {
                 this.mCIFilter = CIFilter.filterWithName('CIColorMatrix');
             }
-            this.mCIFilter.setValueForKey(CIVector.vectorWithValuesCount(new FloatConstructor(value.slice(0, 4)).buffer as any, 4), 'inputRVector');
-            this.mCIFilter.setValueForKey(CIVector.vectorWithValuesCount(new FloatConstructor(value.slice(5, 9)).buffer as any, 4), 'inputGVector');
-            this.mCIFilter.setValueForKey(CIVector.vectorWithValuesCount(new FloatConstructor(value.slice(10, 14)).buffer as any, 4), 'inputBVector');
-            this.mCIFilter.setValueForKey(CIVector.vectorWithValuesCount(new FloatConstructor(value.slice(15, 19)).buffer as any, 4), 'inputAVector');
-            this.mCIFilter.setValueForKey(CIVector.vectorWithValuesCount(new FloatConstructor([value[4], value[9], value[14], value[19]]).buffer as any, 4), 'inputBiasVector');
-            this.mCIFilter.setName(JSON.stringify(value));
+            filterFromMatrix(value, this.mCIFilter);
         } else {
             this.mCIFilter = null;
         }

@@ -1,5 +1,6 @@
 export * from './index-common';
-import { Color, ImageAsset, ImageSource, Screen, Trace, Utils, knownFolders, path } from '@nativescript/core';
+import { ApplicationSettings, Color, ImageAsset, ImageSource, Screen, Trace, Utils, knownFolders, path } from '@nativescript/core';
+import { debounce } from '@nativescript/core/utils';
 import { layout } from '@nativescript/core/utils/layout-helper';
 import { isString } from '@nativescript/core/utils/types';
 import {
@@ -22,7 +23,7 @@ import {
     stretchProperty,
     wrapNativeException
 } from './index-common';
-import { FailureEventData } from '@nativescript-community/ui-image';
+import { FailureEventData, GetContextFromOptionsCallback } from '@nativescript-community/ui-image';
 
 export class ImageInfo implements ImageInfoBase {
     constructor(
@@ -106,6 +107,10 @@ export function initialize(config?: ImagePipelineConfigSetting): void {
 }
 export function shutDown(): void {}
 
+const pluginsGetContextFromOptions = new Set<GetContextFromOptionsCallback>();
+export function registerPluginGetContextFromOptions(callback: GetContextFromOptionsCallback) {
+    pluginsGetContextFromOptions.add(callback);
+}
 function getContextFromOptions(options: Partial<Img>) {
     const context: NSDictionary<string, any> = NSMutableDictionary.dictionary();
     const transformers = [];
@@ -137,16 +142,30 @@ function getContextFromOptions(options: Partial<Img>) {
             )
         );
     }
-    if (options.mCIFilter) {
-        transformers.push(SDImageFilterTransformer.transformerWithFilter(options.mCIFilter));
-    }
+    pluginsGetContextFromOptions.forEach((c) => c(context, transformers, options));
+
     if (transformers.length > 0) {
         context.setValueForKey(SDImagePipelineTransformer.transformerWithTransformers(transformers), SDWebImageContextImageTransformer);
     }
     return context;
 }
 
+// This is not the best solution as their might be a lot of corner cases
+// for example if an image is removed from cache without going through ImagePipeline
+// we wont know it and the cacheKeyMap will grow
+// but i dont see a better way right now
+const CACHE_KEYS_SETTING_KEY = 'NS_ui_image_cache_keys';
+let cacheKeyMap = JSON.parse(ApplicationSettings.getString(CACHE_KEYS_SETTING_KEY, '{}'));
+
+const saveCacheKeys = debounce(() => ApplicationSettings.setString(CACHE_KEYS_SETTING_KEY, JSON.stringify(cacheKeyMap)), 500);
+function registerCacheKey(cacheKey: string, uri: any) {
+    const set = new Set(cacheKeyMap[uri] || []);
+    set.add(cacheKey);
+    cacheKeyMap[uri] = [...set];
+    saveCacheKeys();
+}
 export class ImagePipeline {
+    static iosComplexCacheEviction = false;
     private mIos: SDImageCache = SDImageCache.sharedImageCache;
     constructor() {}
 
@@ -164,22 +183,32 @@ export class ImagePipeline {
     }
 
     evictFromMemoryCache(key: string): void {
-        this.mIos.removeImageFromMemoryForKey(key);
+        const cachekKeys = (cacheKeyMap[key] || []).concat([key]);
+        cachekKeys.forEach((k) => {
+            this.mIos.removeImageFromMemoryForKey(k);
+        });
     }
 
     async evictFromDiskCache(key: string) {
-        return new Promise<void>((resolve) => {
-            this.mIos.removeImageForKeyCacheTypeCompletion(key, SDImageCacheType.Disk, resolve);
-        });
+        return this.evictFromCache(key, SDImageCacheType.Disk);
     }
 
-    async evictFromCache(key: string) {
-        return new Promise<void>((resolve) => {
-            this.mIos.removeImageForKeyCacheTypeCompletion(key, SDImageCacheType.All, resolve);
-        });
+    async evictFromCache(key: string, type = SDImageCacheType.All) {
+        const cachekKeys = (cacheKeyMap[key] || []).concat([key]);
+        delete cacheKeyMap[key];
+        return Promise.all(
+            cachekKeys.map(
+                (k) =>
+                    new Promise<void>((resolve) => {
+                        this.mIos.removeImageForKeyCacheTypeCompletion(k, type, resolve);
+                    })
+            )
+        );
     }
 
     clearCaches() {
+        cacheKeyMap = {};
+        ApplicationSettings.remove(CACHE_KEYS_SETTING_KEY);
         this.mIos.clearMemory();
         this.mIos.clearDiskOnCompletion(null);
     }
@@ -282,7 +311,6 @@ export class Img extends ImageBase {
         return this.mCacheKey;
     }
     protected mImageSourceAffectsLayout: boolean = true;
-    mCIFilter: CIFilter;
     public createNativeView() {
         const result = this.animatedImageView ? SDAnimatedImageView.new() : UIImageView.new();
         result.contentMode = UIViewContentMode.ScaleAspectFit;
@@ -346,10 +374,9 @@ export class Img extends ImageBase {
         const src = this.src;
         const srcType = typeof src;
         if (src && (srcType === 'string' || src instanceof ImageAsset)) {
-            const cachekKey = this.mCacheKey || getUri(src as string | ImageAsset).absoluteString;
             // const isInCache = imagePipeLine.isInBitmapMemoryCache(cachekKey);
             // if (isInCache) {
-            await imagePipeLine.evictFromCache(cachekKey);
+            await imagePipeLine.evictFromCache(getUri(src as string | ImageAsset).absoluteString);
             // }
         }
         // this.src = null;
@@ -538,11 +565,14 @@ export class Img extends ImageBase {
                 }
 
                 this.mCacheKey = SDWebImageManager.sharedManager.cacheKeyForURLContext(uri, context);
+                if (ImagePipeline.iosComplexCacheEviction) {
+                    registerCacheKey(this.mCacheKey, uri);
+                }
                 if (this.showProgressBar) {
                     try {
                         if (this.progressBarColor) {
                             const indicator = new SDWebImageActivityIndicator();
-                            indicator.indicatorView.color = this.progressBarColor.ios;
+                            indicator.indicatorView.color = (this.progressBarColor as Color).ios;
                             this.nativeImageViewProtected.sd_imageIndicator = indicator;
                         } else {
                             this.nativeImageViewProtected.sd_imageIndicator = SDWebImageActivityIndicator.grayIndicator;
@@ -589,8 +619,7 @@ export class Img extends ImageBase {
     }
 
     @needRequestImage
-    [headersProperty.setNative](value) {
-    }
+    [headersProperty.setNative](value) {}
 
     [failureImageUriProperty.setNative]() {
         // this.updateHierarchy();

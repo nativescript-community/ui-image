@@ -1,4 +1,4 @@
-import { Color, CoreTypes, Length, Property, ShorthandProperty, Trace, View, booleanConverter } from '@nativescript/core';
+import { Color, CoreTypes, Length, Property, Trace, View, booleanConverter } from '@nativescript/core';
 import { EventData as IEventData } from '@nativescript/core/data/observable';
 // import { colorConverter } from '@nativescript/core/ui/styling/style-properties';
 import { ImageAsset } from '@nativescript/core/image-asset';
@@ -283,7 +283,7 @@ export abstract class ImageBase extends View {
     public progressiveRenderingEnabled: boolean;
     public localThumbnailPreviewsEnabled: boolean;
     public showProgressBar: boolean;
-    public progressBarColor: Color;
+    public progressBarColor: Color | string;
     public roundAsCircle: boolean;
     public roundBottomRightRadius: number;
     public roundTopLeftRadius: number;

@@ -176,7 +176,7 @@ open class ImageScrollView: UIScrollView {
     
   @objc  func updateForImage(_ size: CGSize) {
         imageSize = size
-        contentSize = imageSize
+        // contentSize = imageSize
 //        setMaxMinZoomScalesForCurrentBounds()
 //        zoomScale = minimumZoomScale
         
@@ -184,8 +184,8 @@ open class ImageScrollView: UIScrollView {
         case .begining:
             contentOffset =  CGPoint.zero
         case .center:
-            let xOffset = contentSize.width < bounds.width ? 0 : (contentSize.width - bounds.width)/2
-            let yOffset = contentSize.height < bounds.height ? 0 : (contentSize.height - bounds.height)/2
+            let xOffset = imageSize.width < bounds.width ? 0 : (imageSize.width - bounds.width)/2
+            let yOffset = imageSize.height < bounds.height ? 0 : (imageSize.height - bounds.height)/2
 
         switch _zoomView?.contentMode {
             case .scaleAspectFit:

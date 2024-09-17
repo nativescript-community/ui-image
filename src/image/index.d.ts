@@ -74,7 +74,7 @@ export class Img extends View {
     /**
      * String value used for the image URI.
      */
-    src: string | ImageSource | ImageAsset | Promise<string | ImageSource | ImageAsset>;
+    src: SrcType;
 
     /**
      * String value used for the lower res image URI.
@@ -127,7 +127,7 @@ export class Img extends View {
     /**
      * String value used for setting the color of the progress bar. Can be set to hex values ("#FF0000"") and predefined colors ("green").
      */
-    progressBarColor: string;
+    progressBarColor: Color | string;
 
     /**
      * Boolean value used for determining if the image should be rounded as a circle.
@@ -350,6 +350,12 @@ export interface AnimatedImage {
  */
 export class ImagePipeline {
     /**
+     * iOS: set this to true to enable complex cache handling
+     * this is necessary when you use colorMatrix, decodeWidth,...
+     * and when you change images on drive requiring cache image eviction
+     */
+    static iosComplexCacheEviction: boolean;
+    /**
      * Returns whether the image is stored in the bitmap memory cache.
      */
     isInBitmapMemoryCache(uri: string): boolean;
@@ -454,3 +460,7 @@ export interface ImagePipelineConfigSetting {
     useOkhttp?: boolean; // Android only
 }
 export const ImageViewTraceCategory;
+
+export type GetContextFromOptionsCallback = (context: NSDictionary<string, any>, transformers: any[], options: Partial<Img>) => void;
+
+declare function registerPluginGetContextFromOptions(callback: GetContextFromOptionsCallback); // iOS only for plugins

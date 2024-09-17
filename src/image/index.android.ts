@@ -875,7 +875,7 @@ export class Img extends ImageBase {
             }
 
             if (this.showProgressBar) {
-                builder.setProgressBarImage(this.progressBarColor?.hex, this.stretch);
+                builder.setProgressBarImage((this.progressBarColor as Color)?.hex, this.stretch);
             }
 
             if (this.roundAsCircle) {
