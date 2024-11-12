@@ -18,6 +18,11 @@ export class ZoomImg extends ZoomImageBase {
         return this.nativeViewProtected?.getZoomableController() as com.facebook.samples.zoomable.DefaultZoomableController;
     }
 
+    updateImageUri() {
+        // this prevents the controller from reseting the current transform
+        this.getController().ignoreNextResetUntilEnabled = true;
+        return super.updateImageUri();
+    }
     [zoomScaleProperty.setNative](scale: number) {
         //possible?
         // if (this.nativeViewProtected) {

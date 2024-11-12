@@ -213,6 +213,7 @@ declare namespace com {
                     public static LIMIT_TRANSLATION_Y: number = 2;
                     public static LIMIT_SCALE: number = 4;
                     public static LIMIT_ALL: number = 7;
+                    public ignoreNextResetUntilEnabled : boolean;
                     public mapViewToImage(param0: globalAndroid.graphics.PointF): globalAndroid.graphics.PointF;
                     public isIdentity(): boolean;
                     public wasTransformCorrected(): boolean;

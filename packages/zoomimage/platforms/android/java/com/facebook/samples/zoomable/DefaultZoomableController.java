@@ -72,6 +72,10 @@ public class DefaultZoomableController
   private final RectF mTempRect = new RectF();
   private boolean mWasTransformCorrected;
 
+  // used to not reset transform on updateImageUri ( controller update )
+  public boolean ignoreNextResetUntilEnabled = false;
+
+
   public static DefaultZoomableController newInstance() {
     return new DefaultZoomableController(TransformGestureDetector.newInstance());
   }
@@ -83,6 +87,9 @@ public class DefaultZoomableController
 
   /** Rests the controller. */
   public void reset() {
+    if (ignoreNextResetUntilEnabled) {
+      return;
+    }
     mGestureDetector.reset();
     mPreviousTransform.reset();
     mActiveTransform.reset();
@@ -101,6 +108,8 @@ public class DefaultZoomableController
     mIsEnabled = enabled;
     if (!enabled) {
       reset();
+    } else {
+      ignoreNextResetUntilEnabled = false;
     }
   }
 
