@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.5.4](https://github.com/@nativescript-community/ui-image/compare/v4.5.3...v4.5.4) (2024-11-12)
+
+### Bug Fixes
+
+* **zoomimage:** android fix for current zoom being reset on `updateImageUri` ([6a312cc](https://github.com/@nativescript-community/ui-image/commit/6a312ccec049a2b9e852bf34bd743ce949511d62))
+
 ## [4.5.3](https://github.com/@nativescript-community/ui-image/compare/v4.5.2...v4.5.3) (2024-09-11)
 
 ### Bug Fixes
