@@ -671,14 +671,14 @@ export class Img extends ImageBase {
                             if (Trace.isEnabled()) {
                                 CLog(CLogTypes.info, 'onFinalImageSet', id, imageInfo, animatable);
                             }
-                            const nativeView = that?.get();
-                            if (nativeView) {
-                                nativeView.updateViewSize(imageInfo);
-                                nativeView.isLoading = false;
+                            const owner = that?.get();
+                            if (owner) {
+                                owner.updateViewSize(imageInfo);
+                                owner.isLoading = false;
                                 const eventName = ImageBase.finalImageSetEvent;
-                                if (nativeView.hasListeners(eventName)) {
+                                if (owner.hasListeners(eventName)) {
                                     const info = new ImageInfo(imageInfo);
-                                    nativeView.notify({
+                                    owner.notify({
                                         eventName,
                                         imageInfo: info,
                                         animatable: animatable as AnimatedImage
@@ -690,14 +690,14 @@ export class Img extends ImageBase {
                             if (Trace.isEnabled()) {
                                 CLog(CLogTypes.info, 'onFailure', id, throwable.getLocalizedMessage());
                             }
-                            const nativeView = that?.get();
-                            if (nativeView) {
+                            const owner = that?.get();
+                            if (owner) {
                                 // const nView = nativeView.nativeViewProtected;
-                                nativeView.isLoading = false;
+                                owner.isLoading = false;
                                 const eventName = ImageBase.failureEvent;
-                                if (nativeView.hasListeners(eventName)) {
+                                if (owner.hasListeners(eventName)) {
                                     const imageError = new ImageError(throwable);
-                                    nativeView.notify({
+                                    owner.notify({
                                         eventName,
                                         error: wrapNativeException(throwable)
                                     } as FailureEventData);
@@ -708,11 +708,11 @@ export class Img extends ImageBase {
                             if (Trace.isEnabled()) {
                                 CLog(CLogTypes.info, 'onIntermediateImageFailed', id, throwable);
                             }
-                            const nativeView = that?.get();
-                            if (nativeView) {
+                            const owner = that?.get();
+                            if (owner) {
                                 const eventName = ImageBase.intermediateImageFailedEvent;
-                                if (nativeView.hasListeners(eventName)) {
-                                    nativeView.notify({
+                                if (owner.hasListeners(eventName)) {
+                                    owner.notify({
                                         eventName,
                                         error: wrapNativeException(throwable)
                                     } as FailureEventData);
@@ -723,13 +723,13 @@ export class Img extends ImageBase {
                             if (Trace.isEnabled()) {
                                 CLog(CLogTypes.info, 'onIntermediateImageSet', id, imageInfo);
                             }
-                            const nativeView = that?.get();
-                            if (nativeView) {
-                                nativeView.updateViewSize(imageInfo);
+                            const owner = that?.get();
+                            if (owner) {
+                                owner.updateViewSize(imageInfo);
                                 const eventName = ImageBase.intermediateImageSetEvent;
-                                if (nativeView.hasListeners(eventName)) {
+                                if (owner.hasListeners(eventName)) {
                                     const info = new ImageInfo(imageInfo);
-                                    nativeView.notify({
+                                    owner.notify({
                                         eventName,
                                         imageInfo: info
                                     } as IntermediateEventData);
@@ -740,11 +740,11 @@ export class Img extends ImageBase {
                             if (Trace.isEnabled()) {
                                 CLog(CLogTypes.info, 'onRelease', id);
                             }
-                            const nativeView = that?.get();
-                            if (nativeView) {
+                            const owner = that?.get();
+                            if (owner) {
                                 const eventName = ImageBase.releaseEvent;
-                                if (nativeView.hasListeners(eventName)) {
-                                    nativeView.notify({
+                                if (owner.hasListeners(eventName)) {
+                                    owner.notify({
                                         eventName
                                     } as EventData);
                                 }
@@ -754,10 +754,10 @@ export class Img extends ImageBase {
                             if (Trace.isEnabled()) {
                                 CLog(CLogTypes.info, 'onSubmit', id, callerContext);
                             }
-                            const nativeView = that?.get();
+                            const owner = that?.get();
                             const eventName = ImageBase.submitEvent;
-                            if (nativeView?.hasListeners(eventName)) {
-                                nativeView.notify({
+                            if (owner?.hasListeners(eventName)) {
+                                owner.notify({
                                     eventName
                                 } as EventData);
                             }
