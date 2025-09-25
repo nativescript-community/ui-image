@@ -59,7 +59,9 @@ export class ZoomImg extends ZoomImageBase {
 
     public onLayout(left: number, top: number, right: number, bottom: number): void {
         super.onLayout(left, top, right, bottom);
-        this.nativeImageViewProtected.frame = this.nativeViewProtected.bounds;
+        if (this.nativeViewProtected) {
+            this.nativeImageViewProtected.frame = this.nativeViewProtected.bounds;
+        }
     }
 
     [zoomScaleProperty.setNative](scale: number) {
