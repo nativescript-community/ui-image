@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/ui-image-colorfilter",
-    "version": "4.5.5",
+    "version": "4.5.6",
     "description": "color matrix filters for @nativescript-community/ui-image",
     "main": "./index",
     "sideEffects": false,
@@ -42,7 +42,7 @@
         "url": "https://github.com/nativescript-community/ui-image"
     },
     "dependencies": {
-        "@nativescript-community/ui-image": "^4.5.5"
+        "@nativescript-community/ui-image": "^4.5.6"
     },
     "license": "Apache-2.0",
     "readmeFilename": "README.md",

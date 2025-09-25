@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.5.6](https://github.com/@nativescript-community/ui-image/compare/v4.5.5...v4.5.6) (2025-09-25)
+
+### Bug Fixes
+
+* prevent error if OnLayout is called after unload ([0ac6cba](https://github.com/@nativescript-community/ui-image/commit/0ac6cbad7ce29c489eb92b5dea92586c8ce82683))
+
 ## [4.5.5](https://github.com/@nativescript-community/ui-image/compare/v4.5.4...v4.5.5) (2025-07-16)
 
 ### Bug Fixes
