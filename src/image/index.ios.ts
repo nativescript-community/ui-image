@@ -340,7 +340,7 @@ export class Img extends ImageBase {
         // if (Trace.isEnabled()) {
         //     CLog(CLogTypes.info, 'onMeasure', this.src, widthMeasureSpec, heightMeasureSpec, width, height, this.aspectRatio, image && image.imageOrientation);
         // }
-        if (image || this.aspectRatio > 0) {
+        if (image || this.aspectRatio > 0 || !this.noRatioEnforce) {
             const nativeWidth = image ? layout.toDevicePixels(image.size.width) : 0;
             const nativeHeight = image ? layout.toDevicePixels(image.size.height) : 0;
             const imgRatio = nativeWidth / nativeHeight;
@@ -364,6 +364,12 @@ export class Img extends ImageBase {
 
             if (Trace.isEnabled()) {
                 CLog(CLogTypes.info, 'onMeasure', this.src, this.aspectRatio, finiteWidth, finiteHeight, width, height, nativeWidth, nativeHeight, widthMeasureSpec, heightMeasureSpec);
+            }
+        } else {
+            if (!finiteWidth && finiteHeight) {
+                widthMeasureSpec = layout.makeMeasureSpec(0, layout.AT_MOST);
+            } else if (!finiteHeight && finiteWidth) {
+                heightMeasureSpec = layout.makeMeasureSpec(0, layout.AT_MOST);
             }
         }
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);

@@ -23,6 +23,7 @@ import {
     imageRotationProperty,
     lowerResSrcProperty,
     needRequestImage,
+    noRatioEnforceProperty,
     placeholderImageUriProperty,
     progressBarColorProperty,
     roundAsCircleProperty,
@@ -587,6 +588,10 @@ export class Img extends ImageBase {
         this.nativeViewProtected.setClipToOutline(value?.hasBorderRadius());
     }
 
+    [noRatioEnforceProperty.setNative](value: boolean) {
+        this.nativeViewProtected.noRatioEnforce = value;
+    }
+
     // [ImageBase.blendingModeProperty.setNative](value: string) {
     //     switch (value) {
     //         case 'multiply':
@@ -627,7 +632,7 @@ export class Img extends ImageBase {
                     //     if (identifier >= 0 && isVectorDrawable(this._context, identifier)) {
                     //         drawable = getBitmapFromVectorDrawable(this._context, identifier);
                     //     }
-                    // } else 
+                    // } else
                     if (Utils.isFontIconURI(src)) {
                         const fontIconCode = src.split('//')[1];
                         if (fontIconCode !== undefined) {

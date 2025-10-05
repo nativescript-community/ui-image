@@ -186,6 +186,7 @@ export const tintColorProperty = new Property<ImageBase, Color>({ name: 'tintCol
 export const alwaysFadeProperty = new Property<ImageBase, boolean>({ name: 'alwaysFade', valueConverter: booleanConverter, defaultValue: false });
 export const fadeDurationProperty = new Property<ImageBase, number>({ name: 'fadeDuration', valueConverter: (v) => parseFloat(v) });
 export const noCacheProperty = new Property<ImageBase, boolean>({ name: 'noCache', defaultValue: false, valueConverter: booleanConverter });
+export const noRatioEnforceProperty = new Property<ImageBase, boolean>({ name: 'noRatioEnforce', affectsLayout: true, defaultValue: false, valueConverter: booleanConverter });
 export const roundTopLeftRadiusProperty = new Property<ImageBase, CoreTypes.LengthType>({
     name: 'roundTopLeftRadius',
     defaultValue: 0,
@@ -300,6 +301,7 @@ export abstract class ImageBase extends View {
     public loadMode: 'sync' | 'async';
     public alwaysFade: boolean;
     public noCache: boolean;
+    public noRatioEnforce: boolean;
     public tintColor: Color;
     headers: Record<string, string>;
 
@@ -432,6 +434,7 @@ noCacheProperty.register(ImageBase);
 clipToBoundsProperty.register(ImageBase);
 animatedImageViewProperty.register(ImageBase);
 loadModeProperty.register(ImageBase);
+noRatioEnforceProperty.register(ImageBase);
 // roundRadiusProperty.register(ImageBase as any);
 
 // ImageBase.blendingModeProperty.register(ImageBase);

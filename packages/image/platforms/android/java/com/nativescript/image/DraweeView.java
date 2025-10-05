@@ -38,6 +38,7 @@ public class DraweeView extends SimpleDraweeView {
     public int imageWidth = 0;
     public int imageHeight = 0;
     public boolean isUsingOutlineProvider = false;
+    public boolean noRatioEnforce = false;
     private static Paint clipPaint;
 
     private boolean mLegacyVisibilityHandlingEnabled = false;
@@ -166,10 +167,11 @@ public class DraweeView extends SimpleDraweeView {
         int width = MeasureSpec.getSize(widthMeasureSpec);
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         int height = MeasureSpec.getSize(heightMeasureSpec);
+
+        boolean finiteWidth = widthMode == android.view.View.MeasureSpec.EXACTLY;
+        boolean finiteHeight = heightMode == android.view.View.MeasureSpec.EXACTLY;
         float aspectRatio = this.getAspectRatio();
-        if (aspectRatio > 0) {
-            boolean finiteWidth = widthMode == android.view.View.MeasureSpec.EXACTLY;
-            boolean finiteHeight = heightMode == android.view.View.MeasureSpec.EXACTLY;
+        if (aspectRatio > 0 && !this.noRatioEnforce) {
             Object scaleType = getHierarchy().getActualImageScaleType();
             if (scaleType instanceof AbstractScaleType) {
                 final float rotation = ((AbstractScaleType)scaleType).getImageRotation();
@@ -194,6 +196,13 @@ public class DraweeView extends SimpleDraweeView {
                         heightMeasureSpec = android.view.View.MeasureSpec.makeMeasureSpec((int) height, android.view.View.MeasureSpec.EXACTLY);
                     }
                 }
+            }
+        } else {
+            if (!finiteWidth && finiteHeight) {
+                widthMeasureSpec = android.view.View.MeasureSpec.makeMeasureSpec.makeMeasureSpec(0, android.view.View.MeasureSpec.AT_MOST);
+            }
+            else if (!finiteHeight && finiteWidth) {
+                heightMeasureSpec = android.view.View.MeasureSpec.makeMeasureSpec.makeMeasureSpec(0, android.view.View.MeasureSpec.AT_MOST);
             }
         }
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
