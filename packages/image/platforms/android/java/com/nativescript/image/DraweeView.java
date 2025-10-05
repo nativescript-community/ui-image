@@ -198,12 +198,6 @@ public class DraweeView extends SimpleDraweeView {
                 }
             }
         } else {
-            if (!finiteWidth && finiteHeight) {
-                widthMeasureSpec = android.view.View.MeasureSpec.makeMeasureSpec.makeMeasureSpec(0, android.view.View.MeasureSpec.AT_MOST);
-            }
-            else if (!finiteHeight && finiteWidth) {
-                heightMeasureSpec = android.view.View.MeasureSpec.makeMeasureSpec.makeMeasureSpec(0, android.view.View.MeasureSpec.AT_MOST);
-            }
         }
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
