@@ -353,8 +353,7 @@ export class Img extends ImageBase {
                 } else {
                     widthMeasureSpec = layout.makeMeasureSpec(0, layout.AT_MOST);
                 }
-            }
-            else if (!finiteHeight && finiteWidth) {
+            } else if (!finiteHeight && finiteWidth) {
                 if (!this.noRatioEnforce || this.verticalAlignment !== 'stretch') {
                     heightMeasureSpec = layout.makeMeasureSpec(width / ratio, layout.EXACTLY);
                 } else {
