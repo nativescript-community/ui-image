@@ -1,6 +1,18 @@
 import groovy.json.JsonSlurper
+
+// for now we support only @nativescript/core and @akylas/nativescript
+// we should have a more generic way
+def widgetsDir = "$USER_PROJECT_ROOT/node_modules/@nativescript/core/platforms/android"
+def appPackageJsonFile = file("$USER_PROJECT_ROOT/package.json")
+if (appPackageJsonFile.exists()) {
+    def appPackageJson = new JsonSlurper().parseText(appPackageJsonFile.text)
+    if (appPackageJson.dependencies['@akylas/nativescript'] != null) {
+        widgetsDir = "$USER_PROJECT_ROOT/node_modules/@akylas/nativescript/platforms/android"
+    }
+}
+
 dependencies {
-	def frescoVersion =  project.hasProperty("frescoVersion") ? project.frescoVersion : "3.6.0"
+	def frescoVersion =  project.hasProperty("frescoVersion") ? project.frescoVersion : "3.1.3"
 
 	implementation("com.facebook.fresco:fresco:$frescoVersion") {
         exclude group: 'com.facebook.soloader', module: 'soloader'
@@ -15,19 +27,19 @@ dependencies {
 	// implementation ("com.facebook.fresco:animated-gif:$frescoVersion") {
 	// 	exclude group: 'com.facebook.soloader', module: 'soloader'
 	// }
-    implementation(name:'widgets-release', ext:'aar')
+
+    // if ui-mobile-base is provided as source the name is nativescript.aar
+    if (file("$widgetsDir/nativescript.aar").exists()) {
+        implementation(name:'nativescript', ext:'aar')
+    }
+    // if ui-mobile-base is provided as aar the name is widget-release.aar
+    if (file("$widgetsDir/widget-release.aar").exists()) {
+        implementation(name:'widget-release', ext:'aar')
+    }
 }
 
 repositories {
 	mavenCentral()
-	def widgetsDir = "$USER_PROJECT_ROOT/node_modules/@nativescript/core/platforms/android"
-    def appPackageJsonFile = file("$USER_PROJECT_ROOT/package.json")
-    if (appPackageJsonFile.exists()) {
-        def appPackageJson = new JsonSlurper().parseText(appPackageJsonFile.text)
-        if (appPackageJson.dependencies['@akylas/nativescript'] != null) {
-            widgetsDir = "$USER_PROJECT_ROOT/node_modules/@akylas/nativescript/platforms/android"
-        }
-    }
     flatDir {
         dirs "$widgetsDir"
     }
