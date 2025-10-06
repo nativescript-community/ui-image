@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.6.0](https://github.com/@nativescript-community/ui-image/compare/v4.5.7...v4.6.0) (2025-10-06)
+
+### Features
+
+* **image:** new `noRatioEnforce` property ([66c2b91](https://github.com/@nativescript-community/ui-image/commit/66c2b91f61edc29b0bc41d90507d6206d6b96840))
+
 ## [4.5.7](https://github.com/@nativescript-community/ui-image/compare/v4.5.5...v4.5.7) (2025-09-25)
 
 ### Bug Fixes
