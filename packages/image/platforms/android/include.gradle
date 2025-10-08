@@ -40,7 +40,6 @@ dependencies {
             implementation(name:'nativescript', ext:'aar')
         }
     }
-    }
 }
 
 repositories {
