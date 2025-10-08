@@ -33,10 +33,10 @@ dependencies {
         }
 
         // if ui-mobile-base is provided as source the name is nativescript.aar
-        if (file("$widgetsDir/nativescript.aar").exists()) {
+	  	//else use widget-release.aar
+      	if (file("$widgetsDir/nativescript.aar").exists()) {
             implementation(name:'nativescript', ext:'aar')
         }
-        // if ui-mobile-base is provided as aar the name is widget-release.aar
         if (file("$widgetsDir/widget-release.aar").exists()) {
             implementation(name:'widget-release', ext:'aar')
         }
