@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.6.3](https://github.com/@nativescript-community/ui-image/compare/v4.6.2...v4.6.3) (2025-10-22)
+
+### Bug Fixes
+
+* **android:** regression update Fresco version to 3.6.0 ([189347e](https://github.com/@nativescript-community/ui-image/commit/189347eb38b623edefc9ee1145985f77c11bcee8))
+
 ## [4.6.2](https://github.com/@nativescript-community/ui-image/compare/v4.6.1...v4.6.2) (2025-10-08)
 
 ### Bug Fixes
