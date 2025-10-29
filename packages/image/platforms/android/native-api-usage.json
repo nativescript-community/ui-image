@@ -26,6 +26,7 @@
         "com.facebook.drawee.backends.pipeline.info:ImagePerfDataListener",
         "com.facebook.drawee.backends.pipeline.info:ImagePerfData",
         "com.facebook.drawee.controller:ControllerListener",
+        "com.nativescript.image:ScalingUtils*",
         "com.nativescript.image:DraweeView",
         "com.nativescript.image:OkHttpNetworkFetcher",
         "com.nativescript.image:ScalingBlurPostprocessor",
