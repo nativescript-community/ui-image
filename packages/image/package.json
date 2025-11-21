@@ -10,8 +10,8 @@
         "build.all": "npm run build && npm run build.angular",
         "build.angular": "ng-packagr -p ../../src/image/angular/ng-package.json -c ../../src/image/angular/tsconfig.json && rm angular/.npmignore",
         "readme": "readme generate -c ../../tools/readme/blueprint.json",
-        "tsc": "cpy '**/*.d.ts' '../../packages/image' --parents --cwd=../../src/image && tsc -skipLibCheck -d",
-        "clean": "rimraf ./*.d.ts ./*.js ./*.js.map"
+        "tsc": "cpy '**/*.d.ts' '../../packages/image' --parents --cwd=../../src/image && tsc  --build",
+        "clean": "bin/rimraf ./*.d.ts ./*.js ./*.js.map ./*.tsbuildinfo ./*.mjs ./*.mjs.map ./angular ./svelte ./vue* ./react"
     },
     "nativescript": {
         "platforms": {

@@ -3,9 +3,9 @@ pnpm-global/
 bin/
 hooks/
 *.ts
-*.map
 *.old
 tsconfig.json
 !*.d.ts
-*.ngsummary.json
-*.metadata.json
+*.aar
+*.jar
+blueprint.md

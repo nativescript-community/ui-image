@@ -9,8 +9,8 @@
         "build": "npm run tsc && npm run readme",
         "build.all": "npm run build",
         "readme": "readme generate -c ../../tools/readme/blueprint.json",
-        "tsc": "cpy '**/*.d.ts' '../../packages/image-colorfilter' --parents --cwd=../../src/image-colorfilter && tsc -skipLibCheck -d",
-        "clean": "rimraf ./*.d.ts ./*.js ./*.js.map"
+        "tsc": "cpy '**/*.d.ts' '../../packages/image-colorfilter' --parents --cwd=../../src/image-colorfilter && tsc  --build",
+        "clean": "bin/rimraf ./*.d.ts ./*.js ./*.js.map ./*.tsbuildinfo ./*.mjs ./*.mjs.map ./angular ./svelte ./vue* ./react"
     },
     "nativescript": {
         "platforms": {
