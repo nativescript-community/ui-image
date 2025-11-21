@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.6.6](https://github.com/@nativescript-community/ui-image/compare/v4.6.5...v4.6.6) (2025-11-21)
+
+### Bug Fixes
+
+* **android:** unwanted log ([73b1d5f](https://github.com/@nativescript-community/ui-image/commit/73b1d5fe093c638a7437b4d98706af21744db57c))
+
 ## [4.6.5](https://github.com/@nativescript-community/ui-image/compare/v4.6.4...v4.6.5) (2025-11-21)
 
 ### Bug Fixes
