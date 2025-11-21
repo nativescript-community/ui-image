@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.6.5](https://github.com/nativescript-community/ui-image/compare/v4.6.4...v4.6.5) (2025-11-21)
+
+### Bug Fixes
+
+* **android:** new fetchingFrom event to know when fetching from network ([e69c70f](https://github.com/nativescript-community/ui-image/commit/e69c70fb748886816d7ad7c4bb59e7d9ade4b2e1))
+
 ## [4.6.4](https://github.com/nativescript-community/ui-image/compare/v4.6.3...v4.6.4) (2025-10-29)
 
 ### Bug Fixes
