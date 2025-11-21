@@ -8,7 +8,7 @@ declare namespace com {
                 noRatioEnforce: boolean;
                 imageWidth: number;
                 imageHeight: number;
-                setUri(uri: globalAndroid.net.Uri, options: string, listener: facebook.drawee.controller.ControllerListener);
+                setUri(uri: globalAndroid.net.Uri, options: string, listener: facebook.drawee.controller.ControllerListener, requestListener: com.facebook.imagepipeline.listener.RequestListener);
             }
             class ScalingBlurPostprocessor extends facebook.imagepipeline.request.BasePostprocessor {
                 public constructor(iterations: number, blurRadius: number, scaleRatio: number);

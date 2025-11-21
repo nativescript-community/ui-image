@@ -272,6 +272,7 @@ export abstract class ImageBase extends View {
     public static intermediateImageSetEvent: string = 'intermediateImageSet';
     public static releaseEvent: string = 'release';
     public static submitEvent: string = 'submit';
+    public static fetchingFromEvent: string = 'fetchingFrom';
 
     public src: SrcType;
     public lowerResSrc: string;

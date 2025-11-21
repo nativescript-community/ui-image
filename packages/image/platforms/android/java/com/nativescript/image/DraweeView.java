@@ -272,8 +272,11 @@ public class DraweeView extends SimpleDraweeView {
         super.onDraw(canvas);
     }
 
-    public void setUri(android.net.Uri uri, String jsonOptions, com.facebook.drawee.controller.ControllerListener listener) {
-    ImageRequestBuilder requestBuilder = ImageRequestBuilder.newBuilderWithSource(uri).setRotationOptions( com.facebook.imagepipeline.common.RotationOptions.autoRotate());
+    public void setUri(android.net.Uri uri, String jsonOptions, com.facebook.drawee.controller.ControllerListener listener, com.facebook.imagepipeline.listener.RequestListener requestListener) {
+        ImageRequestBuilder requestBuilder = ImageRequestBuilder.newBuilderWithSource(uri).setRotationOptions( com.facebook.imagepipeline.common.RotationOptions.autoRotate());
+        if (requestListener != null) {
+            requestBuilder.setRequestListener(requestListener);
+        }
         JSONObject object = null;
         JSONObject headers = null;
         if (jsonOptions.length() > 2) {

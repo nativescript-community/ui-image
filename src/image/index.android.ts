@@ -459,6 +459,7 @@ export class Img extends ImageBase {
 
     public disposeNativeView() {
         this.controllerListener = null;
+        this.requestListener = null;
         // this.nativeImageViewProtected.setImageURI(null, null);
     }
     get cacheKey() {
@@ -608,6 +609,7 @@ export class Img extends ImageBase {
     // }
 
     controllerListener: com.facebook.drawee.controller.ControllerListener<com.facebook.imagepipeline.image.ImageInfo>;
+    requestListener: com.facebook.imagepipeline.listener.RequestListener;
 
     protected async handleImageSrc(src: SrcType) {
         const view = this.nativeViewProtected;
@@ -769,6 +771,41 @@ export class Img extends ImageBase {
                         }
                     });
                 }
+                if (!this.requestListener && this.hasListeners(ImageBase.fetchingFromEvent)) {
+                    const that: WeakRef<Img> = new WeakRef(this);
+                    this.requestListener =  new com.facebook.imagepipeline.listener.RequestListener({
+                        onRequestStart(request, callerContext, requestId, isPrefetch) {
+                            
+                        },
+                        onRequestSuccess(param0: com.facebook.imagepipeline.request.ImageRequest, param1: string, param2: boolean) {},
+                        onRequestFailure(param0: com.facebook.imagepipeline.request.ImageRequest, param1: string, param2: java.lang.Throwable, param3: boolean) {},
+                        onRequestCancellation(param0: string) {},
+                        onProducerStart(param0: string, param1: string) {},
+                        onProducerEvent(param0: string, param1: string, param2: string) {},
+                        onProducerFinishWithSuccess(requestId: string, producerName: string, extraMap: java.util.Map<string,string>) {
+                            console.log('onProducerFinishWithSuccess', producerName)
+                            const owner = that?.get();
+                            const eventName = ImageBase.fetchingFromEvent;
+                           
+                            if (owner?.hasListeners(eventName)) {
+                                 let source = 'local';
+                                if (producerName.indexOf('Network') !== -1) {
+                                    source = 'network'
+                                } else if (producerName.indexOf('Cache') !== -1) {
+                                    source = 'cache'
+                                }  
+                                owner.notify({
+                                    eventName,
+                                    source
+                                });
+                            }
+                        },
+                        onProducerFinishWithFailure(param0: string, param1: string, param2: java.lang.Throwable, param3: java.util.Map<string,string>) {},
+                        onProducerFinishWithCancellation(param0: string, param1: string, param2: java.util.Map<string,string>) {},
+                        onUltimateProducerReached(param0: string, param1: string, param2: boolean) {},
+                        requiresExtraMap(param0: string) { return false},
+                    })
+                }
                 const options = JSON.stringify({
                     progressiveRenderingEnabled: this.blurRadius,
                     localThumbnailPreviewsEnabled: this.blurRadius,
@@ -781,7 +818,7 @@ export class Img extends ImageBase {
                     tapToRetryEnabled: this.tapToRetryEnabled,
                     headers: this.headers
                 });
-                view.setUri(uri, options, this.controllerListener);
+                view.setUri(uri, options, this.controllerListener, this.requestListener);
                 // const async = this.loadMode === 'async';
                 // if (async) {
                 // const builder = com.facebook.drawee.backends.pipeline.Fresco.newDraweeControllerBuilder();
