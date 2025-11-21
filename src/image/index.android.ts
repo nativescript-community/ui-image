@@ -783,7 +783,6 @@ export class Img extends ImageBase {
                         onProducerStart(param0: string, param1: string) {},
                         onProducerEvent(param0: string, param1: string, param2: string) {},
                         onProducerFinishWithSuccess(requestId: string, producerName: string, extraMap: java.util.Map<string,string>) {
-                            console.log('onProducerFinishWithSuccess', producerName)
                             const owner = that?.get();
                             const eventName = ImageBase.fetchingFromEvent;
                            
