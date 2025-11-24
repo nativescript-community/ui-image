@@ -25,7 +25,7 @@
 	</p>
 
 <p align="center">
-  <b>Advanced and efficient image display plugin which uses Fresco (Android) and SDWebImage (iOS) to implement caching, placeholders, image effects, and much more.</b></br>
+  <b>Advanced and efficient image display plugin which uses Glide (Android) and SDWebImage (iOS) to implement caching, placeholders, image effects, and much more.</b></br>
   <sub><sub>
 </p>
 
@@ -84,7 +84,7 @@ Run the following command from the root of your project:
 import imageModule = require("@nativescript-community/ui-image");
 
 //do this before creating any image view
-imageModule.initialize({ isDownsampleEnabled: true });
+imageModule.initialize();
 ```
 
 
@@ -423,15 +423,13 @@ Number value used as the aspect ratio of the image. This property is useful when
 <@nativescript-community/ui-image:Img aspectRatio="1.33" verticalAlignment="top"/>
 ```
 
-- **decodeWidth** (downsampling) - make sure to enable downsample (**isDownsampleEnabled**) in the initialize function of the plugin otherwise this property is disregarded.
-
-Number value used as the downsampled width of the imageModule drawable.
+- **decodeWidth** (downsampling).
 
 ```xml
 <@nativescript-community/ui-image:Img decodeWidth="100"/>
 ```
 
-- **decodeHeight** (downsampling) - make sure to enable downsample (**isDownsampleEnabled**) in the initialize function of the plugin otherwise this property is disregarded.
+- **decodeHeight** (downsampling).
 
 Number value used as the downsampled width of the imageModule drawable.
 

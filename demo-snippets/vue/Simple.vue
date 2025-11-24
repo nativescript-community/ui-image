@@ -6,18 +6,29 @@
 
         <GridLayout rows="300, auto, auto, auto, auto, auto">
             <StackLayout orientation="horizontal">
-                <NSImg :showProgressBar="true" progressBarColor="green" backgroundColor="yellow" height="500" ref="opacityImg" borderRadius="10" width="50%" src="https://images.pexels.com/photos/842711/pexels-photo-842711.jpeg" stretch="aspectFit" />
-                <NSImg backgroundColor="red" width="50%" height="100" verticalAlignment="center" borderRadius="100" :src="imgSource"> </NSImg>
+                <NSImg
+                    ref="opacityImg"
+                    :showProgressBar="true"
+                    :noRatioEnforce="false"
+                    progressBarColor="green"
+                    backgroundColor="yellow"
+                    borderRadius="10"
+                    height="100"
+                    width="50%"
+                    src="https://images.pexels.com/photos/842711/pexels-photo-842711.jpeg"
+                    :stretch="stretch"
+                />
+                <NSImg backgroundColor="red" width="50%" height="300" borderRadius="100" :src="imgSource" :noRatioEnforce="true" :stretch="stretch" />
             </StackLayout>
             <WrapLayout row="1">
-                <Button text="rotateLeft" @tap="onRotateLeft"></Button>
-                <Button text="rotateRight" @tap="onRotateRight"></Button>
-                <Button text="stretch" @tap="onStretch"></Button>
-                <Button text="Set 1" @tap="onSeOpacityTo1"></Button>
-                <Button text="Set 0.5" @tap="onSeOpacityTo05"></Button>
-                <Button text="Set 0.1" @tap="onSeOpacityTo01"></Button>
-                <Button text="Animate to 0.1" @tap="onAnimateTo01"></Button>
-                <Button text="Animate to 1" @tap="onAnimateTo1"></Button>
+                <Button text="rotateLeft" @tap="onRotateLeft" />
+                <Button text="rotateRight" @tap="onRotateRight" />
+                <Button text="stretch" @tap="onStretch" />
+                <Button text="Set 1" @tap="onSeOpacityTo1" />
+                <Button text="Set 0.5" @tap="onSeOpacityTo05" />
+                <Button text="Set 0.1" @tap="onSeOpacityTo01" />
+                <Button text="Animate to 0.1" @tap="onAnimateTo01" />
+                <Button text="Animate to 1" @tap="onAnimateTo1" />
             </WrapLayout>
         </GridLayout>
     </Page>
@@ -41,7 +52,8 @@ export default {
     data() {
         return {
             // warning image source native android image will not be released!
-            imgSource: ImageSource.fromFileSync('~/assets/images/drink.jpg')
+            imgSource: ImageSource.fromFileSync('~/assets/images/drink.jpg'),
+            stretch: 'aspectFit'
         };
     },
     methods: {
@@ -71,18 +83,11 @@ export default {
             } catch (err) {
             } finally {
                 imageView.imageRotation = imageRotation;
-
             }
         },
         async onStretch() {
-            const imageView = this.$refs.opacityImg.nativeView as Img;
-            const stretch = EnumX.of(ScaleType).next(imageView.stretch as ScaleType);
-            console.log('onStretch', imageView.stretch, stretch);
-            try {
-                imageView.stretch = stretch;
-            } catch (err) {
-                console.error(err);
-            }
+            this.stretch = EnumX.of(ScaleType).next(this.stretch as ScaleType);
+            console.log('stretch', this.stretch);
         },
         onSeOpacityTo1(args) {
             this.$refs.opacityImg.nativeView.opacity = 1;

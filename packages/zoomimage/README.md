@@ -73,7 +73,7 @@ Run the following command from the root of your project:
 import imageModule = require("@nativescript-community/ui-zoomimage");
 
 //do this before creating any image view
-imageModule.initialize({ isDownsampleEnabled: true });
+imageModule.initialize();
 ```
 
 This component directly inherint `@nativescript-community/ui-image` so you can find the doc [here]()

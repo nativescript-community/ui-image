@@ -1,23 +1,28 @@
 import groovy.json.JsonSlurper
 
 
-
+repositories {
+	mavenCentral()
+	maven { url 'https://jitpack.io' }
+}
 dependencies {
-	def frescoVersion =  project.hasProperty("frescoVersion") ? project.frescoVersion : "3.6.0"
+	def glideVersion =  project.hasProperty("glideVersion") ? project.glideVersion : "5.0.5"
+	def glideCompilerVersion =  project.hasProperty("glideCompilerVersion") ? project.glideCompilerVersion : "4.16.0"
+	def glideTransformationsVersion =  project.hasProperty("glideTransformationsVersion") ? project.glideTransformationsVersion : "4.3.0"
+	def glideOkHttpVersion =  project.hasProperty("glideOkHttpVersion") ? project.glideOkHttpVersion : "4.11.0"
 
-	implementation("com.facebook.fresco:fresco:$frescoVersion") {
-        exclude group: 'com.facebook.soloader', module: 'soloader'
-		exclude group: 'com.facebook.fresco', module: 'soloader'
-	}
-	implementation("com.facebook.fresco:imagepipeline-okhttp3:$frescoVersion") {
-		exclude group: 'com.facebook.soloader', module: 'soloader'
-	}
-    implementation("com.facebook.fresco:middleware:$frescoVersion")
-    implementation("com.facebook.fresco:nativeimagetranscoder:$frescoVersion")
-    implementation 'com.facebook.infer.annotation:infer-annotation:0.18.0'
-	// implementation ("com.facebook.fresco:animated-gif:$frescoVersion") {
-	// 	exclude group: 'com.facebook.soloader', module: 'soloader'
-	// }
+    def androidXAppCompatVersion = "${ns_default_androidx_appcompat_version}"
+    if (project.hasProperty("androidXAppCompat")) {
+        androidXAppCompatVersion = androidXAppCompat
+        outLogger.withStyle(Style.SuccessHeader).println "\t + using android X library androidx.appcompat:appcompat:$androidXAppCompatVersion"
+    }
+    implementation "androidx.appcompat:appcompat:$androidXAppCompatVersion"
+
+
+    implementation "com.github.bumptech.glide:glide:$glideVersion"
+    annotationProcessor "com.github.bumptech.glide:compiler:$glideCompilerVersion"
+    implementation "jp.wasabeef:glide-transformations:$glideTransformationsVersion"
+    implementation "com.github.bumptech.glide:okhttp3-integration:$glideOkHttpVersion"
 
     if (project.hasProperty("tempBuild")) {
 		// we need to copy the code in both places as N main gradle system does not support top level code

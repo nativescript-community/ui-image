@@ -1,22 +1,27 @@
 export * from './index-common';
-import { Application, Background, Color, ImageAsset, ImageSource, Trace, Utils, backgroundInternalProperty, knownFolders, path } from '@nativescript/core';
+import { Background, Color, ImageAsset, ImageSource, Trace, Utils, backgroundInternalProperty, knownFolders, path } from '@nativescript/core';
 import { isString } from '@nativescript/core/utils/types';
 import { layout } from '@nativescript/core/utils/layout-helper';
 import {
     AnimatedImage,
     CLog,
     CLogTypes,
-    EventData,
+    FailureEventData,
+    FinalEventData,
     ImageBase,
     ImageError as ImageErrorBase,
     ImageInfo as ImageInfoBase,
     ImagePipelineConfigSetting,
+    LoadSourceEventData,
+    ProgressEventData,
     ScaleType,
     SrcType,
     aspectRatioProperty,
     backgroundUriProperty,
     blurDownSamplingProperty,
     blurRadiusProperty,
+    decodeHeightProperty,
+    decodeWidthProperty,
     fadeDurationProperty,
     failureImageUriProperty,
     headersProperty,
@@ -37,58 +42,242 @@ import {
     tintColorProperty,
     wrapNativeException
 } from './index-common';
-import { FailureEventData } from '@nativescript-community/ui-image';
 
 let initialized = false;
-let initializeConfig: ImagePipelineConfigSetting;
+let glideInstance: com.bumptech.glide.Glide;
+// global signature to invalidate all cache if needed by plugin
+let signature: com.bumptech.glide.signature.ObjectKey;
+const globalSignatureKey = 'v1';
+
 export function initialize(config?: ImagePipelineConfigSetting): void {
     if (!initialized) {
         const context = Utils.android.getApplicationContext();
         if (!context) {
-            initializeConfig = config;
             return;
         }
-        let builder: com.facebook.imagepipeline.core.ImagePipelineConfig.Builder;
-        const useOkhttp = config?.useOkhttp !== false;
-        if (useOkhttp) {
-            //@ts-ignore
-            let client: okhttp3.OkHttpClient;
-            //@ts-ignore
-            if (useOkhttp instanceof okhttp3.OkHttpClient) {
-                client = useOkhttp;
-            } else {
-                //@ts-ignore
-                client = new okhttp3.OkHttpClient();
-            }
-            builder = com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory.newBuilder(context, client);
-            builder.setNetworkFetcher(new com.nativescript.image.OkHttpNetworkFetcher(client));
-        } else {
-            builder = com.facebook.imagepipeline.core.ImagePipelineConfig.newBuilder(context);
+        if (config?.usePersistentCacheKeyStore) {
+            const sharedStore = new com.nativescript.image.SharedPrefCacheKeyStore(context.getApplicationContext());
+            com.nativescript.image.EvictionManager.get().setPersistentStore(sharedStore);
         }
-        builder.setDownsampleEnabled(config?.isDownsampleEnabled === true);
-        if (config?.leakTracker) {
-            builder.setCloseableReferenceLeakTracker(config.leakTracker);
-        }
+        // bumping `v1` will invalidate all cache
+        signature = new com.bumptech.glide.signature.ObjectKey(config?.globalSignatureKey ?? globalSignatureKey);
 
-        // builder.experiment().setNativeCodeDisabled(true);
-        const imagePipelineConfig = builder.build();
-        com.facebook.drawee.backends.pipeline.Fresco.initialize(context, imagePipelineConfig);
         initialized = true;
-        initializeConfig = null;
+        glideInstance = com.bumptech.glide.Glide.get(context);
+        com.nativescript.image.EvictionManager.get().clearAll();
+
+        // this is needed for further buildKey to trigger ...
+        com.bumptech.glide.Glide.with(context)
+            .load('toto?ts=' + Date().valueOf())
+            .apply(new com.bumptech.glide.request.RequestOptions().signature(new com.bumptech.glide.signature.ObjectKey(Date().valueOf())))
+            .preload();
+        // com.nativescript.image.EngineKeyFactoryMethodDumper.dumpKeyFactoryMethods(glideInstance);
+        // com.nativescript.image.ForcePreloadTest.forcePreloadAfterInjection(context, 'https://example.com/test-image.png');
     }
 }
 
-let imagePineLine: ImagePipeline;
-export function getImagePipeline(): ImagePipeline {
-    if (!imagePineLine) {
-        if (Application.android.nativeApp) {
-            const nativePipe = com.facebook.drawee.backends.pipeline.Fresco.getImagePipeline();
-            imagePineLine = new ImagePipeline();
-            imagePineLine.android = nativePipe;
+export class ImagePipeline {
+    toUri(value: string | android.net.Uri) {
+        if (value instanceof android.net.Uri) {
+            return value.toString();
         }
+        return value;
     }
 
-    return imagePineLine;
+    getCacheKey(uri: string, context) {
+        return uri;
+    }
+
+    isInDiskCache(uri: string | android.net.Uri): Promise<boolean> {
+        const url = this.toUri(uri);
+        return new Promise<boolean>((resolve, reject) => {
+            com.nativescript.image.EvictionManager.get().isInDiskCacheAsync(
+                url,
+                new com.nativescript.image.EvictionManager.DiskPresenceCallback({
+                    onResult(source, transform) {
+                        resolve(source || transform);
+                    }
+                })
+            );
+        });
+    }
+
+    isInBitmapMemoryCache(uri: string | android.net.Uri): boolean {
+        // Still not directly accessible, but we can check if it's registered
+        const url = this.toUri(uri);
+        return com.nativescript.image.EvictionManager.get().isInMemoryCache(url);
+    }
+
+    evictFromMemoryCache(uri: string | android.net.Uri): Promise<void> {
+        const url = this.toUri(uri);
+        return new Promise<void>((resolve, reject) => {
+            com.nativescript.image.EvictionManager.get().evictMemoryForId(
+                url,
+                new com.nativescript.image.EvictionManager.EvictionCallback({
+                    onComplete(success: boolean, error) {
+                        if (success) {
+                            resolve();
+                        } else {
+                            if (Trace.isEnabled()) {
+                                CLog(CLogTypes.error, error);
+                            }
+                            reject(error);
+                        }
+                    }
+                })
+            );
+        });
+    }
+
+    evictFromDiskCache(uri: string | android.net.Uri): Promise<void> {
+        const url = this.toUri(uri);
+        return new Promise<void>((resolve, reject) => {
+            com.nativescript.image.EvictionManager.get().evictDiskForId(
+                url,
+                new com.nativescript.image.EvictionManager.EvictionCallback({
+                    onComplete(success: boolean, error) {
+                        if (success) {
+                            resolve();
+                        } else {
+                            if (Trace.isEnabled()) {
+                                CLog(CLogTypes.error, error);
+                            }
+                            reject(error);
+                        }
+                    }
+                })
+            );
+        });
+    }
+
+    evictFromCache(uri: string | android.net.Uri): Promise<void> {
+        const url = this.toUri(uri);
+        return new Promise<void>((resolve, reject) => {
+            com.nativescript.image.EvictionManager.get().evictAllForId(
+                url,
+                new com.nativescript.image.EvictionManager.EvictionCallback({
+                    onComplete(success: boolean, error) {
+                        if (success) {
+                            resolve();
+                        } else {
+                            if (Trace.isEnabled()) {
+                                CLog(CLogTypes.error, error);
+                            }
+                            reject(error);
+                        }
+                    }
+                })
+            );
+        });
+    }
+
+    clearCaches(): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            com.nativescript.image.EvictionManager.get().clearAll(
+                new com.nativescript.image.EvictionManager.EvictionCallback({
+                    onComplete(success: boolean, error) {
+                        if (success) {
+                            resolve();
+                        } else {
+                            if (Trace.isEnabled()) {
+                                CLog(CLogTypes.error, error);
+                            }
+                            reject(error);
+                        }
+                    }
+                })
+            );
+        });
+    }
+
+    clearMemoryCaches(): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            com.nativescript.image.EvictionManager.get().clearMemory(
+                new com.nativescript.image.EvictionManager.EvictionCallback({
+                    onComplete(success: boolean, error) {
+                        if (success) {
+                            resolve();
+                        } else {
+                            if (Trace.isEnabled()) {
+                                CLog(CLogTypes.error, error);
+                            }
+                            reject(error);
+                        }
+                    }
+                })
+            );
+        });
+    }
+
+    clearDiskCaches(): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            com.nativescript.image.EvictionManager.get().clearDiskCache(
+                new com.nativescript.image.EvictionManager.EvictionCallback({
+                    onComplete(success: boolean, error) {
+                        if (success) {
+                            resolve();
+                        } else {
+                            if (Trace.isEnabled()) {
+                                CLog(CLogTypes.error, error);
+                            }
+                            reject(error);
+                        }
+                    }
+                })
+            );
+        });
+    }
+
+    prefetchToDiskCache(uri: string): Promise<void> {
+        return this.prefetchToCache(uri, true);
+    }
+
+    prefetchToMemoryCache(uri: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            try {
+                const context = Utils.android.getApplicationContext();
+                const requestManager = com.bumptech.glide.Glide.with(context);
+
+                // Preload into memory cache
+                requestManager.asBitmap().load(uri).preload();
+
+                // Give Glide time to load into memory
+                setTimeout(() => resolve(), 100);
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
+    private prefetchToCache(uri: string, toDiskCache: boolean): Promise<void> {
+        return new Promise((resolve, reject) => {
+            try {
+                const context = Utils.android.getApplicationContext();
+                const requestManager = com.bumptech.glide.Glide.with(context);
+
+                if (toDiskCache) {
+                    requestManager.downloadOnly().load(uri).submit();
+                } else {
+                    requestManager.asBitmap().load(uri).submit();
+                }
+                resolve();
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
+    get android(): any {
+        return glideInstance;
+    }
+}
+
+let imagePipeLine: ImagePipeline;
+export function getImagePipeline(): ImagePipeline {
+    if (!imagePipeLine) {
+        imagePipeLine = new ImagePipeline();
+    }
+    return imagePipeLine;
 }
 
 export function shutDown(): void {
@@ -96,9 +285,13 @@ export function shutDown(): void {
         return;
     }
     initialized = false;
-    com.facebook.drawee.view.SimpleDraweeView.shutDown();
-    com.facebook.drawee.backends.pipeline.Fresco.shutDown();
+    // Glide cleanup
+    const context = Utils.android.getApplicationContext();
+    if (context) {
+        com.bumptech.glide.Glide.get(context).clearMemory();
+    }
 }
+
 function getUri(src: string | ImageAsset, asNative = true) {
     let uri: string;
     let imagePath: string;
@@ -112,174 +305,17 @@ function getUri(src: string | ImageAsset, asNative = true) {
             const resName = imagePath.substring(Utils.RESOURCE_PREFIX.length);
             const identifier = Utils.android.resources.getDrawableId(resName);
             if (0 < identifier) {
-                const netUri = new android.net.Uri.Builder().scheme(com.facebook.common.util.UriUtil.LOCAL_RESOURCE_SCHEME).path(java.lang.String.valueOf(identifier)).build();
-                if (asNative) {
-                    return netUri;
-                }
-                uri = netUri.toString();
+                return `android.resource://${Utils.android.getApplicationContext().getPackageName()}/${identifier}`;
             }
         } else if (imagePath.indexOf('~/') === 0) {
-            uri = `file:${path.join(knownFolders.currentApp().path, imagePath.replace('~/', ''))}`;
+            uri = `file://${path.join(knownFolders.currentApp().path, imagePath.replace('~/', ''))}`;
         } else if (imagePath.indexOf('/') === 0) {
-            uri = `file:${imagePath}`;
+            uri = `file://${imagePath}`;
         }
     } else {
         uri = imagePath;
     }
-    return asNative ? android.net.Uri.parse(uri) : uri;
-}
-
-function isVectorDrawable(context: android.content.Context, resId: number) {
-    const resources = context.getResources();
-    // VectorDrawable resources are usually stored as "drawable" in XML format
-    const value = new android.util.TypedValue();
-    resources.getValue(resId, value, true);
-    if (value.string.toString().endsWith('.xml')) {
-        // It's most likely a VectorDrawable
-        return true;
-    }
-    // If it's not a vector, it's probably a BitmapDrawable or another type
-    return false;
-}
-function getBitmapFromVectorDrawable(context: android.content.Context, drawableId) {
-    const drawable = Utils.android.getApplicationContext().getDrawable(drawableId);
-    const bitmap = android.graphics.Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), android.graphics.Bitmap.Config.ARGB_8888);
-    const canvas = new android.graphics.Canvas(bitmap);
-    drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-    drawable.draw(canvas);
-    console.log('getBitmapFromVectorDrawable', bitmap, bitmap.getWidth(), bitmap.getHeight);
-
-    return new android.graphics.drawable.BitmapDrawable(context.getResources(), bitmap);
-}
-
-export class ImagePipeline {
-    private _android: com.facebook.imagepipeline.core.ImagePipeline;
-
-    toUri(value: string | android.net.Uri) {
-        if (value instanceof android.net.Uri) {
-            return value;
-        }
-        return android.net.Uri.parse(value);
-    }
-
-    getCacheKey(uri: string, context) {
-        // iOS only
-        return uri;
-    }
-
-    isInDiskCache(uri: string | android.net.Uri): boolean {
-        return this._android.isInDiskCacheSync(this.toUri(uri));
-    }
-
-    isInBitmapMemoryCache(uri: string | android.net.Uri): boolean {
-        return this._android.isInBitmapMemoryCache(this.toUri(uri));
-    }
-
-    evictFromMemoryCache(uri: string | android.net.Uri): void {
-        this._android.evictFromMemoryCache(this.toUri(uri));
-    }
-
-    async evictFromDiskCache(uri: string | android.net.Uri) {
-        this._android.evictFromDiskCache(this.toUri(uri));
-    }
-
-    async evictFromCache(uri: string | android.net.Uri) {
-        this._android.evictFromCache(this.toUri(uri));
-    }
-
-    clearCaches() {
-        this._android.clearCaches();
-    }
-
-    clearMemoryCaches() {
-        this._android.clearMemoryCaches();
-    }
-
-    clearDiskCaches() {
-        this._android.clearDiskCaches();
-    }
-
-    prefetchToDiskCache(uri: string): Promise<void> {
-        return this.prefetchToCache(uri, true);
-    }
-
-    prefetchToMemoryCache(uri: string): Promise<void> {
-        return this.prefetchToCache(uri, false);
-    }
-
-    private prefetchToCache(uri: string, toDiskCache: boolean): Promise<void> {
-        return new Promise((resolve, reject) => {
-            try {
-                const nativeUri = android.net.Uri.parse(uri);
-                const request = com.facebook.imagepipeline.request.ImageRequestBuilder.newBuilderWithSource(nativeUri).build();
-                let datasource: com.facebook.datasource.DataSource<java.lang.Void>;
-                if (toDiskCache) {
-                    datasource = this._android.prefetchToDiskCache(request, uri);
-                } else {
-                    datasource = this._android.prefetchToBitmapCache(request, uri);
-                }
-                // initializeBaseDataSubscriber();
-                datasource.subscribe(
-                    new com.nativescript.image.BaseDataSubscriber(
-                        new com.nativescript.image.BaseDataSubscriberListener({
-                            onFailure: reject,
-                            onNewResult: resolve as any
-                        })
-                    ),
-                    com.facebook.common.executors.CallerThreadExecutor.getInstance()
-                );
-            } catch (error) {
-                reject(error);
-            }
-        });
-    }
-
-    get android(): any {
-        return this._android;
-    }
-
-    set android(value: any) {
-        this._android = value;
-    }
-
-    fetchImage() {
-        //         ImagePipeline imagePipeline = Fresco.getImagePipeline();
-        // ImageRequest imageRequest = ImageRequestBuilder
-        //        .newBuilderWithSource(imageUri)
-        //        .setRequestPriority(Priority.HIGH)
-        //        .setLowestPermittedRequestLevel(ImageRequest.RequestLevel.FULL_FETCH)
-        //        .build();
-        // DataSource<CloseableReference<CloseableImage>> dataSource =
-        //        imagePipeline.fetchDecodedImage(imageRequest, mContext);
-        // try {
-        //    dataSource.subscribe(new BaseBitmapDataSubscriber() {
-        //        @Override
-        //        public void onNewResultImpl(Bitmap bitmap) {
-        //            if (bitmap == null) {
-        //                Log.d(TAG, "Bitmap data source returned success, but bitmap null.");
-        //                return;
-        //            }
-        //            // The bitmap provided to this method is only guaranteed to be around
-        //            // for the lifespan of this method. The image pipeline frees the
-        //            // bitmap's memory after this method has completed.
-        //            //
-        //            // This is fine when passing the bitmap to a system process as
-        //            // Android automatically creates a copy.
-        //            //
-        //            // If you need to keep the bitmap around, look into using a
-        //            // BaseDataSubscriber instead of a BaseBitmapDataSubscriber.
-        //        }
-        //        @Override
-        //        public void onFailureImpl(DataSource dataSource) {
-        //            // No cleanup required here
-        //        }
-        //    }, CallerThreadExecutor.getInstance());
-        // } finally {
-        //    if (dataSource != null) {
-        //        dataSource.close();
-        //    }
-        // }
-    }
+    return uri;
 }
 
 export class ImageError implements ImageErrorBase {
@@ -308,77 +344,45 @@ export class ImageError implements ImageErrorBase {
 
 export interface QualityInfo {
     getQuality();
-
     isOfFullQuality();
-
     isOfGoodEnoughQuality();
 }
 
 export class ImageInfo implements ImageInfoBase {
-    private _nativeImageInfo: com.facebook.imagepipeline.image.ImageInfo;
+    private _width: number;
+    private _height: number;
 
-    constructor(imageInfo) {
-        this._nativeImageInfo = imageInfo;
+    constructor(width: number, height: number) {
+        this._width = width;
+        this._height = height;
     }
 
     getHeight(): number {
-        return this._nativeImageInfo.getHeight();
+        return this._height;
     }
 
     getWidth(): number {
-        return this._nativeImageInfo.getWidth();
+        return this._width;
     }
 
     getQualityInfo(): QualityInfo {
-        return this._nativeImageInfo.getQualityInfo();
+        return {
+            getQuality: () => 1,
+            isOfFullQuality: () => true,
+            isOfGoodEnoughQuality: () => true
+        };
     }
 }
 
-export class FinalEventData extends EventData {
-    private _imageInfo: ImageInfo;
-    private _animatable: AnimatedImage;
-
-    get imageInfo(): ImageInfo {
-        return this._imageInfo;
-    }
-
-    set imageInfo(value: ImageInfo) {
-        this._imageInfo = value;
-    }
-
-    get animatable(): AnimatedImage {
-        return this._animatable;
-    }
-
-    set animatable(value: AnimatedImage) {
-        this._animatable = value;
-    }
-    get android(): AnimatedImage {
-        return this._animatable;
-    }
-}
-
-export class IntermediateEventData extends EventData {
-    private _imageInfo: ImageInfo;
-
-    get imageInfo(): ImageInfo {
-        return this._imageInfo;
-    }
-
-    set imageInfo(value: ImageInfo) {
-        this._imageInfo = value;
-    }
-}
-
-export const needUpdateHierarchy = function (targetOrNeedsLayout: any, propertyKey?: string | Symbol, descriptor?: PropertyDescriptor): any {
+export const needUpdateHierarchy = function (targetOrNeedsLayout: any, propertyKey?: string | symbol, descriptor?: PropertyDescriptor): any {
     if (typeof targetOrNeedsLayout === 'boolean') {
-        return function (target2: any, propertyKey: string | Symbol, descriptor: PropertyDescriptor) {
+        return function (target2: any, propertyKey: string | symbol, descriptor: PropertyDescriptor) {
             const originalMethod = descriptor.value;
             descriptor.value = function (...args: any[]) {
                 if (!this.mCanUpdateHierarchy) {
                     this.mNeedUpdateHierarchy = true;
                     if (this.isLoaded && targetOrNeedsLayout) {
-                        const layoutParams = (this.nativeViewProtected as com.nativescript.image.DraweeView)?.getLayoutParams();
+                        const layoutParams = (this.nativeViewProtected as android.widget.ImageView)?.getLayoutParams();
                         if (layoutParams) {
                             if (layout.getMeasureSpecMode(layoutParams.height) !== layout.EXACTLY || layout.getMeasureSpecMode(layoutParams.width) !== layout.EXACTLY) {
                                 this.mNeedUpdateLayout = true;
@@ -402,16 +406,26 @@ export const needUpdateHierarchy = function (targetOrNeedsLayout: any, propertyK
 };
 
 export class Img extends ImageBase {
-    nativeViewProtected: com.nativescript.image.DraweeView;
-    // @ts-ignore
-    nativeImageViewProtected: com.nativescript.image.DraweeView;
+    //TODO: remove as it needs to be added after TS 5.7 change https://github.com/microsoft/TypeScript/pull/59860
+    [key: symbol]: (...args: any[]) => any | void;
+
+    nativeViewProtected: com.nativescript.image.MatrixImageView;
+    //@ts-expect-error just for declaration
+    nativeImageViewProtected: com.nativescript.image.MatrixImageView;
     isLoading = false;
 
     mCanUpdateHierarchy = true;
     mNeedUpdateHierarchy = false;
     mNeedUpdateLayout = false;
+
+    private currentRequestBuilder: any = null;
+    private currentDrawable: android.graphics.drawable.Drawable = null;
+    private currentTarget: any = null;
+    private isNetworkRequest = false;
+    private progressCallback: any = null;
+    private loadSourceCallback: any = null;
+
     public onResumeNativeUpdates(): void {
-        // {N} suspends properties update on `_suspendNativeUpdates`. So we only need to do this in onResumeNativeUpdates
         this.mCanUpdateHierarchy = false;
         super.onResumeNativeUpdates();
         this.mCanUpdateHierarchy = true;
@@ -424,44 +438,34 @@ export class Img extends ImageBase {
             this.nativeViewProtected.requestLayout();
         }
     }
+
     public createNativeView() {
         if (!initialized) {
-            initialize(initializeConfig);
+            initialize();
         }
-        const view = new com.nativescript.image.DraweeView(this._context);
-        // (view as any).setClipToBounds(false);
-        return view;
+        return new com.nativescript.image.MatrixImageView(this._context);
     }
-    updateViewSize(imageInfo) {
-        const draweeView = this.nativeImageViewProtected;
-        if (!draweeView) {
+
+    updateViewSize(drawable: android.graphics.drawable.Drawable) {
+        const view = this.nativeImageViewProtected;
+        if (!view) {
             return;
         }
-        if (imageInfo != null) {
-            draweeView.imageWidth = imageInfo.getWidth();
-            draweeView.imageHeight = imageInfo.getHeight();
-        }
-        if (!this.aspectRatio && imageInfo != null) {
-            const ratio = imageInfo.getWidth() / imageInfo.getHeight();
 
-            draweeView.setAspectRatio(ratio);
-        } else if (this.aspectRatio) {
-            draweeView.setAspectRatio(this.aspectRatio);
-        } else {
-            draweeView.setAspectRatio(0);
+        const width = drawable ? drawable.getIntrinsicWidth() : 0;
+        const height = drawable ? drawable.getIntrinsicHeight() : 0;
+        if (drawable != null) {
+            view.setImageSize(width, height);
         }
     }
-
-    // public initNativeView(): void {
-    //     this.initDrawee();
-    //     this.updateHierarchy();
-    // }
 
     public disposeNativeView() {
-        this.controllerListener = null;
-        this.requestListener = null;
-        // this.nativeImageViewProtected.setImageURI(null, null);
+        this.currentRequestBuilder = null;
+        this.currentDrawable = null;
+        this.progressCallback = null;
+        this.loadSourceCallback = null;
     }
+
     get cacheKey() {
         const src = this.src;
         const srcType = typeof src;
@@ -470,14 +474,12 @@ export class Img extends ImageBase {
         }
         return undefined;
     }
+
     public async updateImageUri() {
         const imagePipeLine = getImagePipeline();
         const cacheKey = this.cacheKey;
         if (cacheKey) {
-            // const isInCache = imagePipeLine.isInBitmapMemoryCache(uri);
-            // // if (isInCache) {
             await imagePipeLine.evictFromCache(cacheKey);
-            // }
         }
         this.handleImageSrc(null);
         this.initImage();
@@ -493,9 +495,14 @@ export class Img extends ImageBase {
         this.updateHierarchy();
     }
 
-    @needUpdateHierarchy
     [stretchProperty.setNative]() {
-        this.updateHierarchy();
+        // Scale type
+        if (this.stretch) {
+            const scaleType = getScaleType(this.stretch);
+            if (scaleType) {
+                this.nativeViewProtected.setScaleType(scaleType);
+            }
+        }
     }
 
     @needUpdateHierarchy
@@ -527,11 +534,12 @@ export class Img extends ImageBase {
     [roundTopLeftRadiusProperty.setNative]() {
         this.updateHierarchy();
     }
+
     @needUpdateHierarchy(true)
     [imageRotationProperty.setNative](value) {
-        const scaleType = this.nativeImageViewProtected.getHierarchy().getActualImageScaleType();
-        scaleType['setImageRotation']?.(value);
-        this.nativeImageViewProtected.invalidate();
+        if (this.nativeImageViewProtected) {
+            this.nativeImageViewProtected.setImageRotation(value);
+        }
     }
 
     @needUpdateHierarchy
@@ -549,18 +557,27 @@ export class Img extends ImageBase {
         this.updateHierarchy();
     }
 
-    @needUpdateHierarchy
     [tintColorProperty.setNative](value: Color) {
-        this.updateHierarchy();
+        if (this.nativeImageViewProtected) {
+            this.nativeImageViewProtected.setColorFilter(value?.android ?? -1, android.graphics.PorterDuff.Mode.MULTIPLY);
+        }
     }
 
     @needRequestImage
-    [blurRadiusProperty.setNative]() {
+    [blurRadiusProperty.setNative](value) {
         this.initImage();
     }
 
     @needRequestImage
     [srcProperty.setNative]() {
+        this.initImage();
+    }
+    @needRequestImage
+    [decodeWidthProperty.setNative]() {
+        this.initImage();
+    }
+    @needRequestImage
+    [decodeHeightProperty.setNative]() {
         this.initImage();
     }
 
@@ -575,8 +592,10 @@ export class Img extends ImageBase {
     }
 
     @needRequestImage
-    [aspectRatioProperty.setNative]() {
-        this.initImage();
+    [aspectRatioProperty.setNative](value) {
+        if (this.nativeViewProtected) {
+            this.nativeViewProtected.setAspectRatio(value || 0);
+        }
     }
 
     @needRequestImage
@@ -586,289 +605,399 @@ export class Img extends ImageBase {
 
     [backgroundInternalProperty.setNative](value: Background) {
         super[backgroundInternalProperty.setNative](value);
-        this.nativeViewProtected.setClipToOutline(value?.hasBorderRadius());
+        if (this.nativeViewProtected) {
+            this.nativeViewProtected.setClipToOutline(value?.hasBorderRadius());
+        }
     }
 
     [noRatioEnforceProperty.setNative](value: boolean) {
-        this.nativeViewProtected.noRatioEnforce = value;
+        if (this.nativeViewProtected) {
+            this.nativeViewProtected.setNoRatioEnforce(value);
+        }
     }
 
-    // [ImageBase.blendingModeProperty.setNative](value: string) {
-    //     switch (value) {
-    //         case 'multiply':
-    //             (this.nativeImageViewProtected as any).setXfermode(android.graphics.PorterDuff.Mode.MULTIPLY);
-    //             break;
-    //         case 'lighten':
-    //             (this.nativeImageViewProtected as any).setXfermode(android.graphics.PorterDuff.Mode.LIGHTEN);
-    //             break;
-    //     }
-    // }
+    private loadImageWithGlide(uri: string) {
+        const view = this.nativeViewProtected;
+        const context = this._context;
+        // Determine if this is a network request
+        this.isNetworkRequest = typeof uri === 'string' && (uri.startsWith('http://') || uri.startsWith('https://'));
 
-    // private initDrawee() {
-    //     this.initImage();
-    // }
+        let requestBuilder: com.bumptech.glide.RequestBuilder<globalAndroid.graphics.drawable.Drawable>;
+        let loadModel: any = uri;
+        // Create callbacks separately based on what's needed
+        const needsProgress = this.isNetworkRequest && this.hasListeners(ImageBase.progressEvent);
+        const needsLoadSource = this.isNetworkRequest && this.hasListeners('loadSource');
 
-    controllerListener: com.facebook.drawee.controller.ControllerListener<com.facebook.imagepipeline.image.ImageInfo>;
-    requestListener: com.facebook.imagepipeline.listener.RequestListener;
+        // Create progress callback if needed (only for network requests with listener)
+        if (needsProgress) {
+            const owner = new WeakRef(this);
+
+            this.progressCallback = new com.nativescript.image.ImageProgressCallback({
+                onProgress(url: string, bytesRead: number, totalBytes: number) {
+                    const instance = owner.get();
+                    if (instance) {
+                        const progress = totalBytes > 0 ? bytesRead / totalBytes : 0;
+                        instance.notifyProgress({
+                            loaded: bytesRead,
+                            total: totalBytes,
+                            progress,
+                            finished: bytesRead >= totalBytes
+                        });
+                    }
+                }
+            });
+        }
+
+        // Create load source callback if needed (separate from progress)
+        if (needsLoadSource) {
+            const owner = new WeakRef(this);
+            this.loadSourceCallback = new com.nativescript.image.ImageLoadSourceCallback({
+                onLoadStarted(url: string, source: string) {
+                    const instance = owner.get();
+                    if (instance) {
+                        instance.notifyLoadSource(source);
+                    }
+                }
+            });
+        }
+        // Use CustomGlideUrl if we need headers, progress, or load source
+        if (this.isNetworkRequest && (this.headers || this.progressCallback || this.loadSourceCallback)) {
+            const headersMap = new java.util.HashMap();
+
+            if (this.headers) {
+                for (const key in this.headers) {
+                    headersMap.put(key, this.headers[key]);
+                }
+            }
+
+            loadModel = new com.nativescript.image.CustomGlideUrl(
+                uri,
+                headersMap,
+                this.progressCallback, // Can be null
+                this.loadSourceCallback // Can be null
+            );
+        }
+        requestBuilder = com.bumptech.glide.Glide.with(context).load(loadModel).signature(new com.bumptech.glide.signature.ObjectKey(Date().valueOf()));
+
+        // Apply transformations (blur, rounded corners, etc.)
+        const transformations = [];
+
+        if (this.blurRadius) {
+            transformations.push(new jp.wasabeef.glide.transformations.BlurTransformation(Math.round(this.blurRadius), this.blurDownSampling || 1));
+        }
+
+        if (this.roundAsCircle) {
+            transformations.push(new jp.wasabeef.glide.transformations.CropCircleTransformation());
+        } else {
+            const topLeft = Utils.layout.toDevicePixels(this.roundTopLeftRadius || 0);
+            const topRight = Utils.layout.toDevicePixels(this.roundTopRightRadius || 0);
+            const bottomRight = Utils.layout.toDevicePixels(this.roundBottomRightRadius || 0);
+            const bottomLeft = Utils.layout.toDevicePixels(this.roundBottomLeftRadius || 0);
+
+            if (topLeft || topRight || bottomRight || bottomLeft) {
+                const radius = Math.max(topLeft, topRight, bottomRight, bottomLeft);
+                transformations.push(
+                    new jp.wasabeef.glide.transformations.RoundedCornersTransformation(Math.round(radius), 0, jp.wasabeef.glide.transformations.RoundedCornersTransformation.CornerType.ALL)
+                );
+            }
+        }
+        // Tint color
+        if (this.tintColor) {
+            transformations.push(new jp.wasabeef.glide.transformations.ColorFilterTransformation(this.tintColor.android));
+        }
+        let multiTransform: com.bumptech.glide.load.MultiTransformation<any>;
+        if (transformations.length > 0) {
+            multiTransform = new com.bumptech.glide.load.MultiTransformation(java.util.Arrays.asList(transformations));
+            requestBuilder = requestBuilder.transform(multiTransform);
+        }
+
+        // Placeholder
+        if (this.placeholderImageUri) {
+            const placeholder = this.getDrawable(this.placeholderImageUri);
+            if (placeholder) {
+                requestBuilder = requestBuilder.placeholder(placeholder as any);
+            }
+        }
+
+        // Error image
+        if (this.failureImageUri) {
+            const error = this.getDrawable(this.failureImageUri);
+            if (error) {
+                requestBuilder = requestBuilder.error(error);
+            }
+        }
+
+        // Thumbnail
+        if (this.lowerResSrc) {
+            const lowerResUri = getUri(this.lowerResSrc);
+            if (lowerResUri) {
+                const thumbnailRequest = com.bumptech.glide.Glide.with(context).load(lowerResUri);
+                requestBuilder = requestBuilder.thumbnail(thumbnailRequest);
+            }
+        }
+
+        // Fade duration + conditional crossfade
+        if (this.fadeDuration > 0) {
+            const factory = new com.nativescript.image.ConditionalCrossFadeFactory(this.fadeDuration, !this.alwaysFade);
+            requestBuilder = requestBuilder.transition(com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade(factory));
+        }
+        // Cache settings
+        if (this.noCache) {
+            requestBuilder = requestBuilder.skipMemoryCache(true).diskCacheStrategy(com.bumptech.glide.load.engine.DiskCacheStrategy.NONE);
+        }
+
+        // Decode size
+        if (this.decodeWidth || this.decodeHeight) {
+            const Target = com.bumptech.glide.request.target.Target;
+            const width = this.decodeWidth || Target.SIZE_ORIGINAL;
+            const height = this.decodeHeight || Target.SIZE_ORIGINAL;
+            if (width === Target.SIZE_ORIGINAL) {
+                requestBuilder = requestBuilder.override(height);
+            } else if (height === Target.SIZE_ORIGINAL) {
+                requestBuilder = requestBuilder.override(width);
+            } else {
+                requestBuilder = requestBuilder.override(width, height);
+            }
+        }
+
+        const owner = new WeakRef(this);
+        const sourceKey = new com.bumptech.glide.signature.ObjectKey(uri);
+        const objectArr = Array.create(com.bumptech.glide.request.RequestListener, 2);
+        const ro = new com.bumptech.glide.request.RequestOptions().signature(signature);
+
+        objectArr[0] = new com.nativescript.image.SaveKeysRequestListener(
+            uri,
+            uri,
+            sourceKey,
+            signature,
+            this.decodeWidth || com.bumptech.glide.request.target.Target.SIZE_ORIGINAL,
+            this.decodeHeight || com.bumptech.glide.request.target.Target.SIZE_ORIGINAL,
+            multiTransform,
+            ro,
+            null
+        );
+        objectArr[1] = new com.bumptech.glide.request.RequestListener({
+            onLoadFailed(e: any, model: any, target: any, isFirstResource: boolean): boolean {
+                const instance = owner.get();
+                if (instance) {
+                    instance.isLoading = false;
+                    instance.progressCallback = null; // Clean up
+                    instance.loadSourceCallback = null;
+                    instance.notifyFailure(e);
+                }
+                return false;
+            },
+            onResourceReady(resource: android.graphics.drawable.Drawable, model: any, target: any, dataSource: any, isFirstResource: boolean): boolean {
+                const instance = owner.get();
+                if (instance) {
+                    instance.isLoading = false;
+                    instance.progressCallback = null; // Clean up
+                    instance.loadSourceCallback = null;
+
+                    instance.updateViewSize(resource);
+                    instance.notifyFinalImageSet(resource, dataSource);
+                    instance.currentDrawable = resource;
+
+                    // Handle auto-play for animated drawables
+                    if (!instance.autoPlayAnimations && resource instanceof android.graphics.drawable.Animatable) {
+                        setTimeout(() => {
+                            resource.stop();
+                        }, 0);
+                    }
+
+                    // Notify load source for cache hits (network notified by interceptor)
+                    let source = 'local';
+                    if (dataSource) {
+                        try {
+                            const sourceName = dataSource.name ? dataSource.name() : String(dataSource);
+                            switch ((sourceName || '').toUpperCase()) {
+                                case 'MEMORY_CACHE':
+                                    source = 'memory';
+                                    break;
+                                case 'DATA_DISK_CACHE':
+                                case 'RESOURCE_DISK_CACHE':
+                                    source = 'disk';
+                                    break;
+                                case 'REMOTE':
+                                    source = 'network';
+                                    break;
+                                case 'LOCAL':
+                                    source = 'local';
+                                    break;
+                            }
+                        } catch (err) {
+                            source = 'unknown';
+                        }
+                    }
+
+                    // Only notify if not network (network already notified by interceptor)
+                    if (source !== 'network' && instance.hasListeners('loadSource')) {
+                        instance.notifyLoadSource(source);
+                    }
+                }
+                return false;
+            }
+        });
+
+        // fallback to using the view as the target
+        requestBuilder.signature(signature).listener(new com.nativescript.image.CompositeRequestListener(objectArr)).into(new com.nativescript.image.MatrixDrawableImageViewTarget(view));
+        this.currentRequestBuilder = requestBuilder;
+    }
+
+    private notifyLoadSource(source: string) {
+        const eventName = ImageBase.loadSourceEvent;
+        if (this.hasListeners(eventName)) {
+            this.notify({
+                eventName,
+                source // 'network', 'memory', 'disk', 'local'
+            } as LoadSourceEventData);
+        }
+    }
+
+    public notifyProgress(payload: { loaded: number; total: number; progress: number; finished: boolean }) {
+        const eventName = ImageBase.progressEvent;
+        if (this.hasListeners(eventName)) {
+            this.notify({
+                eventName,
+                current: payload.loaded,
+                total: payload.total,
+                progress: payload.progress,
+                finished: payload.finished
+            } as ProgressEventData);
+        }
+    }
+
+    private notifyFinalImageSet(drawable: android.graphics.drawable.Drawable, dataSource?) {
+        let sourceLabel = 'local';
+        if (dataSource) {
+            try {
+                sourceLabel = dataSource.name ? dataSource.name() : String(dataSource);
+            } catch (err) {
+                sourceLabel = String(dataSource);
+            }
+
+            switch ((sourceLabel || '').toUpperCase()) {
+                case 'MEMORY_CACHE':
+                    sourceLabel = 'memory';
+                    break;
+                case 'DATA_DISK_CACHE':
+                case 'RESOURCE_DISK_CACHE':
+                    sourceLabel = 'disk';
+                    break;
+                case 'REMOTE':
+                    sourceLabel = 'network';
+                    break;
+                case 'LOCAL':
+                    sourceLabel = 'local';
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        const eventName = ImageBase.finalImageSetEvent;
+        if (this.hasListeners(eventName)) {
+            const width = drawable ? drawable.getIntrinsicWidth() : 0;
+            const height = drawable ? drawable.getIntrinsicHeight() : 0;
+            const info = new ImageInfo(width, height);
+
+            this.notify({
+                eventName,
+                imageInfo: info,
+                animatable: this.getAnimatable(drawable),
+                android: drawable,
+                source: sourceLabel
+            } as FinalEventData);
+        }
+    }
+
+    private notifyFailure(error: any) {
+        const eventName = ImageBase.failureEvent;
+        if (this.hasListeners(eventName)) {
+            this.notify({
+                eventName,
+                error: error instanceof java.lang.Throwable ? wrapNativeException(error) : error
+            } as FailureEventData);
+        }
+    }
+
+    private getAnimatable(drawable: android.graphics.drawable.Drawable): AnimatedImage | null {
+        if (drawable && drawable instanceof android.graphics.drawable.Animatable) {
+            return drawable as any;
+        }
+        return null;
+    }
 
     protected async handleImageSrc(src: SrcType) {
         const view = this.nativeViewProtected;
-        if (view) {
-            if (src instanceof Promise) {
-                this.handleImageSrc(await src);
-                return;
-            } else if (typeof src === 'function') {
-                const newSrc = src();
-                if (newSrc instanceof Promise) {
-                    await newSrc;
-                }
-                this.handleImageSrc(newSrc);
-                return;
+        if (!view) {
+            return;
+        }
+
+        if (src instanceof Promise) {
+            this.handleImageSrc(await src);
+            return;
+        } else if (typeof src === 'function') {
+            const newSrc = src();
+            if (newSrc instanceof Promise) {
+                await newSrc;
             }
-            if (src) {
-                let drawable: android.graphics.drawable.Drawable;
-                if (typeof src === 'string') {
-                    // disabled for now: loading vector drawables
-                    // if (src.indexOf(Utils.RESOURCE_PREFIX) === 0) {
-                    //     const identifier = Utils.android.resources.getDrawableId(src.substring(Utils.RESOURCE_PREFIX.length));
-                    //     if (identifier >= 0 && isVectorDrawable(this._context, identifier)) {
-                    //         drawable = getBitmapFromVectorDrawable(this._context, identifier);
-                    //     }
-                    // } else
-                    if (Utils.isFontIconURI(src)) {
-                        const fontIconCode = src.split('//')[1];
-                        if (fontIconCode !== undefined) {
-                            // support sync mode only
-                            const font = this.style.fontInternal;
-                            const color = this.style.color;
-                            drawable = new android.graphics.drawable.BitmapDrawable(
-                                Utils.android.getApplicationContext().getResources(),
-                                ImageSource.fromFontIconCodeSync(fontIconCode, font, color).android
-                            );
-                        }
+            this.handleImageSrc(newSrc);
+            return;
+        }
+
+        if (src) {
+            let drawable: android.graphics.drawable.Drawable;
+
+            if (typeof src === 'string') {
+                if (Utils.isFontIconURI(src)) {
+                    const fontIconCode = src.split('//')[1];
+                    if (fontIconCode !== undefined) {
+                        const font = this.style.fontInternal;
+                        const color = this.style.color;
+                        drawable = new android.graphics.drawable.BitmapDrawable(
+                            Utils.android.getApplicationContext().getResources(),
+                            ImageSource.fromFontIconCodeSync(fontIconCode, font, color).android
+                        );
                     }
-                } else if (src instanceof ImageSource) {
-                    drawable = new android.graphics.drawable.BitmapDrawable(Utils.android.getApplicationContext().getResources(), src.android as android.graphics.Bitmap);
-                    this.updateViewSize(src.android);
                 }
-                if (drawable) {
-                    const hierarchy: com.facebook.drawee.generic.GenericDraweeHierarchy = this.nativeImageViewProtected.getHierarchy();
-                    hierarchy.setImage(drawable, 1, hierarchy.getFadeDuration() === 0);
-                    return;
-                }
-                const uri = getUri(src as string) as android.net.Uri;
-                if (!uri) {
-                    console.error(`Error: 'src' not valid: ${src}`);
-                    return;
-                }
-                if (this.noCache) {
-                    // testing if is in cache is slow so lets remove without testing
-                    // const imagePipeLine = getImagePipeline();
-                    // const isInCache = imagePipeLine.isInBitmapMemoryCache(uri) || imagePipeLine.isInDiskCache(uri);
-                    // if (isInCache) {
-                    getImagePipeline().evictFromCache(uri);
-                    // }
-                }
-                this.isLoading = true;
-
-                if (!this.controllerListener) {
-                    const that: WeakRef<Img> = new WeakRef(this);
-                    this.controllerListener = new com.facebook.drawee.controller.ControllerListener<com.facebook.imagepipeline.image.ImageInfo>({
-                        onFinalImageSet(id, imageInfo, animatable) {
-                            if (Trace.isEnabled()) {
-                                CLog(CLogTypes.info, 'onFinalImageSet', id, imageInfo, animatable);
-                            }
-                            const owner = that?.get();
-                            if (owner) {
-                                owner.updateViewSize(imageInfo);
-                                owner.isLoading = false;
-                                const eventName = ImageBase.finalImageSetEvent;
-                                if (owner.hasListeners(eventName)) {
-                                    const info = new ImageInfo(imageInfo);
-                                    owner.notify({
-                                        eventName,
-                                        imageInfo: info,
-                                        animatable: animatable as AnimatedImage
-                                    } as FinalEventData);
-                                }
-                            }
-                        },
-                        onFailure(id, throwable) {
-                            if (Trace.isEnabled()) {
-                                CLog(CLogTypes.info, 'onFailure', id, throwable.getLocalizedMessage());
-                            }
-                            const owner = that?.get();
-                            if (owner) {
-                                // const nView = nativeView.nativeViewProtected;
-                                owner.isLoading = false;
-                                const eventName = ImageBase.failureEvent;
-                                if (owner.hasListeners(eventName)) {
-                                    const imageError = new ImageError(throwable);
-                                    owner.notify({
-                                        eventName,
-                                        error: wrapNativeException(throwable)
-                                    } as FailureEventData);
-                                }
-                            }
-                        },
-                        onIntermediateImageFailed(id, throwable) {
-                            if (Trace.isEnabled()) {
-                                CLog(CLogTypes.info, 'onIntermediateImageFailed', id, throwable);
-                            }
-                            const owner = that?.get();
-                            if (owner) {
-                                const eventName = ImageBase.intermediateImageFailedEvent;
-                                if (owner.hasListeners(eventName)) {
-                                    owner.notify({
-                                        eventName,
-                                        error: wrapNativeException(throwable)
-                                    } as FailureEventData);
-                                }
-                            }
-                        },
-                        onIntermediateImageSet(id, imageInfo) {
-                            if (Trace.isEnabled()) {
-                                CLog(CLogTypes.info, 'onIntermediateImageSet', id, imageInfo);
-                            }
-                            const owner = that?.get();
-                            if (owner) {
-                                owner.updateViewSize(imageInfo);
-                                const eventName = ImageBase.intermediateImageSetEvent;
-                                if (owner.hasListeners(eventName)) {
-                                    const info = new ImageInfo(imageInfo);
-                                    owner.notify({
-                                        eventName,
-                                        imageInfo: info
-                                    } as IntermediateEventData);
-                                }
-                            }
-                        },
-                        onRelease(id) {
-                            if (Trace.isEnabled()) {
-                                CLog(CLogTypes.info, 'onRelease', id);
-                            }
-                            const owner = that?.get();
-                            if (owner) {
-                                const eventName = ImageBase.releaseEvent;
-                                if (owner.hasListeners(eventName)) {
-                                    owner.notify({
-                                        eventName
-                                    } as EventData);
-                                }
-                            }
-                        },
-                        onSubmit(id, callerContext) {
-                            if (Trace.isEnabled()) {
-                                CLog(CLogTypes.info, 'onSubmit', id, callerContext);
-                            }
-                            const owner = that?.get();
-                            const eventName = ImageBase.submitEvent;
-                            if (owner?.hasListeners(eventName)) {
-                                owner.notify({
-                                    eventName
-                                } as EventData);
-                            }
-                        }
-                    });
-                }
-                if (!this.requestListener && this.hasListeners(ImageBase.fetchingFromEvent)) {
-                    const that: WeakRef<Img> = new WeakRef(this);
-                    this.requestListener =  new com.facebook.imagepipeline.listener.RequestListener({
-                        onRequestStart(request, callerContext, requestId, isPrefetch) {
-                            
-                        },
-                        onRequestSuccess(param0: com.facebook.imagepipeline.request.ImageRequest, param1: string, param2: boolean) {},
-                        onRequestFailure(param0: com.facebook.imagepipeline.request.ImageRequest, param1: string, param2: java.lang.Throwable, param3: boolean) {},
-                        onRequestCancellation(param0: string) {},
-                        onProducerStart(param0: string, param1: string) {},
-                        onProducerEvent(param0: string, param1: string, param2: string) {},
-                        onProducerFinishWithSuccess(requestId: string, producerName: string, extraMap: java.util.Map<string,string>) {
-                            const owner = that?.get();
-                            const eventName = ImageBase.fetchingFromEvent;
-                           
-                            if (owner?.hasListeners(eventName)) {
-                                 let source = 'local';
-                                if (producerName.indexOf('Network') !== -1) {
-                                    source = 'network'
-                                } else if (producerName.indexOf('Cache') !== -1) {
-                                    source = 'cache'
-                                }  
-                                owner.notify({
-                                    eventName,
-                                    source
-                                });
-                            }
-                        },
-                        onProducerFinishWithFailure(param0: string, param1: string, param2: java.lang.Throwable, param3: java.util.Map<string,string>) {},
-                        onProducerFinishWithCancellation(param0: string, param1: string, param2: java.util.Map<string,string>) {},
-                        onUltimateProducerReached(param0: string, param1: string, param2: boolean) {},
-                        requiresExtraMap(param0: string) { return false},
-                    })
-                }
-                const options = JSON.stringify({
-                    progressiveRenderingEnabled: this.blurRadius,
-                    localThumbnailPreviewsEnabled: this.blurRadius,
-                    decodeWidth: this.decodeWidth,
-                    decodeHeight: this.decodeHeight,
-                    blurRadius: this.blurRadius,
-                    lowerResSrc: this.lowerResSrc ? getUri(this.lowerResSrc, false) : undefined,
-                    blurDownSampling: this.blurDownSampling,
-                    autoPlayAnimations: this.autoPlayAnimations,
-                    tapToRetryEnabled: this.tapToRetryEnabled,
-                    headers: this.headers
-                });
-                view.setUri(uri, options, this.controllerListener, this.requestListener);
-                // const async = this.loadMode === 'async';
-                // if (async) {
-                // const builder = com.facebook.drawee.backends.pipeline.Fresco.newDraweeControllerBuilder();
-                // builder.setImageRequest(request);
-                // builder.setCallerContext(src);
-                // builder.setControllerListener(listener);
-                // builder.setOldController(this.nativeImageViewProtected.getController());
-                // if (Trace.isEnabled()) {
-                //     builder.setPerfDataListener(
-                //         new com.facebook.drawee.backends.pipeline.info.ImagePerfDataListener({
-                //             onImageLoadStatusUpdated(param0: com.facebook.drawee.backends.pipeline.info.ImagePerfData, param1: number) {
-                //                 CLog(CLogTypes.info, 'onImageLoadStatusUpdated', param0, param1);
-                //             },
-                //             onImageVisibilityUpdated(param0: com.facebook.drawee.backends.pipeline.info.ImagePerfData, param1: number) {
-                //                 CLog(CLogTypes.info, 'onImageVisibilityUpdated', param0, param1);
-                //             }
-                //         })
-                //     );
-                // }
-                // if (this.lowerResSrc) {
-                //     builder.setLowResImageRequest(com.facebook.imagepipeline.request.ImageRequest.fromUri(getUri(this.lowerResSrc)));
-                // }
-
-                // if (this.autoPlayAnimations) {
-                //     builder.setAutoPlayAnimations(this.autoPlayAnimations);
-                // }
-
-                // if (this.tapToRetryEnabled) {
-                //     builder.setTapToRetryEnabled(this.tapToRetryEnabled);
-                // }
-
-                // const controller = builder.build();
-
-                // this.nativeImageViewProtected.setController(controller);
-                // } else {
-                // const dataSource = com.facebook.drawee.backends.pipeline.Fresco.getImagePipeline().fetchDecodedImage(request, src);
-                // const result = com.facebook.datasource.DataSources.waitForFinalResult(dataSource);
-                // const bitmap = result.get().underlyingBitmap;
-                // CloseableReference.closeSafely(result);
-                // dataSource.close();
-                // }
-            } else {
-                this.nativeImageViewProtected.setController(null);
-                this.nativeImageViewProtected.setImageBitmap(null);
+            } else if (src instanceof ImageSource) {
+                drawable = new android.graphics.drawable.BitmapDrawable(Utils.android.getApplicationContext().getResources(), src.android as android.graphics.Bitmap);
+                this.updateViewSize(drawable);
             }
+
+            if (drawable) {
+                view.setImageDrawable(drawable);
+                this.notifyFinalImageSet(drawable);
+                return;
+            }
+
+            const uri = getUri(src as string);
+            if (!uri) {
+                console.error(`Error: 'src' not valid: ${src}`);
+                return;
+            }
+
+            this.isLoading = true;
+            this.loadImageWithGlide(uri);
+        } else {
+            // Clear existing request before removing the drawable
+            if (this.currentTarget) {
+                com.bumptech.glide.Glide.with(this._context).clear(this.currentTarget);
+                this.currentTarget = null;
+            } else {
+                com.bumptech.glide.Glide.with(this._context).clear(view);
+            }
+            view.setImageDrawable(null);
         }
     }
 
     protected async initImage() {
-        // this.nativeImageViewProtected.setImageURI(null);
-        this.handleImageSrc(this.src);
+        try {
+            await this.handleImageSrc(this.src);
+        } catch (error) {
+            console.error(error, error.stack);
+        }
     }
 
     private updateHierarchy() {
@@ -876,300 +1005,88 @@ export class Img extends ImageBase {
             this.mNeedUpdateHierarchy = true;
             return;
         }
-        if (this.nativeImageViewProtected) {
-            let failureImageDrawable: android.graphics.drawable.BitmapDrawable | number;
-            let placeholderImageDrawable: android.graphics.drawable.BitmapDrawable | number;
-            let backgroundDrawable: android.graphics.drawable.BitmapDrawable | number;
-            if (this.failureImageUri) {
-                failureImageDrawable = this.getDrawable(this.failureImageUri);
-            }
 
-            if (this.placeholderImageUri) {
-                placeholderImageDrawable = this.getDrawable(this.placeholderImageUri);
-            }
-
-            if (this.backgroundUri) {
-                backgroundDrawable = this.getDrawable(this.backgroundUri);
-            }
-
-            const builder: GenericDraweeHierarchyBuilder = new GenericDraweeHierarchyBuilder();
-            if (this.failureImageUri && failureImageDrawable) {
-                builder.setFailureImage(failureImageDrawable, this.stretch);
-            }
-
-            if (this.tintColor) {
-                builder.setActualImageColorFilter(new android.graphics.PorterDuffColorFilter(this.tintColor.android, android.graphics.PorterDuff.Mode.MULTIPLY));
-            }
-
-            if (this.placeholderImageUri && placeholderImageDrawable) {
-                builder.setPlaceholderImage(placeholderImageDrawable, this.stretch);
-            }
-
-            if (this.stretch) {
-                builder.setActualImageScaleType(this.stretch, this.imageRotation);
-            }
-
-            builder.setFadeDuration(this.fadeDuration || 0);
-
-            if (this.backgroundUri && backgroundDrawable) {
-                builder.setBackground(backgroundDrawable);
-            }
-
-            if (this.showProgressBar) {
-                builder.setProgressBarImage((this.progressBarColor as Color)?.hex, this.stretch);
-            }
-
-            if (this.roundAsCircle) {
-                builder.setRoundingParamsAsCircle();
-            }
-
-            const topLeftRadius = this.roundTopLeftRadius || 0;
-            const topRightRadius = this.roundTopRightRadius || 0;
-            const bottomRightRadius = this.roundBottomRightRadius || 0;
-            const bottomLeftRadius = this.roundBottomLeftRadius || 0;
-            if (topLeftRadius || topRightRadius || bottomRightRadius || bottomLeftRadius) {
-                builder.setCornersRadii(
-                    Utils.layout.toDevicePixels(topLeftRadius),
-                    Utils.layout.toDevicePixels(topRightRadius),
-                    Utils.layout.toDevicePixels(bottomRightRadius),
-                    Utils.layout.toDevicePixels(bottomLeftRadius)
-                );
-            }
-
-            this.nativeImageViewProtected.setHierarchy(builder.build());
-            if (!this.mNeedRequestImage) {
-                this.nativeImageViewProtected.setController(this.nativeImageViewProtected.getController());
-            }
+        // Force reload with new settings
+        if (this.nativeImageViewProtected && this.src) {
+            this.initImage();
         }
     }
 
-    private getDrawable(path: string | ImageSource) {
-        let drawable: android.graphics.drawable.BitmapDrawable;
+    private getDrawable(path: string | ImageSource): android.graphics.drawable.Drawable | number {
         if (typeof path === 'string') {
             if (Utils.isFontIconURI(path)) {
                 const fontIconCode = path.split('//')[1];
                 if (fontIconCode !== undefined) {
-                    // support sync mode only
                     const font = this.style.fontInternal;
                     const color = this.style.color;
-                    drawable = new android.graphics.drawable.BitmapDrawable(Utils.android.getApplicationContext().getResources(), ImageSource.fromFontIconCodeSync(fontIconCode, font, color).android);
+                    return new android.graphics.drawable.BitmapDrawable(Utils.android.getApplicationContext().getResources(), ImageSource.fromFontIconCodeSync(fontIconCode, font, color).android);
                 }
             } else if (Utils.isFileOrResourcePath(path)) {
                 if (path.indexOf(Utils.RESOURCE_PREFIX) === 0) {
-                    return this.getDrawableFromResource(path); // number!
+                    return this.getDrawableFromResource(path);
                 } else {
-                    drawable = this.getDrawableFromLocalFile(path);
+                    return this.getDrawableFromLocalFile(path);
                 }
             }
-        } else {
-            drawable = new android.graphics.drawable.BitmapDrawable(Utils.android.getApplicationContext().getResources(), path.android);
+        } else if (path instanceof ImageSource) {
+            return new android.graphics.drawable.BitmapDrawable(Utils.android.getApplicationContext().getResources(), path.android);
         }
-
-        return drawable;
+        return null;
     }
 
-    private getDrawableFromLocalFile(localFilePath: string) {
+    private getDrawableFromLocalFile(localFilePath: string): android.graphics.drawable.BitmapDrawable {
         const img = ImageSource.fromFileSync(localFilePath);
-        let drawable: android.graphics.drawable.BitmapDrawable = null;
         if (img) {
-            drawable = new android.graphics.drawable.BitmapDrawable(Utils.android.getApplicationContext().getResources(), img.android);
+            return new android.graphics.drawable.BitmapDrawable(Utils.android.getApplicationContext().getResources(), img.android);
         }
-
-        return drawable;
+        return null;
     }
 
-    private getDrawableFromResource(resourceName: string) {
+    private getDrawableFromResource(resourceName: string): number {
         const application = Utils.android.getApplication();
         const resources = application.getResources();
         const identifier = resources.getIdentifier(resourceName.substring(Utils.RESOURCE_PREFIX.length), 'drawable', application.getPackageName());
-        // we return the identifier to allow Fresco to handle memory / caching
         return identifier;
-        // return Utils.android.getApplicationContext().getDrawable(identifier);
     }
 
     startAnimating() {
-        if (this.nativeImageViewProtected) {
-            const controller = this.nativeImageViewProtected.getController();
-            if (controller) {
-                const animatable = controller.getAnimatable();
-                if (animatable) {
-                    animatable.start();
-                }
-            }
+        if (this.currentDrawable && this.currentDrawable instanceof android.graphics.drawable.Animatable) {
+            (this.currentDrawable as android.graphics.drawable.Animatable).start();
         }
     }
+
     stopAnimating() {
-        if (this.nativeImageViewProtected) {
-            const controller = this.nativeImageViewProtected.getController();
-            if (controller) {
-                const animatable = controller.getAnimatable();
-                if (animatable) {
-                    animatable.stop();
-                }
-            }
+        if (this.currentDrawable && this.currentDrawable instanceof android.graphics.drawable.Animatable) {
+            (this.currentDrawable as android.graphics.drawable.Animatable).stop();
         }
     }
 }
 
-class GenericDraweeHierarchyBuilder {
-    private nativeBuilder: com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
-
-    constructor() {
-        const res = Utils.android.getApplicationContext().getResources();
-        this.nativeBuilder = new com.facebook.drawee.generic.GenericDraweeHierarchyBuilder(res);
-    }
-
-    public setPlaceholderImage(drawable, scaleType: ScaleType): GenericDraweeHierarchyBuilder {
-        if (!this.nativeBuilder) {
-            return this;
-        }
-
-        if (scaleType) {
-            this.nativeBuilder.setPlaceholderImage(drawable, getScaleType(scaleType));
-        } else {
-            this.nativeBuilder.setPlaceholderImage(drawable);
-        }
-
-        return this;
-    }
-    public setActualImageColorFilter(filter: android.graphics.ColorFilter): GenericDraweeHierarchyBuilder {
-        if (!this.nativeBuilder) {
-            return this;
-        }
-
-        this.nativeBuilder.setActualImageColorFilter(filter);
-
-        return this;
-    }
-
-    public setFailureImage(drawable, scaleType: ScaleType): GenericDraweeHierarchyBuilder {
-        if (!this.nativeBuilder) {
-            return null;
-        }
-
-        if (scaleType) {
-            this.nativeBuilder.setFailureImage(drawable, getScaleType(scaleType));
-        } else {
-            this.nativeBuilder.setFailureImage(drawable);
-        }
-
-        return this;
-    }
-
-    public setActualImageScaleType(scaleType: ScaleType, imageRotation = 0): GenericDraweeHierarchyBuilder {
-        if (!this.nativeBuilder) {
-            return this;
-        }
-        const nativeScaleType = getScaleType(scaleType);
-        if (imageRotation !== 0 && nativeScaleType['setImageRotation']) {
-            nativeScaleType['setImageRotation'](imageRotation);
-        }
-        this.nativeBuilder.setActualImageScaleType(nativeScaleType);
-
-        return this;
-    }
-
-    public build(): com.facebook.drawee.generic.GenericDraweeHierarchy {
-        if (!this.nativeBuilder) {
-            return null;
-        }
-
-        return this.nativeBuilder.build();
-    }
-
-    public setFadeDuration(duration: number): GenericDraweeHierarchyBuilder {
-        if (!this.nativeBuilder) {
-            return null;
-        }
-
-        this.nativeBuilder.setFadeDuration(duration);
-
-        return this;
-    }
-
-    public setBackground(drawable): GenericDraweeHierarchyBuilder {
-        if (!this.nativeBuilder) {
-            return this;
-        }
-
-        this.nativeBuilder.setBackground(drawable);
-
-        return this;
-    }
-
-    public setProgressBarImage(color: string, stretch): GenericDraweeHierarchyBuilder {
-        if (!this.nativeBuilder) {
-            return null;
-        }
-
-        const drawable = new com.facebook.drawee.drawable.ProgressBarDrawable();
-        if (color) {
-            drawable.setColor(android.graphics.Color.parseColor(color));
-        }
-
-        this.nativeBuilder.setProgressBarImage(drawable, getScaleType(stretch));
-
-        return this;
-    }
-
-    public setRoundingParamsAsCircle(): GenericDraweeHierarchyBuilder {
-        if (!this.nativeBuilder) {
-            return this;
-        }
-
-        const params = com.facebook.drawee.generic.RoundingParams.asCircle();
-        this.nativeBuilder.setRoundingParams(params);
-
-        return this;
-    }
-
-    public setCornersRadii(topLeft: number, topRight: number, bottomRight: number, bottomLeft: number): GenericDraweeHierarchyBuilder {
-        if (!this.nativeBuilder) {
-            return this;
-        }
-
-        const params = new com.facebook.drawee.generic.RoundingParams();
-        params.setCornersRadii(topLeft, topRight, bottomRight, bottomLeft);
-        this.nativeBuilder.setRoundingParams(params);
-
-        return this;
-    }
-}
-
-function getScaleType(scaleType: ScaleType) {
+function getScaleType(scaleType: ScaleType): android.widget.ImageView.ScaleType {
     if (isString(scaleType)) {
         switch (scaleType) {
             case ScaleType.Center:
-                //@ts-ignore
-                return new com.nativescript.image.ScalingUtils.ScaleTypeCenter();
+                return android.widget.ImageView.ScaleType.CENTER;
             case ScaleType.AspectFill:
             case ScaleType.CenterCrop:
-                //@ts-ignore
-                return new com.nativescript.image.ScalingUtils.ScaleTypeCenterCrop();
+                return android.widget.ImageView.ScaleType.CENTER_CROP;
             case ScaleType.CenterInside:
-                //@ts-ignore
-                return new com.nativescript.image.ScalingUtils.ScaleTypeCenterInside();
+                return android.widget.ImageView.ScaleType.CENTER_INSIDE;
             case ScaleType.FitCenter:
             case ScaleType.AspectFit:
-                //@ts-ignore
-                return new com.nativescript.image.ScalingUtils.ScaleTypeFitCenter();
+                return android.widget.ImageView.ScaleType.FIT_CENTER;
             case ScaleType.FitEnd:
-                //@ts-ignore
-                return new com.nativescript.image.ScalingUtils.ScaleTypeFitEnd();
+                return android.widget.ImageView.ScaleType.FIT_END;
             case ScaleType.FitStart:
-                //@ts-ignore
-                return new com.nativescript.image.ScalingUtils.ScaleTypeFitStart();
+                return android.widget.ImageView.ScaleType.FIT_START;
             case ScaleType.Fill:
             case ScaleType.FitXY:
-                //@ts-ignore
-                return new com.nativescript.image.ScalingUtils.ScaleTypeFitXY();
+                return android.widget.ImageView.ScaleType.FIT_XY;
             case ScaleType.FocusCrop:
-                //@ts-ignore
-                return new com.nativescript.image.ScalingUtils.ScaleTypeFocusCrop();
+                return android.widget.ImageView.ScaleType.CENTER_CROP;
             default:
-                break;
+                return android.widget.ImageView.ScaleType.FIT_CENTER;
         }
     }
-
-    return null;
+    return android.widget.ImageView.ScaleType.FIT_CENTER;
 }

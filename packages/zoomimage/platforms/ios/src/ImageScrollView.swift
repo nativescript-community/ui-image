@@ -9,17 +9,36 @@
 import UIKit
 
 @objc public protocol ImageScrollViewDelegate: UIScrollViewDelegate {
-    func imageScrollViewDidChangeOrientation(imageScrollView: ImageScrollView)
+    @objc optional func imageScrollViewDidChangeOrientation(imageScrollView: ImageScrollView)
+    // Single-tap callback with both view (local) & image coordinates.
+    @objc optional func imageScrollViewSingleTapped(_ imageScrollView: ImageScrollView, viewPoint: CGPoint, imagePoint: CGPoint)
+    // Optional callbacks for double-tap pan/zoom start/end
+    @objc optional func imageScrollViewDidStartDoubleTapPan(_ imageScrollView: ImageScrollView, viewPoint: CGPoint, imagePoint: CGPoint)
+    @objc optional func imageScrollViewDidEndDoubleTapPan(_ imageScrollView: ImageScrollView)
 }
 
 open class ImageScrollView: UIScrollView {
+    // Gesture recognizer storage (for replacing zoomView cleanly)
+    private var singleTapRecognizer: UITapGestureRecognizer?
+    private var doubleTapRecognizer: UITapGestureRecognizer?
+    private var doubleTapHoldRecognizer: UILongPressGestureRecognizer?
     
-//    @objc public enum ScaleMode: Int {
-//        case aspectFill
-//        case aspectFit
-//        case widthFill
-//        case heightFill
-//    }
+    // Double-tap-hold sensitivity and minimum press duration (configurable)
+    @objc open var doubleTapHoldMinPressDuration: TimeInterval = 0.08
+    @objc open var doubleTapPanSensitivity: CGFloat = 0.005
+    
+    // Interactive double-tap pan/zoom state
+    private var isDoubleTapPanZooming: Bool = false
+    private var doubleTapPanInitialScale: CGFloat = 1.0
+    private var doubleTapPanInitialCenter: CGPoint = .zero
+    private var doubleTapPanInitialTouchY: CGFloat = 0.0
+    
+    @objc public enum ScaleMode: Int {
+        case aspectFill
+        case aspectFit
+        case widthFill
+        case heightFill
+    }
     
     @objc public enum Offset: Int {
         case begining
@@ -28,7 +47,7 @@ open class ImageScrollView: UIScrollView {
     
     static let kZoomInFactorFromMinWhenDoubleTap: CGFloat = 2
     
-//    @objc open var imageContentMode: ScaleMode = .widthFill
+    @objc open var imageContentMode: ScaleMode = .widthFill
     @objc open var initialOffset: Offset = .begining
     
     private var _zoomView: UIImageView? = nil
@@ -38,15 +57,49 @@ open class ImageScrollView: UIScrollView {
       }
       set {
         if (_zoomView != nil) {
-          _zoomView?.removeFromSuperview()
+            // remove previously added gestures on the old zoomView
+            if let g = singleTapRecognizer { _zoomView?.removeGestureRecognizer(g); singleTapRecognizer = nil }
+            if let g = doubleTapRecognizer { _zoomView?.removeGestureRecognizer(g); doubleTapRecognizer = nil }
+            if let g = doubleTapHoldRecognizer { _zoomView?.removeGestureRecognizer(g); doubleTapHoldRecognizer = nil }
+            _zoomView?.removeFromSuperview()
         }
         self._zoomView = newValue
         _zoomView!.isUserInteractionEnabled = true
         addSubview(_zoomView!)
         
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(ImageScrollView.doubleTapGestureRecognizer(_:)))
-        tapGesture.numberOfTapsRequired = 2
-        zoomView!.addGestureRecognizer(tapGesture)
+        // --- Single-tap recognizer (reports both view & image coordinates)
+        let singleTap = UITapGestureRecognizer(target: self, action: #selector(ImageScrollView.singleTapGestureRecognizer(_:)))
+        singleTap.numberOfTapsRequired = 1
+        
+        // --- Double-tap (regular quick double-tap toggling)
+        let doubleTap = UITapGestureRecognizer(target: self, action: #selector(ImageScrollView.doubleTapGestureRecognizer(_:)))
+        doubleTap.numberOfTapsRequired = 2
+        
+        // --- Double-tap-and-hold: begin interactive "drag to zoom"
+        let doubleTapHold = UILongPressGestureRecognizer(target: self, action: #selector(ImageScrollView.handleDoubleTapHold(_:)))
+        doubleTapHold.numberOfTapsRequired = 2
+        doubleTapHold.minimumPressDuration = doubleTapHoldMinPressDuration
+        doubleTapHold.allowableMovement = 100 // allow some movement
+        
+        // Interaction rules:
+        // - If the user starts panning (scrollView's pan recognizes), cancel double-tap toggle.
+        // - If the double-tap-hold is recognized, the double-tap toggle should not fire.
+        doubleTap.require(toFail: doubleTapHold)
+        // Cancel double-tap if a pan larger than the pan gesture threshold happens prior to recognition:
+        doubleTap.require(toFail: self.panGestureRecognizer)
+        doubleTapHold.require(toFail: self.panGestureRecognizer)
+        // Make singleTap wait for double gestures to avoid misfires.
+        singleTap.require(toFail: doubleTap)
+        singleTap.require(toFail: doubleTapHold)
+        
+        _zoomView!.addGestureRecognizer(doubleTapHold)
+        _zoomView!.addGestureRecognizer(doubleTap)
+        _zoomView!.addGestureRecognizer(singleTap)
+        
+        // keep strong refs to the recognizers so we can remove them if zoomView changes
+        singleTapRecognizer = singleTap
+        doubleTapRecognizer = doubleTap
+        doubleTapHoldRecognizer = doubleTapHold
       }
     }
     
@@ -231,6 +284,50 @@ open class ImageScrollView: UIScrollView {
     }
     
     // MARK: - Gesture
+    
+    @objc func singleTapGestureRecognizer(_ gestureRecognizer: UITapGestureRecognizer) {
+        guard let zoom = _zoomView else { return }
+        let viewPoint = gestureRecognizer.location(in: zoom)
+        let imagePoint = convertPointToImagePoint(viewPoint) ?? CGPoint.zero
+        imageScrollViewDelegate?.imageScrollViewSingleTapped?(self, viewPoint: viewPoint, imagePoint: imagePoint)
+    }
+
+    // Double-tap-and-drag to zoom
+    @objc func handleDoubleTapHold(_ recognizer: UILongPressGestureRecognizer) {
+        guard let zoom = _zoomView else { return }
+        let touchPointInZoom = recognizer.location(in: zoom)
+        let touchPointInSelf = recognizer.location(in: self)
+
+        switch recognizer.state {
+        case .began:
+            // Start interactive zoom; capture initial scale and anchor.
+            isDoubleTapPanZooming = true
+            doubleTapPanInitialScale = zoomScale
+            doubleTapPanInitialCenter = touchPointInZoom
+            doubleTapPanInitialTouchY = touchPointInSelf.y
+            // temporarily disable the scroll view panning so that the gesture exclusively handles zooming
+            self.isScrollEnabled = false
+            imageScrollViewDelegate?.imageScrollViewDidStartDoubleTapPan?(self, viewPoint: touchPointInZoom, imagePoint: convertPointToImagePoint(touchPointInZoom) ?? CGPoint.zero)
+
+        case .changed:
+            guard isDoubleTapPanZooming else { return }
+            let currentY = touchPointInSelf.y
+            let deltaTotal = doubleTapPanInitialTouchY - currentY
+            // Ramped exponential scale for comfortable control
+            let rawNewScale = doubleTapPanInitialScale * CGFloat(expf(Float(deltaTotal * doubleTapPanSensitivity)))
+            // clamp scale
+            let newScale = min(max(rawNewScale, minimumZoomScale), maximumZoomScale)
+            if abs(newScale - zoomScale) > 1e-4 {
+                let zoomRect = zoomRectForScale(newScale, center: doubleTapPanInitialCenter)
+                zoom(to: zoomRect, animated: false)
+            }
+        default:
+            // Ended/cancelled/failed: restore normal scrolling and notify
+            isDoubleTapPanZooming = false
+            self.isScrollEnabled = true
+            imageScrollViewDelegate?.imageScrollViewDidEndDoubleTapPan?(self)
+        }
+    }
     
     @objc func doubleTapGestureRecognizer(_ gestureRecognizer: UIGestureRecognizer) {
         // zoom out if it bigger than the scale factor after double-tap scaling. Else, zoom in

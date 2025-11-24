@@ -6,10 +6,13 @@ import { isString } from '@nativescript/core/utils/types';
 import {
     CLog,
     CLogTypes,
-    EventData,
+    FailureEventData,
+    FinalEventData,
     ImageBase,
     ImageInfo as ImageInfoBase,
     ImagePipelineConfigSetting,
+    LoadSourceEventData,
+    ProgressEventData,
     ScaleType,
     SrcType,
     Stretch,
@@ -23,7 +26,7 @@ import {
     stretchProperty,
     wrapNativeException
 } from './index-common';
-import { FailureEventData, GetContextFromOptionsCallback } from '@nativescript-community/ui-image';
+import { GetContextFromOptionsCallback } from '.';
 
 export class ImageInfo implements ImageInfoBase {
     constructor(
@@ -38,11 +41,6 @@ export class ImageInfo implements ImageInfoBase {
     getWidth(): number {
         return this.width;
     }
-}
-
-export interface FinalEventData extends EventData {
-    imageInfo: ImageInfo;
-    ios: UIImage;
 }
 
 const supportedLocalFormats = ['png', 'jpg', 'gif', 'jpeg', 'webp'];
@@ -249,7 +247,7 @@ export class ImagePipeline {
     }
 }
 
-export const needRequestImage = function (target: any, propertyKey: string | Symbol, descriptor: PropertyDescriptor) {
+export const needRequestImage = function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
     descriptor.value = function (...args: any[]) {
         if (!this.mCanRequestImage) {
@@ -304,6 +302,10 @@ export class Img extends ImageBase {
     nativeImageViewProtected: SDAnimatedImageView | UIImageView;
     isLoading = false;
     mCacheKey: string;
+
+    // network detection + notification guard
+    private _isRemote: boolean = false;
+    private _notifiedLoadSourceNetworkStart: boolean = false;
 
     contextOptions = null;
 
@@ -401,31 +403,30 @@ export class Img extends ImageBase {
 
     public _setNativeImage(nativeImage: UIImage, animated = true) {
         if (animated && this.fadeDuration) {
-            // switch (this.transition) {
-            //     case 'fade':
-            this.nativeImageViewProtected.alpha = 0.0;
-            this.nativeImageViewProtected.image = nativeImage;
-            UIView.animateWithDurationAnimations(this.fadeDuration / 1000, () => {
-                this.nativeImageViewProtected.alpha = this.opacity;
-            });
-            //     break;
-            // case 'curlUp':
-            //     UIView.transitionWithViewDurationOptionsAnimationsCompletion(
-            //        this.nativeImageViewProtected,
-            //         0.3,
-            //         UIViewAnimationOptions.TransitionCrossDissolve,
-            //         () => {
-            //             this._setNativeImage(image);
-            //         },
-            //         null
-            //     );
-            //     break;
-            // default:
-            //     this._setNativeImage(image);
-            // }
+            // Crossfade from the currently visible content (placeholder/previous image) to the new image.
+            try {
+                UIView.transitionWithViewDurationOptionsAnimationsCompletion(
+                    this.nativeImageViewProtected,
+                    this.fadeDuration / 1000,
+                    UIViewAnimationOptions.TransitionCrossDissolve,
+                    () => {
+                        this.nativeImageViewProtected.image = nativeImage;
+                    },
+                    null
+                );
+            } catch (ex) {
+                // Fall back to an alpha fade if transition isn't available for some reason.
+                this.nativeImageViewProtected.alpha = 0.0;
+                this.nativeImageViewProtected.image = nativeImage;
+                UIView.animateWithDurationAnimations(this.fadeDuration / 1000, () => {
+                    this.nativeImageViewProtected.alpha = this.opacity;
+                });
+            }
         } else {
             this.nativeImageViewProtected.image = nativeImage;
         }
+        // Ensure final alpha is set to the view's current opacity.
+        this.nativeImageViewProtected.alpha = this.opacity;
         if (this.mImageSourceAffectsLayout) {
             // this.mImageSourceAffectsLayout = false;
             this.requestLayout();
@@ -445,6 +446,14 @@ export class Img extends ImageBase {
             this.nativeImageViewProtected.stopAnimating();
         }
 
+        let sourceStr = 'none';
+        if (typeof cacheType === 'number') {
+            if (cacheType === SDImageCacheType.Memory) sourceStr = 'memory';
+            else if (cacheType === SDImageCacheType.Disk) sourceStr = 'disk';
+            else if (cacheType === SDImageCacheType.None) sourceStr = 'network';
+            else sourceStr = 'unknown';
+        }
+
         if (error) {
             this.notify({
                 eventName: Img.failureEvent,
@@ -458,13 +467,47 @@ export class Img extends ImageBase {
             this.notify({
                 eventName: ImageBase.finalImageSetEvent,
                 imageInfo: new ImageInfo(image.size.width, image.size.height),
-                ios: image
+                ios: image,
+                source: sourceStr
             } as FinalEventData);
         }
+
+        // Notify where the image came from (memory/disk/network) in a loadSource event.
+        // For cached (memory/disk) images, emit loadSource now (we already emit a "network start" in onLoadProgress for remote)
+        if (cacheType !== SDImageCacheType.None && this.hasListeners(ImageBase.loadSourceEvent)) {
+            this.notify({
+                eventName: ImageBase.loadSourceEvent,
+                source: sourceStr
+            } as LoadSourceEventData);
+        }
+
         this.handleImageProgress(1);
     };
+
     private onLoadProgress = (currentSize: number, totalSize: number) => {
-        this.handleImageProgress(totalSize > 0 ? currentSize / totalSize : -1, totalSize);
+        const fraction = totalSize > 0 ? currentSize / totalSize : -1;
+        this.handleImageProgress(fraction, totalSize);
+        const eventName = ImageBase.progressEvent;
+        if (this.hasListeners(eventName)) {
+            // Notify progress event
+            this.notify({
+                eventName,
+                progress: fraction,
+                current: currentSize,
+                total: totalSize
+            } as ProgressEventData);
+        }
+
+        // If this is a network load, notify loadSource event once at the first progress call
+        if (this._isRemote && !this._notifiedLoadSourceNetworkStart) {
+            this._notifiedLoadSourceNetworkStart = true;
+            if (this.hasListeners(ImageBase.loadSourceEvent)) {
+                this.notify({
+                    eventName: ImageBase.loadSourceEvent,
+                    source: 'network'
+                } as LoadSourceEventData);
+            }
+        }
     };
 
     private getUIImage(imagePath: string | ImageSource) {
@@ -529,6 +572,11 @@ export class Img extends ImageBase {
                 }
 
                 const uri = getUri(src as string | ImageAsset);
+                // detect whether this uri is a remote HTTP/HTTPS resource
+                const scheme = uri && (uri as NSURL).scheme ? ((uri as NSURL).scheme + '').toLowerCase() : null;
+                this._isRemote = scheme === 'http' || scheme === 'https';
+                // reset network-start notification guard for this new request
+                this._notifiedLoadSourceNetworkStart = false;
                 this.isLoading = true;
                 let options = SDWebImageOptions.ScaleDownLargeImages | SDWebImageOptions.AvoidAutoSetImage;
 

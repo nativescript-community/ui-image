@@ -4,6 +4,7 @@ import { EventData as IEventData } from '@nativescript/core/data/observable';
 import { ImageAsset } from '@nativescript/core/image-asset';
 import { ImageSource } from '@nativescript/core/image-source';
 import { isAndroid } from '@nativescript/core/platform';
+import { Optional } from '@nativescript/core/utils/typescript-utils';
 
 export function colorConverter(v: string | Color): Color {
     if (!v || v instanceof Color) {
@@ -11,63 +12,58 @@ export function colorConverter(v: string | Color): Color {
     }
     return new Color(v);
 }
-function isNonNegativeFiniteNumber(value: number): boolean {
-    return isFinite(value) && !isNaN(value) && value >= 0;
+
+export type EventData = Optional<IEventData, 'object'>;
+
+// New: loadSource and progress event payloads
+export interface LoadSourceEventData extends EventData {
+    source?: string;
 }
-interface Thickness {
-    top: string;
-    right: string;
-    bottom: string;
-    left: string;
+
+/**
+ * Instances of this class are provided to the handlers of the {@link finalImageSet}.
+ */
+export interface FinalEventData extends EventData {
+    /**
+     * Contains information about an image.
+     */
+    imageInfo: ImageInfo;
+    android?: any; // Drawable;
+    ios?: any; // UIImage
+    source?: string;
 }
-function parseThickness(value: string): Thickness {
-    if (typeof value === 'string') {
-        const arr = value.split(/[ ,]+/);
 
-        let top: string;
-        let right: string;
-        let bottom: string;
-        let left: string;
+/**
+ * Instances of this class are provided to the handlers of the {@link intermediateImageSet}.
+ */
+export interface IntermediateEventData extends EventData {
+    /**
+     * Contains information about an image.
+     */
+    imageInfo: ImageInfo;
+}
 
-        if (arr.length === 1) {
-            top = arr[0];
-            right = arr[0];
-            bottom = arr[0];
-            left = arr[0];
-        } else if (arr.length === 2) {
-            top = arr[0];
-            bottom = arr[0];
-            right = arr[1];
-            left = arr[1];
-        } else if (arr.length === 3) {
-            top = arr[0];
-            right = arr[1];
-            left = arr[1];
-            bottom = arr[2];
-        } else if (arr.length === 4) {
-            top = arr[0];
-            right = arr[1];
-            bottom = arr[2];
-            left = arr[3];
-        } else {
-            throw new Error('Expected 1, 2, 3 or 4 parameters. Actual: ' + value);
-        }
+/**
+ * Instances of this class are provided to the handlers of the {@link failure} and {@link intermediateImageFailed}.
+ */
+export interface FailureEventData extends EventData {
+    /**
+     * An object containing information about the status of the event.
+     */
+    error: Error;
+}
 
-        return {
-            top,
-            right,
-            bottom,
-            left
-        };
-    } else {
-        return value;
-    }
+export interface ProgressEventData extends EventData {
+    progress?: number; // 0..1 or -1 if unknown
+    current?: number; // bytes received (or -1)
+    total?: number; // total bytes (or -1)
+    finished?: boolean;
 }
 
 export enum CLogTypes {
     log = Trace.messageType.log,
     info = Trace.messageType.info,
-    warning = Trace.messageType.warn,
+    warn = Trace.messageType.warn,
     error = Trace.messageType.error
 }
 
@@ -135,31 +131,11 @@ export function wrapNativeException(ex, errorType = typeof ex) {
 }
 
 export interface ImagePipelineConfigSetting {
-    isDownsampleEnabled?: boolean;
-    leakTracker?: any;
-    useOkhttp?: boolean;
+    usePersistentCacheKeyStore?: boolean;
+    // android signature key for cache. You can bump/change (v1, v2,...) to invalidate all cache
+    globalSignatureKey?: string;
 }
 
-export class EventData implements IEventData {
-    private _eventName: string;
-    private _object: any;
-
-    get eventName(): string {
-        return this._eventName;
-    }
-
-    set eventName(value: string) {
-        this._eventName = value;
-    }
-
-    get object(): any {
-        return this._object;
-    }
-
-    set object(value: any) {
-        this._object = value;
-    }
-}
 export type Stretch = 'none' | 'fill' | 'aspectFill' | 'aspectFit';
 
 export const srcProperty = new Property<ImageBase, string | ImageSource | ImageAsset>({ name: 'src' });
@@ -252,7 +228,7 @@ export const loadModeProperty = new Property<ImageBase, 'sync' | 'async'>({
 export const clipToBoundsProperty = new Property<ImageBase, boolean>({ name: 'clipToBounds', defaultValue: true, valueConverter: booleanConverter });
 export const animatedImageViewProperty = new Property<ImageBase, boolean>({ name: 'animatedImageView', defaultValue: false, valueConverter: booleanConverter });
 
-export const needRequestImage = function (target: any, propertyKey: string | Symbol, descriptor: PropertyDescriptor) {
+export const needRequestImage = function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
     descriptor.value = function (...args: any[]) {
         if (!this.mCanRequestImage) {
@@ -272,7 +248,8 @@ export abstract class ImageBase extends View {
     public static intermediateImageSetEvent: string = 'intermediateImageSet';
     public static releaseEvent: string = 'release';
     public static submitEvent: string = 'submit';
-    public static fetchingFromEvent: string = 'fetchingFrom';
+    public static progressEvent: string = 'progress';
+    public static loadSourceEvent: string = 'loadSource';
 
     public src: SrcType;
     public lowerResSrc: string;
@@ -436,6 +413,7 @@ clipToBoundsProperty.register(ImageBase);
 animatedImageViewProperty.register(ImageBase);
 loadModeProperty.register(ImageBase);
 noRatioEnforceProperty.register(ImageBase);
+tintColorProperty.register(ImageBase);
 // roundRadiusProperty.register(ImageBase as any);
 
 // ImageBase.blendingModeProperty.register(ImageBase);

@@ -6,6 +6,7 @@ const server = http.createServer((req, res) => {
     if (req.url === '/image' && req.method === 'GET') {
         // Check the authorization header
         const authToken = req.headers['authorization'];
+        console.log('image request', req.headers)
         if (!authToken || authToken !== 'Bearer 1234') {
             res.writeHead(401, { 'Content-Type': 'text/plain' });
             res.end('Unauthorized: No token provided or token is invalid');

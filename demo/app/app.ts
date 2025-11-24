@@ -5,7 +5,7 @@ import * as imageModule from '@nativescript-community/ui-image';
 
 if (app.android) {
     app.on(app.launchEvent, () => {
-        imageModule.initialize({ isDownsampleEnabled: true });
+        imageModule.initialize();
     });
 
     app.on(app.exitEvent, args => {

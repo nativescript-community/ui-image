@@ -1,5 +1,7 @@
 import { ImageAsset, ImageSource, View } from '@nativescript/core';
 
+export * from './index-common.ts';
+
 /**
  * When called, initializes the android Image library. Calling this method is required.
  * A good place to call it is at the application onLaunch() method.
@@ -260,73 +262,6 @@ export interface ImageError {
 }
 
 /**
- * Instances of this class are provided to the handlers of the {@link release} and {@link submit}.
- */
-export class EventData {
-    /**
-     * Returns the name of the event that has been fired.
-     */
-    eventName: string;
-
-    /**
-     * The object that fires the event.
-     */
-    object: any;
-}
-
-/**
- * Instances of this class are provided to the handlers of the {@link finalImageSet}.
- */
-export class FinalEventData {
-    /**
-     * Returns the name of the event that has been fired.
-     */
-    eventName: string;
-
-    /**
-     * The object that fires the event.
-     */
-    object: any;
-
-    /**
-     * Contains information about an image.
-     */
-    imageInfo: ImageInfo;
-    android?: AnimatedImage;
-    ios?: any; // UIImage
-}
-
-/**
- * Instances of this class are provided to the handlers of the {@link intermediateImageSet}.
- */
-export class IntermediateEventData {
-    /**
-     * Returns the name of the event that has been fired.
-     */
-    eventName: string;
-
-    /**
-     * The object that fires the event.
-     */
-    object: any;
-
-    /**
-     * Contains information about an image.
-     */
-    imageInfo: ImageInfo;
-}
-
-/**
- * Instances of this class are provided to the handlers of the {@link failure} and {@link intermediateImageFailed}.
- */
-export class FailureEventData extends EventData {
-    /**
-     * An object containing information about the status of the event.
-     */
-    error: Error;
-}
-
-/**
  * Interface of the common abstraction behind a platform specific animated image object.
  */
 export interface AnimatedImage {
@@ -369,37 +304,37 @@ export class ImagePipeline {
     /**
      * Returns whether the image is stored in the disk cache.
      */
-    isInDiskCache(uri: string): boolean;
+    isInDiskCache(uri: string): Promise<boolean>;
 
     /**
      * Removes all images with the specified Uri from memory cache.
      */
-    evictFromMemoryCache(uri: string): void;
+    evictFromMemoryCache(uri: string): Promise<boolean>;
 
     /**
      * Removes all images with the specified Uri from disk cache.
      */
-    async evictFromDiskCache(uri: string): void;
+    async evictFromDiskCache(uri: string): Promise<boolean>;
 
     /**
      * Removes all images with the specified Uri from all the caches (memory and disk).
      */
-    async evictFromCache(uri: string): void;
+    async evictFromCache(uri: string): Promise<boolean>;
 
     /**
      * Clear all the caches (memory and disk).
      */
-    clearCaches(): void;
+    clearCaches(): Promise<void>;
 
     /**
      * Clear the memory caches.
      */
-    clearMemoryCaches(): void;
+    clearMemoryCaches(): Promise<void>;
 
     /**
      * Clear disk caches.
      */
-    clearDiskCaches(): void;
+    clearDiskCaches(): Promise<void>;
 
     /**
      * Prefetch to disk cache.
@@ -452,12 +387,12 @@ export enum ScaleType {
 
 /**
  * Advanced Configurations used for initializing Image
- * For more details, see http://frescolib.org/docs/configure-image-pipeline.html
  */
 export interface ImagePipelineConfigSetting {
-    isDownsampleEnabled?: boolean;
-    leakTracker?: any; // Android only
-    useOkhttp?: boolean; // Android only
+    // android only, disk cache key store persists to use evictFromDiskCache between app launches
+    usePersistentCacheKeyStore?: boolean;
+    // android signature key for cache. You can bump/change (v1, v2,...) to invalidate all cache
+    globalSignatureKey?: string;
 }
 export const ImageViewTraceCategory;
 
