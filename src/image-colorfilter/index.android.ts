@@ -3,8 +3,8 @@ import { Image } from '@nativescript/core';
 import { applyMixins, colorMatrixProperty, cssProperty } from './index-common';
 
 class ImgExtended {
-    nativeImageViewProtected: com.nativescript.image.DraweeView;
-    nativeViewProtected: com.nativescript.image.DraweeView;
+    nativeImageViewProtected: com.nativescript.image.MatrixImageView;
+    nativeViewProtected: com.nativescript.image.MatrixImageView;
     @cssProperty colorMatrix: number[];
     [colorMatrixProperty.setNative](value: number[]) {
         const nativeView = this.nativeImageViewProtected || this.nativeViewProtected;

@@ -6,7 +6,7 @@ export * from './index-common.ts';
  * When called, initializes the android Image library. Calling this method is required.
  * A good place to call it is at the application onLaunch() method.
  */
-export  function initialize(config?: ImagePipelineConfigSetting): void;
+export function initialize(config?: ImagePipelineConfigSetting): void;
 
 /**
  * Shuts the native Image and SimpleDraweeView down. By design this method should not be called manually as it is handled by the Image library internally.
@@ -388,4 +388,4 @@ export const ImageViewTraceCategory;
 
 export type GetContextFromOptionsCallback = (context: NSDictionary<string, any>, transformers: any[], options: Partial<Img>) => void;
 
-declare function registerPluginGetContextFromOptions(callback: GetContextFromOptionsCallback); // iOS only for plugins
+export function registerPluginGetContextFromOptions(callback: GetContextFromOptionsCallback); // iOS only for plugins

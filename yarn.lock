@@ -3559,10 +3559,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nativescript/ios@npm:8.9.5":
-  version: 8.9.5
-  resolution: "@nativescript/ios@npm:8.9.5"
-  checksum: 10/a9a7a2a9133593cd07bc938f8184deb417f6e75b77af37e10f8f17279574a1ca3013bf98e0a55236f655fb29c9f4d4dca223a6854d4fd01719d4dd26f9c038ee
+"@nativescript/ios@npm:8.9.4":
+  version: 8.9.4
+  resolution: "@nativescript/ios@npm:8.9.4"
+  checksum: 10/3495c23232a4a57696f2c32d8ab8529f0191c3afc4d497350ad0b04d9085e6bb5bb8b2302cca886a016271e68ba00cf5407804ccce9dd95a55926fa292b0b1c1
   languageName: node
   linkType: hard
 
@@ -3574,7 +3574,7 @@ __metadata:
     "@nativescript-community/template-snippet": "npm:*"
     "@nativescript/android": "npm:8.9.2"
     "@nativescript/core": "npm:8.9.9"
-    "@nativescript/ios": "npm:8.9.5"
+    "@nativescript/ios": "npm:8.9.4"
     "@nativescript/theme": "npm:3.1.0"
     "@nativescript/types": "npm:8.9.1"
     "@nativescript/webpack": "npm:5.0.24"
@@ -3605,7 +3605,7 @@ __metadata:
     "@nativescript/android": "npm:8.9.2"
     "@nativescript/angular": "npm:20.0.0"
     "@nativescript/core": "npm:8.9.9"
-    "@nativescript/ios": "npm:8.9.5"
+    "@nativescript/ios": "npm:8.9.4"
     "@nativescript/theme": "npm:3.1.0"
     "@nativescript/types": "npm:8.9.1"
     "@nativescript/webpack": "npm:5.0.24"
