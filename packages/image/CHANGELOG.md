@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.0](https://github.com/nativescript-community/ui-image/compare/v4.6.6...v5.0.0) (2025-11-25)
+
+### Features
+
+* **android:** plugin now uses Glide. Comes with many new features ( alwaysFade, progress event, loadSource event, improved ZoomImage...) ([cb75fa9](https://github.com/nativescript-community/ui-image/commit/cb75fa9b32102d9a4cceedbb1fe982d71d47b3c6))
+* **ios:** updated SDWebImage, progress and loadSource events ([989cda4](https://github.com/nativescript-community/ui-image/commit/989cda47b02f0f49d2f0f6d512481511b9669ce8))
+
 ## [4.6.6](https://github.com/nativescript-community/ui-image/compare/v4.6.5...v4.6.6) (2025-11-21)
 
 **Note:** Version bump only for package @nativescript-community/ui-image
