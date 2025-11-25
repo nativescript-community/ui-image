@@ -13,7 +13,6 @@ const examples = [
     'fade',
     'blur',
     'progressiverenderingenabled',
-    'showprogressbar',
     'roundascircle',
     'roundedcornerradius',
     'autoplayanimations',

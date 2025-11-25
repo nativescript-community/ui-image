@@ -8,9 +8,7 @@
             <StackLayout orientation="horizontal">
                 <NSImg
                     ref="opacityImg"
-                    :showProgressBar="true"
                     :noRatioEnforce="false"
-                    progressBarColor="green"
                     backgroundColor="yellow"
                     borderRadius="10"
                     height="100"

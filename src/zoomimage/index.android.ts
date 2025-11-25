@@ -56,7 +56,7 @@ export class ZoomImg extends ZoomImageBase {
                 this.nativeViewProtected.zoomTo(scale, animated);
             } else {
                 // Zoom to specific point
-                this.nativeViewProtected.zoomToPoint(scale, point.x, point.y, animated);
+                this.nativeViewProtected.zoomToPoint(scale, point.x, point.y, animated, null);
             }
         }
     }

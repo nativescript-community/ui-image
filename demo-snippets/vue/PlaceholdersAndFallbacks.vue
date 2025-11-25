@@ -14,8 +14,6 @@
                     :failureImageUri="failure"
                     :progressiveRenderingEnabled="progressive"
                     :localThumbnailPreviewsEnabled="localThumb"
-                    :showProgressBar="showProgressBar"
-                    :progressBarColor="progressColor"
                     @finalImageSet="onFinalImage"
                     @failure="onFailure"
                     @progress="onProgress"
@@ -32,7 +30,6 @@
                 <WrapLayout marginTop="8">
                     <Button :text="'Progressive: ' + progressive" @tap="toggle('progressive')" />
                     <Button :text="'LocalThumbs: ' + localThumb" @tap="toggle('localThumb')" />
-                    <Button :text="'ProgressBar: ' + showProgressBar" @tap="toggle('showProgressBar')" />
                     <Button :text="'Placeholder(resource)'" @tap="setPlaceholderToResource" />
                     <Button :text="'Placeholder(local)'" @tap="setPlaceholderToLocal" />
                     <Button :text="'Clear placeholder'" @tap="clearPlaceholder" />
@@ -61,8 +58,6 @@ export default {
             failure: null,
             progressive: true,
             localThumb: false,
-            showProgressBar: true,
-            progressColor: 'blue',
             logs: [] as string[],
             localFile: ImageSource.fromFileSync('~/assets/images/drink.jpg')
         };

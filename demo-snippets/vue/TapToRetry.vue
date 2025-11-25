@@ -3,7 +3,7 @@
         <ActionBar title="Tap to Retry Demo" />
         <StackLayout padding="10">
             <Label text="Tap-to-Retry" class="h2" />
-            <NSImg ref="img" width="100%" height="200" :src="src" :tapToRetryEnabled="tapToRetry" :showProgressBar="true" progressBarColor="orange" @failure="onFailure" @finalImageSet="onFinal" />
+            <NSImg ref="img" width="100%" height="200" :src="src" :tapToRetryEnabled="tapToRetry" @failure="onFailure" @finalImageSet="onFinal" />
             <WrapLayout marginTop="8">
                 <Button :text="'TapToRetry: ' + tapToRetry" @tap="toggle('tapToRetry')" />
                 <Button text="Set broken image" @tap="setBroken" />

@@ -8,8 +8,6 @@
                 width="98%"
                 height="220"
                 src="https://images.pexels.com/photos/842711/pexels-photo-842711.jpeg"
-                showProgressBar="true"
-                progressBarColor="blue"
                 :animatedImageView="true"
                 @finalImageSet="onFinalImageSet"
                 @failure="onFailure"

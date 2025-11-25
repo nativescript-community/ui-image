@@ -20,8 +20,6 @@ import {
     headersProperty,
     imageRotationProperty,
     placeholderImageUriProperty,
-    progressBarColorProperty,
-    showProgressBarProperty,
     srcProperty,
     stretchProperty,
     wrapNativeException
@@ -300,7 +298,6 @@ export class Img extends ImageBase {
     nativeViewProtected: SDAnimatedImageView | UIImageView;
     //@ts-ignore
     nativeImageViewProtected: SDAnimatedImageView | UIImageView;
-    isLoading = false;
     mCacheKey: string;
 
     // network detection + notification guard
@@ -434,7 +431,6 @@ export class Img extends ImageBase {
     }
 
     private handleImageLoaded = (image: UIImage, error: NSError, cacheType: number) => {
-        this.isLoading = false;
         if (!this.nativeViewProtected) {
             return;
         }
@@ -487,27 +483,29 @@ export class Img extends ImageBase {
     private onLoadProgress = (currentSize: number, totalSize: number) => {
         const fraction = totalSize > 0 ? currentSize / totalSize : -1;
         this.handleImageProgress(fraction, totalSize);
-        const eventName = ImageBase.progressEvent;
-        if (this.hasListeners(eventName)) {
-            // Notify progress event
-            this.notify({
-                eventName,
-                progress: fraction,
-                current: currentSize,
-                total: totalSize
-            } as ProgressEventData);
-        }
-
-        // If this is a network load, notify loadSource event once at the first progress call
-        if (this._isRemote && !this._notifiedLoadSourceNetworkStart) {
-            this._notifiedLoadSourceNetworkStart = true;
-            if (this.hasListeners(ImageBase.loadSourceEvent)) {
+        Utils.executeOnMainThread(()=>{
+            const eventName = ImageBase.progressEvent;
+            if (this.hasListeners(eventName)) {
+                // Notify progress event
                 this.notify({
-                    eventName: ImageBase.loadSourceEvent,
-                    source: 'network'
-                } as LoadSourceEventData);
+                    eventName,
+                    progress: fraction,
+                    current: currentSize,
+                    total: totalSize
+                } as ProgressEventData);
             }
-        }
+
+            // If this is a network load, notify loadSource event once at the first progress call
+            if (this._isRemote && !this._notifiedLoadSourceNetworkStart) {
+                this._notifiedLoadSourceNetworkStart = true;
+                if (this.hasListeners(ImageBase.loadSourceEvent)) {
+                    this.notify({
+                        eventName: ImageBase.loadSourceEvent,
+                        source: 'network'
+                    } as LoadSourceEventData);
+                }
+            }
+        })
     };
 
     private getUIImage(imagePath: string | ImageSource) {
@@ -577,7 +575,6 @@ export class Img extends ImageBase {
                 this._isRemote = scheme === 'http' || scheme === 'https';
                 // reset network-start notification guard for this new request
                 this._notifiedLoadSourceNetworkStart = false;
-                this.isLoading = true;
                 let options = SDWebImageOptions.ScaleDownLargeImages | SDWebImageOptions.AvoidAutoSetImage;
 
                 if (this.placeholderImageUri) {
@@ -630,19 +627,6 @@ export class Img extends ImageBase {
                 if (ImagePipeline.iosComplexCacheEviction) {
                     registerCacheKey(this.mCacheKey, uri);
                 }
-                if (this.showProgressBar) {
-                    try {
-                        if (this.progressBarColor) {
-                            const indicator = new SDWebImageActivityIndicator();
-                            indicator.indicatorView.color = (this.progressBarColor as Color).ios;
-                            this.nativeImageViewProtected.sd_imageIndicator = indicator;
-                        } else {
-                            this.nativeImageViewProtected.sd_imageIndicator = SDWebImageActivityIndicator.grayIndicator;
-                        }
-                    } catch (ex) {
-                        console.error(ex);
-                    }
-                }
 
                 this.nativeImageViewProtected.sd_setImageWithURLPlaceholderImageOptionsContextProgressCompleted(
                     uri,
@@ -670,15 +654,6 @@ export class Img extends ImageBase {
     placeholderImage: UIImage;
     @needRequestImage
     [placeholderImageUriProperty.setNative]() {}
-
-    @needRequestImage
-    [showProgressBarProperty.setNative](value) {
-        this.showProgressBar = value;
-    }
-
-    [progressBarColorProperty.setNative](value) {
-        this.progressBarColor = value;
-    }
 
     @needRequestImage
     [headersProperty.setNative](value) {}

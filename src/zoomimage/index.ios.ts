@@ -47,6 +47,7 @@ export class ZoomImg extends ZoomImageBase {
     }
 
     public initNativeView() {
+        super.initNativeView();
         this.delegate = UIZoomImgScrollViewDelegateImpl.initWithOwner(new WeakRef<ZoomImg>(this));
         this.nativeViewProtected.delegate = this.delegate;
     }

@@ -96,8 +96,6 @@ export declare const stretchProperty: Property<ImageBase, string>;
 export declare const backgroundUriProperty: Property<ImageBase, string>;
 export declare const progressiveRenderingEnabledProperty: Property<ImageBase, boolean>;
 export declare const localThumbnailPreviewsEnabledProperty: Property<ImageBase, boolean>;
-export declare const showProgressBarProperty: Property<ImageBase, boolean>;
-export declare const progressBarColorProperty: Property<ImageBase, Color>;
 export declare const roundAsCircleProperty: Property<ImageBase, boolean>;
 export declare const blurRadiusProperty: Property<ImageBase, number>;
 export declare const blurDownSamplingProperty: Property<ImageBase, number>;
@@ -141,8 +139,6 @@ export declare abstract class ImageBase extends View {
     backgroundUri: string;
     progressiveRenderingEnabled: boolean;
     localThumbnailPreviewsEnabled: boolean;
-    showProgressBar: boolean;
-    progressBarColor: Color | string;
     roundAsCircle: boolean;
     roundBottomRightRadius: number;
     roundTopLeftRadius: number;

@@ -21,24 +21,13 @@ open class ImageScrollView: UIScrollView {
     // Gesture recognizer storage (for replacing zoomView cleanly)
     private var singleTapRecognizer: UITapGestureRecognizer?
     private var doubleTapRecognizer: UITapGestureRecognizer?
-    private var doubleTapHoldRecognizer: UILongPressGestureRecognizer?
     
-    // Double-tap-hold sensitivity and minimum press duration (configurable)
-    @objc open var doubleTapHoldMinPressDuration: TimeInterval = 0.08
-    @objc open var doubleTapPanSensitivity: CGFloat = 0.005
-    
-    // Interactive double-tap pan/zoom state
-    private var isDoubleTapPanZooming: Bool = false
-    private var doubleTapPanInitialScale: CGFloat = 1.0
-    private var doubleTapPanInitialCenter: CGPoint = .zero
-    private var doubleTapPanInitialTouchY: CGFloat = 0.0
-    
-    @objc public enum ScaleMode: Int {
-        case aspectFill
-        case aspectFit
-        case widthFill
-        case heightFill
-    }
+    // @objc public enum ScaleMode: Int {
+    //     case aspectFill
+    //     case aspectFit
+    //     case widthFill
+    //     case heightFill
+    // }
     
     @objc public enum Offset: Int {
         case begining
@@ -47,7 +36,7 @@ open class ImageScrollView: UIScrollView {
     
     static let kZoomInFactorFromMinWhenDoubleTap: CGFloat = 2
     
-    @objc open var imageContentMode: ScaleMode = .widthFill
+    // @objc open var imageContentMode: ScaleMode = .widthFill
     @objc open var initialOffset: Offset = .begining
     
     private var _zoomView: UIImageView? = nil
@@ -60,7 +49,6 @@ open class ImageScrollView: UIScrollView {
             // remove previously added gestures on the old zoomView
             if let g = singleTapRecognizer { _zoomView?.removeGestureRecognizer(g); singleTapRecognizer = nil }
             if let g = doubleTapRecognizer { _zoomView?.removeGestureRecognizer(g); doubleTapRecognizer = nil }
-            if let g = doubleTapHoldRecognizer { _zoomView?.removeGestureRecognizer(g); doubleTapHoldRecognizer = nil }
             _zoomView?.removeFromSuperview()
         }
         self._zoomView = newValue
@@ -75,31 +63,18 @@ open class ImageScrollView: UIScrollView {
         let doubleTap = UITapGestureRecognizer(target: self, action: #selector(ImageScrollView.doubleTapGestureRecognizer(_:)))
         doubleTap.numberOfTapsRequired = 2
         
-        // --- Double-tap-and-hold: begin interactive "drag to zoom"
-        let doubleTapHold = UILongPressGestureRecognizer(target: self, action: #selector(ImageScrollView.handleDoubleTapHold(_:)))
-        doubleTapHold.numberOfTapsRequired = 2
-        doubleTapHold.minimumPressDuration = doubleTapHoldMinPressDuration
-        doubleTapHold.allowableMovement = 100 // allow some movement
         
-        // Interaction rules:
-        // - If the user starts panning (scrollView's pan recognizes), cancel double-tap toggle.
-        // - If the double-tap-hold is recognized, the double-tap toggle should not fire.
-        doubleTap.require(toFail: doubleTapHold)
         // Cancel double-tap if a pan larger than the pan gesture threshold happens prior to recognition:
         doubleTap.require(toFail: self.panGestureRecognizer)
-        doubleTapHold.require(toFail: self.panGestureRecognizer)
         // Make singleTap wait for double gestures to avoid misfires.
         singleTap.require(toFail: doubleTap)
-        singleTap.require(toFail: doubleTapHold)
         
-        _zoomView!.addGestureRecognizer(doubleTapHold)
         _zoomView!.addGestureRecognizer(doubleTap)
         _zoomView!.addGestureRecognizer(singleTap)
         
         // keep strong refs to the recognizers so we can remove them if zoomView changes
         singleTapRecognizer = singleTap
         doubleTapRecognizer = doubleTap
-        doubleTapHoldRecognizer = doubleTapHold
       }
     }
     
@@ -292,42 +267,6 @@ open class ImageScrollView: UIScrollView {
         imageScrollViewDelegate?.imageScrollViewSingleTapped?(self, viewPoint: viewPoint, imagePoint: imagePoint)
     }
 
-    // Double-tap-and-drag to zoom
-    @objc func handleDoubleTapHold(_ recognizer: UILongPressGestureRecognizer) {
-        guard let zoom = _zoomView else { return }
-        let touchPointInZoom = recognizer.location(in: zoom)
-        let touchPointInSelf = recognizer.location(in: self)
-
-        switch recognizer.state {
-        case .began:
-            // Start interactive zoom; capture initial scale and anchor.
-            isDoubleTapPanZooming = true
-            doubleTapPanInitialScale = zoomScale
-            doubleTapPanInitialCenter = touchPointInZoom
-            doubleTapPanInitialTouchY = touchPointInSelf.y
-            // temporarily disable the scroll view panning so that the gesture exclusively handles zooming
-            self.isScrollEnabled = false
-            imageScrollViewDelegate?.imageScrollViewDidStartDoubleTapPan?(self, viewPoint: touchPointInZoom, imagePoint: convertPointToImagePoint(touchPointInZoom) ?? CGPoint.zero)
-
-        case .changed:
-            guard isDoubleTapPanZooming else { return }
-            let currentY = touchPointInSelf.y
-            let deltaTotal = doubleTapPanInitialTouchY - currentY
-            // Ramped exponential scale for comfortable control
-            let rawNewScale = doubleTapPanInitialScale * CGFloat(expf(Float(deltaTotal * doubleTapPanSensitivity)))
-            // clamp scale
-            let newScale = min(max(rawNewScale, minimumZoomScale), maximumZoomScale)
-            if abs(newScale - zoomScale) > 1e-4 {
-                let zoomRect = zoomRectForScale(newScale, center: doubleTapPanInitialCenter)
-                zoom(to: zoomRect, animated: false)
-            }
-        default:
-            // Ended/cancelled/failed: restore normal scrolling and notify
-            isDoubleTapPanZooming = false
-            self.isScrollEnabled = true
-            imageScrollViewDelegate?.imageScrollViewDidEndDoubleTapPan?(self)
-        }
-    }
     
     @objc func doubleTapGestureRecognizer(_ gestureRecognizer: UIGestureRecognizer) {
         // zoom out if it bigger than the scale factor after double-tap scaling. Else, zoom in
@@ -356,13 +295,65 @@ open class ImageScrollView: UIScrollView {
         return zoomRect
     }
     
+    /// Convert a point in the zoomView's local coordinates to the corresponding point in the image's pixel/point coordinates.
+    /// Returns nil if conversion cannot be performed (e.g. no image).
+    func convertPointToImagePoint(_ point: CGPoint) -> CGPoint? {
+        guard let zoom = _zoomView, let image = zoom.image else { return nil }
+        let imageSize = image.size
+        let viewSize = zoom.bounds.size
+        if imageSize.width == 0 || imageSize.height == 0 || viewSize.width == 0 || viewSize.height == 0 {
+            return nil
+        }
+
+        var imageRect = CGRect.zero
+        switch zoom.contentMode {
+        case .scaleAspectFit:
+            let scale = min(viewSize.width / imageSize.width, viewSize.height / imageSize.height)
+            let scaled = CGSize(width: imageSize.width * scale, height: imageSize.height * scale)
+            imageRect.size = scaled
+            imageRect.origin = CGPoint(x: (viewSize.width - scaled.width) / 2.0, y: (viewSize.height - scaled.height) / 2.0)
+        case .scaleAspectFill:
+            let scale = max(viewSize.width / imageSize.width, viewSize.height / imageSize.height)
+            let scaled = CGSize(width: imageSize.width * scale, height: imageSize.height * scale)
+            imageRect.size = scaled
+            imageRect.origin = CGPoint(x: (viewSize.width - scaled.width) / 2.0, y: (viewSize.height - scaled.height) / 2.0)
+        case .scaleToFill:
+            imageRect = CGRect(origin: .zero, size: viewSize)
+        case .center:
+            imageRect.size = imageSize
+            imageRect.origin = CGPoint(x: (viewSize.width - imageSize.width) / 2.0, y: (viewSize.height - imageSize.height) / 2.0)
+        default:
+            // treat unknown/other modes as scaleToFill
+            imageRect = CGRect(origin: .zero, size: viewSize)
+        }
+
+        // Avoid divide-by-zero
+        guard imageRect.width != 0 && imageRect.height != 0 else { return nil }
+
+        // convert to a [0..1] ratio within the imageRect
+        var ratioX = (point.x - imageRect.origin.x) / imageRect.width
+        var ratioY = (point.y - imageRect.origin.y) / imageRect.height
+
+        // Clamp ratios in case of small floating point differences
+        ratioX = min(max(ratioX, 0.0), 1.0)
+        ratioY = min(max(ratioY, 0.0), 1.0)
+
+        // Map into the original image pixel/point coordinates
+        return CGPoint(x: ratioX * imageSize.width, y: ratioY * imageSize.height)
+    }
+
+    /// Simple wrapper for UIScrollView's zoom(to:animated:) for explicitness/clarity
+    @objc open override func zoom(to rect: CGRect, animated: Bool) {
+        super.zoom(to: rect, animated: animated)
+    }
+    
     // MARK: - Actions
     
     @objc func changeOrientationNotification() {
         // A weird bug that frames are not update right after orientation changed. Need delay a little bit with async.
         DispatchQueue.main.async {
             self.updateForImage(self.imageSize)
-            self.imageScrollViewDelegate?.imageScrollViewDidChangeOrientation(imageScrollView: self)
+            self.imageScrollViewDelegate?.imageScrollViewDidChangeOrientation?(imageScrollView: self)
         }
     }
 }

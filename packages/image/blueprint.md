@@ -388,22 +388,6 @@ Boolean value used for enabling or disabling the streaming of progressive JPEG i
 <@nativescript-community/ui-image:Img progressiveRenderingEnabled="true"/>
 ```
 
-- **showProgressBar**
-
-Boolean value used for showing or hiding the progress bar.
-
-```xml
-<@nativescript-community/ui-image:Img showProgressBar="true"/>
-```
-
-- **progressBarColor**
-
-String value used for setting the color of the progress bar. You can set it to hex values ("*#FF0000*") and/or predefined colors ("*green*").
-
-```xml
-<@nativescript-community/ui-image:Img progressBarColor="blue"/>
-```
-
 - **roundAsCircle** 
 
 Boolean value used for determining if the image will be rounded as a circle. Its default value is false. If set to true the image will be rounder to a circle.

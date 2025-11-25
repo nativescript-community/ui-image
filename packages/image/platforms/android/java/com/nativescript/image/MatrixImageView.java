@@ -410,12 +410,13 @@ public class MatrixImageView extends AppCompatImageView {
             if (old instanceof Animatable) {
                 ((Animatable) old).stop();
             }
+            setImageSize(0, 0);
             super.setImageDrawable(null);
             // clear implicit image size when drawable removed
             // (do not clear explicit mImageWidth/mImageHeight set by caller)
             return;
         }
-
+        setImageSize(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
         MatrixDrawable md = new MatrixDrawable(drawable);
         // set the wrapper as the ImageView drawable - AppCompatImageView will set the
         // wrapper's callback to the view.

@@ -4,8 +4,8 @@
         <StackLayout padding="10">
             <Label text="Tint & Background Demo" class="h2" />
             <GridLayout columns="*,*" marginTop="8" height="60%">
-                <NSImg col="0" width="100%" height="200" :src="src" :tintColor="tint" :showProgressBar="true" />
-                <NSImg col="1" width="100%" height="200" :src="src" :backgroundUri="background" :showProgressBar="true" />
+                <NSImg col="0" width="100%" height="200" :src="src" :tintColor="tint" />
+                <NSImg col="1" width="100%" height="200" :src="src" :backgroundUri="background" />
             </GridLayout>
             <WrapLayout marginTop="8">
                 <Button text="Apply red tint" @tap="applyTint('#ff000088')" />

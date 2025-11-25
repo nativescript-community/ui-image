@@ -11,8 +11,6 @@
                 :animatedImageView="true"
                 :autoPlayAnimations="autoPlayAnimations"
                 :tapToRetryEnabled="tapToRetryEnabled"
-                showProgressBar="true"
-                progressBarColor="red"
             />
             <WrapLayout marginTop="8">
                 <Button :text="'AutoPlay: ' + autoPlayAnimations" @tap="toggleAutoPlay" />

@@ -14,8 +14,6 @@
                     :blurRadius="blurRadius"
                     :blurDownSampling="blurDownSampling"
                     :noRatioEnforce="noRatioEnforce"
-                    :showProgressBar="true"
-                    progressBarColor="purple"
                     @finalImageSet="onFinal"
                 />
 

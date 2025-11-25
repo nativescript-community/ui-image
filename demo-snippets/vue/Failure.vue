@@ -11,7 +11,6 @@
                 placeholderImageUri="res://icon_star"
                 backgroundColor="blue"
                 failureImageUri="res://icon_not_found"
-                showProgressBar="true"
                 failure="onFailure"
                 src="http://error.jpgerror"
             />

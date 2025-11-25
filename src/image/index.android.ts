@@ -30,13 +30,11 @@ import {
     needRequestImage,
     noRatioEnforceProperty,
     placeholderImageUriProperty,
-    progressBarColorProperty,
     roundAsCircleProperty,
     roundBottomLeftRadiusProperty,
     roundBottomRightRadiusProperty,
     roundTopLeftRadiusProperty,
     roundTopRightRadiusProperty,
-    showProgressBarProperty,
     srcProperty,
     stretchProperty,
     tintColorProperty,
@@ -412,14 +410,11 @@ export class Img extends ImageBase {
     nativeViewProtected: com.nativescript.image.MatrixImageView;
     //@ts-expect-error just for declaration
     nativeImageViewProtected: com.nativescript.image.MatrixImageView;
-    isLoading = false;
 
     mCanUpdateHierarchy = true;
     mNeedUpdateHierarchy = false;
     mNeedUpdateLayout = false;
 
-    private currentRequestBuilder: any = null;
-    private currentDrawable: android.graphics.drawable.Drawable = null;
     private currentTarget: any = null;
     private isNetworkRequest = false;
     private progressCallback: any = null;
@@ -446,22 +441,7 @@ export class Img extends ImageBase {
         return new com.nativescript.image.MatrixImageView(this._context);
     }
 
-    updateViewSize(drawable: android.graphics.drawable.Drawable) {
-        const view = this.nativeImageViewProtected;
-        if (!view) {
-            return;
-        }
-
-        const width = drawable ? drawable.getIntrinsicWidth() : 0;
-        const height = drawable ? drawable.getIntrinsicHeight() : 0;
-        if (drawable != null) {
-            view.setImageSize(width, height);
-        }
-    }
-
     public disposeNativeView() {
-        this.currentRequestBuilder = null;
-        this.currentDrawable = null;
         this.progressCallback = null;
         this.loadSourceCallback = null;
     }
@@ -516,17 +496,7 @@ export class Img extends ImageBase {
     }
 
     @needUpdateHierarchy
-    [showProgressBarProperty.setNative]() {
-        this.updateHierarchy();
-    }
-
-    @needUpdateHierarchy
-    [progressBarColorProperty.setNative]() {
-        this.updateHierarchy();
-    }
-
-    @needUpdateHierarchy
-    [roundAsCircleProperty.setNative]() {
+    [roundAsCircleProperty.setNative](value) {
         this.updateHierarchy();
     }
 
@@ -535,11 +505,8 @@ export class Img extends ImageBase {
         this.updateHierarchy();
     }
 
-    @needUpdateHierarchy(true)
     [imageRotationProperty.setNative](value) {
-        if (this.nativeImageViewProtected) {
-            this.nativeImageViewProtected.setImageRotation(value);
-        }
+        this.nativeImageViewProtected?.setImageRotation(value);
     }
 
     @needUpdateHierarchy
@@ -780,7 +747,6 @@ export class Img extends ImageBase {
             onLoadFailed(e: any, model: any, target: any, isFirstResource: boolean): boolean {
                 const instance = owner.get();
                 if (instance) {
-                    instance.isLoading = false;
                     instance.progressCallback = null; // Clean up
                     instance.loadSourceCallback = null;
                     instance.notifyFailure(e);
@@ -790,13 +756,10 @@ export class Img extends ImageBase {
             onResourceReady(resource: android.graphics.drawable.Drawable, model: any, target: any, dataSource: any, isFirstResource: boolean): boolean {
                 const instance = owner.get();
                 if (instance) {
-                    instance.isLoading = false;
                     instance.progressCallback = null; // Clean up
                     instance.loadSourceCallback = null;
 
-                    instance.updateViewSize(resource);
                     instance.notifyFinalImageSet(resource, dataSource);
-                    instance.currentDrawable = resource;
 
                     // Handle auto-play for animated drawables
                     if (!instance.autoPlayAnimations && resource instanceof android.graphics.drawable.Animatable) {
@@ -839,9 +802,8 @@ export class Img extends ImageBase {
             }
         });
 
-        // fallback to using the view as the target
-        requestBuilder.signature(signature).listener(new com.nativescript.image.CompositeRequestListener(objectArr)).into(new com.nativescript.image.MatrixDrawableImageViewTarget(view));
-        this.currentRequestBuilder = requestBuilder;
+        this.currentTarget = new com.nativescript.image.MatrixDrawableImageViewTarget(view)
+        requestBuilder.signature(signature).listener(new com.nativescript.image.CompositeRequestListener(objectArr)).into(this.currentTarget);
     }
 
     private notifyLoadSource(source: string) {
@@ -963,7 +925,6 @@ export class Img extends ImageBase {
                 }
             } else if (src instanceof ImageSource) {
                 drawable = new android.graphics.drawable.BitmapDrawable(Utils.android.getApplicationContext().getResources(), src.android as android.graphics.Bitmap);
-                this.updateViewSize(drawable);
             }
 
             if (drawable) {
@@ -978,7 +939,6 @@ export class Img extends ImageBase {
                 return;
             }
 
-            this.isLoading = true;
             this.loadImageWithGlide(uri);
         } else {
             // Clear existing request before removing the drawable
@@ -1050,14 +1010,16 @@ export class Img extends ImageBase {
     }
 
     startAnimating() {
-        if (this.currentDrawable && this.currentDrawable instanceof android.graphics.drawable.Animatable) {
-            (this.currentDrawable as android.graphics.drawable.Animatable).start();
+        const drawable = this.nativeViewProtected.getDrawable()
+        if (drawable && drawable instanceof android.graphics.drawable.Animatable) {
+            drawable.start();
         }
     }
 
     stopAnimating() {
-        if (this.currentDrawable && this.currentDrawable instanceof android.graphics.drawable.Animatable) {
-            (this.currentDrawable as android.graphics.drawable.Animatable).stop();
+        const drawable = this.nativeViewProtected.getDrawable()
+        if (drawable && drawable instanceof android.graphics.drawable.Animatable) {
+            drawable.stop();
         }
     }
 }

@@ -6,19 +6,19 @@ export * from './index-common.ts';
  * When called, initializes the android Image library. Calling this method is required.
  * A good place to call it is at the application onLaunch() method.
  */
-declare function initialize(config?: ImagePipelineConfigSetting): void;
+export  function initialize(config?: ImagePipelineConfigSetting): void;
 
 /**
  * Shuts the native Image and SimpleDraweeView down. By design this method should not be called manually as it is handled by the Image library internally.
  * NOTE: Be careful when manuallycalling this method as it will completely shutdown the functionality of Image.
  */
-declare function shutDown(): void;
+export function shutDown(): void;
 
 /**
  * When called, initializes the android Image library. Calling this method is required.
  * A good place to call it is at the application onLaunch() method.
  */
-declare function getImagePipeline(): ImagePipeline;
+export function getImagePipeline(): ImagePipeline;
 
 /**
  * Encapsulates the common abstraction behind a platform specific object (typically a Bitmap) that is used view to show remote or local images.
@@ -120,16 +120,6 @@ export class Img extends View {
      * Boolean value used for enabling or disabling the streaming of progressive JPEG images.
      */
     progressiveRenderingEnabled: boolean;
-
-    /**
-     * Boolean value used for showing or hiding the progress bar.
-     */
-    showProgressBar: boolean;
-
-    /**
-     * String value used for setting the color of the progress bar. Can be set to hex values ("#FF0000"") and predefined colors ("green").
-     */
-    progressBarColor: Color | string;
 
     /**
      * Boolean value used for determining if the image should be rounded as a circle.

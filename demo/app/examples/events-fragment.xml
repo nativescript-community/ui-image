@@ -5,8 +5,6 @@
                             verticalAlignment="top"
                             width="75%"
                             progressiveRenderingEnabled="true"
-                            showProgressBar="true"
-                            progressBarColor="#3C5AFD"
                             src="http://pooyak.com/p/progjpeg/jpegload.cgi?o=1"
                             finalImageSet="onFinalImageSet"
                             intermediateImageSet="onIntermediateImageSet"

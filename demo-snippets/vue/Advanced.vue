@@ -12,8 +12,6 @@
                     :lowerResSrc="lowerResSrc"
                     :placeholderImageUri="placeholderImage"
                     :failureImageUri="failureImage"
-                    :showProgressBar="showProgressBar"
-                    :progressBarColor="progressBarColor"
                     :stretch="stretch"
                     :roundAsCircle="roundAsCircle"
                     :roundTopLeftRadius="roundTopLeftRadius"
@@ -57,7 +55,6 @@
 
                 <Label text="Toggles" class="h3" marginTop="12" />
                 <WrapLayout>
-                    <Button :text="'Progress: ' + showProgressBar" @tap="toggle('showProgressBar')" />
                     <Button :text="'RoundAsCircle: ' + roundAsCircle" @tap="toggle('roundAsCircle')" />
                     <Button :text="'No Cache: ' + noCache" @tap="toggle('noCache')" />
                     <Button :text="'No Ratio Enforce: ' + noRatioEnforce" @tap="toggle('noRatioEnforce')" />
@@ -147,8 +144,6 @@ export default {
             lowerResSrc: null,
             placeholderImage: null,
             failureImage: null,
-            showProgressBar: true,
-            progressBarColor: 'green',
             roundAsCircle: false,
             roundTopLeftRadius: 0,
             roundTopRightRadius: 0,
