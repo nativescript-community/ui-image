@@ -407,6 +407,8 @@ export class Img extends ImageBase {
     //TODO: remove as it needs to be added after TS 5.7 change https://github.com/microsoft/TypeScript/pull/59860
     [key: symbol]: (...args: any[]) => any | void;
 
+    public preventPreClearDrawable = false;
+
     nativeViewProtected: com.nativescript.image.MatrixImageView;
     //@ts-expect-error just for declaration
     nativeImageViewProtected: com.nativescript.image.MatrixImageView;
@@ -442,6 +444,8 @@ export class Img extends ImageBase {
     }
 
     public disposeNativeView() {
+        // Cancel any running Glide requests before dispose
+        this.cancelCurrentRequest();
         this.progressCallback = null;
         this.loadSourceCallback = null;
     }
@@ -583,9 +587,35 @@ export class Img extends ImageBase {
         }
     }
 
+    // Clear any active Glide target/request attached to this view.
+    private cancelCurrentRequest(): void {
+        const ctx = this._context;
+        if (!ctx) {
+            return;
+        }
+        if (this.currentTarget) {
+            // cancel and drop reference; Any callbacks from the old target will be swallowed.
+            try {
+                com.bumptech.glide.Glide.with(ctx).clear(this.currentTarget);
+            } catch (err) {
+                // ignore
+            }
+            this.currentTarget = null;
+        }
+        // if (this.nativeViewProtected) {
+        //     try {
+        //         com.bumptech.glide.Glide.with(ctx).clear(this.nativeViewProtected);
+        //     } catch (err) {
+        //         // ignore
+        //     }
+        // }
+    }
+
     private loadImageWithGlide(uri: string) {
         const view = this.nativeViewProtected;
         const context = this._context;
+        // Cancel any prior Glide request/target for this view before starting a new one.
+        this.cancelCurrentRequest();
         // Determine if this is a network request
         this.isNetworkRequest = typeof uri === 'string' && (uri.startsWith('http://') || uri.startsWith('https://'));
 
@@ -747,6 +777,15 @@ export class Img extends ImageBase {
             onLoadFailed(e: any, model: any, target: any, isFirstResource: boolean): boolean {
                 const instance = owner.get();
                 if (instance) {
+                    // If this callback is for a previously canceled request, swallow it to avoid
+                    // emitting/logging errors for obsolete requests.
+                    if (instance.currentTarget && target !== instance.currentTarget) {
+                        instance.progressCallback = null;
+                        instance.loadSourceCallback = null;
+                        // Swallow: we handled it (don't let Glide default log/clear)
+                        return true;
+                    }
+                    instance.currentTarget = null;
                     instance.progressCallback = null; // Clean up
                     instance.loadSourceCallback = null;
                     instance.notifyFailure(e);
@@ -756,6 +795,13 @@ export class Img extends ImageBase {
             onResourceReady(resource: android.graphics.drawable.Drawable, model: any, target: any, dataSource: any, isFirstResource: boolean): boolean {
                 const instance = owner.get();
                 if (instance) {
+                    // Ignore if the callback is from a previous request (stale).
+                    if (instance.currentTarget && target !== instance.currentTarget) {
+                        instance.progressCallback = null;
+                        instance.loadSourceCallback = null;
+                        return true;
+                    }
+                    instance.currentTarget = null;
                     instance.progressCallback = null; // Clean up
                     instance.loadSourceCallback = null;
 
@@ -802,8 +848,14 @@ export class Img extends ImageBase {
             }
         });
 
-        this.currentTarget = new com.nativescript.image.MatrixDrawableImageViewTarget(view)
-        requestBuilder.signature(signature).listener(new com.nativescript.image.CompositeRequestListener(objectArr)).into(this.currentTarget);
+        // Always create and track our custom target so we can detect stale callbacks later.
+        const target = new com.nativescript.image.MatrixDrawableImageViewTarget(view);
+        this.currentTarget = target;
+        if (this.preventPreClearDrawable) {
+            target.setClearFirst(false);
+        }
+
+        requestBuilder.signature(signature).listener(new com.nativescript.image.CompositeRequestListener(objectArr)).into(target);
     }
 
     private notifyLoadSource(source: string) {
@@ -942,12 +994,7 @@ export class Img extends ImageBase {
             this.loadImageWithGlide(uri);
         } else {
             // Clear existing request before removing the drawable
-            if (this.currentTarget) {
-                com.bumptech.glide.Glide.with(this._context).clear(this.currentTarget);
-                this.currentTarget = null;
-            } else {
-                com.bumptech.glide.Glide.with(this._context).clear(view);
-            }
+            this.cancelCurrentRequest();
             view.setImageDrawable(null);
         }
     }
@@ -1010,14 +1057,14 @@ export class Img extends ImageBase {
     }
 
     startAnimating() {
-        const drawable = this.nativeViewProtected.getDrawable()
+        const drawable = this.nativeViewProtected.getDrawable();
         if (drawable && drawable instanceof android.graphics.drawable.Animatable) {
             drawable.start();
         }
     }
 
     stopAnimating() {
-        const drawable = this.nativeViewProtected.getDrawable()
+        const drawable = this.nativeViewProtected.getDrawable();
         if (drawable && drawable instanceof android.graphics.drawable.Animatable) {
             drawable.stop();
         }

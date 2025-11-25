@@ -419,6 +419,9 @@ declare namespace com {
 				public getOpacity(): number;
 			}
 			export class MatrixDrawableImageViewTarget extends com.bumptech.glide.request.target.ViewTarget<globalAndroid.widget.ImageView,globalAndroid.graphics.drawable.Drawable> implements com.bumptech.glide.request.transition.Transition.ViewAdapter  {
+                setClearFirst(arg0: boolean) {
+                    throw new Error('Method not implemented.');
+                }
 				public static class: java.lang.Class<com.nativescript.image.MatrixDrawableImageViewTarget>;
 				public constructor(view: globalAndroid.widget.ImageView);
 				public getCurrentDrawable(): globalAndroid.graphics.drawable.Drawable;

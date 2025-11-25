@@ -20,6 +20,10 @@ public class MatrixDrawableImageViewTarget extends ViewTarget<ImageView, Drawabl
     @Nullable
     private Animatable animatable;
 
+    // If true, clear drawable first on load, error. Disabling will prevent flickering
+    // but wont look good with recycled views
+    private boolean mClearFirst = true;
+
   public MatrixDrawableImageViewTarget(ImageView view) {
     super(view);
   }
@@ -31,6 +35,15 @@ public class MatrixDrawableImageViewTarget extends ViewTarget<ImageView, Drawabl
   @Deprecated
   public MatrixDrawableImageViewTarget(ImageView view, boolean waitForLayout) {
     super(view, waitForLayout);
+  }
+
+  /**
+   * Control whether to preserve current drawable on load start/clear.
+   * Default is true (clear). Call this immediately after creating the target if you want
+   * to disable this with false.
+   */
+  public void setClearFirst(boolean preserve) {
+      this.mClearFirst = preserve;
   }
 
     /**
@@ -66,8 +79,9 @@ public class MatrixDrawableImageViewTarget extends ViewTarget<ImageView, Drawabl
     @Override
     public void onLoadStarted(@Nullable Drawable placeholder) {
         super.onLoadStarted(placeholder);
-
-        // setResourceInternal(null);
+        if (this.mClearFirst) {
+            setResourceInternal(null);
+        }
         if (placeholder != null) {
             setDrawable(placeholder);
         }
@@ -83,7 +97,9 @@ public class MatrixDrawableImageViewTarget extends ViewTarget<ImageView, Drawabl
     @Override
     public void onLoadFailed(@Nullable Drawable errorDrawable) {
         super.onLoadFailed(errorDrawable);
-        setResourceInternal(null);
+        if (this.mClearFirst) {
+            setResourceInternal(null);
+        }
         if (errorDrawable != null) {
             setDrawable(errorDrawable);
         }
@@ -102,7 +118,9 @@ public class MatrixDrawableImageViewTarget extends ViewTarget<ImageView, Drawabl
         if (animatable != null) {
             animatable.stop();
         }
-        // setResourceInternal(null);
+        if (this.mClearFirst) {
+            setResourceInternal(null);
+        }
         if (placeholder != null) {
             setDrawable(placeholder);
         }
