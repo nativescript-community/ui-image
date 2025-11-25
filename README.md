@@ -439,7 +439,7 @@ Number value used as the aspect ratio of the image. This property is useful when
 <@nativescript-community/ui-image:Img aspectRatio="1.33" verticalAlignment="top"/>
 ```
 
-- **decodeWidth** (downsampling).
+- **decodeWidth** (downsampling)
 
 Number value used as the downsampled width of the imageModule drawable.
 
@@ -447,7 +447,7 @@ Number value used as the downsampled width of the imageModule drawable.
 <@nativescript-community/ui-image:Img decodeWidth="100"/>
 ```
 
-- **decodeHeight** (downsampling).
+- **decodeHeight** (downsampling)
 
 Number value used as the downsampled width of the imageModule drawable.
 
@@ -469,22 +469,6 @@ Boolean value used for enabling or disabling the streaming of progressive JPEG i
 
 ```xml
 <@nativescript-community/ui-image:Img progressiveRenderingEnabled="true"/>
-```
-
-- **showProgressBar**
-
-Boolean value used for showing or hiding the progress bar.
-
-```xml
-<@nativescript-community/ui-image:Img showProgressBar="true"/>
-```
-
-- **progressBarColor**
-
-String value used for setting the color of the progress bar. You can set it to hex values ("*#FF0000*") and/or predefined colors ("*green*").
-
-```xml
-<@nativescript-community/ui-image:Img progressBarColor="blue"/>
 ```
 
 - **roundAsCircle** 

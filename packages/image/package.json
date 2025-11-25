@@ -1,7 +1,7 @@
 {
     "name": "@nativescript-community/ui-image",
     "version": "4.6.6",
-    "description": "Advanced and efficient image display plugin which uses Fresco (Android) and SDWebImage (iOS) to implement caching, placeholders, image effects, and much more.",
+    "description": "Advanced and efficient image display plugin which uses Glide (Android) and SDWebImage (iOS) to implement caching, placeholders, image effects, and much more.",
     "main": "./index",
     "sideEffects": false,
     "typings": "./index.d.ts",
