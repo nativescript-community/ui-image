@@ -11,7 +11,7 @@ dependencies {
 	def glideTransformationsVersion =  project.hasProperty("glideTransformationsVersion") ? project.glideTransformationsVersion : "4.3.0"
 	def glideOkHttpVersion =  project.hasProperty("glideOkHttpVersion") ? project.glideOkHttpVersion : "4.11.0"
 
-    def androidXAppCompatVersion = "${ns_default_androidx_appcompat_version}"
+    def androidXAppCompatVersion = "1.1.0"
     if (project.hasProperty("androidXAppCompat")) {
         androidXAppCompatVersion = androidXAppCompat
         outLogger.withStyle(Style.SuccessHeader).println "\t + using android X library androidx.appcompat:appcompat:$androidXAppCompatVersion"
