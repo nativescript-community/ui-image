@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.2](https://github.com/@nativescript-community/ui-image/compare/v5.0.1...v5.0.2) (2025-11-28)
+
+### Bug Fixes
+
+* prevent duplicate calls to initImage ([dbf352b](https://github.com/@nativescript-community/ui-image/commit/dbf352be37ae606cc8fc8686c01c612774d47dee))
+
 ## [5.0.1](https://github.com/@nativescript-community/ui-image/compare/v5.0.0...v5.0.1) (2025-11-25)
 
 ### Bug Fixes
