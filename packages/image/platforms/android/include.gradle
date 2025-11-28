@@ -1,10 +1,6 @@
 import groovy.json.JsonSlurper
 
 
-repositories {
-	mavenCentral()
-	maven { url 'https://jitpack.io' }
-}
 dependencies {
 	def glideVersion =  project.hasProperty("glideVersion") ? project.glideVersion : "5.0.5"
 	def glideCompilerVersion =  project.hasProperty("glideCompilerVersion") ? project.glideCompilerVersion : "4.16.0"
@@ -49,6 +45,7 @@ dependencies {
 
 repositories {
 	mavenCentral()
+	maven { url 'https://jitpack.io' }
     // we need to copy the code in both places as N main gradle system does not support top level code
     // for now we support only @nativescript/core and @akylas/nativescript
     // we should have a more generic way
