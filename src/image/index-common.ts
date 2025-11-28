@@ -150,7 +150,7 @@ export const localThumbnailPreviewsEnabledProperty = new Property<ImageBase, boo
 export const roundAsCircleProperty = new Property<ImageBase, boolean>({ name: 'roundAsCircle', valueConverter: booleanConverter, affectsLayout: isAndroid });
 export const blurRadiusProperty = new Property<ImageBase, number>({ name: 'blurRadius', valueConverter: (v) => parseFloat(v) });
 export const blurDownSamplingProperty = new Property<ImageBase, number>({ name: 'blurDownSampling', valueConverter: (v) => parseFloat(v) });
-export const imageRotationProperty = new Property<ImageBase, number>({ name: 'imageRotation', valueConverter: (v) => parseFloat(v), defaultValue: 0 , affectsLayout: true});
+export const imageRotationProperty = new Property<ImageBase, number>({ name: 'imageRotation', valueConverter: (v) => parseFloat(v), defaultValue: 0, affectsLayout: true });
 export const autoPlayAnimationsProperty = new Property<ImageBase, boolean>({ name: 'autoPlayAnimations', valueConverter: booleanConverter });
 export const tapToRetryEnabledProperty = new Property<ImageBase, boolean>({ name: 'tapToRetryEnabled', valueConverter: booleanConverter });
 export const aspectRatioProperty = new Property<ImageBase, number>({ name: 'aspectRatio', affectsLayout: true, valueConverter: (v) => parseFloat(v) });
@@ -233,6 +233,7 @@ export const needRequestImage = function (target: any, propertyKey: string | sym
             this.mNeedRequestImage = true;
             return;
         }
+        this.initImage();
         return originalMethod.apply(this, args);
     };
 };

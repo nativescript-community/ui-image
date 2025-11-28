@@ -299,6 +299,7 @@ export class Img extends ImageBase {
     //@ts-ignore
     nativeImageViewProtected: SDAnimatedImageView | UIImageView;
     mCacheKey: string;
+    placeholderImage: UIImage;
 
     // network detection + notification guard
     private _isRemote: boolean = false;
@@ -483,7 +484,7 @@ export class Img extends ImageBase {
     private onLoadProgress = (currentSize: number, totalSize: number) => {
         const fraction = totalSize > 0 ? currentSize / totalSize : -1;
         this.handleImageProgress(fraction, totalSize);
-        Utils.executeOnMainThread(()=>{
+        Utils.executeOnMainThread(() => {
             const eventName = ImageBase.progressEvent;
             if (this.hasListeners(eventName)) {
                 // Notify progress event
@@ -505,7 +506,7 @@ export class Img extends ImageBase {
                     } as LoadSourceEventData);
                 }
             }
-        })
+        });
     };
 
     private getUIImage(imagePath: string | ImageSource) {
@@ -644,14 +645,9 @@ export class Img extends ImageBase {
         }
     }
     @needRequestImage
-    [srcProperty.setNative](value) {
-        this.initImage();
-    }
+    [srcProperty.setNative](value) {}
     @needRequestImage
-    [imageRotationProperty.setNative](value) {
-        this.initImage();
-    }
-    placeholderImage: UIImage;
+    [imageRotationProperty.setNative](value) {}
     @needRequestImage
     [placeholderImageUriProperty.setNative]() {}
 

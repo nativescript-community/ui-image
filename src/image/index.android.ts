@@ -372,37 +372,6 @@ export class ImageInfo implements ImageInfoBase {
     }
 }
 
-export const needUpdateHierarchy = function (targetOrNeedsLayout: any, propertyKey?: string | symbol, descriptor?: PropertyDescriptor): any {
-    if (typeof targetOrNeedsLayout === 'boolean') {
-        return function (target2: any, propertyKey: string | symbol, descriptor: PropertyDescriptor) {
-            const originalMethod = descriptor.value;
-            descriptor.value = function (...args: any[]) {
-                if (!this.mCanUpdateHierarchy) {
-                    this.mNeedUpdateHierarchy = true;
-                    if (this.isLoaded && targetOrNeedsLayout) {
-                        const layoutParams = (this.nativeViewProtected as android.widget.ImageView)?.getLayoutParams();
-                        if (layoutParams) {
-                            if (layout.getMeasureSpecMode(layoutParams.height) !== layout.EXACTLY || layout.getMeasureSpecMode(layoutParams.width) !== layout.EXACTLY) {
-                                this.mNeedUpdateLayout = true;
-                            }
-                        }
-                    }
-                    return;
-                }
-                return originalMethod.apply(this, args);
-            };
-        };
-    }
-    const originalMethod = descriptor.value;
-    descriptor.value = function (...args: any[]) {
-        if (!this.mCanUpdateHierarchy) {
-            this.mNeedUpdateHierarchy = true;
-            return;
-        }
-        return originalMethod.apply(this, args);
-    };
-};
-
 export class Img extends ImageBase {
     //TODO: remove as it needs to be added after TS 5.7 change https://github.com/microsoft/TypeScript/pull/59860
     [key: symbol]: (...args: any[]) => any | void;
@@ -413,28 +382,12 @@ export class Img extends ImageBase {
     //@ts-expect-error just for declaration
     nativeImageViewProtected: com.nativescript.image.MatrixImageView;
 
-    mCanUpdateHierarchy = true;
-    mNeedUpdateHierarchy = false;
     mNeedUpdateLayout = false;
 
     private currentTarget: any = null;
     private isNetworkRequest = false;
     private progressCallback: any = null;
     private loadSourceCallback: any = null;
-
-    public onResumeNativeUpdates(): void {
-        this.mCanUpdateHierarchy = false;
-        super.onResumeNativeUpdates();
-        this.mCanUpdateHierarchy = true;
-        if (this.mNeedUpdateHierarchy) {
-            this.mNeedUpdateHierarchy = false;
-            this.updateHierarchy();
-        }
-        if (this.mNeedUpdateLayout) {
-            this.mNeedUpdateLayout = false;
-            this.nativeViewProtected.requestLayout();
-        }
-    }
 
     public createNativeView() {
         if (!initialized) {
@@ -469,15 +422,11 @@ export class Img extends ImageBase {
         this.initImage();
     }
 
-    @needUpdateHierarchy
-    [placeholderImageUriProperty.setNative]() {
-        this.updateHierarchy();
-    }
+    @needRequestImage
+    [placeholderImageUriProperty.setNative]() {}
 
-    @needUpdateHierarchy
-    [failureImageUriProperty.setNative]() {
-        this.updateHierarchy();
-    }
+    @needRequestImage
+    [failureImageUriProperty.setNative]() {}
 
     [stretchProperty.setNative]() {
         // Scale type
@@ -489,44 +438,30 @@ export class Img extends ImageBase {
         }
     }
 
-    @needUpdateHierarchy
-    [fadeDurationProperty.setNative]() {
-        this.updateHierarchy();
-    }
+    @needRequestImage
+    [fadeDurationProperty.setNative]() {}
 
-    @needUpdateHierarchy
-    [backgroundUriProperty.setNative]() {
-        this.updateHierarchy();
-    }
+    @needRequestImage
+    [backgroundUriProperty.setNative]() {}
 
-    @needUpdateHierarchy
-    [roundAsCircleProperty.setNative](value) {
-        this.updateHierarchy();
-    }
+    @needRequestImage
+    [roundAsCircleProperty.setNative](value) {}
 
-    @needUpdateHierarchy
-    [roundTopLeftRadiusProperty.setNative]() {
-        this.updateHierarchy();
-    }
+    @needRequestImage
+    [roundTopLeftRadiusProperty.setNative]() {}
 
     [imageRotationProperty.setNative](value) {
         this.nativeImageViewProtected?.setImageRotation(value);
     }
 
-    @needUpdateHierarchy
-    [roundTopRightRadiusProperty.setNative]() {
-        this.updateHierarchy();
-    }
+    @needRequestImage
+    [roundTopRightRadiusProperty.setNative]() {}
 
-    @needUpdateHierarchy
-    [roundBottomLeftRadiusProperty.setNative]() {
-        this.updateHierarchy();
-    }
+    @needRequestImage
+    [roundBottomLeftRadiusProperty.setNative]() {}
 
-    @needUpdateHierarchy
-    [roundBottomRightRadiusProperty.setNative]() {
-        this.updateHierarchy();
-    }
+    @needRequestImage
+    [roundBottomRightRadiusProperty.setNative]() {}
 
     [tintColorProperty.setNative](value: Color) {
         if (this.nativeImageViewProtected) {
@@ -535,34 +470,21 @@ export class Img extends ImageBase {
     }
 
     @needRequestImage
-    [blurRadiusProperty.setNative](value) {
-        this.initImage();
-    }
+    [blurRadiusProperty.setNative](value) {}
 
     @needRequestImage
-    [srcProperty.setNative]() {
-        this.initImage();
-    }
+    [srcProperty.setNative]() {}
     @needRequestImage
-    [decodeWidthProperty.setNative]() {
-        this.initImage();
-    }
+    [decodeWidthProperty.setNative]() {}
     @needRequestImage
-    [decodeHeightProperty.setNative]() {
-        this.initImage();
-    }
+    [decodeHeightProperty.setNative]() {}
 
     @needRequestImage
-    [lowerResSrcProperty.setNative]() {
-        this.initImage();
-    }
+    [lowerResSrcProperty.setNative]() {}
 
     @needRequestImage
-    [blurDownSamplingProperty.setNative]() {
-        this.initImage();
-    }
+    [blurDownSamplingProperty.setNative]() {}
 
-    @needRequestImage
     [aspectRatioProperty.setNative](value) {
         if (this.nativeViewProtected) {
             this.nativeViewProtected.setAspectRatio(value || 0);
@@ -570,9 +492,7 @@ export class Img extends ImageBase {
     }
 
     @needRequestImage
-    [headersProperty.setNative](value) {
-        this.initImage();
-    }
+    [headersProperty.setNative](value) {}
 
     [backgroundInternalProperty.setNative](value: Background) {
         super[backgroundInternalProperty.setNative](value);
@@ -1004,18 +924,6 @@ export class Img extends ImageBase {
             await this.handleImageSrc(this.src);
         } catch (error) {
             console.error(error, error.stack);
-        }
-    }
-
-    private updateHierarchy() {
-        if (!this.mCanUpdateHierarchy) {
-            this.mNeedUpdateHierarchy = true;
-            return;
-        }
-
-        // Force reload with new settings
-        if (this.nativeImageViewProtected && this.src) {
-            this.initImage();
         }
     }
 
