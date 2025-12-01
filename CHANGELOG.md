@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.6](https://github.com/@nativescript-community/ui-image/compare/v5.0.5...v5.0.6) (2025-12-01)
+
+### Bug Fixes
+
+* **android:** crash in prefetchToMemoryCache and prefetchToDiskCache ([2c3502c](https://github.com/@nativescript-community/ui-image/commit/2c3502c52803cb81ae55cb948838fc097f13af53))
+
 ## [5.0.5](https://github.com/@nativescript-community/ui-image/compare/v5.0.4...v5.0.5) (2025-12-01)
 
 ### Bug Fixes
