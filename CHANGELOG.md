@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.5](https://github.com/@nativescript-community/ui-image/compare/v5.0.4...v5.0.5) (2025-12-01)
+
+### Bug Fixes
+
+* **android:** ImagePipeline prefetch wait for finish ([90896a8](https://github.com/@nativescript-community/ui-image/commit/90896a8da151badbc77ee3dcd9e92091ee06074a))
+
 ## [5.0.4](https://github.com/@nativescript-community/ui-image/compare/v5.0.3...v5.0.4) (2025-11-28)
 
 ### Bug Fixes
