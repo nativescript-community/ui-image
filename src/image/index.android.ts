@@ -236,28 +236,31 @@ export class ImagePipeline {
                 const context = Utils.android.getApplicationContext();
                 const requestManager = com.bumptech.glide.Glide.with(context);
                 const requestBuilder = requestManager.asBitmap().load(uri);
-                function clear() {
+
+                let futureTarget = null;
+                function clearLater() {
                     if (futureTarget) {
-                        com.bumptech.glide.Glide.with(context).clear(futureTarget);
+                        setTimeout(() => {
+                            com.bumptech.glide.Glide.with(context).clear(futureTarget);
+                        }, 0);
                     }
                 }
-                // Build request listener that resolves the promise when resource is ready
+
                 const listener = new com.bumptech.glide.request.RequestListener({
                     onLoadFailed(e: any, model: any, target: any, isFirstResource: boolean): boolean {
-                        clear();
+                        clearLater();
                         reject(e);
                         return true; // consumed
                     },
                     onResourceReady(resource: any, model: any, target: any, dataSource: any, isFirstResource: boolean): boolean {
-                        clear();
-
+                        clearLater();
                         resolve();
                         return true; // consumed
                     }
                 });
 
                 // Kick the request off and keep a reference to the FutureTarget so it can be cleared.
-                const futureTarget = requestBuilder.listener(listener).preload();
+                futureTarget = requestBuilder.listener(listener).preload();
             } catch (error) {
                 reject(error);
             }
@@ -270,26 +273,34 @@ export class ImagePipeline {
                 const context = Utils.android.getApplicationContext();
                 const requestManager = com.bumptech.glide.Glide.with(context);
                 const requestBuilder = toDiskCache ? requestManager.downloadOnly().load(uri) : requestManager.asBitmap().load(uri);
-                function clear() {
+
+                let futureTarget = null;
+                function clearLater() {
                     if (futureTarget) {
-                        com.bumptech.glide.Glide.with(context).clear(futureTarget);
+                        setTimeout(() => {
+                            try {
+                                com.bumptech.glide.Glide.with(context).clear(futureTarget);
+                            } catch (err) {
+                                // ignore
+                            }
+                        }, 0);
                     }
                 }
 
                 const listener = new com.bumptech.glide.request.RequestListener({
                     onLoadFailed(e: any, model: any, target: any, isFirstResource: boolean): boolean {
-                        clear();
+                        clearLater();
                         reject(e);
                         return true;
                     },
                     onResourceReady(resource: any, model: any, target: any, dataSource: any, isFirstResource: boolean): boolean {
-                        clear();
+                        clearLater();
                         resolve();
                         return true;
                     }
                 });
 
-                const futureTarget = requestBuilder.listener(listener).preload();
+                futureTarget = requestBuilder.listener(listener).preload();
             } catch (error) {
                 reject(error);
             }
