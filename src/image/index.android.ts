@@ -66,8 +66,8 @@ export function initialize(config?: ImagePipelineConfigSetting): void {
 
         // this is needed for further buildKey to trigger ...
         com.bumptech.glide.Glide.with(context)
-            .load('toto?ts=' + Date().valueOf())
-            .apply(new com.bumptech.glide.request.RequestOptions().signature(new com.bumptech.glide.signature.ObjectKey(Date().valueOf())))
+            .load('toto')
+            .apply(new com.bumptech.glide.request.RequestOptions().signature(signature))
             .preload();
         // com.nativescript.image.EngineKeyFactoryMethodDumper.dumpKeyFactoryMethods(glideInstance);
         // com.nativescript.image.ForcePreloadTest.forcePreloadAfterInjection(context, 'https://example.com/test-image.png');
@@ -235,7 +235,10 @@ export class ImagePipeline {
             try {
                 const context = Utils.android.getApplicationContext();
                 const requestManager = com.bumptech.glide.Glide.with(context);
-                const requestBuilder = requestManager.asBitmap().load(uri);
+                const requestBuilder = requestManager
+                    .asBitmap()
+                    .load(uri)
+                    .apply(new com.bumptech.glide.request.RequestOptions().signature(signature));
 
                 let futureTarget = null;
                 function clearLater() {
@@ -272,7 +275,9 @@ export class ImagePipeline {
             try {
                 const context = Utils.android.getApplicationContext();
                 const requestManager = com.bumptech.glide.Glide.with(context);
-                const requestBuilder = toDiskCache ? requestManager.downloadOnly().load(uri) : requestManager.asBitmap().load(uri);
+                const requestBuilder = (toDiskCache ? requestManager.downloadOnly().load(uri) : requestManager.asBitmap().load(uri)).apply(
+                    new com.bumptech.glide.request.RequestOptions().signature(signature)
+                );
 
                 let futureTarget = null;
                 function clearLater() {
@@ -636,7 +641,7 @@ export class Img extends ImageBase {
                 this.loadSourceCallback // Can be null
             );
         }
-        requestBuilder = com.bumptech.glide.Glide.with(context).load(loadModel).signature(new com.bumptech.glide.signature.ObjectKey(Date().valueOf()));
+        requestBuilder = com.bumptech.glide.Glide.with(context).load(loadModel);
 
         // Apply transformations (blur, rounded corners, etc.)
         const transformations = [];
@@ -817,7 +822,10 @@ export class Img extends ImageBase {
             target.setClearFirst(false);
         }
 
-        requestBuilder.signature(signature).listener(new com.nativescript.image.CompositeRequestListener(objectArr)).into(target);
+        requestBuilder
+            .apply(ro)
+            .listener(new com.nativescript.image.CompositeRequestListener(objectArr))
+            .into(target);
     }
 
     private notifyLoadSource(source: string) {
