@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.7](https://github.com/@nativescript-community/ui-image/compare/v5.0.6...v5.0.7) (2025-12-02)
+
+### Bug Fixes
+
+* cache ([9f2357d](https://github.com/@nativescript-community/ui-image/commit/9f2357dbea9af93d6af5551c8f9436a36c01f841))
+
 ## [5.0.6](https://github.com/@nativescript-community/ui-image/compare/v5.0.5...v5.0.6) (2025-12-01)
 
 ### Bug Fixes
