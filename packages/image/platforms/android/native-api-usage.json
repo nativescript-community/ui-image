@@ -14,6 +14,7 @@
         "com.nativescript.image:CompositeRequestListener",
         "com.nativescript.image:MatrixDrawableImageViewTarget",
         "com.nativescript.image:MatrixImageView",
+        "com.nativescript.image:GlideConfiguration",
         "com.bumptech.glide:Glide",
         "com.bumptech.glide.signature:ObjectKey",
         "com.bumptech.glide.request:RequestOptions",

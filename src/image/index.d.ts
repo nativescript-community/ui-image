@@ -1,6 +1,7 @@
 import { ImageAsset, ImageSource, View } from '@nativescript/core';
+import { ImagePipelineConfigSetting } from './index-common';
 
-export * from './index-common.ts';
+export * from './index-common';
 
 /**
  * When called, initializes the android Image library. Calling this method is required.
@@ -375,15 +376,6 @@ export enum ScaleType {
     focusCrop
 }
 
-/**
- * Advanced Configurations used for initializing Image
- */
-export interface ImagePipelineConfigSetting {
-    // android only, disk cache key store persists to use evictFromDiskCache between app launches
-    usePersistentCacheKeyStore?: boolean;
-    // android signature key for cache. You can bump/change (v1, v2,...) to invalidate all cache
-    globalSignatureKey?: string;
-}
 export const ImageViewTraceCategory;
 
 export type GetContextFromOptionsCallback = (context: NSDictionary<string, any>, transformers: any[], options: Partial<Img>) => void;

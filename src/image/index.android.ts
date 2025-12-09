@@ -1,7 +1,6 @@
 export * from './index-common';
 import { Background, Color, ImageAsset, ImageSource, Trace, Utils, backgroundInternalProperty, knownFolders, path } from '@nativescript/core';
 import { isString } from '@nativescript/core/utils/types';
-import { layout } from '@nativescript/core/utils/layout-helper';
 import {
     AnimatedImage,
     CLog,
@@ -50,27 +49,25 @@ const globalSignatureKey = 'v1';
 export function initialize(config?: ImagePipelineConfigSetting): void {
     if (!initialized) {
         const context = Utils.android.getApplicationContext();
-        if (!context) {
-            return;
+        const glideConfig = com.nativescript.image.GlideConfiguration.getInstance();
+        if (config?.memoryCacheSize > 0) {
+            glideConfig.setMemoryCacheSize(config.memoryCacheSize);
         }
-        if (config?.usePersistentCacheKeyStore) {
-            const sharedStore = new com.nativescript.image.SharedPrefCacheKeyStore(context.getApplicationContext());
-            com.nativescript.image.EvictionManager.get().setPersistentStore(sharedStore);
-        }
-        // bumping `v1` will invalidate all cache
-        signature = new com.bumptech.glide.signature.ObjectKey(config?.globalSignatureKey ?? globalSignatureKey);
 
-        initialized = true;
+        if (config?.memoryCacheScreens > 0) {
+            glideConfig.setMemoryCacheScreens(config.memoryCacheScreens);
+        }
+
+        signature = new com.bumptech.glide.signature.ObjectKey(config?.globalSignatureKey || globalSignatureKey);
+
+        // Now initialize Glide (which will read from GlideConfiguration)
         glideInstance = com.bumptech.glide.Glide.get(context);
-        com.nativescript.image.EvictionManager.get().clearAll();
 
         // this is needed for further buildKey to trigger ...
-        com.bumptech.glide.Glide.with(context)
-            .load('toto')
-            .apply(new com.bumptech.glide.request.RequestOptions().signature(signature))
-            .preload();
+        com.bumptech.glide.Glide.with(context).load('toto').apply(new com.bumptech.glide.request.RequestOptions().signature(signature)).preload();
         // com.nativescript.image.EngineKeyFactoryMethodDumper.dumpKeyFactoryMethods(glideInstance);
         // com.nativescript.image.ForcePreloadTest.forcePreloadAfterInjection(context, 'https://example.com/test-image.png');
+        initialized = true;
     }
 }
 
@@ -235,10 +232,7 @@ export class ImagePipeline {
             try {
                 const context = Utils.android.getApplicationContext();
                 const requestManager = com.bumptech.glide.Glide.with(context);
-                const requestBuilder = requestManager
-                    .asBitmap()
-                    .load(uri)
-                    .apply(new com.bumptech.glide.request.RequestOptions().signature(signature));
+                const requestBuilder = requestManager.asBitmap().load(uri).apply(new com.bumptech.glide.request.RequestOptions().signature(signature));
 
                 let futureTarget = null;
                 function clearLater() {
@@ -822,10 +816,7 @@ export class Img extends ImageBase {
             target.setClearFirst(false);
         }
 
-        requestBuilder
-            .apply(ro)
-            .listener(new com.nativescript.image.CompositeRequestListener(objectArr))
-            .into(target);
+        requestBuilder.apply(ro).listener(new com.nativescript.image.CompositeRequestListener(objectArr)).into(target);
     }
 
     private notifyLoadSource(source: string) {

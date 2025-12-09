@@ -32,13 +32,29 @@ public class CustomGlideModule extends AppGlideModule {
   @Override
   public void applyOptions(@NonNull Context context, @NonNull GlideBuilder builder) {
 
+    // Get configuration
+    GlideConfiguration config = GlideConfiguration.getInstance();
+    
+    // Determine memory cache size
+    long memoryCacheSize;
+    if (config.getMemoryCacheSize() > 0) {
+      // Use custom size
+      memoryCacheSize = config.getMemoryCacheSize();
+      // Log.i(TAG, "Using custom memory cache size: " + memoryCacheSize + " bytes");
+    } else {
+      // Use default calculator
+      MemorySizeCalculator calculator = new MemorySizeCalculator.Builder(context)
+          .setMemoryCacheScreens(config.getMemoryCacheScreens())
+          .build();
+      memoryCacheSize = calculator.getMemoryCacheSize();
+      // Log.i(TAG, "Using calculated memory cache size: " + memoryCacheSize + " bytes with memoryCacheSceens: " + config.getMemoryCacheScreens());
+    }
+    
     // Use our custom memory cache wrapper
-    MemorySizeCalculator calculator = new MemorySizeCalculator.Builder(context)
-        .setMemoryCacheScreens(2)
-        .build();
-    LruResourceCache memoryCache = new LruResourceCache(calculator.getMemoryCacheSize());
+    LruResourceCache memoryCache = new LruResourceCache(memoryCacheSize);
     EvictionManager.get().setMemoryCache(memoryCache);
     builder.setMemoryCache(memoryCache);
+    
     // Set a disk cache factory that also registers the disk cache instance with
     // EvictionManager.
     builder.setDiskCache(new DiskCache.Factory() {
