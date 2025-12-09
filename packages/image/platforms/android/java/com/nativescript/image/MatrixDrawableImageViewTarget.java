@@ -42,8 +42,8 @@ public class MatrixDrawableImageViewTarget extends ViewTarget<ImageView, Drawabl
    * Default is true (clear). Call this immediately after creating the target if you want
    * to disable this with false.
    */
-  public void setClearFirst(boolean preserve) {
-      this.mClearFirst = preserve;
+  public void setClearFirst(boolean value) {
+      this.mClearFirst = value;
   }
 
     /**

@@ -21,6 +21,7 @@ import ZoomImage from './ZoomImage.vue';
 import ColorFilter from './ColorFilter.vue';
 import Failure from './Failure.vue';
 import NavigationTest from './NavigationTest.vue';
+import CrossFadeTest from './CrossFadeTest.vue';
 
 // Trace.addCategories('NativescriptImage');
 // Trace.enable();
@@ -34,6 +35,7 @@ export function installPlugin() {
 
 export const demos = [
     { name: 'Simple', path: 'simple', component: Simple },
+    { name: 'CrossFadeTest', path: 'CrossFadeTest', component: CrossFadeTest },
     { name: 'Animated', path: 'animated', component: Animated },
     { name: 'Advanced', path: 'advanced', component: Advanced },
     { name: 'Events', path: 'events', component: Events },

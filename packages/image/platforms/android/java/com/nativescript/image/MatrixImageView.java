@@ -12,6 +12,7 @@ import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
+import android.graphics.drawable.TransitionDrawable;
 
 import android.graphics.Canvas;
 import android.graphics.Path;
@@ -32,27 +33,6 @@ import android.util.Log;
  * ImageView that exposes setImageRotation(float) and coordinates rotation +
  * scaleType.
  *
- * Enhancements:
- * - Re-asserts MatrixDrawable -> wrapped drawable callback binding after the
- * wrapper is set on the ImageView,
- * to ensure the wrapped drawable's invalidation/schedule callbacks are received
- * by the wrapper.
- * - Starts/stops Animatable wrapped drawables consistently on
- * attach/detach/visibility changes.
- * - Aspect-ratio support (like MatrixImageView): setAspectRatio(float) to force
- * measured width/height to respect ratio.
- * - Supports rotation-aware measurement: when imageRotation is 90 or 270
- * degrees, the enforced aspect ratio
- * is inverted so measurement reflects the rotated content.
- * - Adds a noRatioEnforce flag that disables all aspect-ratio measurement logic
- * and simply calls super.onMeasure().
- * - Auto-size support: when width or height measure is not finite, the view can
- * size itself using
- * explicit imageWidth/imageHeight (setImageSize) or the drawable intrinsic
- * size.
- *
- * Protected fields allow subclasses (e.g. ZoomableMatrixImageView) to inspect
- * base matrix for clamping.
  */
 public class MatrixImageView extends AppCompatImageView {
     // made protected so ZoomableMatrixImageView can compute clamped translations
@@ -402,6 +382,26 @@ public class MatrixImageView extends AppCompatImageView {
         }
     }
 
+    /**
+     * Compute the transformation matrix for a given drawable based on current view size,
+     * rotation, and scale type.
+     */
+    public Matrix computeMatrixForDrawable(Drawable drawable) {
+        Matrix matrix = new Matrix();
+        if (drawable == null) {
+            return matrix;
+        }
+        
+        int vw = getWidth() - getPaddingLeft() - getPaddingRight();
+        int vh = getHeight() - getPaddingTop() - getPaddingBottom();
+        
+        if (vw > 0 && vh > 0) {
+            ScaleUtils.getImageMatrix(drawable, vw, vh, mImageRotation, mAppliedScaleType, matrix);
+        }
+        
+        return matrix;
+    }
+
     @Override
     public void setImageDrawable(@Nullable Drawable drawable) {
         if (drawable == null) {
@@ -412,45 +412,55 @@ public class MatrixImageView extends AppCompatImageView {
             }
             setImageSize(0, 0);
             super.setImageDrawable(null);
-            // clear implicit image size when drawable removed
-            // (do not clear explicit mImageWidth/mImageHeight set by caller)
             return;
         }
+        
+        // Special handling for TransitionDrawable - use it directly without wrapping
+        if (drawable instanceof TransitionDrawable) {
+            setImageSize(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+            super.setImageDrawable(drawable);
+            mLastComposedDrawable = null;
+            // Don't call updateBaseMatrix here - let the transition finish
+            return;
+        }
+        
         setImageSize(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
-        MatrixDrawable md = new MatrixDrawable(drawable);
-        // set the wrapper as the ImageView drawable - AppCompatImageView will set the
-        // wrapper's callback to the view.
-        super.setImageDrawable(md);
-
-        // Re-assert the wrapped drawable's callback -> wrapper relationship (safe no-op
-        // if already set).
-        md.refreshWrappedCallback();
-
-        // If caller hasn't set an explicit image size, capture drawable intrinsic size
-        // as a hint for measuring
-        if (mImageWidth <= 0 || mImageHeight <= 0) {
-            int iw = drawable.getIntrinsicWidth();
-            int ih = drawable.getIntrinsicHeight();
-            if (iw > 0 && ih > 0) {
-                mImageWidth = iw;
-                mImageHeight = ih;
-                // we captured a size that may affect measurement
-                requestLayout();
-            }
+        
+        // If already a MatrixDrawable, use it directly
+        if (drawable instanceof MatrixDrawable) {
+            super.setImageDrawable(drawable);
+            ((MatrixDrawable) drawable).refreshWrappedCallback();
+        } else {
+            // Wrap in MatrixDrawable
+            MatrixDrawable md = new MatrixDrawable(drawable);
+            super.setImageDrawable(md);
+            md.refreshWrappedCallback();
         }
 
-        // Ensure the next updateBaseMatrix applies the matrix to the new wrapper instance.
-        mLastComposedDrawable = null;
-        updateBaseMatrix();
-
-        // If underlying drawable is animatable and ImageView is visible, start it
-        if (drawable instanceof Animatable && getVisibility() == VISIBLE) {
-            ((Animatable) drawable).start();
+    // If caller hasn't set an explicit image size, capture drawable intrinsic size
+    // as a hint for measuring
+    if (mImageWidth <= 0 || mImageHeight <= 0) {
+        int iw = drawable.getIntrinsicWidth();
+        int ih = drawable.getIntrinsicHeight();
+        if (iw > 0 && ih > 0) {
+            mImageWidth = iw;
+            mImageHeight = ih;
+            requestLayout();
         }
     }
 
-    // cache last composed matrix so we can no-op identical updates (avoid repeated invalidates)
-    private final Matrix mLastComposedMatrix = new Matrix();
+    mLastComposedDrawable = null;
+    updateBaseMatrix();
+
+    // If underlying drawable is animatable and ImageView is visible, start it
+    Drawable inner = drawable instanceof MatrixDrawable ? ((MatrixDrawable) drawable).getWrappedDrawable() : drawable;
+    if (inner instanceof Animatable && getVisibility() == VISIBLE) {
+        ((Animatable) inner).start();
+    }
+}
+
+// cache last composed matrix so we can no-op identical updates (avoid repeated invalidates)
+private final Matrix mLastComposedMatrix = new Matrix();
     // The drawable instance we last applied mLastComposedMatrix to. If a new drawable is
     // installed (wrapper changed), we must still apply the composed matrix even if values match.
     private Drawable mLastComposedDrawable = null;
