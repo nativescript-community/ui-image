@@ -4,7 +4,6 @@ repositories {
 }
 
 dependencies {
-    def androidXAppCompatVersion = "${ns_default_androidx_appcompat_version}"
 	def androidXAppCompatVersion =  project.hasProperty("androidXAppCompat") ? project.androidXAppCompat : "1.1.0"
     implementation "androidx.appcompat:appcompat:$androidXAppCompatVersion"
 }
