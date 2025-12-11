@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/ui-image",
-    "version": "5.0.11",
+    "version": "5.0.12",
     "description": "Advanced and efficient image display plugin which uses Glide (Android) and SDWebImage (iOS) to implement caching, placeholders, image effects, and much more.",
     "main": "./index",
     "sideEffects": false,
