@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.10](https://github.com/@nativescript-community/ui-image/compare/v5.0.9...v5.0.10) (2025-12-11)
+
+### Bug Fixes
+
+* **ui-zoomimage:** android build fix ([0ed710d](https://github.com/@nativescript-community/ui-image/commit/0ed710d426a6c9ded653aab6202d7a95a3be02e2))
+
 ## [5.0.9](https://github.com/@nativescript-community/ui-image/compare/v5.0.8...v5.0.9) (2025-12-11)
 
 ### Bug Fixes
