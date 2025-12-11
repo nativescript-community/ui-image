@@ -6,15 +6,9 @@ dependencies {
 	def glideCompilerVersion =  project.hasProperty("glideCompilerVersion") ? project.glideCompilerVersion : "4.16.0"
 	def glideTransformationsVersion =  project.hasProperty("glideTransformationsVersion") ? project.glideTransformationsVersion : "4.3.0"
 	def glideOkHttpVersion =  project.hasProperty("glideOkHttpVersion") ? project.glideOkHttpVersion : "4.11.0"
+	def androidXAppCompatVersion =  project.hasProperty("androidXAppCompat") ? project.androidXAppCompat : "1.1.0"
 
-    def androidXAppCompatVersion = "1.1.0"
-    if (project.hasProperty("androidXAppCompat")) {
-        androidXAppCompatVersion = androidXAppCompat
-        outLogger.withStyle(Style.SuccessHeader).println "\t + using android X library androidx.appcompat:appcompat:$androidXAppCompatVersion"
-    }
     implementation "androidx.appcompat:appcompat:$androidXAppCompatVersion"
-
-
     implementation "com.github.bumptech.glide:glide:$glideVersion"
     annotationProcessor "com.github.bumptech.glide:compiler:$glideCompilerVersion"
     implementation "jp.wasabeef:glide-transformations:$glideTransformationsVersion"
