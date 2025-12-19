@@ -120,7 +120,7 @@ public class SharedPrefCacheKeyStore extends CacheKeyStore {
         sourceKey = source != null && !"null".equals(source) ? new ObjectKey(source) : new ObjectKey(id);
       }
       
-      String signature = j.optString("signature", null);
+      String signatureStr = j.optString("signature", null);
       int width = j.optInt("width", com.bumptech.glide.request.target.Target.SIZE_ORIGINAL);
       int height = j.optInt("height", com.bumptech.glide.request.target.Target.SIZE_ORIGINAL);
       String decodedName = j.optString("decodedResourceClass", android.graphics.Bitmap.class.getName());
@@ -128,8 +128,20 @@ public class SharedPrefCacheKeyStore extends CacheKeyStore {
     String transformationBase64 = j.optString("transformationBytes", null);
       String optionsBase64 = j.optString("optionsBytes", null);
 
-      Key signatureKey = signature != null && !"null".equals(signature) ? new ObjectKey(signature)
-          : new ObjectKey("signature-none");
+      // Parse signature: extract the inner value from "ObjectKey{object=v1}"
+      // to avoid double-wrapping
+      Key signatureKey;
+      if (signatureStr != null && !"null".equals(signatureStr)) {
+        // Extract inner value from "ObjectKey{object=value}" format
+        String innerValue = signatureStr;
+        if (signatureStr.startsWith("ObjectKey{object=") && signatureStr.endsWith("}")) {
+          innerValue = signatureStr.substring(17, signatureStr.length() - 1);
+        }
+        signatureKey = new ObjectKey(innerValue);
+      } else {
+        signatureKey = new ObjectKey("signature-none");
+      }
+      
       Class<?> decodedClass = Class.forName(decodedName);
       byte[] transformationBytes = (transformationBase64 == null || "null".equals(transformationBase64)) ? null
           : Base64.decode(transformationBase64, Base64.NO_WRAP);
