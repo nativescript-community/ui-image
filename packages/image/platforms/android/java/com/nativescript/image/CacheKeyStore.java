@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * need to re-create Transformation/Options objects in order to reconstruct the
  * ResourceCacheKey.
  */
-public final class CacheKeyStore {
+public class CacheKeyStore {
   public static class StoredKeys {
     public final Key sourceKey;
     public final Key signature;
@@ -61,5 +61,8 @@ public final class CacheKeyStore {
 
   public void remove(String id) {
     map.remove(id);
+  }
+  public void clearAll() {
+    map.clear();
   }
 }

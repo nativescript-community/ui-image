@@ -3,7 +3,7 @@ import Vue from 'nativescript-vue';
 import { Trace } from '@nativescript/core';
 import ImageModule from '@nativescript-community/ui-image/vue';
 import ZoomImageModule from '@nativescript-community/ui-zoomimage/vue';
-import { initialize } from '@nativescript-community/ui-image';
+import { getImagePipeline, initialize } from '@nativescript-community/ui-image';
 import { installMixins } from '@nativescript-community/ui-image-colorfilter';
 
 import Simple from './Simple.vue';
@@ -28,9 +28,16 @@ import CrossFadeTest from './CrossFadeTest.vue';
 
 export function installPlugin() {
     installMixins();
-    initialize();
+    initialize({
+        usePersistentCacheKeyStore: true
+    });
     Vue.use(ImageModule);
     Vue.use(ZoomImageModule);
+    getImagePipeline()
+        .isInDiskCache('https://images.pexels.com/photos/842711/pexels-photo-842711.jpeg')
+        .then((r) => {
+            console.log('installPlugin test pipeline:', r);
+        });
 }
 
 export const demos = [

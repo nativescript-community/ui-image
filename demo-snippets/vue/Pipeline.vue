@@ -4,7 +4,7 @@
         <StackLayout padding="12">
             <Label text="ImagePipeline API" class="h2" />
             <TextField v-model="url" hint="Image URL" keyboardType="url" />
-            <NSImg ref="opacityImg" height="100" width="100%" :src="url" />
+            <NSImg ref="opacityImg" height="100" width="100%" :src="url" @finalImageSet="onFinalImageSet" @failure="onFailure" />
             <WrapLayout marginTop="8">
                 <Button text="prefetchToMemory" @tap="prefetchMem" />
                 <Button text="prefetchToDisk" @tap="prefetchDisk" />
@@ -38,8 +38,17 @@ export default {
         };
     },
     methods: {
+        onFinalImageSet(e: any) {
+            const info = e.imageInfo;
+            this.addLog('loaded: ' + (info ? `${info.getWidth()}x${info.getHeight()}` : 'unknown') + ' from: ' + e.source);
+        },
+        onFailure(e: any) {
+            const err = e.error;
+            const msg = err && err.getMessage ? err.getMessage() : String(err);
+            this.addLog('onFailure: ' + msg);
+        },
         addLog(msg: string) {
-            this.logs.unshift(new Date().toLocaleTimeString() + ' - ' + msg);
+            this.logs.unshift(new Date().toTimeString() + ' - ' + msg);
             if (this.logs.length > 200) {
                 this.logs.length = 200;
             }

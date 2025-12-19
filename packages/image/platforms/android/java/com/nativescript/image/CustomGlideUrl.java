@@ -2,6 +2,7 @@ package com.nativescript.image;
 
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.LazyHeaders;
+import com.bumptech.glide.load.model.Headers;
 import java.util.Map;
 
 /**
@@ -16,8 +17,7 @@ public class CustomGlideUrl extends GlideUrl {
                          Map<String, String> headers, 
                          ImageProgressCallback progressCallback,
                          ImageLoadSourceCallback loadSourceCallback) {
-        // Use LazyHeaders.Builder - Glide automatically includes these in cache key!
-        super(url, buildLazyHeaders(headers));
+        super(url, headers != null ? buildLazyHeaders(headers) : Headers.DEFAULT);
         this.progressCallback = progressCallback;
         this.loadSourceCallback = loadSourceCallback;
     }

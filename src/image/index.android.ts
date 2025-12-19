@@ -58,6 +58,10 @@ export function initialize(config?: ImagePipelineConfigSetting): void {
             glideConfig.setMemoryCacheScreens(config.memoryCacheScreens);
         }
 
+        if (config?.usePersistentCacheKeyStore) {
+            com.nativescript.image.EvictionManager.get().setPersistentStore(new com.nativescript.image.SharedPrefCacheKeyStore(Utils.android.getApplicationContext()));
+        }
+
         signature = new com.bumptech.glide.signature.ObjectKey(config?.globalSignatureKey || globalSignatureKey);
 
         // Now initialize Glide (which will read from GlideConfiguration)
@@ -110,13 +114,13 @@ export class ImagePipeline {
                 url,
                 new com.nativescript.image.EvictionManager.EvictionCallback({
                     onComplete(success: boolean, error) {
-                        if (success) {
-                            resolve();
-                        } else {
+                        if (error) {
                             if (Trace.isEnabled()) {
                                 CLog(CLogTypes.error, error);
                             }
                             reject(error);
+                        } else {
+                            resolve();
                         }
                     }
                 })
@@ -131,13 +135,13 @@ export class ImagePipeline {
                 url,
                 new com.nativescript.image.EvictionManager.EvictionCallback({
                     onComplete(success: boolean, error) {
-                        if (success) {
-                            resolve();
-                        } else {
+                        if (error) {
                             if (Trace.isEnabled()) {
                                 CLog(CLogTypes.error, error);
                             }
                             reject(error);
+                        } else {
+                            resolve();
                         }
                     }
                 })
@@ -152,13 +156,13 @@ export class ImagePipeline {
                 url,
                 new com.nativescript.image.EvictionManager.EvictionCallback({
                     onComplete(success: boolean, error) {
-                        if (success) {
-                            resolve();
-                        } else {
+                        if (error) {
                             if (Trace.isEnabled()) {
                                 CLog(CLogTypes.error, error);
                             }
                             reject(error);
+                        } else {
+                            resolve();
                         }
                     }
                 })
@@ -171,13 +175,13 @@ export class ImagePipeline {
             com.nativescript.image.EvictionManager.get().clearAll(
                 new com.nativescript.image.EvictionManager.EvictionCallback({
                     onComplete(success: boolean, error) {
-                        if (success) {
-                            resolve();
-                        } else {
+                        if (error) {
                             if (Trace.isEnabled()) {
                                 CLog(CLogTypes.error, error);
                             }
                             reject(error);
+                        } else {
+                            resolve();
                         }
                     }
                 })
@@ -228,40 +232,7 @@ export class ImagePipeline {
     }
 
     prefetchToMemoryCache(uri: string): Promise<void> {
-        return new Promise((resolve, reject) => {
-            try {
-                const context = Utils.android.getApplicationContext();
-                const requestManager = com.bumptech.glide.Glide.with(context);
-                const requestBuilder = requestManager.asBitmap().load(uri).apply(new com.bumptech.glide.request.RequestOptions().signature(signature));
-
-                let futureTarget = null;
-                function clearLater() {
-                    if (futureTarget) {
-                        setTimeout(() => {
-                            com.bumptech.glide.Glide.with(context).clear(futureTarget);
-                        }, 0);
-                    }
-                }
-
-                const listener = new com.bumptech.glide.request.RequestListener({
-                    onLoadFailed(e: any, model: any, target: any, isFirstResource: boolean): boolean {
-                        clearLater();
-                        reject(e);
-                        return true; // consumed
-                    },
-                    onResourceReady(resource: any, model: any, target: any, dataSource: any, isFirstResource: boolean): boolean {
-                        clearLater();
-                        resolve();
-                        return true; // consumed
-                    }
-                });
-
-                // Kick the request off and keep a reference to the FutureTarget so it can be cleared.
-                futureTarget = requestBuilder.listener(listener).preload();
-            } catch (error) {
-                reject(error);
-            }
-        });
+        return this.prefetchToCache(uri, false);
     }
 
     private prefetchToCache(uri: string, toDiskCache: boolean): Promise<void> {
@@ -269,7 +240,13 @@ export class ImagePipeline {
             try {
                 const context = Utils.android.getApplicationContext();
                 const requestManager = com.bumptech.glide.Glide.with(context);
-                const requestBuilder = (toDiskCache ? requestManager.downloadOnly().load(uri) : requestManager.asBitmap().load(uri)).apply(
+                const loadModel = new com.nativescript.image.CustomGlideUrl(
+                    uri,
+                    null,
+                    null, // Can be null
+                    null // Can be null
+                );
+                const requestBuilder = (toDiskCache ? requestManager.downloadOnly().load(uri) : requestManager.asBitmap().load(loadModel)).apply(
                     new com.bumptech.glide.request.RequestOptions().signature(signature)
                 );
 
@@ -619,22 +596,22 @@ export class Img extends ImageBase {
             });
         }
         // Use CustomGlideUrl if we need headers, progress, or load source
+        let headersMap;
         if (this.isNetworkRequest && (this.headers || this.progressCallback || this.loadSourceCallback)) {
-            const headersMap = new java.util.HashMap();
+            headersMap = new java.util.HashMap();
 
             if (this.headers) {
                 for (const key in this.headers) {
                     headersMap.put(key, this.headers[key]);
                 }
             }
-
-            loadModel = new com.nativescript.image.CustomGlideUrl(
-                uri,
-                headersMap,
-                this.progressCallback, // Can be null
-                this.loadSourceCallback // Can be null
-            );
         }
+        loadModel = new com.nativescript.image.CustomGlideUrl(
+            uri,
+            headersMap,
+            this.progressCallback, // Can be null
+            this.loadSourceCallback // Can be null
+        );
         requestBuilder = com.bumptech.glide.Glide.with(context).load(loadModel);
 
         // Apply transformations (blur, rounded corners, etc.)
@@ -719,14 +696,13 @@ export class Img extends ImageBase {
         }
 
         const owner = new WeakRef(this);
-        const sourceKey = new com.bumptech.glide.signature.ObjectKey(uri);
         const objectArr = Array.create(com.bumptech.glide.request.RequestListener, 2);
         const ro = new com.bumptech.glide.request.RequestOptions().signature(signature);
 
         objectArr[0] = new com.nativescript.image.SaveKeysRequestListener(
             uri,
-            uri,
-            sourceKey,
+            loadModel,
+            new com.bumptech.glide.signature.ObjectKey(uri), // fallback only
             signature,
             this.decodeWidth || com.bumptech.glide.request.target.Target.SIZE_ORIGINAL,
             this.decodeHeight || com.bumptech.glide.request.target.Target.SIZE_ORIGINAL,
