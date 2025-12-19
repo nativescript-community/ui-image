@@ -404,7 +404,7 @@ public final class EvictionManager {
       }
       if (dc != null) {
         try {
-          if (s != null && s.sourceKey != null && s.signature != null) {
+          if (hasValidStoredKeys(s)) {
             // Use DataCacheKey for proper source data deletion
             CustomDataCacheKey dataCacheKey = new CustomDataCacheKey(s.sourceKey, s.signature);
             dc.delete(dataCacheKey);
@@ -554,7 +554,7 @@ LruResourceCache mc;
       }
 
       try {
-        if (s != null && s.sourceKey != null) {
+        if (hasValidStoredKeys(s)) {
           Log.i("JS", "isInDiskCacheAsync sourceKey=" + s.sourceKey + " sourceKeyHeaders="  + ((CustomGlideUrl)s.sourceKey).getHeaders()  + " signature="  + s.signature + " " + dc.get(s.sourceKey) );
           CustomDataCacheKey cachekey = new CustomDataCacheKey(s.sourceKey, s.signature);
           sourcePresent = dc.get(cachekey) != null;
@@ -592,7 +592,7 @@ LruResourceCache mc;
     if (dc == null)
       return new boolean[] { false, false };
     try {
-      if (s != null && s.sourceKey != null && s.signature != null) {
+      if (hasValidStoredKeys(s)) {
         // Check source data using DataCacheKey
         CustomDataCacheKey dataCacheKey = new CustomDataCacheKey(s.sourceKey, s.signature);
         sourcePresent = dc.get(dataCacheKey) != null;
@@ -770,6 +770,15 @@ LruResourceCache mc;
     
     // Return whichever we have (prefer persistent)
     return persistent != null ? persistent : inMem;
+  }
+
+  /**
+   * Helper to check if StoredKeys has all required components for disk cache operations.
+   * @param s the StoredKeys to check
+   * @return true if s has non-null sourceKey and signature
+   */
+  private static boolean hasValidStoredKeys(@Nullable CacheKeyStore.StoredKeys s) {
+    return s != null && s.sourceKey != null && s.signature != null;
   }
 
   @Nullable
