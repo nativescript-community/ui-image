@@ -266,7 +266,24 @@ export class ImagePipeline {
                     }
                 }
 
-                const listener = new com.bumptech.glide.request.RequestListener({
+                // Create a composite listener array to save keys during preload
+                const objectArr = Array.create(com.bumptech.glide.request.RequestListener, 2);
+                const ro = new com.bumptech.glide.request.RequestOptions().signature(signature);
+                
+                // Add SaveKeysRequestListener to capture keys during preload
+                objectArr[0] = new com.nativescript.image.SaveKeysRequestListener(
+                    uri,
+                    loadModel,
+                    new com.bumptech.glide.signature.ObjectKey(uri), // fallback only
+                    signature,
+                    com.bumptech.glide.request.target.Target.SIZE_ORIGINAL,
+                    com.bumptech.glide.request.target.Target.SIZE_ORIGINAL,
+                    null, // no transformation for preload
+                    ro,
+                    null // decodedResourceClass
+                );
+
+                objectArr[1] = new com.bumptech.glide.request.RequestListener({
                     onLoadFailed(e: any, model: any, target: any, isFirstResource: boolean): boolean {
                         clearLater();
                         reject(e);
@@ -279,7 +296,7 @@ export class ImagePipeline {
                     }
                 });
 
-                futureTarget = requestBuilder.listener(listener).preload();
+                futureTarget = requestBuilder.listener(new com.nativescript.image.CompositeRequestListener(objectArr)).preload();
             } catch (error) {
                 reject(error);
             }
