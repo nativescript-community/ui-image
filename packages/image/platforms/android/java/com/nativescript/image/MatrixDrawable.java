@@ -52,9 +52,15 @@ public class MatrixDrawable extends Drawable implements Drawable.Callback, Anima
     }
 
     /**
+     * Expose the wrapped drawable for callers that need to inspect.
+     */
+    public Drawable getWrappedDrawable() {
+        return mWrapped;
+    }
+
+    /**
      * Re-assert that the wrapped drawable's callback is this wrapper.
-     * Call this if you suspect the wrapped drawable's callback may have been
-     * changed.
+     * Call this if you suspect the wrapped drawable's callback may have been changed.
      */
     public void refreshWrappedCallback() {
         mWrapped.setCallback(this);
@@ -70,6 +76,13 @@ public class MatrixDrawable extends Drawable implements Drawable.Callback, Anima
             mMatrix.set(matrix);
         }
         invalidateSelf();
+    }
+
+    /**
+     * Get a copy of the current transformation matrix.
+     */
+    public Matrix getMatrix() {
+        return new Matrix(mMatrix);
     }
 
     @Override

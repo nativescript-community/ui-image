@@ -11,6 +11,7 @@ import com.bumptech.glide.load.Transformation;
 import com.bumptech.glide.load.engine.cache.DiskCache;
 import com.bumptech.glide.load.engine.cache.MemoryCache;
 import com.bumptech.glide.load.engine.cache.LruResourceCache;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -35,7 +36,7 @@ import android.util.Log;
  * - Callbacks are always posted on the main thread.
  */
 public final class EvictionManager {
-  private static final String TAG = "EvictionManager";
+  private static final String TAG = "JS";
   private static final EvictionManager INSTANCE = new EvictionManager();
 
   private final ExecutorService diskExecutor = Executors.newSingleThreadExecutor();
@@ -77,6 +78,9 @@ public final class EvictionManager {
    * there.
    */
   public CacheKeyStore getKeyStore() {
+    if (persistentStore != null) {
+      return persistentStore;
+    }
     return inMemoryKeyStore;
   }
 
@@ -90,40 +94,40 @@ public final class EvictionManager {
     }
 
     try {
-      // 1) Load existing stored keys (check persistent store first, fallback to
-      // in-memory)
-      CacheKeyStore.StoredKeys existing = null;
-      if (persistentStore != null) {
+      // 1) Load existing stored keys (check in-memory first to get engineKey)
+      CacheKeyStore.StoredKeys existing = inMemoryKeyStore.get(id);
+      if (existing == null && persistentStore != null) {
         existing = persistentStore.get(id);
       }
-      if (existing == null) {
-        existing = inMemoryKeyStore.get(id);
-      }
 
-      // 2) If existing has an engineKey and newStored doesn't, merge the engineKey in
+      // 2) Always preserve engineKey from existing if newStored doesn't have one
+      // This ensures CapturingEngineKeyFactory's engineKey is not lost when
+      // SaveKeysRequestListener overwrites with more complete data
       CacheKeyStore.StoredKeys toPersist = newStored;
-      if (existing != null && existing.engineKey != null && toPersist.engineKey == null) {
-        // create a new StoredKeys that is identical to newStored but keeps
-        // existing.engineKey
+      if (existing != null && existing.engineKey != null && newStored.engineKey == null) {
+        Log.i("JS", "saveKeys: preserving existing engineKey for " + id);
         toPersist = new CacheKeyStore.StoredKeys(
-            toPersist.sourceKey,
-            toPersist.signature,
-            toPersist.width,
-            toPersist.height,
-            toPersist.transformation,
-            toPersist.transformationKeyBytes,
-            toPersist.decodedResourceClass,
-            toPersist.options,
-            toPersist.optionsKeyBytes,
+            newStored.sourceKey,
+            newStored.signature,
+            newStored.width,
+            newStored.height,
+            newStored.transformation,
+            newStored.transformationKeyBytes,
+            newStored.decodedResourceClass,
+            newStored.options,
+            newStored.optionsKeyBytes,
             existing.engineKey // preserve captured engine key
         );
       }
 
-      // 3) Persist to persistent store if available, else to in-memory store
+      Log.i(TAG, "saveKeys final: " + id + 
+               " hasEngineKey=" + (toPersist.engineKey != null) + 
+               " sourceKey=" + (toPersist.sourceKey != null ? toPersist.sourceKey.getClass().getSimpleName() : "null"));
+      
+      // 4) Save to both stores
+      inMemoryKeyStore.put(id, toPersist);
       if (persistentStore != null) {
         persistentStore.put(id, toPersist);
-      } else {
-        inMemoryKeyStore.put(id, toPersist);
       }
     } catch (Throwable t) {
       Log.w(TAG, "saveKeys failed for id=" + id, t);
@@ -169,6 +173,9 @@ public final class EvictionManager {
           ex = e;
         }
       }
+      if (persistentStore != null) {
+          persistentStore.clearAll();
+        }
       if (callback != null) {
         final boolean finalSuccess = success;
         final Exception finalEx = ex;
@@ -203,6 +210,7 @@ public final class EvictionManager {
           ex = e;
         }
       }
+      inMemoryKeyStore.clearAll();
       if (callback != null) {
         callback.onComplete(success, ex);
       }
@@ -255,8 +263,12 @@ public final class EvictionManager {
               memEx = e;
           }
         }
+        inMemoryKeyStore.clearAll();
         boolean combined = finalDiskSuccess && memSuccess;
         Exception combinedEx = finalFirstEx != null ? finalFirstEx : memEx;
+        if (persistentStore != null) {
+          persistentStore.clearAll();
+        }
         if (callback != null)
           callback.onComplete(combined, combinedEx);
       });
@@ -494,11 +506,12 @@ public final class EvictionManager {
    */
   @MainThread
   public boolean isInMemoryCache(final String id) {
-    final CacheKeyStore.StoredKeys s = (persistentStore != null) ? persistentStore.get(id) : inMemoryKeyStore.get(id);
+    final CacheKeyStore.StoredKeys s = readStoredKeysPreferPersistent(id);
     if (s == null || s.engineKey == null)
       return false;
     final Key engineKey = s.engineKey;
-    LruResourceCache mc;
+      Log.i("JS", "isInMemoryCache " + id + " " + s  + " " + engineKey);
+LruResourceCache mc;
     synchronized (this) {
       mc = memoryCache;
     }
@@ -518,8 +531,8 @@ public final class EvictionManager {
       boolean sourcePresent = false;
       boolean transformedPresent = false;
 
-      final CacheKeyStore.StoredKeys s = (persistentStore != null) ? persistentStore.get(id) : inMemoryKeyStore.get(id);
-
+      final CacheKeyStore.StoredKeys s = readStoredKeysPreferPersistent(id);
+      Log.i(TAG, "isInDiskCacheAsync " + id + " " + s  + " " + persistentStore );
       DiskCache dc;
       synchronized (EvictionManager.this) {
         dc = diskCache;
@@ -532,7 +545,9 @@ public final class EvictionManager {
 
       try {
         if (s != null && s.sourceKey != null) {
-          sourcePresent = dc.get(s.sourceKey) != null;
+          Log.i("JS", "isInDiskCacheAsync sourceKey=" + s.sourceKey + " sourceKeyHeaders="  + ((CustomGlideUrl)s.sourceKey).getHeaders()  + " signature="  + s.signature + " " + dc.get(s.sourceKey) );
+          CustomDataCacheKey cachekey = new CustomDataCacheKey(s.sourceKey, s.signature);
+          sourcePresent = dc.get(cachekey) != null;
           byte[] transformationBytes = getTransformationBytesFromStoredKeys(s);
           Key resourceKey = new RecreatedResourceKey(s.sourceKey, s.signature, s.width, s.height, transformationBytes,
               s.decodedResourceClass, s.optionsKeyBytes);
@@ -557,7 +572,7 @@ public final class EvictionManager {
    * Returns array [sourcePresent, transformedPresent].
    */
   public boolean[] isInDiskCacheBlocking(final String id) {
-    final CacheKeyStore.StoredKeys s = (persistentStore != null) ? persistentStore.get(id) : inMemoryKeyStore.get(id);
+    final CacheKeyStore.StoredKeys s = readStoredKeysPreferPersistent(id);
     DiskCache dc;
     synchronized (EvictionManager.this) {
       dc = diskCache;
@@ -704,16 +719,42 @@ public final class EvictionManager {
   }
 
   @Nullable
-  private CacheKeyStore.StoredKeys readStoredKeysPreferPersistent(String id) {
+  public CacheKeyStore.StoredKeys readStoredKeysPreferPersistent(String id) {
+    CacheKeyStore.StoredKeys s = null;
+    
+    // First check in-memory (has engineKey)
+    CacheKeyStore.StoredKeys inMem = inMemoryKeyStore.get(id);
+    CacheKeyStore.StoredKeys persistent = null;
+    
     if (persistentStore != null) {
-      CacheKeyStore.StoredKeys s = persistentStore.get(id);
-      if (s != null) {
-        // keep mirrored in-memory copy for engineKey augmentation
-        inMemoryKeyStore.put(id, s);
-        return s;
-      }
+      persistent = persistentStore.get(id);
     }
-    return inMemoryKeyStore.get(id);
+    
+    Log.i(TAG, "readStoredKeysPreferPersistent: " + id + 
+          " inMem=" + (inMem != null) + 
+          " persistent=" + (persistent != null));
+
+    
+    // If both exist, merge (prefer persistent for sourceKey, preserve in-memory engineKey)
+    if (persistent != null && inMem != null && inMem.engineKey != null && persistent.engineKey == null) {
+      CacheKeyStore.StoredKeys merged = new CacheKeyStore.StoredKeys(
+          persistent.sourceKey,
+          persistent.signature,
+          persistent.width,
+          persistent.height,
+          persistent.transformation,
+          persistent.transformationKeyBytes,
+          persistent.decodedResourceClass,
+          persistent.options,
+          persistent.optionsKeyBytes,
+          inMem.engineKey // Use in-memory engineKey
+      );
+      Log.i(TAG, "readStoredKeysPreferPersistent: merged for " + id);
+      return merged;
+    }
+    
+    // Return whichever we have (prefer persistent)
+    return persistent != null ? persistent : inMem;
   }
 
   @Nullable

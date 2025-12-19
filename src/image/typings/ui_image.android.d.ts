@@ -45,6 +45,12 @@ declare namespace com {
 	}
 	export namespace nativescript {
 		export namespace image {
+			export class GlideConfiguration {
+                setMemoryCacheScreens(memoryCacheScreens: number);
+                getMemoryCacheSize(): number;
+                setMemoryCacheSize(memoryCacheSize: number);
+				static getInstance():GlideConfiguration;
+			}
 			export class CacheKeyStore {
 				public static class: java.lang.Class<com.nativescript.image.CacheKeyStore>;
 				public put(id: string, keys: com.nativescript.image.CacheKeyStore.StoredKeys): void;

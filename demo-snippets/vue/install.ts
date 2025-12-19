@@ -3,7 +3,7 @@ import Vue from 'nativescript-vue';
 import { Trace } from '@nativescript/core';
 import ImageModule from '@nativescript-community/ui-image/vue';
 import ZoomImageModule from '@nativescript-community/ui-zoomimage/vue';
-import { initialize } from '@nativescript-community/ui-image';
+import { getImagePipeline, initialize } from '@nativescript-community/ui-image';
 import { installMixins } from '@nativescript-community/ui-image-colorfilter';
 
 import Simple from './Simple.vue';
@@ -21,19 +21,28 @@ import ZoomImage from './ZoomImage.vue';
 import ColorFilter from './ColorFilter.vue';
 import Failure from './Failure.vue';
 import NavigationTest from './NavigationTest.vue';
+import CrossFadeTest from './CrossFadeTest.vue';
 
 // Trace.addCategories('NativescriptImage');
 // Trace.enable();
 
 export function installPlugin() {
     installMixins();
-    initialize();
+    initialize({
+        usePersistentCacheKeyStore: true
+    });
     Vue.use(ImageModule);
     Vue.use(ZoomImageModule);
+    getImagePipeline()
+        .isInDiskCache('https://images.pexels.com/photos/842711/pexels-photo-842711.jpeg')
+        .then((r) => {
+            console.log('installPlugin test pipeline:', r);
+        });
 }
 
 export const demos = [
     { name: 'Simple', path: 'simple', component: Simple },
+    { name: 'CrossFadeTest', path: 'CrossFadeTest', component: CrossFadeTest },
     { name: 'Animated', path: 'animated', component: Animated },
     { name: 'Advanced', path: 'advanced', component: Advanced },
     { name: 'Events', path: 'events', component: Events },

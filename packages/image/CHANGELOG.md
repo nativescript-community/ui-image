@@ -3,6 +3,37 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.12](https://github.com/nativescript-community/ui-image/compare/v5.0.11...v5.0.12) (2025-12-11)
+
+**Note:** Version bump only for package @nativescript-community/ui-image
+
+## [5.0.11](https://github.com/nativescript-community/ui-image/compare/v5.0.10...v5.0.11) (2025-12-11)
+
+### Bug Fixes
+
+* **ui-image:** android native-api-usage fix ([9d3ced7](https://github.com/nativescript-community/ui-image/commit/9d3ced7ce4c1f01a5413925ec1863cb4697d27de))
+
+## [5.0.10](https://github.com/nativescript-community/ui-image/compare/v5.0.9...v5.0.10) (2025-12-11)
+
+**Note:** Version bump only for package @nativescript-community/ui-image
+
+## [5.0.9](https://github.com/nativescript-community/ui-image/compare/v5.0.8...v5.0.9) (2025-12-11)
+
+### Bug Fixes
+
+* **android:** build fix ([145269a](https://github.com/nativescript-community/ui-image/commit/145269a197867aa8b8597af021730e33e2d6bcdd))
+
+## [5.0.8](https://github.com/nativescript-community/ui-image/compare/v5.0.7...v5.0.8) (2025-12-09)
+
+### Bug Fixes
+
+* **android:** allow to configure memory size ([02fc293](https://github.com/nativescript-community/ui-image/commit/02fc2930ad6993f709ae567ca0bcbe9b00fb0d2f))
+* **android:** much better crossfading between images of different ratio ([2321ba1](https://github.com/nativescript-community/ui-image/commit/2321ba19b4fe8e47e4842c374557dd2512b5ac4d))
+
+## [5.0.7](https://github.com/nativescript-community/ui-image/compare/v5.0.6...v5.0.7) (2025-12-02)
+
+**Note:** Version bump only for package @nativescript-community/ui-image
+
 ## [5.0.6](https://github.com/nativescript-community/ui-image/compare/v5.0.5...v5.0.6) (2025-12-01)
 
 **Note:** Version bump only for package @nativescript-community/ui-image

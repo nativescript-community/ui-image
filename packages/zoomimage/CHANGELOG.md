@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.12](https://github.com/nativescript-community/ui-image/compare/v5.0.11...v5.0.12) (2025-12-11)
+
+### Bug Fixes
+
+* **ui-zoomimage:** android build fix ([cf3ab85](https://github.com/nativescript-community/ui-image/commit/cf3ab85732815d3da0bedc212dd65114362667ee))
+
+## [5.0.11](https://github.com/nativescript-community/ui-image/compare/v5.0.10...v5.0.11) (2025-12-11)
+
+**Note:** Version bump only for package @nativescript-community/ui-zoomimage
+
+## [5.0.10](https://github.com/nativescript-community/ui-image/compare/v5.0.9...v5.0.10) (2025-12-11)
+
+### Bug Fixes
+
+* **ui-zoomimage:** android build fix ([0ed710d](https://github.com/nativescript-community/ui-image/commit/0ed710d426a6c9ded653aab6202d7a95a3be02e2))
+
+## [5.0.9](https://github.com/nativescript-community/ui-image/compare/v5.0.8...v5.0.9) (2025-12-11)
+
+**Note:** Version bump only for package @nativescript-community/ui-zoomimage
+
+## [5.0.8](https://github.com/nativescript-community/ui-image/compare/v5.0.7...v5.0.8) (2025-12-09)
+
+**Note:** Version bump only for package @nativescript-community/ui-zoomimage
+
+## [5.0.7](https://github.com/nativescript-community/ui-image/compare/v5.0.6...v5.0.7) (2025-12-02)
+
+**Note:** Version bump only for package @nativescript-community/ui-zoomimage
+
 ## [5.0.6](https://github.com/nativescript-community/ui-image/compare/v5.0.5...v5.0.6) (2025-12-01)
 
 **Note:** Version bump only for package @nativescript-community/ui-zoomimage

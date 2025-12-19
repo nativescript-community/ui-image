@@ -131,9 +131,13 @@ export function wrapNativeException(ex, errorType = typeof ex) {
 }
 
 export interface ImagePipelineConfigSetting {
+    // android only, disk cache key store persists to use evictFromDiskCache between app launches
     usePersistentCacheKeyStore?: boolean;
     // android signature key for cache. You can bump/change (v1, v2,...) to invalidate all cache
     globalSignatureKey?: string;
+
+    memoryCacheSize?: number; // in bytes
+    memoryCacheScreens?: number; // multiplier for auto-calculation
 }
 
 export type Stretch = 'none' | 'fill' | 'aspectFill' | 'aspectFit';

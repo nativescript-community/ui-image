@@ -32,13 +32,29 @@ public class CustomGlideModule extends AppGlideModule {
   @Override
   public void applyOptions(@NonNull Context context, @NonNull GlideBuilder builder) {
 
+    // Get configuration
+    GlideConfiguration config = GlideConfiguration.getInstance();
+    
+    // Determine memory cache size
+    long memoryCacheSize;
+    if (config.getMemoryCacheSize() > 0) {
+      // Use custom size
+      memoryCacheSize = config.getMemoryCacheSize();
+      // Log.i(TAG, "Using custom memory cache size: " + memoryCacheSize + " bytes");
+    } else {
+      // Use default calculator
+      MemorySizeCalculator calculator = new MemorySizeCalculator.Builder(context)
+          .setMemoryCacheScreens(config.getMemoryCacheScreens())
+          .build();
+      memoryCacheSize = calculator.getMemoryCacheSize();
+      // Log.i(TAG, "Using calculated memory cache size: " + memoryCacheSize + " bytes with memoryCacheSceens: " + config.getMemoryCacheScreens());
+    }
+    
     // Use our custom memory cache wrapper
-    MemorySizeCalculator calculator = new MemorySizeCalculator.Builder(context)
-        .setMemoryCacheScreens(2)
-        .build();
-    LruResourceCache memoryCache = new LruResourceCache(calculator.getMemoryCacheSize());
+    LruResourceCache memoryCache = new LruResourceCache(memoryCacheSize);
     EvictionManager.get().setMemoryCache(memoryCache);
     builder.setMemoryCache(memoryCache);
+    
     // Set a disk cache factory that also registers the disk cache instance with
     // EvictionManager.
     builder.setDiskCache(new DiskCache.Factory() {
@@ -51,14 +67,34 @@ public class CustomGlideModule extends AppGlideModule {
     });
   }
 
+  private static String normalizeIdFromModel(Object model, String fallback) {
+    if (model == null) {
+      return fallback;
+    }
+    if (model instanceof com.bumptech.glide.load.model.GlideUrl) {
+      try {
+        return ((com.bumptech.glide.load.model.GlideUrl) model).toStringUrl();
+      } catch (Throwable t) {
+        return String.valueOf(model);
+      }
+    }
+    return String.valueOf(model);
+  }
+
+  private static com.bumptech.glide.load.Key sourceKeyFromModel(Object model, com.bumptech.glide.load.Key fallback) {
+    if (model instanceof com.bumptech.glide.load.Key) {
+      return (com.bumptech.glide.load.Key) model;
+    }
+    // GlideUrl implements Key, so the above will catch it.
+    return fallback;
+  }
+
   @Override
   public void registerComponents(@NonNull Context context, @NonNull Glide glide, @NonNull Registry registry) {
 
     // Create base OkHttp client
     OkHttpClient client = new OkHttpClient.Builder().build();
 
-    // SINGLE LOADER: CustomUrlLoader handles both CustomGlideUrl and GlideUrl
-    // This replaces both the old CustomUrlLoader and UrlTrackingModelLoader
     registry.replace(
         GlideUrl.class,
         InputStream.class,
@@ -66,17 +102,20 @@ public class CustomGlideModule extends AppGlideModule {
     // Listener: called when an EngineKey is created. Update the stored keys to
     // include engineKey.
     CapturingEngineKeyFactory.Listener listener = (engineKey, model) -> {
-      // Log.i("JS", "CapturingEngineKeyFactory.Listener 1" + engineKey + " " + model);
       if (model == null)
         return;
-      String id = String.valueOf(model);
+      Log.i("JS", "CapturingEngineKeyFactory.Listener 1" + engineKey + " " + model + " " + model.getClass().getName());
+
+      final String id = normalizeIdFromModel(model,  String.valueOf(model));
+
 
       // Read either persistent or in-memory stored keys
-      CacheKeyStore.StoredKeys s = EvictionManager.get().getKeyStore().get(id);
+      CacheKeyStore.StoredKeys s = EvictionManager.get().readStoredKeysPreferPersistent(id);
       if (s == null) {
         // if key store exists but no entry, create minimal
+        final Key actualSourceKey = sourceKeyFromModel(model, null);
         s = new CacheKeyStore.StoredKeys(
-            new com.bumptech.glide.signature.ObjectKey(id),
+            actualSourceKey,
             new com.bumptech.glide.signature.ObjectKey("signature-none"),
             com.bumptech.glide.request.target.Target.SIZE_ORIGINAL,
             com.bumptech.glide.request.target.Target.SIZE_ORIGINAL,
@@ -87,6 +126,7 @@ public class CustomGlideModule extends AppGlideModule {
             null,
             null);
       }
+         Log.i("JS", "CapturingEngineKeyFactory.Listener 2 " + engineKey + " " + id + " " + s + " " + s.sourceKey + " " + s.sourceKey.getClass().getName());
 
       // Build an updated StoredKeys that preserves everything and sets engineKey
       CacheKeyStore.StoredKeys updated = new CacheKeyStore.StoredKeys(
@@ -104,7 +144,8 @@ public class CustomGlideModule extends AppGlideModule {
 
       // Put updated entry into the in-memory store so later EvictionManager can
       // remove memory entry.
-      EvictionManager.get().getKeyStore().put(id, updated);
+      EvictionManager.get().saveKeys(id, updated);
+      Log.i("JS", "CapturingEngineKeyFactory.Listener 3 " + id + " " + updated + " " + updated.engineKey + " " + engineKey);
     };
 
     // Create the capturing factory
