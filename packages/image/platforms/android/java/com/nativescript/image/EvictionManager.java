@@ -354,12 +354,15 @@ public final class EvictionManager {
         dc = diskCache;
       }
       if (dc != null) {
+        // Delete source data using DataCacheKey (sourceKey + signature)
         try {
-          dc.delete(s.sourceKey);
+          CustomDataCacheKey dataCacheKey = new CustomDataCacheKey(s.sourceKey, s.signature);
+          dc.delete(dataCacheKey);
         } catch (Exception e) {
           success = false;
           ex = e;
         }
+        // Delete transformed resource using ResourceCacheKey
         try {
           Key resourceKey = new RecreatedResourceKey(
               s.sourceKey,
@@ -392,8 +395,6 @@ public final class EvictionManager {
   /** Evict only source/raw bytes (disk). */
   public void evictSourceForId(final String id, @Nullable final EvictionCallback callback) {
     final CacheKeyStore.StoredKeys s = readStoredKeysPreferPersistent(id);
-    final Key sourceKey = (s != null && s.sourceKey != null) ? s.sourceKey
-        : new com.bumptech.glide.signature.ObjectKey(id);
     diskExecutor.execute(() -> {
       boolean success = true;
       Exception ex = null;
@@ -403,7 +404,15 @@ public final class EvictionManager {
       }
       if (dc != null) {
         try {
-          dc.delete(sourceKey);
+          if (s != null && s.sourceKey != null && s.signature != null) {
+            // Use DataCacheKey for proper source data deletion
+            CustomDataCacheKey dataCacheKey = new CustomDataCacheKey(s.sourceKey, s.signature);
+            dc.delete(dataCacheKey);
+          } else {
+            // Fallback to ObjectKey if we don't have stored keys
+            Key fallbackKey = new com.bumptech.glide.signature.ObjectKey(id);
+            dc.delete(fallbackKey);
+          }
         } catch (Exception e) {
           success = false;
           ex = e;
@@ -582,8 +591,11 @@ LruResourceCache mc;
     if (dc == null)
       return new boolean[] { false, false };
     try {
-      if (s != null && s.sourceKey != null) {
-        sourcePresent = dc.get(s.sourceKey) != null;
+      if (s != null && s.sourceKey != null && s.signature != null) {
+        // Check source data using DataCacheKey
+        CustomDataCacheKey dataCacheKey = new CustomDataCacheKey(s.sourceKey, s.signature);
+        sourcePresent = dc.get(dataCacheKey) != null;
+        // Check transformed resource
         Key resourceKey = new RecreatedResourceKey(s.sourceKey, s.signature, s.width, s.height,
             getTransformationBytesFromStoredKeys(s), s.decodedResourceClass, s.optionsKeyBytes);
         transformedPresent = dc.get(resourceKey) != null;
@@ -643,7 +655,7 @@ LruResourceCache mc;
     final AtomicBoolean failed = new AtomicBoolean(false);
     final AtomicReference<Exception> firstException = new AtomicReference<>(null);
 
-    // delete source bytes
+    // delete source bytes using DataCacheKey
     if (sourceKey != null) {
       diskExecutor.execute(() -> {
         DiskCache dc;
@@ -652,7 +664,9 @@ LruResourceCache mc;
         }
         if (dc != null) {
           try {
-            dc.delete(sourceKey);
+            // Use DataCacheKey to match Glide's internal source data storage
+            CustomDataCacheKey dataCacheKey = new CustomDataCacheKey(sourceKey, signature);
+            dc.delete(dataCacheKey);
           } catch (Exception e) {
             failed.set(true);
             firstException.compareAndSet(null, e);
