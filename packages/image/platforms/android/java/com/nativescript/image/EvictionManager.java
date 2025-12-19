@@ -468,7 +468,8 @@ public final class EvictionManager {
    */
   @MainThread
   public void evictMemoryForId(final String id, @Nullable final EvictionCallback callback) {
-    final CacheKeyStore.StoredKeys s = (persistentStore != null) ? persistentStore.get(id) : inMemoryKeyStore.get(id);
+    // Use the merged read to get engineKey from in-memory store (not persisted)
+    final CacheKeyStore.StoredKeys s = readStoredKeysPreferPersistent(id);
     final Key engineKey = (s != null) ? s.engineKey : null;
     boolean success = true;
     Exception ex = null;

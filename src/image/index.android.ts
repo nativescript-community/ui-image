@@ -240,13 +240,16 @@ export class ImagePipeline {
             try {
                 const context = Utils.android.getApplicationContext();
                 const requestManager = com.bumptech.glide.Glide.with(context);
+                // CRITICAL: Use CustomGlideUrl for both disk and memory preload to ensure
+                // the cache keys match those used during normal image loading
                 const loadModel = new com.nativescript.image.CustomGlideUrl(
                     uri,
                     null,
                     null, // Can be null
                     null // Can be null
                 );
-                const requestBuilder = (toDiskCache ? requestManager.downloadOnly().load(uri) : requestManager.asBitmap().load(loadModel)).apply(
+                // Use the same model for both disk and memory to ensure key consistency
+                const requestBuilder = (toDiskCache ? requestManager.downloadOnly().load(loadModel) : requestManager.asBitmap().load(loadModel)).apply(
                     new com.bumptech.glide.request.RequestOptions().signature(signature)
                 );
 
