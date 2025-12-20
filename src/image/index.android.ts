@@ -12,6 +12,7 @@ import {
     ImageInfo as ImageInfoBase,
     ImagePipelineConfigSetting,
     LoadSourceEventData,
+    PrefetchOptions,
     ProgressEventData,
     ScaleType,
     SrcType,
@@ -227,31 +228,100 @@ export class ImagePipeline {
         });
     }
 
-    prefetchToDiskCache(uri: string): Promise<void> {
-        return this.prefetchToCache(uri, true);
+    prefetchToDiskCache(uri: string, options?: PrefetchOptions): Promise<void> {
+        return this.prefetchToCache(uri, true, options);
     }
 
-    prefetchToMemoryCache(uri: string): Promise<void> {
-        return this.prefetchToCache(uri, false);
+    prefetchToMemoryCache(uri: string, options?: PrefetchOptions): Promise<void> {
+        return this.prefetchToCache(uri, false, options);
     }
 
-    private prefetchToCache(uri: string, toDiskCache: boolean): Promise<void> {
+    private prefetchToCache(uri: string, toDiskCache: boolean, options?: PrefetchOptions): Promise<void> {
         return new Promise((resolve, reject) => {
             try {
                 const context = Utils.android.getApplicationContext();
                 const requestManager = com.bumptech.glide.Glide.with(context);
+                
+                // Build headers map if provided
+                let headersMap = null;
+                if (options?.headers) {
+                    headersMap = new java.util.HashMap();
+                    for (const key in options.headers) {
+                        headersMap.put(key, options.headers[key]);
+                    }
+                }
+                
                 // CRITICAL: Use CustomGlideUrl for both disk and memory preload to ensure
                 // the cache keys match those used during normal image loading
                 const loadModel = new com.nativescript.image.CustomGlideUrl(
                     uri,
-                    null,
-                    null, // Can be null
-                    null // Can be null
+                    headersMap,
+                    null, // progressCallback
+                    null // loadSourceCallback
                 );
+                
                 // Use the same model for both disk and memory to ensure key consistency
-                const requestBuilder = (toDiskCache ? requestManager.downloadOnly().load(loadModel) : requestManager.asBitmap().load(loadModel)).apply(
-                    new com.bumptech.glide.request.RequestOptions().signature(signature)
-                );
+                let requestBuilder = (toDiskCache ? requestManager.downloadOnly().load(loadModel) : requestManager.asBitmap().load(loadModel));
+                
+                // Apply transformations if provided
+                const transformations = [];
+                
+                if (options?.blurRadius) {
+                    transformations.push(new jp.wasabeef.glide.transformations.BlurTransformation(
+                        Math.round(options.blurRadius), 
+                        options.blurDownSampling || 1
+                    ));
+                }
+                
+                if (options?.roundAsCircle) {
+                    transformations.push(new jp.wasabeef.glide.transformations.CropCircleTransformation());
+                } else {
+                    const topLeft = Utils.layout.toDevicePixels(options?.roundTopLeftRadius || 0);
+                    const topRight = Utils.layout.toDevicePixels(options?.roundTopRightRadius || 0);
+                    const bottomRight = Utils.layout.toDevicePixels(options?.roundBottomRightRadius || 0);
+                    const bottomLeft = Utils.layout.toDevicePixels(options?.roundBottomLeftRadius || 0);
+                    
+                    if (topLeft || topRight || bottomRight || bottomLeft) {
+                        const radius = Math.max(topLeft, topRight, bottomRight, bottomLeft);
+                        transformations.push(
+                            new jp.wasabeef.glide.transformations.RoundedCornersTransformation(
+                                Math.round(radius), 
+                                0, 
+                                jp.wasabeef.glide.transformations.RoundedCornersTransformation.CornerType.ALL
+                            )
+                        );
+                    }
+                }
+                
+                // Tint color
+                if (options?.tintColor) {
+                    const tintColor = options.tintColor instanceof Color ? options.tintColor : new Color(options.tintColor as string);
+                    transformations.push(new jp.wasabeef.glide.transformations.ColorFilterTransformation(tintColor.android));
+                }
+                
+                let multiTransform: com.bumptech.glide.load.MultiTransformation<any> = null;
+                if (transformations.length > 0) {
+                    multiTransform = new com.bumptech.glide.load.MultiTransformation(java.util.Arrays.asList(transformations));
+                    requestBuilder = requestBuilder.transform(multiTransform);
+                }
+                
+                // Apply decode size if provided
+                if (options?.decodeWidth || options?.decodeHeight) {
+                    const Target = com.bumptech.glide.request.target.Target;
+                    const width = options.decodeWidth || Target.SIZE_ORIGINAL;
+                    const height = options.decodeHeight || Target.SIZE_ORIGINAL;
+                    if (width === Target.SIZE_ORIGINAL) {
+                        requestBuilder = requestBuilder.override(height);
+                    } else if (height === Target.SIZE_ORIGINAL) {
+                        requestBuilder = requestBuilder.override(width);
+                    } else {
+                        requestBuilder = requestBuilder.override(width, height);
+                    }
+                }
+                
+                // Apply signature
+                const ro = new com.bumptech.glide.request.RequestOptions().signature(signature);
+                requestBuilder = requestBuilder.apply(ro);
 
                 let futureTarget = null;
                 function clearLater() {
@@ -268,7 +338,6 @@ export class ImagePipeline {
 
                 // Create a composite listener array to save keys during preload
                 const objectArr = Array.create(com.bumptech.glide.request.RequestListener, 2);
-                const ro = new com.bumptech.glide.request.RequestOptions().signature(signature);
 
                 // Add SaveKeysRequestListener to capture keys during preload
                 objectArr[0] = new com.nativescript.image.SaveKeysRequestListener(
@@ -276,9 +345,9 @@ export class ImagePipeline {
                     loadModel,
                     new com.bumptech.glide.signature.ObjectKey(uri), // fallback only
                     signature,
-                    com.bumptech.glide.request.target.Target.SIZE_ORIGINAL,
-                    com.bumptech.glide.request.target.Target.SIZE_ORIGINAL,
-                    null, // no transformation for preload
+                    options?.decodeWidth || com.bumptech.glide.request.target.Target.SIZE_ORIGINAL,
+                    options?.decodeHeight || com.bumptech.glide.request.target.Target.SIZE_ORIGINAL,
+                    multiTransform, // transformations applied
                     ro,
                     null // decodedResourceClass
                 );
