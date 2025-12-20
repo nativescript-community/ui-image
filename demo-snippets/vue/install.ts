@@ -30,7 +30,7 @@ export function installPlugin() {
     installMixins();
     initialize({
         usePersistentCacheKeyStore: true,
-        memoryCacheScreens:8
+        // memoryCacheScreens: 8
     });
     Vue.use(ImageModule);
     Vue.use(ZoomImageModule);

@@ -228,55 +228,8 @@ export class ImagePipeline {
 
     private prefetchToCacheType(uri: string, cacheType: SDImageCacheType, options?: PrefetchOptions): Promise<void> {
         return new Promise((resolve, reject) => {
-            const context = NSMutableDictionary.alloc<string, any>().initWithCapacity(5);
-            context.setObjectForKey(cacheType, SDWebImageContextStoreCacheType);
-            
-            // Apply transformations if provided
-            const transformers = NSMutableArray.alloc().init();
-            
-            if (options?.roundAsCircle) {
-                transformers.addObject(SDImageCircleTransformer.sharedTransformer);
-            } else if (options?.roundTopLeftRadius || options?.roundTopRightRadius || options?.roundBottomLeftRadius || options?.roundBottomRightRadius) {
-                const topLeft = layout.toDevicePixels(options.roundTopLeftRadius || 0);
-                const topRight = layout.toDevicePixels(options.roundTopRightRadius || 0);
-                const bottomLeft = layout.toDevicePixels(options.roundBottomLeftRadius || 0);
-                const bottomRight = layout.toDevicePixels(options.roundBottomRightRadius || 0);
-                const radius = Math.max(topLeft, topRight, bottomLeft, bottomRight);
-                
-                if (radius > 0) {
-                    transformers.addObject(SDImageRoundedCornerTransformer.transformerWithRadiusCornersBorderWidthBorderColor(
-                        radius, 
-                        SDImageRectCorner.All,
-                        0, 
-                        null
-                    ));
-                }
-            }
-            
-            // Blur transformation
-            if (options?.blurRadius) {
-                transformers.addObject(SDImageBlurTransformer.transformerWithRadius(options.blurRadius));
-            }
-            
-            // Tint color
-            if (options?.tintColor) {
-                const tintColor = options.tintColor instanceof Color ? options.tintColor : new Color(options.tintColor as string);
-                transformers.addObject(SDImageTintTransformer.transformerWithColor(tintColor.ios));
-            }
-            
-            if (transformers.count > 0) {
-                const pipeline = SDImagePipelineTransformer.transformerWithTransformers(transformers);
-                context.setObjectForKey(pipeline, SDWebImageContextImageTransformer);
-            }
-            
-            // Apply thumbnail size if decode dimensions provided
-            if (options?.decodeWidth || options?.decodeHeight) {
-                const width = options.decodeWidth || 0;
-                const height = options.decodeHeight || 0;
-                const size = CGSizeMake(width, height);
-                context.setObjectForKey(NSValue.valueWithCGSize(size), SDWebImageContextImageThumbnailPixelSize);
-            }
-            
+            const context = getContextFromOptions(options as any);
+
             SDWebImagePrefetcher.sharedImagePrefetcher.context = context;
             SDWebImagePrefetcher.sharedImagePrefetcher.prefetchURLsProgressCompleted([getUri(uri)], null, (finished, skipped) => {
                 if (finished && !skipped) {

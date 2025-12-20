@@ -88,7 +88,6 @@ public final class EvictionManager {
    */
   public synchronized void saveKeys(final String id, final CacheKeyStore.StoredKeys newStored) {
     if (id == null || newStored == null) {
-      Log.w(TAG, "saveKeys called with null id or newStored");
       return;
     }
 
@@ -102,9 +101,6 @@ public final class EvictionManager {
       // 2) Just save the new keys directly
       CacheKeyStore.StoredKeys toPersist = newStored;
 
-      Log.i(TAG, "saveKeys final: " + id + 
-               " sourceKey=" + (toPersist.sourceKey != null ? toPersist.sourceKey.getClass().getSimpleName() : "null"));
-      
       // 3) Save to both stores
       inMemoryKeyStore.put(id, toPersist);
       if (persistentStore != null) {
@@ -499,7 +495,6 @@ public final class EvictionManager {
     final CacheKeyStore.StoredKeys s = readStoredKeysPreferPersistent(id);
     if (s == null || s.sourceKey == null || s.signature == null)
       return false;
-    Log.i("JS", "isInMemoryCache " + id + " " + s.sourceKey + " " + s.signature);
     ModelSignatureMemoryCache mc;
     synchronized (this) {
       mc = memoryCache;
@@ -521,21 +516,18 @@ public final class EvictionManager {
       boolean transformedPresent = false;
 
       final CacheKeyStore.StoredKeys s = readStoredKeysPreferPersistent(id);
-      Log.i(TAG, "isInDiskCacheAsync " + id + " " + s  + " " + persistentStore );
       DiskCache dc;
       synchronized (EvictionManager.this) {
         dc = diskCache;
       }
 
       if (dc == null) {
-          Log.i(TAG, "disk cache not loaded yet " );
-    mainHandler.post(() -> callback.onResult(false, false));
+        mainHandler.post(() -> callback.onResult(false, false));
         return;
       }
 
       try {
         if (hasValidStoredKeys(s)) {
-          Log.i(TAG, "isInDiskCacheAsync sourceKey=" + s.sourceKey + " sourceKeyHeaders="  + ((CustomGlideUrl)s.sourceKey).getHeaders()  + " signature="  + s.signature + " " + dc.get(s.sourceKey) );
           CustomDataCacheKey cachekey = new CustomDataCacheKey(s.sourceKey, s.signature);
           sourcePresent = dc.get(cachekey) != null;
           byte[] transformationBytes = getTransformationBytesFromStoredKeys(s);
@@ -682,10 +674,6 @@ public final class EvictionManager {
     if (persistentStore != null) {
       persistent = persistentStore.get(id);
     }
-    
-    Log.i(TAG, "readStoredKeysPreferPersistent: " + id + 
-          " inMem=" + (inMem != null) + 
-          " persistent=" + (persistent != null));
     
     // Return whichever we have (prefer persistent)
     return persistent != null ? persistent : inMem;

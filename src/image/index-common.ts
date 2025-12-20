@@ -157,7 +157,7 @@ export interface PrefetchOptions {
     /** Round image as circle */
     roundAsCircle?: boolean;
     /** Tint color */
-    tintColor?: Color | string;
+    tintColor?: Color;
     /** Round corner radius for top left */
     roundTopLeftRadius?: number;
     /** Round corner radius for top right */
@@ -166,6 +166,8 @@ export interface PrefetchOptions {
     roundBottomLeftRadius?: number;
     /** Round corner radius for bottom right */
     roundBottomRightRadius?: number;
+    /** image rotation, iOS only */
+    imageRotation?: number;
 }
 
 export type Stretch = 'none' | 'fill' | 'aspectFill' | 'aspectFit';

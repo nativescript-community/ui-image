@@ -35,11 +35,9 @@ public final class ModelSignatureMemoryCache extends LruResourceCache {
 
   public ModelSignatureMemoryCache(long maxSizeBytes) {
     super(maxSizeBytes);
-    Log.i("JS", "ModelSignatureMemoryCache " + maxSizeBytes);
   }
   @Override
   public void trimMemory(int level) {
-     Log.i("JS", "trimMemory " + level + " "  + getMaxSize());
    super.trimMemory(level);
   }
 
@@ -47,16 +45,13 @@ public final class ModelSignatureMemoryCache extends LruResourceCache {
   @Override
   public Resource<?> put(@NonNull Key key, @Nullable Resource<?> resource) {
     // Save string representation for indexing before delegating.
-    Log.i("JS", "MemoryCache put " + key.toString() + getSize(resource) + " " + Arrays.toString(new Throwable().getStackTrace()).replace( ',', '\n' ));
     keyStrings.put(key, key.toString());
-    Log.i("JS", "MemoryCache put " + key.toString() + " "  + keyStrings.size());
     return super.put(key, resource);
   }
 
   @Nullable
   @Override
   public Resource<?> remove(@NonNull Key key) {
-    Log.i("JS", "MemoryCache remove " + key + " " +  Arrays.toString(new Throwable().getStackTrace()).replace( ',', '\n' ));
     keyStrings.remove(key);
     return super.remove(key);
   }
@@ -64,7 +59,6 @@ public final class ModelSignatureMemoryCache extends LruResourceCache {
   @Override
   protected void onItemEvicted(@NonNull Key key, @Nullable Resource<?> item) {
     // Called by the LRU when an item is evicted; keep our index in sync.
-    Log.i("JS", "MemoryCache onItemEvicted " + key + " "  + getMaxSize() + " " + Arrays.toString(new Throwable().getStackTrace()).replace( ',', '\n' ));
     keyStrings.remove(key);
     super.onItemEvicted(key, item);
   }
@@ -82,7 +76,6 @@ public final class ModelSignatureMemoryCache extends LruResourceCache {
   public int removeByModelAndSignature(@NonNull Object model, @NonNull Key signature) {
     final String modelStr = model.toString();
     final String signatureStr = signature.toString();
-          Log.i("JS", "ModelSignatureMemoryCache removeByModelAndSignature " + modelStr + " " +  signatureStr + " " +  keyStrings.size());
 
     List<Key> toRemove = new ArrayList<>();
     for (Map.Entry<Key, String> e : keyStrings.entrySet()) {
@@ -136,10 +129,8 @@ public final class ModelSignatureMemoryCache extends LruResourceCache {
   public boolean containsByModelAndSignature(@NonNull Object model, @NonNull Key signature) {
     final String modelStr = model.toString();
     final String signatureStr = signature.toString();
-          Log.i("JS", "ModelSignatureMemoryCache containsByModelAndSignature " + modelStr + " " +  signatureStr + " " +  keyStrings.size());
 
     for (String s : keyStrings.values()) {
-          Log.i("JS", "ModelSignatureMemoryCache containsByModelAndSignature1 " + s);
       if ((s.contains("model=" + modelStr) && s.contains("signature=" + signatureStr))
           || (s.contains(modelStr) && s.contains(signatureStr))) {
         return true;

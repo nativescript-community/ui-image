@@ -145,7 +145,7 @@ public class SharedPrefCacheKeyStore extends CacheKeyStore {
 
       Options options = new Options();
       return new CacheKeyStore.StoredKeys(sourceKey, signatureKey, width, height, null,
-          transformationBytes, decodedClass, options, optionsBytes, null);
+          transformationBytes, decodedClass, options, optionsBytes);
     } catch (Exception e) {
       Log.e(TAG, "Failed to deserialize keys for " + id, e);
       return null;

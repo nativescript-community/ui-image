@@ -241,7 +241,7 @@ export class ImagePipeline {
             try {
                 const context = Utils.android.getApplicationContext();
                 const requestManager = com.bumptech.glide.Glide.with(context);
-                
+
                 // Build headers map if provided
                 let headersMap = null;
                 if (options?.headers) {
@@ -250,7 +250,7 @@ export class ImagePipeline {
                         headersMap.put(key, options.headers[key]);
                     }
                 }
-                
+
                 // CRITICAL: Use CustomGlideUrl for both disk and memory preload to ensure
                 // the cache keys match those used during normal image loading
                 const loadModel = new com.nativescript.image.CustomGlideUrl(
@@ -259,20 +259,17 @@ export class ImagePipeline {
                     null, // progressCallback
                     null // loadSourceCallback
                 );
-                
+
                 // Use the same model for both disk and memory to ensure key consistency
-                let requestBuilder = (toDiskCache ? requestManager.downloadOnly().load(loadModel) : requestManager.asBitmap().load(loadModel));
-                
+                let requestBuilder = toDiskCache ? requestManager.downloadOnly().load(loadModel) : requestManager.asBitmap().load(loadModel);
+
                 // Apply transformations if provided
                 const transformations = [];
-                
+
                 if (options?.blurRadius) {
-                    transformations.push(new jp.wasabeef.glide.transformations.BlurTransformation(
-                        Math.round(options.blurRadius), 
-                        options.blurDownSampling || 1
-                    ));
+                    transformations.push(new jp.wasabeef.glide.transformations.BlurTransformation(Math.round(options.blurRadius), options.blurDownSampling || 1));
                 }
-                
+
                 if (options?.roundAsCircle) {
                     transformations.push(new jp.wasabeef.glide.transformations.CropCircleTransformation());
                 } else {
@@ -280,31 +277,27 @@ export class ImagePipeline {
                     const topRight = Utils.layout.toDevicePixels(options?.roundTopRightRadius || 0);
                     const bottomRight = Utils.layout.toDevicePixels(options?.roundBottomRightRadius || 0);
                     const bottomLeft = Utils.layout.toDevicePixels(options?.roundBottomLeftRadius || 0);
-                    
+
                     if (topLeft || topRight || bottomRight || bottomLeft) {
                         const radius = Math.max(topLeft, topRight, bottomRight, bottomLeft);
                         transformations.push(
-                            new jp.wasabeef.glide.transformations.RoundedCornersTransformation(
-                                Math.round(radius), 
-                                0, 
-                                jp.wasabeef.glide.transformations.RoundedCornersTransformation.CornerType.ALL
-                            )
+                            new jp.wasabeef.glide.transformations.RoundedCornersTransformation(Math.round(radius), 0, jp.wasabeef.glide.transformations.RoundedCornersTransformation.CornerType.ALL)
                         );
                     }
                 }
-                
+
                 // Tint color
                 if (options?.tintColor) {
                     const tintColor = options.tintColor instanceof Color ? options.tintColor : new Color(options.tintColor as string);
                     transformations.push(new jp.wasabeef.glide.transformations.ColorFilterTransformation(tintColor.android));
                 }
-                
+
                 let multiTransform: com.bumptech.glide.load.MultiTransformation<any> = null;
                 if (transformations.length > 0) {
                     multiTransform = new com.bumptech.glide.load.MultiTransformation(java.util.Arrays.asList(transformations));
                     requestBuilder = requestBuilder.transform(multiTransform);
                 }
-                
+
                 // Apply decode size if provided
                 if (options?.decodeWidth || options?.decodeHeight) {
                     const Target = com.bumptech.glide.request.target.Target;
@@ -318,7 +311,7 @@ export class ImagePipeline {
                         requestBuilder = requestBuilder.override(width, height);
                     }
                 }
-                
+
                 // Apply signature
                 const ro = new com.bumptech.glide.request.RequestOptions().signature(signature);
                 requestBuilder = requestBuilder.apply(ro);
