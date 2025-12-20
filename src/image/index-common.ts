@@ -140,6 +140,34 @@ export interface ImagePipelineConfigSetting {
     memoryCacheScreens?: number; // multiplier for auto-calculation
 }
 
+/**
+ * Options for prefetching images with transformations and request options
+ */
+export interface PrefetchOptions {
+    /** Custom headers for the request */
+    headers?: Record<string, string>;
+    /** Decode width for downsampling */
+    decodeWidth?: number;
+    /** Decode height for downsampling */
+    decodeHeight?: number;
+    /** Blur radius */
+    blurRadius?: number;
+    /** Blur downsampling factor (Android only) */
+    blurDownSampling?: number;
+    /** Round image as circle */
+    roundAsCircle?: boolean;
+    /** Tint color */
+    tintColor?: Color | string;
+    /** Round corner radius for top left */
+    roundTopLeftRadius?: number;
+    /** Round corner radius for top right */
+    roundTopRightRadius?: number;
+    /** Round corner radius for bottom left */
+    roundBottomLeftRadius?: number;
+    /** Round corner radius for bottom right */
+    roundBottomRightRadius?: number;
+}
+
 export type Stretch = 'none' | 'fill' | 'aspectFill' | 'aspectFit';
 
 export const srcProperty = new Property<ImageBase, string | ImageSource | ImageAsset>({ name: 'src' });

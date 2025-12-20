@@ -23,7 +23,6 @@ public class CacheKeyStore {
     public final Class<?> decodedResourceClass;
     public final Options options; // may be null or placeholder for in-memory
     public final byte[] optionsKeyBytes; // raw bytes from options.updateDiskCacheKey
-    public final Key engineKey; // optional - in-memory only
 
     public StoredKeys(
         Key sourceKey,
@@ -34,8 +33,7 @@ public class CacheKeyStore {
         byte[] transformationKeyBytes,
         Class<?> decodedResourceClass,
         Options options,
-        byte[] optionsKeyBytes,
-        Key engineKey) {
+        byte[] optionsKeyBytes) {
       this.sourceKey = sourceKey;
       this.signature = signature;
       this.width = width;
@@ -45,7 +43,6 @@ public class CacheKeyStore {
       this.decodedResourceClass = decodedResourceClass;
       this.options = options;
       this.optionsKeyBytes = optionsKeyBytes;
-      this.engineKey = engineKey;
     }
   }
 
