@@ -45,9 +45,9 @@ public final class EvictionManager {
   @GuardedBy("this")
   private DiskCache diskCache;
   @GuardedBy("this")
-  private LruResourceCache memoryCache;
+  private ModelSignatureMemoryCache memoryCache;
 
-  // in-memory store for captured info and engineKey object
+  // in-memory store for captured info
   private final CacheKeyStore inMemoryKeyStore = new CacheKeyStore();
 
   // optional persistent store (SharedPref). If null, fallback to in-memory only.
@@ -65,7 +65,7 @@ public final class EvictionManager {
     this.diskCache = diskCache;
   }
 
-  public synchronized void setMemoryCache(LruResourceCache memoryCache) {
+  public synchronized void setMemoryCache(ModelSignatureMemoryCache memoryCache) {
     this.memoryCache = memoryCache;
   }
 
@@ -74,8 +74,7 @@ public final class EvictionManager {
   }
 
   /**
-   * Expose the in-memory store so callers/listeners can put engineKey objects
-   * there.
+   * Expose the in-memory store so callers/listeners can put key objects there.
    */
   public CacheKeyStore getKeyStore() {
     if (persistentStore != null) {
@@ -89,42 +88,20 @@ public final class EvictionManager {
    */
   public synchronized void saveKeys(final String id, final CacheKeyStore.StoredKeys newStored) {
     if (id == null || newStored == null) {
-      Log.w(TAG, "saveKeys called with null id or newStored");
       return;
     }
 
     try {
-      // 1) Load existing stored keys (check in-memory first to get engineKey)
+      // 1) Load existing stored keys
       CacheKeyStore.StoredKeys existing = inMemoryKeyStore.get(id);
       if (existing == null && persistentStore != null) {
         existing = persistentStore.get(id);
       }
 
-      // 2) Always preserve engineKey from existing if newStored doesn't have one
-      // This ensures CapturingEngineKeyFactory's engineKey is not lost when
-      // SaveKeysRequestListener overwrites with more complete data
+      // 2) Just save the new keys directly
       CacheKeyStore.StoredKeys toPersist = newStored;
-      if (existing != null && existing.engineKey != null && newStored.engineKey == null) {
-        Log.i("JS", "saveKeys: preserving existing engineKey for " + id);
-        toPersist = new CacheKeyStore.StoredKeys(
-            newStored.sourceKey,
-            newStored.signature,
-            newStored.width,
-            newStored.height,
-            newStored.transformation,
-            newStored.transformationKeyBytes,
-            newStored.decodedResourceClass,
-            newStored.options,
-            newStored.optionsKeyBytes,
-            existing.engineKey // preserve captured engine key
-        );
-      }
 
-      Log.i(TAG, "saveKeys final: " + id + 
-               " hasEngineKey=" + (toPersist.engineKey != null) + 
-               " sourceKey=" + (toPersist.sourceKey != null ? toPersist.sourceKey.getClass().getSimpleName() : "null"));
-      
-      // 4) Save to both stores
+      // 3) Save to both stores
       inMemoryKeyStore.put(id, toPersist);
       if (persistentStore != null) {
         persistentStore.put(id, toPersist);
@@ -198,7 +175,7 @@ public final class EvictionManager {
     mainHandler.post(() -> {
       boolean success = true;
       Exception ex = null;
-      LruResourceCache mc;
+      ModelSignatureMemoryCache mc;
       synchronized (EvictionManager.this) {
         mc = memoryCache;
       }
@@ -250,7 +227,7 @@ public final class EvictionManager {
       mainHandler.post(() -> {
         boolean memSuccess = true;
         Exception memEx = null;
-        LruResourceCache mc;
+        ModelSignatureMemoryCache mc;
         synchronized (EvictionManager.this) {
           mc = memoryCache;
         }
@@ -305,7 +282,6 @@ public final class EvictionManager {
         transformationBytes,
         s.decodedResourceClass,
         optionsBytes,
-        s.engineKey,
         callback);
   }
 
@@ -354,12 +330,15 @@ public final class EvictionManager {
         dc = diskCache;
       }
       if (dc != null) {
+        // Delete source data using DataCacheKey (sourceKey + signature)
         try {
-          dc.delete(s.sourceKey);
+          CustomDataCacheKey dataCacheKey = new CustomDataCacheKey(s.sourceKey, s.signature);
+          dc.delete(dataCacheKey);
         } catch (Exception e) {
           success = false;
           ex = e;
         }
+        // Delete transformed resource using ResourceCacheKey
         try {
           Key resourceKey = new RecreatedResourceKey(
               s.sourceKey,
@@ -392,8 +371,6 @@ public final class EvictionManager {
   /** Evict only source/raw bytes (disk). */
   public void evictSourceForId(final String id, @Nullable final EvictionCallback callback) {
     final CacheKeyStore.StoredKeys s = readStoredKeysPreferPersistent(id);
-    final Key sourceKey = (s != null && s.sourceKey != null) ? s.sourceKey
-        : new com.bumptech.glide.signature.ObjectKey(id);
     diskExecutor.execute(() -> {
       boolean success = true;
       Exception ex = null;
@@ -403,7 +380,15 @@ public final class EvictionManager {
       }
       if (dc != null) {
         try {
-          dc.delete(sourceKey);
+          if (hasValidStoredKeys(s)) {
+            // Use DataCacheKey for proper source data deletion
+            CustomDataCacheKey dataCacheKey = new CustomDataCacheKey(s.sourceKey, s.signature);
+            dc.delete(dataCacheKey);
+          } else {
+            // Fallback to ObjectKey if we don't have stored keys
+            Key fallbackKey = new com.bumptech.glide.signature.ObjectKey(id);
+            dc.delete(fallbackKey);
+          }
         } catch (Exception e) {
           success = false;
           ex = e;
@@ -459,16 +444,17 @@ public final class EvictionManager {
    */
   @MainThread
   public void evictMemoryForId(final String id, @Nullable final EvictionCallback callback) {
-    final CacheKeyStore.StoredKeys s = (persistentStore != null) ? persistentStore.get(id) : inMemoryKeyStore.get(id);
-    final Key engineKey = (s != null) ? s.engineKey : null;
+    // Use the merged read to get engineKey from in-memory store (not persisted)
+    final CacheKeyStore.StoredKeys s = readStoredKeysPreferPersistent(id);
+    // final Key engineKey = (s != null) ? s.engineKey : null;
     boolean success = true;
     Exception ex = null;
-    if (engineKey == null) {
+    if (s == null) {
       if (callback != null)
         callback.onComplete(false, null);
       return;
     }
-    LruResourceCache mc;
+    ModelSignatureMemoryCache mc;
     synchronized (this) {
       mc = memoryCache;
     }
@@ -478,7 +464,7 @@ public final class EvictionManager {
       return;
     }
     try {
-      mc.remove(engineKey);
+      mc.removeByModelAndSignature(s.sourceKey, s.signature );
     } catch (Exception e) {
       success = false;
       ex = e;
@@ -507,18 +493,16 @@ public final class EvictionManager {
   @MainThread
   public boolean isInMemoryCache(final String id) {
     final CacheKeyStore.StoredKeys s = readStoredKeysPreferPersistent(id);
-    if (s == null || s.engineKey == null)
+    if (s == null || s.sourceKey == null || s.signature == null)
       return false;
-    final Key engineKey = s.engineKey;
-      Log.i("JS", "isInMemoryCache " + id + " " + s  + " " + engineKey);
-LruResourceCache mc;
+    ModelSignatureMemoryCache mc;
     synchronized (this) {
       mc = memoryCache;
     }
     if (mc == null)
       return false;
 
-    return mc.contains(engineKey);
+    return mc.containsByModelAndSignature(s.sourceKey, s.signature);
   }
 
   /**
@@ -532,7 +516,6 @@ LruResourceCache mc;
       boolean transformedPresent = false;
 
       final CacheKeyStore.StoredKeys s = readStoredKeysPreferPersistent(id);
-      Log.i(TAG, "isInDiskCacheAsync " + id + " " + s  + " " + persistentStore );
       DiskCache dc;
       synchronized (EvictionManager.this) {
         dc = diskCache;
@@ -544,8 +527,7 @@ LruResourceCache mc;
       }
 
       try {
-        if (s != null && s.sourceKey != null) {
-          Log.i("JS", "isInDiskCacheAsync sourceKey=" + s.sourceKey + " sourceKeyHeaders="  + ((CustomGlideUrl)s.sourceKey).getHeaders()  + " signature="  + s.signature + " " + dc.get(s.sourceKey) );
+        if (hasValidStoredKeys(s)) {
           CustomDataCacheKey cachekey = new CustomDataCacheKey(s.sourceKey, s.signature);
           sourcePresent = dc.get(cachekey) != null;
           byte[] transformationBytes = getTransformationBytesFromStoredKeys(s);
@@ -582,8 +564,11 @@ LruResourceCache mc;
     if (dc == null)
       return new boolean[] { false, false };
     try {
-      if (s != null && s.sourceKey != null) {
-        sourcePresent = dc.get(s.sourceKey) != null;
+      if (hasValidStoredKeys(s)) {
+        // Check source data using DataCacheKey
+        CustomDataCacheKey dataCacheKey = new CustomDataCacheKey(s.sourceKey, s.signature);
+        sourcePresent = dc.get(dataCacheKey) != null;
+        // Check transformed resource
         Key resourceKey = new RecreatedResourceKey(s.sourceKey, s.signature, s.width, s.height,
             getTransformationBytesFromStoredKeys(s), s.decodedResourceClass, s.optionsKeyBytes);
         transformedPresent = dc.get(resourceKey) != null;
@@ -607,7 +592,6 @@ LruResourceCache mc;
       final byte[] transformationKeyBytes,
       final Class<?> decodedResourceClass,
       final byte[] optionsKeyBytes,
-      final Key engineKey,
       @Nullable final EvictionCallback callback) {
 
     int tasks = 0;
@@ -616,26 +600,9 @@ LruResourceCache mc;
     if (signature != null && sourceKey != null)
       tasks++;
     if (tasks == 0) {
-      // only memory removal possible
-      if (engineKey != null) {
-        mainHandler.post(() -> {
-          MemoryCache mc;
-          synchronized (EvictionManager.this) {
-            mc = memoryCache;
-          }
-          if (mc != null) {
-            try {
-              mc.remove(engineKey);
-            } catch (Exception ignored) {
-            }
-          }
-          if (callback != null)
-            callback.onComplete(true, null);
-        });
-      } else {
-        if (callback != null)
-          mainHandler.post(() -> callback.onComplete(true, null));
-      }
+      // No disk tasks - just complete
+      if (callback != null)
+        mainHandler.post(() -> callback.onComplete(true, null));
       return;
     }
 
@@ -643,7 +610,7 @@ LruResourceCache mc;
     final AtomicBoolean failed = new AtomicBoolean(false);
     final AtomicReference<Exception> firstException = new AtomicReference<>(null);
 
-    // delete source bytes
+    // delete source bytes using DataCacheKey
     if (sourceKey != null) {
       diskExecutor.execute(() -> {
         DiskCache dc;
@@ -652,7 +619,9 @@ LruResourceCache mc;
         }
         if (dc != null) {
           try {
-            dc.delete(sourceKey);
+            // Use DataCacheKey to match Glide's internal source data storage
+            CustomDataCacheKey dataCacheKey = new CustomDataCacheKey(sourceKey, signature);
+            dc.delete(dataCacheKey);
           } catch (Exception e) {
             failed.set(true);
             firstException.compareAndSet(null, e);
@@ -660,18 +629,6 @@ LruResourceCache mc;
         }
         if (remaining.decrementAndGet() == 0) {
           mainHandler.post(() -> {
-            if (engineKey != null) {
-              MemoryCache mc;
-              synchronized (EvictionManager.this) {
-                mc = memoryCache;
-              }
-              if (mc != null) {
-                try {
-                  mc.remove(engineKey);
-                } catch (Exception ignored) {
-                }
-              }
-            }
             if (callback != null)
               callback.onComplete(!failed.get(), firstException.get());
           });
@@ -698,18 +655,6 @@ LruResourceCache mc;
         }
         if (remaining.decrementAndGet() == 0) {
           mainHandler.post(() -> {
-            if (engineKey != null) {
-              MemoryCache mc;
-              synchronized (EvictionManager.this) {
-                mc = memoryCache;
-              }
-              if (mc != null) {
-                try {
-                  mc.remove(engineKey);
-                } catch (Exception ignored) {
-                }
-              }
-            }
             if (callback != null)
               callback.onComplete(!failed.get(), firstException.get());
           });
@@ -722,7 +667,7 @@ LruResourceCache mc;
   public CacheKeyStore.StoredKeys readStoredKeysPreferPersistent(String id) {
     CacheKeyStore.StoredKeys s = null;
     
-    // First check in-memory (has engineKey)
+    // First check in-memory
     CacheKeyStore.StoredKeys inMem = inMemoryKeyStore.get(id);
     CacheKeyStore.StoredKeys persistent = null;
     
@@ -730,31 +675,17 @@ LruResourceCache mc;
       persistent = persistentStore.get(id);
     }
     
-    Log.i(TAG, "readStoredKeysPreferPersistent: " + id + 
-          " inMem=" + (inMem != null) + 
-          " persistent=" + (persistent != null));
-
-    
-    // If both exist, merge (prefer persistent for sourceKey, preserve in-memory engineKey)
-    if (persistent != null && inMem != null && inMem.engineKey != null && persistent.engineKey == null) {
-      CacheKeyStore.StoredKeys merged = new CacheKeyStore.StoredKeys(
-          persistent.sourceKey,
-          persistent.signature,
-          persistent.width,
-          persistent.height,
-          persistent.transformation,
-          persistent.transformationKeyBytes,
-          persistent.decodedResourceClass,
-          persistent.options,
-          persistent.optionsKeyBytes,
-          inMem.engineKey // Use in-memory engineKey
-      );
-      Log.i(TAG, "readStoredKeysPreferPersistent: merged for " + id);
-      return merged;
-    }
-    
     // Return whichever we have (prefer persistent)
     return persistent != null ? persistent : inMem;
+  }
+
+  /**
+   * Helper to check if StoredKeys has all required components for disk cache operations.
+   * @param s the StoredKeys to check
+   * @return true if s has non-null sourceKey and signature
+   */
+  private static boolean hasValidStoredKeys(@Nullable CacheKeyStore.StoredKeys s) {
+    return s != null && s.sourceKey != null && s.signature != null;
   }
 
   @Nullable

@@ -29,15 +29,19 @@ import CrossFadeTest from './CrossFadeTest.vue';
 export function installPlugin() {
     installMixins();
     initialize({
-        usePersistentCacheKeyStore: true
+        usePersistentCacheKeyStore: true,
+        // memoryCacheScreens: 8
     });
     Vue.use(ImageModule);
     Vue.use(ZoomImageModule);
-    getImagePipeline()
-        .isInDiskCache('https://images.pexels.com/photos/842711/pexels-photo-842711.jpeg')
-        .then((r) => {
-            console.log('installPlugin test pipeline:', r);
-        });
+    setTimeout(() => {
+        // we need to wait for the diskcache to be set
+        getImagePipeline()
+            .isInDiskCache('https://images.pexels.com/photos/842711/pexels-photo-842711.jpeg')
+            .then((r) => {
+                console.log('installPlugin test pipeline:', r);
+            });
+    }, 1000);
 }
 
 export const demos = [

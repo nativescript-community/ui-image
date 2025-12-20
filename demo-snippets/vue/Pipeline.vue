@@ -55,7 +55,10 @@ export default {
         },
         async prefetchMem() {
             try {
-                await getImagePipeline().prefetchToMemoryCache(this.url);
+                await getImagePipeline().prefetchToMemoryCache(this.url, {
+                    decodeWidth: 300,
+                    decodeHeight: 300,
+                });
                 this.addLog('prefetchToMemoryCache success');
                 this.result = 'prefetchToMemoryCache success';
             } catch (err) {

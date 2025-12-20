@@ -13,13 +13,13 @@ import com.bumptech.glide.load.engine.cache.MemorySizeCalculator;
 import com.bumptech.glide.load.engine.cache.DiskCache;
 import com.bumptech.glide.load.engine.cache.DiskLruCacheWrapper;
 import com.bumptech.glide.load.engine.cache.MemoryCache;
-import com.bumptech.glide.load.engine.cache.LruResourceCache;
 import com.bumptech.glide.load.engine.CapturingEngineKeyFactory;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.module.AppGlideModule;
 import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.signature.ObjectKey;
 import okhttp3.OkHttpClient;
+import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -28,6 +28,37 @@ import java.lang.reflect.Modifier;
 public class CustomGlideModule extends AppGlideModule {
   private static final String TAG = "MyAppGlideModule";
   private static final String INJECT_TAG = "EngineKeyFactoryInject";
+
+  private File getInternalCacheDirectory(@NonNull Context context, final String diskCacheName) {
+    File cacheDirectory = context.getCacheDir();
+    if (cacheDirectory == null) {
+      return null;
+    }
+    if (diskCacheName != null) {
+      return new File(cacheDirectory, diskCacheName);
+    }
+    return cacheDirectory;
+  }
+  public File getCacheDirectory(@NonNull Context context, final String diskCacheName) {
+      File internalCacheDirectory = getInternalCacheDirectory(context, diskCacheName);
+
+      // Already used internal cache, so keep using that one,
+      // thus avoiding using both external and internal with transient errors.
+      if (internalCacheDirectory != null && internalCacheDirectory.exists()) {
+        return internalCacheDirectory;
+      }
+
+      File cacheDirectory = context.getExternalCacheDir();
+
+      // Shared storage is not available.
+      if (cacheDirectory == null || !cacheDirectory.canWrite()) {
+        return internalCacheDirectory;
+      }
+      if (diskCacheName != null) {
+        return new File(cacheDirectory, diskCacheName);
+      }
+      return cacheDirectory;
+  }
 
   @Override
   public void applyOptions(@NonNull Context context, @NonNull GlideBuilder builder) {
@@ -51,7 +82,7 @@ public class CustomGlideModule extends AppGlideModule {
     }
     
     // Use our custom memory cache wrapper
-    LruResourceCache memoryCache = new LruResourceCache(memoryCacheSize);
+    ModelSignatureMemoryCache memoryCache = new ModelSignatureMemoryCache(memoryCacheSize);
     EvictionManager.get().setMemoryCache(memoryCache);
     builder.setMemoryCache(memoryCache);
     
@@ -60,33 +91,11 @@ public class CustomGlideModule extends AppGlideModule {
     builder.setDiskCache(new DiskCache.Factory() {
       @Override
       public DiskCache build() {
-        DiskCache dc = DiskLruCacheWrapper.create(context.getCacheDir(), 250 * 1024 * 1024);
+        DiskCache dc = DiskLruCacheWrapper.create(getCacheDirectory(context, config.getDiskCacheName()), config.getDiskCacheSize());
         EvictionManager.get().setDiskCache(dc);
         return dc;
       }
     });
-  }
-
-  private static String normalizeIdFromModel(Object model, String fallback) {
-    if (model == null) {
-      return fallback;
-    }
-    if (model instanceof com.bumptech.glide.load.model.GlideUrl) {
-      try {
-        return ((com.bumptech.glide.load.model.GlideUrl) model).toStringUrl();
-      } catch (Throwable t) {
-        return String.valueOf(model);
-      }
-    }
-    return String.valueOf(model);
-  }
-
-  private static com.bumptech.glide.load.Key sourceKeyFromModel(Object model, com.bumptech.glide.load.Key fallback) {
-    if (model instanceof com.bumptech.glide.load.Key) {
-      return (com.bumptech.glide.load.Key) model;
-    }
-    // GlideUrl implements Key, so the above will catch it.
-    return fallback;
   }
 
   @Override
@@ -99,159 +108,6 @@ public class CustomGlideModule extends AppGlideModule {
         GlideUrl.class,
         InputStream.class,
         new CustomUrlLoader.Factory(client));
-    // Listener: called when an EngineKey is created. Update the stored keys to
-    // include engineKey.
-    CapturingEngineKeyFactory.Listener listener = (engineKey, model) -> {
-      if (model == null)
-        return;
-      Log.i("JS", "CapturingEngineKeyFactory.Listener 1" + engineKey + " " + model + " " + model.getClass().getName());
-
-      final String id = normalizeIdFromModel(model,  String.valueOf(model));
-
-
-      // Read either persistent or in-memory stored keys
-      CacheKeyStore.StoredKeys s = EvictionManager.get().readStoredKeysPreferPersistent(id);
-      if (s == null) {
-        // if key store exists but no entry, create minimal
-        final Key actualSourceKey = sourceKeyFromModel(model, null);
-        s = new CacheKeyStore.StoredKeys(
-            actualSourceKey,
-            new com.bumptech.glide.signature.ObjectKey("signature-none"),
-            com.bumptech.glide.request.target.Target.SIZE_ORIGINAL,
-            com.bumptech.glide.request.target.Target.SIZE_ORIGINAL,
-            null,
-            null,
-            android.graphics.Bitmap.class,
-            new Options(),
-            null,
-            null);
-      }
-         Log.i("JS", "CapturingEngineKeyFactory.Listener 2 " + engineKey + " " + id + " " + s + " " + s.sourceKey + " " + s.sourceKey.getClass().getName());
-
-      // Build an updated StoredKeys that preserves everything and sets engineKey
-      CacheKeyStore.StoredKeys updated = new CacheKeyStore.StoredKeys(
-          s.sourceKey,
-          s.signature,
-          s.width,
-          s.height,
-          s.transformation, // may be null; preserved for in-process fallback
-          s.transformationKeyBytes, // raw bytes if recorded (preferred)
-          s.decodedResourceClass,
-          s.options,
-          s.optionsKeyBytes,
-          engineKey // set the captured engineKey
-      );
-
-      // Put updated entry into the in-memory store so later EvictionManager can
-      // remove memory entry.
-      EvictionManager.get().saveKeys(id, updated);
-      Log.i("JS", "CapturingEngineKeyFactory.Listener 3 " + id + " " + updated + " " + updated.engineKey + " " + engineKey);
-    };
-
-    // Create the capturing factory
-    // instantiate the capturing factory (public class in
-    // com.bumptech.glide.load.engine)
-    Object capturingFactory = new com.bumptech.glide.load.engine.CapturingEngineKeyFactory(listener);
-
-    // inject it into Glide's Engine reflectively, passing it as Object (no
-    // EngineKeyFactory compile-time ref)
-    try {
-      injectEngineKeyFactoryIntoGlide(glide, capturingFactory);
-      Log.i(TAG, "Injected capturing EngineKeyFactory into Glide engine");
-    } catch (Exception e) {
-      Log.w(TAG, "Failed to inject capturing EngineKeyFactory", e);
-    }
-
-  }
-
-  /**
-   * Reflectively find Glide.engine and replace its EngineKeyFactory-typed field
-   * with capturingFactory.
-   * This tries to be resilient across minor Glide 5.x binary differences.
-   */
-  private void injectEngineKeyFactoryIntoGlide(Object glideInstance, Object capturingFactory) throws Exception {
-    if (glideInstance == null) {
-      throw new IllegalArgumentException("glideInstance == null");
-    }
-    // 1) find Engine field on Glide
-    Field engineField = null;
-    for (Field f : glideInstance.getClass().getDeclaredFields()) {
-      if (f.getType().getName().contains("Engine")) {
-        engineField = f;
-        break;
-      }
-    }
-    if (engineField == null) {
-      throw new NoSuchFieldException("Could not find Engine field on Glide");
-    }
-    engineField.setAccessible(true);
-    Object engineInstance = engineField.get(glideInstance);
-    if (engineInstance == null) {
-      throw new IllegalStateException("Glide.engine is null");
-    }
-
-    // 2) find the keyFactory-like field on Engine
-    Field targetField = null;
-    Class<?> engineClass = engineInstance.getClass();
-    Class<?> cur = engineClass;
-    while (cur != null && targetField == null) {
-      for (Field f : cur.getDeclaredFields()) {
-        String typeName = f.getType().getName();
-        if (typeName.contains("EngineKeyFactory") || typeName.endsWith("EngineKeyFactory")
-            || f.getName().toLowerCase().contains("keyfactory")) {
-          targetField = f;
-          break;
-        }
-      }
-      cur = cur.getSuperclass();
-    }
-    if (targetField == null) {
-      throw new NoSuchFieldException(
-          "Could not find EngineKeyFactory-like field in Engine class: " + engineClass.getName());
-    }
-
-    targetField.setAccessible(true);
-
-    // Log current value
-    Object before = targetField.get(engineInstance);
-    int beforeHash = System.identityHashCode(before);
-    String beforeClass = (before == null) ? "null" : before.getClass().getName();
-
-    // If field is final, try to remove final modifier so setting works reliably
-    try {
-      Field modifiersField = Field.class.getDeclaredField("modifiers");
-      modifiersField.setAccessible(true);
-      int mods = targetField.getModifiers();
-      if (Modifier.isFinal(mods)) {
-        modifiersField.setInt(targetField, mods & ~Modifier.FINAL);
-      }
-    } catch (NoSuchFieldException nsf) {
-      // Android ART may not expose 'modifiers' the same way; ignore if not available
-      Log.i(INJECT_TAG, "Could not access Field.modifiers to clear final; continuing");
-    } catch (Throwable t) {
-      Log.w(INJECT_TAG, "Failed to clear final modifier (continuing attempt to set field)", t);
-    }
-
-    // 3) set the new factory instance
-    try {
-      targetField.set(engineInstance, capturingFactory);
-    } catch (IllegalAccessException | IllegalArgumentException iae) {
-      // Log and rethrow so caller can inspect
-      Log.w(INJECT_TAG, "targetField.set(...) failed", iae);
-      throw iae;
-    }
-
-    // 4) read back and log to verify
-    Object after = targetField.get(engineInstance);
-    int afterHash = System.identityHashCode(after);
-    String afterClass = (after == null) ? "null" : after.getClass().getName();
-
-    // quick verification: are they the same instance we tried to set?
-    boolean sameInstance = (after == capturingFactory);
-    if (!sameInstance) {
-      throw new IllegalStateException(
-          "Injection did not set the expected capturingFactory instance. afterClass=" + afterClass);
-    }
   }
 
   @Override

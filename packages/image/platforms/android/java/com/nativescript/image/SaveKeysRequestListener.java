@@ -130,8 +130,7 @@ public class SaveKeysRequestListener implements RequestListener<Object> {
                 transformBytes,
                 this.decodedResourceClass,
                 this.options,
-                optionsBytes,
-                null // engineKey captured separately by CapturingEngineKeyFactory
+                optionsBytes
             );
 
             EvictionManager.get().saveKeys(normalizedId, s);

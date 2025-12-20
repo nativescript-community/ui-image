@@ -12,6 +12,7 @@ import {
     ImageInfo as ImageInfoBase,
     ImagePipelineConfigSetting,
     LoadSourceEventData,
+    PrefetchOptions,
     ProgressEventData,
     ScaleType,
     SrcType,
@@ -217,18 +218,18 @@ export class ImagePipeline {
         this.mIos.clearDiskOnCompletion(null);
     }
 
-    prefetchToDiskCache(uri: string): Promise<void> {
-        return this.prefetchToCacheType(uri, SDImageCacheType.Disk);
+    prefetchToDiskCache(uri: string, options?: PrefetchOptions): Promise<void> {
+        return this.prefetchToCacheType(uri, SDImageCacheType.Disk, options);
     }
 
-    prefetchToMemoryCache(uri: string): Promise<void> {
-        return this.prefetchToCacheType(uri, SDImageCacheType.Memory);
+    prefetchToMemoryCache(uri: string, options?: PrefetchOptions): Promise<void> {
+        return this.prefetchToCacheType(uri, SDImageCacheType.Memory, options);
     }
 
-    private prefetchToCacheType(uri: string, cacheType: SDImageCacheType): Promise<void> {
+    private prefetchToCacheType(uri: string, cacheType: SDImageCacheType, options?: PrefetchOptions): Promise<void> {
         return new Promise((resolve, reject) => {
-            const context = NSMutableDictionary.alloc<string, any>().initWithCapacity(1);
-            context.setObjectForKey(cacheType, SDWebImageContextStoreCacheType);
+            const context = getContextFromOptions(options as any);
+
             SDWebImagePrefetcher.sharedImagePrefetcher.context = context;
             SDWebImagePrefetcher.sharedImagePrefetcher.prefetchURLsProgressCompleted([getUri(uri)], null, (finished, skipped) => {
                 if (finished && !skipped) {

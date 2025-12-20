@@ -33,9 +33,6 @@ public class SharedPrefCacheKeyStore extends CacheKeyStore {
     try {
       JSONObject j = new JSONObject();
 
-      Log.i(TAG, "SharedPrefCacheKeyStore put: " + id + 
-               " keys=" + keys);
-      
       // Serialize sourceKey properly - extract URL and headers
       if (keys.sourceKey instanceof GlideUrl) {
         GlideUrl glideUrl = (GlideUrl) keys.sourceKey;
@@ -77,7 +74,6 @@ public class SharedPrefCacheKeyStore extends CacheKeyStore {
       if ( keys.optionsKeyBytes != null) {
         j.put("optionsBytes", Base64.encodeToString(keys.optionsKeyBytes, Base64.NO_WRAP));
       }
-      Log.i(TAG, "SharedPrefCacheKeyStore putString: " + id +   " string=" + j.toString());
       prefs.edit().putString(id, j.toString()).apply();
     } catch (JSONException e) {
       Log.e(TAG, "Failed to serialize keys for " + id, e);
@@ -120,16 +116,27 @@ public class SharedPrefCacheKeyStore extends CacheKeyStore {
         sourceKey = source != null && !"null".equals(source) ? new ObjectKey(source) : new ObjectKey(id);
       }
       
-      String signature = j.optString("signature", null);
+      String signatureStr = j.optString("signature", null);
       int width = j.optInt("width", com.bumptech.glide.request.target.Target.SIZE_ORIGINAL);
       int height = j.optInt("height", com.bumptech.glide.request.target.Target.SIZE_ORIGINAL);
       String decodedName = j.optString("decodedResourceClass", android.graphics.Bitmap.class.getName());
-        Log.i(TAG, "SharedPrefCacheKeyStore get decodedName: " + decodedName);
-    String transformationBase64 = j.optString("transformationBytes", null);
+      String transformationBase64 = j.optString("transformationBytes", null);
       String optionsBase64 = j.optString("optionsBytes", null);
 
-      Key signatureKey = signature != null && !"null".equals(signature) ? new ObjectKey(signature)
-          : new ObjectKey("signature-none");
+      // Parse signature: extract the inner value from "ObjectKey{object=v1}"
+      // to avoid double-wrapping
+      Key signatureKey;
+      if (signatureStr != null && !"null".equals(signatureStr)) {
+        // Extract inner value from "ObjectKey{object=value}" format
+        String innerValue = signatureStr;
+        if (signatureStr.startsWith("ObjectKey{object=") && signatureStr.endsWith("}")) {
+          innerValue = signatureStr.substring(17, signatureStr.length() - 1);
+        }
+        signatureKey = new ObjectKey(innerValue);
+      } else {
+        signatureKey = new ObjectKey("signature-none");
+      }
+      
       Class<?> decodedClass = Class.forName(decodedName);
       byte[] transformationBytes = (transformationBase64 == null || "null".equals(transformationBase64)) ? null
           : Base64.decode(transformationBase64, Base64.NO_WRAP);
@@ -137,9 +144,8 @@ public class SharedPrefCacheKeyStore extends CacheKeyStore {
           : Base64.decode(optionsBase64, Base64.NO_WRAP);
 
       Options options = new Options();
-      Log.i(TAG, "SharedPrefCacheKeyStore get: " + id +   " string=" + s +   " sourceKey=" + sourceKey);
-    return new CacheKeyStore.StoredKeys(sourceKey, signatureKey, width, height, null,
-          transformationBytes, decodedClass, options, optionsBytes, null);
+      return new CacheKeyStore.StoredKeys(sourceKey, signatureKey, width, height, null,
+          transformationBytes, decodedClass, options, optionsBytes);
     } catch (Exception e) {
       Log.e(TAG, "Failed to deserialize keys for " + id, e);
       return null;

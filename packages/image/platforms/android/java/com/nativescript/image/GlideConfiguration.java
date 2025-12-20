@@ -8,8 +8,10 @@ package com.nativescript.image;
 public class GlideConfiguration {
     private static GlideConfiguration instance;
     
+    private long diskCacheSize = 250 * 1024 * 1024; 
     private long memoryCacheSize = -1; // -1 means use default
     private float memoryCacheScreens = 2.0f;
+    private String diskCacheName = null;
     
     private GlideConfiguration() {
     }
@@ -19,6 +21,19 @@ public class GlideConfiguration {
             instance = new GlideConfiguration();
         }
         return instance;
+    }
+    
+    /**
+     * Set custom disk cache name.
+     * Must be called before Glide is initialized (before first image load).
+     * @param name String
+     */
+    public void setDiskCacheName(String diskCacheName) {
+        this.diskCacheName = diskCacheName;
+    }
+    
+    public String getDiskCacheName() {
+        return diskCacheName;
     }
     
     /**
@@ -32,6 +47,19 @@ public class GlideConfiguration {
     
     public long getMemoryCacheSize() {
         return memoryCacheSize;
+    }
+    
+    /**
+     * Set custom disk cache size in bytes.
+     * Must be called before Glide is initialized (before first image load).
+     * @param bytes Size in bytes
+     */
+    public void setDiskCacheSize(long bytes) {
+        this.diskCacheSize = bytes;
+    }
+    
+    public long getDiskCacheSize() {
+        return diskCacheSize;
     }
     
     /**
