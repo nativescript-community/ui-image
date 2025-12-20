@@ -33,9 +33,6 @@ public class SharedPrefCacheKeyStore extends CacheKeyStore {
     try {
       JSONObject j = new JSONObject();
 
-      Log.i(TAG, "SharedPrefCacheKeyStore put: " + id + 
-               " keys=" + keys);
-      
       // Serialize sourceKey properly - extract URL and headers
       if (keys.sourceKey instanceof GlideUrl) {
         GlideUrl glideUrl = (GlideUrl) keys.sourceKey;
@@ -77,7 +74,6 @@ public class SharedPrefCacheKeyStore extends CacheKeyStore {
       if ( keys.optionsKeyBytes != null) {
         j.put("optionsBytes", Base64.encodeToString(keys.optionsKeyBytes, Base64.NO_WRAP));
       }
-      Log.i(TAG, "SharedPrefCacheKeyStore putString: " + id +   " string=" + j.toString());
       prefs.edit().putString(id, j.toString()).apply();
     } catch (JSONException e) {
       Log.e(TAG, "Failed to serialize keys for " + id, e);
@@ -124,8 +120,7 @@ public class SharedPrefCacheKeyStore extends CacheKeyStore {
       int width = j.optInt("width", com.bumptech.glide.request.target.Target.SIZE_ORIGINAL);
       int height = j.optInt("height", com.bumptech.glide.request.target.Target.SIZE_ORIGINAL);
       String decodedName = j.optString("decodedResourceClass", android.graphics.Bitmap.class.getName());
-        Log.i(TAG, "SharedPrefCacheKeyStore get decodedName: " + decodedName);
-    String transformationBase64 = j.optString("transformationBytes", null);
+      String transformationBase64 = j.optString("transformationBytes", null);
       String optionsBase64 = j.optString("optionsBytes", null);
 
       // Parse signature: extract the inner value from "ObjectKey{object=v1}"
@@ -149,8 +144,7 @@ public class SharedPrefCacheKeyStore extends CacheKeyStore {
           : Base64.decode(optionsBase64, Base64.NO_WRAP);
 
       Options options = new Options();
-      Log.i(TAG, "SharedPrefCacheKeyStore get: " + id +   " string=" + s +   " sourceKey=" + sourceKey);
-    return new CacheKeyStore.StoredKeys(sourceKey, signatureKey, width, height, null,
+      return new CacheKeyStore.StoredKeys(sourceKey, signatureKey, width, height, null,
           transformationBytes, decodedClass, options, optionsBytes, null);
     } catch (Exception e) {
       Log.e(TAG, "Failed to deserialize keys for " + id, e);

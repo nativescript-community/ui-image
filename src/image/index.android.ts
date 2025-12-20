@@ -269,7 +269,7 @@ export class ImagePipeline {
                 // Create a composite listener array to save keys during preload
                 const objectArr = Array.create(com.bumptech.glide.request.RequestListener, 2);
                 const ro = new com.bumptech.glide.request.RequestOptions().signature(signature);
-                
+
                 // Add SaveKeysRequestListener to capture keys during preload
                 objectArr[0] = new com.nativescript.image.SaveKeysRequestListener(
                     uri,

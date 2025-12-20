@@ -13,13 +13,13 @@ import com.bumptech.glide.load.engine.cache.MemorySizeCalculator;
 import com.bumptech.glide.load.engine.cache.DiskCache;
 import com.bumptech.glide.load.engine.cache.DiskLruCacheWrapper;
 import com.bumptech.glide.load.engine.cache.MemoryCache;
-import com.bumptech.glide.load.engine.cache.LruResourceCache;
 import com.bumptech.glide.load.engine.CapturingEngineKeyFactory;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.module.AppGlideModule;
 import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.signature.ObjectKey;
 import okhttp3.OkHttpClient;
+import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -28,6 +28,37 @@ import java.lang.reflect.Modifier;
 public class CustomGlideModule extends AppGlideModule {
   private static final String TAG = "MyAppGlideModule";
   private static final String INJECT_TAG = "EngineKeyFactoryInject";
+
+  private File getInternalCacheDirectory(@NonNull Context context, final String diskCacheName) {
+    File cacheDirectory = context.getCacheDir();
+    if (cacheDirectory == null) {
+      return null;
+    }
+    if (diskCacheName != null) {
+      return new File(cacheDirectory, diskCacheName);
+    }
+    return cacheDirectory;
+  }
+  public File getCacheDirectory(@NonNull Context context, final String diskCacheName) {
+      File internalCacheDirectory = getInternalCacheDirectory(context, diskCacheName);
+
+      // Already used internal cache, so keep using that one,
+      // thus avoiding using both external and internal with transient errors.
+      if (internalCacheDirectory != null && internalCacheDirectory.exists()) {
+        return internalCacheDirectory;
+      }
+
+      File cacheDirectory = context.getExternalCacheDir();
+
+      // Shared storage is not available.
+      if (cacheDirectory == null || !cacheDirectory.canWrite()) {
+        return internalCacheDirectory;
+      }
+      if (diskCacheName != null) {
+        return new File(cacheDirectory, diskCacheName);
+      }
+      return cacheDirectory;
+  }
 
   @Override
   public void applyOptions(@NonNull Context context, @NonNull GlideBuilder builder) {
@@ -51,7 +82,7 @@ public class CustomGlideModule extends AppGlideModule {
     }
     
     // Use our custom memory cache wrapper
-    LruResourceCache memoryCache = new LruResourceCache(memoryCacheSize);
+    ModelSignatureMemoryCache memoryCache = new ModelSignatureMemoryCache(memoryCacheSize);
     EvictionManager.get().setMemoryCache(memoryCache);
     builder.setMemoryCache(memoryCache);
     
@@ -60,7 +91,7 @@ public class CustomGlideModule extends AppGlideModule {
     builder.setDiskCache(new DiskCache.Factory() {
       @Override
       public DiskCache build() {
-        DiskCache dc = DiskLruCacheWrapper.create(context.getCacheDir(), 250 * 1024 * 1024);
+        DiskCache dc = DiskLruCacheWrapper.create(getCacheDirectory(context, config.getDiskCacheName()), config.getDiskCacheSize());
         EvictionManager.get().setDiskCache(dc);
         return dc;
       }
@@ -104,7 +135,6 @@ public class CustomGlideModule extends AppGlideModule {
     CapturingEngineKeyFactory.Listener listener = (engineKey, model) -> {
       if (model == null)
         return;
-      Log.i("JS", "CapturingEngineKeyFactory.Listener 1" + engineKey + " " + model + " " + model.getClass().getName());
 
       final String id = normalizeIdFromModel(model,  String.valueOf(model));
 
@@ -126,7 +156,6 @@ public class CustomGlideModule extends AppGlideModule {
             null,
             null);
       }
-         Log.i("JS", "CapturingEngineKeyFactory.Listener 2 " + engineKey + " " + id + " " + s + " " + s.sourceKey + " " + s.sourceKey.getClass().getName());
 
       // Build an updated StoredKeys that preserves everything and sets engineKey
       CacheKeyStore.StoredKeys updated = new CacheKeyStore.StoredKeys(
@@ -145,7 +174,6 @@ public class CustomGlideModule extends AppGlideModule {
       // Put updated entry into the in-memory store so later EvictionManager can
       // remove memory entry.
       EvictionManager.get().saveKeys(id, updated);
-      Log.i("JS", "CapturingEngineKeyFactory.Listener 3 " + id + " " + updated + " " + updated.engineKey + " " + engineKey);
     };
 
     // Create the capturing factory
@@ -157,7 +185,6 @@ public class CustomGlideModule extends AppGlideModule {
     // EngineKeyFactory compile-time ref)
     try {
       injectEngineKeyFactoryIntoGlide(glide, capturingFactory);
-      Log.i(TAG, "Injected capturing EngineKeyFactory into Glide engine");
     } catch (Exception e) {
       Log.w(TAG, "Failed to inject capturing EngineKeyFactory", e);
     }

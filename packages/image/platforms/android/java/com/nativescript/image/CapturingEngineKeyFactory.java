@@ -33,7 +33,6 @@ public class CapturingEngineKeyFactory extends EngineKeyFactory {
       Class<?> resourceClass,
       Class<?> transcodeClass,
       Options options) {
-    Log.d("JS", "CapturingEngineKeyFactory buildKey " + model);
     com.bumptech.glide.load.engine.EngineKey engineKey = super.buildKey(model, signature, width, height,
         transformations, resourceClass, transcodeClass, options);
     if (listener != null) {
