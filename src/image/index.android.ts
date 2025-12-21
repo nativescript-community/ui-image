@@ -83,7 +83,11 @@ export function initialize(config?: ImagePipelineConfigSetting): void {
  * @returns true if the URI is a network request, false otherwise
  */
 function isNetworkUri(uri: string): boolean {
-    return typeof uri === 'string' && (uri.startsWith('http://') || uri.startsWith('https://'));
+    // Defensive check for runtime safety (uri should always be a string by TypeScript typing)
+    if (!uri) {
+        return false;
+    }
+    return uri.startsWith('http://') || uri.startsWith('https://');
 }
 
 export class ImagePipeline {
