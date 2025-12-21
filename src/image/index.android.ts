@@ -83,7 +83,7 @@ export function initialize(config?: ImagePipelineConfigSetting): void {
  * @returns true if the URI is a network request, false otherwise
  */
 function isNetworkUri(uri: string): boolean {
-    return uri.startsWith('http://') || uri.startsWith('https://');
+    return typeof uri === 'string' && (uri.startsWith('http://') || uri.startsWith('https://'));
 }
 
 export class ImagePipeline {
@@ -657,7 +657,7 @@ export class Img extends ImageBase {
         // Cancel any prior Glide request/target for this view before starting a new one.
         this.cancelCurrentRequest();
         // Determine if this is a network request
-        this.isNetworkRequest = typeof uri === 'string' && isNetworkUri(uri);
+        this.isNetworkRequest = isNetworkUri(uri);
 
         let requestBuilder: com.bumptech.glide.RequestBuilder<globalAndroid.graphics.drawable.Drawable>;
         let loadModel: any = uri;
@@ -700,9 +700,10 @@ export class Img extends ImageBase {
         // Use CustomGlideUrl ONLY for network requests (http/https)
         // For local file:// URIs, use the string directly to avoid CustomDataFetcher's OkHttp requirement
         if (this.isNetworkRequest && (this.headers || this.progressCallback || this.loadSourceCallback)) {
-            const headersMap = new java.util.HashMap();
-
+            let headersMap = null;
+            
             if (this.headers) {
+                headersMap = new java.util.HashMap();
                 for (const key in this.headers) {
                     headersMap.put(key, this.headers[key]);
                 }
