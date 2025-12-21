@@ -76,6 +76,16 @@ export function initialize(config?: ImagePipelineConfigSetting): void {
     }
 }
 
+/**
+ * Helper function to determine if a URI is a network request.
+ * Only http:// and https:// URLs are considered network requests.
+ * @param uri The URI to check
+ * @returns true if the URI is a network request, false otherwise
+ */
+function isNetworkUri(uri: string): boolean {
+    return uri.startsWith('http://') || uri.startsWith('https://');
+}
+
 export class ImagePipeline {
     toUri(value: string | android.net.Uri) {
         if (value instanceof android.net.Uri) {
@@ -243,7 +253,7 @@ export class ImagePipeline {
                 const requestManager = com.bumptech.glide.Glide.with(context);
 
                 // Determine if this is a network request
-                const isNetworkRequest = uri.startsWith('http://') || uri.startsWith('https://');
+                const isNetworkRequest = isNetworkUri(uri);
                 
                 // Build the load model
                 let loadModel: any;
@@ -647,7 +657,7 @@ export class Img extends ImageBase {
         // Cancel any prior Glide request/target for this view before starting a new one.
         this.cancelCurrentRequest();
         // Determine if this is a network request
-        this.isNetworkRequest = typeof uri === 'string' && (uri.startsWith('http://') || uri.startsWith('https://'));
+        this.isNetworkRequest = typeof uri === 'string' && isNetworkUri(uri);
 
         let requestBuilder: com.bumptech.glide.RequestBuilder<globalAndroid.graphics.drawable.Drawable>;
         let loadModel: any = uri;
