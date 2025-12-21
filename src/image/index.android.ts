@@ -242,23 +242,33 @@ export class ImagePipeline {
                 const context = Utils.android.getApplicationContext();
                 const requestManager = com.bumptech.glide.Glide.with(context);
 
-                // Build headers map if provided
-                let headersMap = null;
-                if (options?.headers) {
-                    headersMap = new java.util.HashMap();
-                    for (const key in options.headers) {
-                        headersMap.put(key, options.headers[key]);
+                // Determine if this is a network request
+                const isNetworkRequest = uri.startsWith('http://') || uri.startsWith('https://');
+                
+                // Build the load model
+                let loadModel: any;
+                
+                // Only use CustomGlideUrl for network requests to ensure cache key consistency
+                // For local files (file://), use plain URI string to avoid OkHttp requirement
+                if (isNetworkRequest) {
+                    let headersMap = null;
+                    if (options?.headers) {
+                        headersMap = new java.util.HashMap();
+                        for (const key in options.headers) {
+                            headersMap.put(key, options.headers[key]);
+                        }
                     }
+                    
+                    loadModel = new com.nativescript.image.CustomGlideUrl(
+                        uri,
+                        headersMap,
+                        null, // progressCallback
+                        null // loadSourceCallback
+                    );
+                } else {
+                    // For local files, use plain URI string
+                    loadModel = uri;
                 }
-
-                // CRITICAL: Use CustomGlideUrl for both disk and memory preload to ensure
-                // the cache keys match those used during normal image loading
-                const loadModel = new com.nativescript.image.CustomGlideUrl(
-                    uri,
-                    headersMap,
-                    null, // progressCallback
-                    null // loadSourceCallback
-                );
 
                 // Use the same model for both disk and memory to ensure key consistency
                 let requestBuilder = toDiskCache ? requestManager.downloadOnly().load(loadModel) : requestManager.asBitmap().load(loadModel);
@@ -677,23 +687,27 @@ export class Img extends ImageBase {
                 }
             });
         }
-        // Use CustomGlideUrl if we need headers, progress, or load source
-        let headersMap;
+        // Use CustomGlideUrl ONLY for network requests (http/https)
+        // For local file:// URIs, use the string directly to avoid CustomDataFetcher's OkHttp requirement
         if (this.isNetworkRequest && (this.headers || this.progressCallback || this.loadSourceCallback)) {
-            headersMap = new java.util.HashMap();
+            const headersMap = new java.util.HashMap();
 
             if (this.headers) {
                 for (const key in this.headers) {
                     headersMap.put(key, this.headers[key]);
                 }
             }
+            
+            loadModel = new com.nativescript.image.CustomGlideUrl(
+                uri,
+                headersMap,
+                this.progressCallback, // Can be null
+                this.loadSourceCallback // Can be null
+            );
+        } else {
+            // For local files or network requests without callbacks/headers, use plain URI
+            loadModel = uri;
         }
-        loadModel = new com.nativescript.image.CustomGlideUrl(
-            uri,
-            headersMap,
-            this.progressCallback, // Can be null
-            this.loadSourceCallback // Can be null
-        );
         requestBuilder = com.bumptech.glide.Glide.with(context).load(loadModel);
 
         // Apply transformations (blur, rounded corners, etc.)
