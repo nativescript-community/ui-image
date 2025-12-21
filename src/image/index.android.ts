@@ -165,12 +165,15 @@ export class ImagePipeline {
     }
 
     evictFromCache(uri: string | android.net.Uri): Promise<void> {
+        console.log('evictFromCache ', uri, new Error().stack);
+
         const url = this.toUri(uri);
         return new Promise<void>((resolve, reject) => {
             com.nativescript.image.EvictionManager.get().evictAllForId(
                 url,
                 new com.nativescript.image.EvictionManager.EvictionCallback({
                     onComplete(success: boolean, error) {
+                        console.log('evictFromCache done', success, error);
                         if (error) {
                             if (Trace.isEnabled()) {
                                 CLog(CLogTypes.error, error);
@@ -258,10 +261,10 @@ export class ImagePipeline {
 
                 // Determine if this is a network request
                 const isNetworkRequest = isNetworkUri(uri);
-                
+
                 // Build the load model
                 let loadModel: any;
-                
+
                 // Only use CustomGlideUrl for network requests to ensure cache key consistency
                 // For local files (file://), use plain URI string to avoid OkHttp requirement
                 if (isNetworkRequest) {
@@ -272,7 +275,7 @@ export class ImagePipeline {
                             headersMap.put(key, options.headers[key]);
                         }
                     }
-                    
+
                     loadModel = new com.nativescript.image.CustomGlideUrl(
                         uri,
                         headersMap,
@@ -539,9 +542,11 @@ export class Img extends ImageBase {
     public async updateImageUri() {
         const imagePipeLine = getImagePipeline();
         const cacheKey = this.cacheKey;
+        console.log('updateImageUri', await imagePipeLine.isInDiskCache(cacheKey), imagePipeLine.isInBitmapMemoryCache(cacheKey));
         if (cacheKey) {
             await imagePipeLine.evictFromCache(cacheKey);
         }
+        console.log('updateImageUri 1', await imagePipeLine.isInDiskCache(cacheKey), imagePipeLine.isInBitmapMemoryCache(cacheKey));
         this.handleImageSrc(null);
         this.initImage();
     }
@@ -705,14 +710,14 @@ export class Img extends ImageBase {
         // For local file:// URIs, use the string directly to avoid CustomDataFetcher's OkHttp requirement
         if (this.isNetworkRequest && (this.headers || this.progressCallback || this.loadSourceCallback)) {
             let headersMap = null;
-            
+
             if (this.headers) {
                 headersMap = new java.util.HashMap();
                 for (const key in this.headers) {
                     headersMap.put(key, this.headers[key]);
                 }
             }
-            
+
             loadModel = new com.nativescript.image.CustomGlideUrl(
                 uri,
                 headersMap,
@@ -724,6 +729,7 @@ export class Img extends ImageBase {
             loadModel = uri;
         }
         requestBuilder = com.bumptech.glide.Glide.with(context).load(loadModel);
+        console.info('🚀 ~ Img ~ loadImageWithGlide ~ loadModel:', uri, loadModel);
 
         // Apply transformations (blur, rounded corners, etc.)
         const transformations = [];
@@ -823,6 +829,7 @@ export class Img extends ImageBase {
         );
         objectArr[1] = new com.bumptech.glide.request.RequestListener({
             onLoadFailed(e: any, model: any, target: any, isFirstResource: boolean): boolean {
+                console.info('🚀 ~ Img ~ loadImageWithGlide ~ onLoadFailed:', e, model);
                 const instance = owner.get();
                 if (instance) {
                     // If this callback is for a previously canceled request, swallow it to avoid
@@ -841,7 +848,9 @@ export class Img extends ImageBase {
                 return false;
             },
             onResourceReady(resource: android.graphics.drawable.Drawable, model: any, target: any, dataSource: any, isFirstResource: boolean): boolean {
+                console.info('🚀 ~ Img ~ loadImageWithGlide ~ onResourceReady:', resource, model, dataSource);
                 const instance = owner.get();
+
                 if (instance) {
                     // Ignore if the callback is from a previous request (stale).
                     if (instance.currentTarget && target !== instance.currentTarget) {
