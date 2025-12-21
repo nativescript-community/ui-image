@@ -268,12 +268,32 @@ public final class EvictionManager {
   public void evictAllForId(final String id, @Nullable final EvictionCallback callback) {
     final CacheKeyStore.StoredKeys s = readStoredKeysPreferPersistent(id);
     if (s == null) {
-      // fallback conservative attempt (source only)
-      evictDiskForId(id, callback);
+      // fallback conservative attempt (disk only, then memory)
+      evictDiskForId(id, new EvictionCallback() {
+        @Override
+        public void onComplete(boolean diskSuccess, @Nullable Exception diskError) {
+          // After disk eviction, try memory eviction (will fail gracefully if no keys)
+          mainHandler.post(() -> {
+            evictMemoryForId(id, new EvictionCallback() {
+              @Override
+              public void onComplete(boolean memSuccess, @Nullable Exception memError) {
+                // Combine results: success only if both succeeded (or memory failed gracefully)
+                boolean combined = diskSuccess && memSuccess;
+                Exception combinedEx = diskError != null ? diskError : memError;
+                if (callback != null) {
+                  callback.onComplete(combined, combinedEx);
+                }
+              }
+            });
+          });
+        }
+      });
       return;
     }
     final byte[] transformationBytes = getTransformationBytesFromStoredKeys(s);
     final byte[] optionsBytes = s.optionsKeyBytes;
+    
+    // First evict from disk (source + transformed)
     performEvictionTasks(
         s.sourceKey,
         s.signature,
@@ -282,7 +302,39 @@ public final class EvictionManager {
         transformationBytes,
         s.decodedResourceClass,
         optionsBytes,
-        callback);
+        new EvictionCallback() {
+          @Override
+          public void onComplete(boolean diskSuccess, @Nullable Exception diskError) {
+            // After disk eviction completes, evict from memory cache
+            // Memory eviction must be done on main thread
+            mainHandler.post(() -> {
+              boolean memSuccess = true;
+              Exception memError = null;
+              
+              ModelSignatureMemoryCache mc;
+              synchronized (EvictionManager.this) {
+                mc = memoryCache;
+              }
+              
+              if (mc != null && s.sourceKey != null && s.signature != null) {
+                try {
+                  mc.removeByModelAndSignature(s.sourceKey, s.signature);
+                } catch (Exception e) {
+                  memSuccess = false;
+                  memError = e;
+                }
+              }
+              
+              // Combine results: both disk and memory must succeed
+              boolean combined = diskSuccess && memSuccess;
+              Exception combinedEx = diskError != null ? diskError : memError;
+              
+              if (callback != null) {
+                callback.onComplete(combined, combinedEx);
+              }
+            });
+          }
+        });
   }
 
   /** Backwards-compatible no-callback variant */
