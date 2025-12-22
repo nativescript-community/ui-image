@@ -580,20 +580,52 @@ public final class EvictionManager {
 
       try {
         if (hasValidStoredKeys(s)) {
-          CustomDataCacheKey cachekey = new CustomDataCacheKey(s.sourceKey, s.signature);
           Log.d("JS", "EvictionManager isInDiskCacheAsync " + id + " " + s.sourceKey+ " " + s.sourceKey.getClass().getName()+ " " + s.signature);
 
-          sourcePresent = dc.get(cachekey) != null;
+          // Special handling for local file:// URIs (identified by ObjectKey sourceKey)
+          // For local files, check if the file exists on disk instead of Glide's cache
+          // since local files are not copied to Glide's disk cache
+          if (s.sourceKey instanceof com.bumptech.glide.signature.ObjectKey && id.startsWith("file://")) {
+            try {
+              // Extract file path from file:// URI
+              String filePath = id.substring(7); // Remove "file://" prefix
+              java.io.File file = new java.io.File(filePath);
+              sourcePresent = file.exists() && file.isFile();
+              Log.d("JS", "EvictionManager local file check: " + filePath + " exists=" + sourcePresent);
+            } catch (Exception e) {
+              Log.w("JS", "EvictionManager failed to check local file: " + id, e);
+              sourcePresent = false;
+            }
+          } else {
+            // For network URLs, check Glide's disk cache
+            CustomDataCacheKey cachekey = new CustomDataCacheKey(s.sourceKey, s.signature);
+            sourcePresent = dc.get(cachekey) != null;
+          }
+          
+          // Always check for transformed versions in cache
           byte[] transformationBytes = getTransformationBytesFromStoredKeys(s);
           Key resourceKey = new RecreatedResourceKey(s.sourceKey, s.signature, s.width, s.height, transformationBytes,
               s.decodedResourceClass, s.optionsKeyBytes);
           transformedPresent = dc.get(resourceKey) != null;
         } else {
           // fallback: check ObjectKey(id) as source
-          Key fallback = new com.bumptech.glide.signature.ObjectKey(id);
-          sourcePresent = dc.get(fallback) != null;
+          // Also handle file:// URIs in fallback case
+          if (id.startsWith("file://")) {
+            try {
+              String filePath = id.substring(7);
+              java.io.File file = new java.io.File(filePath);
+              sourcePresent = file.exists() && file.isFile();
+              Log.d("JS", "EvictionManager fallback local file check: " + filePath + " exists=" + sourcePresent);
+            } catch (Exception e) {
+              sourcePresent = false;
+            }
+          } else {
+            Key fallback = new com.bumptech.glide.signature.ObjectKey(id);
+            sourcePresent = dc.get(fallback) != null;
+          }
         }
       } catch (Exception ignored) {
+        Log.w("JS", "EvictionManager isInDiskCacheAsync exception for " + id, ignored);
       }
 
       final boolean finalSource = sourcePresent;
@@ -619,16 +651,38 @@ public final class EvictionManager {
       return new boolean[] { false, false };
     try {
       if (hasValidStoredKeys(s)) {
-        // Check source data using DataCacheKey
-        CustomDataCacheKey dataCacheKey = new CustomDataCacheKey(s.sourceKey, s.signature);
-        sourcePresent = dc.get(dataCacheKey) != null;
+        // Special handling for local file:// URIs
+        if (s.sourceKey instanceof com.bumptech.glide.signature.ObjectKey && id.startsWith("file://")) {
+          try {
+            String filePath = id.substring(7);
+            java.io.File file = new java.io.File(filePath);
+            sourcePresent = file.exists() && file.isFile();
+          } catch (Exception e) {
+            sourcePresent = false;
+          }
+        } else {
+          // For network URLs, check Glide's disk cache
+          CustomDataCacheKey dataCacheKey = new CustomDataCacheKey(s.sourceKey, s.signature);
+          sourcePresent = dc.get(dataCacheKey) != null;
+        }
         // Check transformed resource
         Key resourceKey = new RecreatedResourceKey(s.sourceKey, s.signature, s.width, s.height,
             getTransformationBytesFromStoredKeys(s), s.decodedResourceClass, s.optionsKeyBytes);
         transformedPresent = dc.get(resourceKey) != null;
       } else {
-        Key fallback = new com.bumptech.glide.signature.ObjectKey(id);
-        sourcePresent = dc.get(fallback) != null;
+        // Fallback case - also handle file:// URIs
+        if (id.startsWith("file://")) {
+          try {
+            String filePath = id.substring(7);
+            java.io.File file = new java.io.File(filePath);
+            sourcePresent = file.exists() && file.isFile();
+          } catch (Exception e) {
+            sourcePresent = false;
+          }
+        } else {
+          Key fallback = new com.bumptech.glide.signature.ObjectKey(id);
+          sourcePresent = dc.get(fallback) != null;
+        }
       }
     } catch (Exception ignored) {
     }
