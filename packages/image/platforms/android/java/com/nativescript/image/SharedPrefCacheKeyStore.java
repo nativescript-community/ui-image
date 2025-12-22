@@ -32,6 +32,7 @@ public class SharedPrefCacheKeyStore extends CacheKeyStore {
   public void put(String id, CacheKeyStore.StoredKeys keys) {
     try {
       JSONObject j = new JSONObject();
+        Log.d("JS", "SharedPrefCacheKeyStore.put id=" + id + " sourceKey=" + keys.sourceKey);
 
       // Serialize sourceKey properly - extract URL and headers
       if (keys.sourceKey instanceof GlideUrl) {
@@ -111,9 +112,19 @@ public class SharedPrefCacheKeyStore extends CacheKeyStore {
         } else {
           sourceKey = new ObjectKey(id);
         }
-      } else {
+      } else{
         String source = j.optString("source", null);
-        sourceKey = source != null && !"null".equals(source) ? new ObjectKey(source) : new ObjectKey(id);
+        if (source != null && !"null".equals(source)) {
+          // Extract inner value from "ObjectKey{object=value}" format
+          String innerValue = source;
+          if (innerValue.startsWith("ObjectKey{object=") && innerValue.endsWith("}")) {
+            innerValue = innerValue.substring(17, innerValue.length() - 1);
+          }
+          sourceKey = new ObjectKey(innerValue);
+        } else {
+          sourceKey = new ObjectKey(id);
+        }
+        Log.d("JS", "SharedPrefCacheKeyStore.get id=" + id + " source=" + source + " sourceKey=" + sourceKey);
       }
       
       String signatureStr = j.optString("signature", null);

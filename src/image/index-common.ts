@@ -324,7 +324,7 @@ export abstract class ImageBase extends View {
 
     mCanRequestImage = true;
     mNeedRequestImage = false;
-    protected abstract initImage();
+    protected abstract initImage(): Promise<void>;
     public onResumeNativeUpdates(): void {
         // {N} suspends properties update on `_suspendNativeUpdates`. So we only need to do this in onResumeNativeUpdates
         this.mCanRequestImage = false;

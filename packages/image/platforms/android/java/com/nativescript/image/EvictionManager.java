@@ -100,7 +100,7 @@ public final class EvictionManager {
 
       // 2) Just save the new keys directly
       CacheKeyStore.StoredKeys toPersist = newStored;
-
+    Log.d("JS", "EvictionManager saveKeys " + id + " " + toPersist.sourceKey+ " " + toPersist.sourceKey.getClass().getName()+ " " + toPersist.signature);
       // 3) Save to both stores
       inMemoryKeyStore.put(id, toPersist);
       if (persistentStore != null) {
@@ -581,6 +581,8 @@ public final class EvictionManager {
       try {
         if (hasValidStoredKeys(s)) {
           CustomDataCacheKey cachekey = new CustomDataCacheKey(s.sourceKey, s.signature);
+          Log.d("JS", "EvictionManager isInDiskCacheAsync " + id + " " + s.sourceKey+ " " + s.sourceKey.getClass().getName()+ " " + s.signature);
+
           sourcePresent = dc.get(cachekey) != null;
           byte[] transformationBytes = getTransformationBytesFromStoredKeys(s);
           Key resourceKey = new RecreatedResourceKey(s.sourceKey, s.signature, s.width, s.height, transformationBytes,

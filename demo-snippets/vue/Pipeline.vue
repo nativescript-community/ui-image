@@ -32,7 +32,7 @@ import { getImagePipeline } from '@nativescript-community/ui-image';
 export default {
     data() {
         return {
-            url: 'https://images.pexels.com/photos/842711/pexels-photo-842711.jpeg',
+            url: '~/assets/images/dessert.jpg',
             logs: [] as string[],
             result: ''
         };

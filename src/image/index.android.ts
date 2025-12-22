@@ -95,15 +95,16 @@ export class ImagePipeline {
         if (value instanceof android.net.Uri) {
             return value.toString();
         }
-        return value;
+        return getUri(value);
     }
 
-    getCacheKey(uri: string, context) {
-        return uri;
+    getCacheKey(uri: string | android.net.Uri) {
+        return this.toUri(uri);
     }
 
     isInDiskCache(uri: string | android.net.Uri): Promise<boolean> {
-        const url = this.toUri(uri);
+        const url = this.getCacheKey(uri);
+        console.log('isInDiskCache', uri, url);
         return new Promise<boolean>((resolve, reject) => {
             com.nativescript.image.EvictionManager.get().isInDiskCacheAsync(
                 url,
@@ -118,12 +119,14 @@ export class ImagePipeline {
 
     isInBitmapMemoryCache(uri: string | android.net.Uri): boolean {
         // Still not directly accessible, but we can check if it's registered
-        const url = this.toUri(uri);
+        const url = this.getCacheKey(uri);
+        console.log('isInBitmapMemoryCache', uri, url);
         return com.nativescript.image.EvictionManager.get().isInMemoryCache(url);
     }
 
     evictFromMemoryCache(uri: string | android.net.Uri): Promise<void> {
-        const url = this.toUri(uri);
+        const url = this.getCacheKey(uri);
+        console.log('evictFromMemoryCache', uri, url);
         return new Promise<void>((resolve, reject) => {
             com.nativescript.image.EvictionManager.get().evictMemoryForId(
                 url,
@@ -144,7 +147,8 @@ export class ImagePipeline {
     }
 
     evictFromDiskCache(uri: string | android.net.Uri): Promise<void> {
-        const url = this.toUri(uri);
+        const url = this.getCacheKey(uri);
+        console.log('evictFromDiskCache', uri, url);
         return new Promise<void>((resolve, reject) => {
             com.nativescript.image.EvictionManager.get().evictDiskForId(
                 url,
@@ -164,16 +168,15 @@ export class ImagePipeline {
         });
     }
 
-    evictFromCache(uri: string | android.net.Uri): Promise<void> {
-        console.log('evictFromCache ', uri, new Error().stack);
-
+    async evictFromCache(uri: string | android.net.Uri): Promise<void> {
         const url = this.toUri(uri);
+        console.log('evictFromCache ', uri, url, await this.isInDiskCache(url), this.isInBitmapMemoryCache(url));
         return new Promise<void>((resolve, reject) => {
             com.nativescript.image.EvictionManager.get().evictAllForId(
                 url,
                 new com.nativescript.image.EvictionManager.EvictionCallback({
-                    onComplete(success: boolean, error) {
-                        console.log('evictFromCache done', success, error);
+                    async onComplete(success: boolean, error) {
+                        console.log('evictFromCache done', uri, await this.isInDiskCache(uri), this.isInBitmapMemoryCache(uri), success, error);
                         if (error) {
                             if (Trace.isEnabled()) {
                                 CLog(CLogTypes.error, error);
@@ -256,6 +259,7 @@ export class ImagePipeline {
     private prefetchToCache(uri: string, toDiskCache: boolean, options?: PrefetchOptions): Promise<void> {
         return new Promise((resolve, reject) => {
             try {
+                const url = this.toUri(uri);
                 const context = Utils.android.getApplicationContext();
                 const requestManager = com.bumptech.glide.Glide.with(context);
 
@@ -277,14 +281,14 @@ export class ImagePipeline {
                     }
 
                     loadModel = new com.nativescript.image.CustomGlideUrl(
-                        uri,
+                        url,
                         headersMap,
                         null, // progressCallback
                         null // loadSourceCallback
                     );
                 } else {
                     // For local files, use plain URI string
-                    loadModel = uri;
+                    loadModel = url;
                 }
 
                 // Use the same model for both disk and memory to ensure key consistency
@@ -540,13 +544,6 @@ export class Img extends ImageBase {
     }
 
     public async updateImageUri() {
-        const imagePipeLine = getImagePipeline();
-        const cacheKey = this.cacheKey;
-        console.log('updateImageUri', await imagePipeLine.isInDiskCache(cacheKey), imagePipeLine.isInBitmapMemoryCache(cacheKey));
-        if (cacheKey) {
-            await imagePipeLine.evictFromCache(cacheKey);
-        }
-        console.log('updateImageUri 1', await imagePipeLine.isInDiskCache(cacheKey), imagePipeLine.isInBitmapMemoryCache(cacheKey));
         this.handleImageSrc(null);
         this.initImage();
     }
@@ -663,6 +660,7 @@ export class Img extends ImageBase {
     private loadImageWithGlide(uri: string) {
         const view = this.nativeViewProtected;
         const context = this._context;
+        console.log('loadImageWithGlide', uri);
         // Cancel any prior Glide request/target for this view before starting a new one.
         this.cancelCurrentRequest();
         // Determine if this is a network request
