@@ -109,8 +109,8 @@ export class ImagePipeline {
             com.nativescript.image.EvictionManager.get().isInDiskCacheAsync(
                 url,
                 new com.nativescript.image.EvictionManager.DiskPresenceCallback({
-                    onResult(source, transform) {
-                        resolve(source || transform);
+                    onResult(present) {
+                        resolve(present);
                     }
                 })
             );
@@ -363,9 +363,9 @@ export class ImagePipeline {
 
                 // Add SaveKeysRequestListener to capture keys during preload
                 objectArr[0] = new com.nativescript.image.SaveKeysRequestListener(
-                    uri,
+                    url,
                     loadModel,
-                    new com.bumptech.glide.signature.ObjectKey(uri), // fallback only
+                    new com.bumptech.glide.signature.ObjectKey(url), // fallback only
                     signature,
                     options?.decodeWidth || com.bumptech.glide.request.target.Target.SIZE_ORIGINAL,
                     options?.decodeHeight || com.bumptech.glide.request.target.Target.SIZE_ORIGINAL,

@@ -91,7 +91,7 @@ public class CustomGlideModule extends AppGlideModule {
     builder.setDiskCache(new DiskCache.Factory() {
       @Override
       public DiskCache build() {
-        DiskCache dc = ModelSignatureDiskLruCacheWrapper.create(getCacheDirectory(context, config.getDiskCacheName()), config.getDiskCacheSize());
+        ModelSignatureDiskLruCacheWrapper dc = ModelSignatureDiskLruCacheWrapper.create(getCacheDirectory(context, config.getDiskCacheName()), config.getDiskCacheSize());
         EvictionManager.get().setDiskCache(dc);
         return dc;
       }

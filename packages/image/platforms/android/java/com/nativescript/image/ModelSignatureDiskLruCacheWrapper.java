@@ -69,7 +69,7 @@ public class ModelSignatureDiskLruCacheWrapper implements DiskCache {
    * @return The new disk cache with the given arguments
    */
   @SuppressWarnings("deprecation")
-  public static DiskCache create(File directory, long maxSize) {
+  public static ModelSignatureDiskLruCacheWrapper create(File directory, long maxSize) {
     return new ModelSignatureDiskLruCacheWrapper(directory, maxSize);
   }
 
@@ -95,13 +95,13 @@ public class ModelSignatureDiskLruCacheWrapper implements DiskCache {
   @Override
   public File get(Key key) {
     String safeKey = safeKeyGenerator.getSafeKey(key);
-    Log.v(TAG, "DiskCache Get: " + safeKey + " for Key: " + key);
     File result = null;
     try {
       // It is possible that the there will be a put in between these two gets. If so that shouldn't
       // be a problem because we will always put the same value at the same key so our input streams
       // will still represent the same data.
       final DiskLruCache.Value value = getDiskCache().get(safeKey);
+    Log.v(TAG, "DiskCache Get: " + safeKey + " for Key: " + key + " found: " + value);
       if (value != null) {
         result = value.getFile(0);
       }
@@ -206,9 +206,10 @@ public class ModelSignatureDiskLruCacheWrapper implements DiskCache {
     final String signatureStr = signature.toString();
 
     for (String keyStr : keyIndex.values()) {
-      if (matchesModelAndSignature(keyStr, modelStr, signatureStr)) {
-        return true;
-      }
+        Log.v(TAG, "DiskCache containsByModelAndSignature: " + model + " signature: " + signature + " keyStr: " + keyStr);
+        if (matchesModelAndSignature(keyStr, modelStr, signatureStr)) {
+            return true;
+        }
     }
     return false;
   }
@@ -225,7 +226,7 @@ public class ModelSignatureDiskLruCacheWrapper implements DiskCache {
     final String modelStr = model.toString();
     final String signatureStr = signature.toString();
     
-    Log.i(TAG, "DiskCache removeByModelAndSignature: model=" + modelStr + " signature=" + signatureStr);
+    Log.i(TAG, "DiskCache removeByModelAndSignature: model=" + modelStr + " signature=" + signatureStr + " cacheCount=" + keyIndex.size());
 
     List<String> safeKeysToRemove = new ArrayList<>();
     
@@ -314,6 +315,7 @@ public class ModelSignatureDiskLruCacheWrapper implements DiskCache {
    */
   private boolean matchesModelAndSignature(String keyStr, String modelStr, String signatureStr) {
     // Strategy 1: Exact pattern matching for known key formats (e.g., DataCacheKey, ResourceCacheKey)
+    Log.v(TAG, "DiskCache matchesModelAndSignature: " + keyStr + " modelStr: " + modelStr + " signatureStr: " + signatureStr);
     if (keyStr.contains("model=" + modelStr) && keyStr.contains("signature=" + signatureStr)) {
       return true;
     }

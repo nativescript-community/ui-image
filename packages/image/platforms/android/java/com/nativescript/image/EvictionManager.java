@@ -11,6 +11,7 @@ import com.bumptech.glide.load.Transformation;
 import com.bumptech.glide.load.engine.cache.DiskCache;
 import com.bumptech.glide.load.engine.cache.MemoryCache;
 import com.bumptech.glide.load.engine.cache.LruResourceCache;
+import com.bumptech.glide.load.engine.cache.ModelSignatureDiskLruCacheWrapper;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -43,7 +44,7 @@ public final class EvictionManager {
   private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
   @GuardedBy("this")
-  private DiskCache diskCache;
+  private ModelSignatureDiskLruCacheWrapper diskCache;
   @GuardedBy("this")
   private ModelSignatureMemoryCache memoryCache;
 
@@ -61,7 +62,7 @@ public final class EvictionManager {
     return INSTANCE;
   }
 
-  public synchronized void setDiskCache(DiskCache diskCache) {
+  public synchronized void setDiskCache(ModelSignatureDiskLruCacheWrapper diskCache) {
     this.diskCache = diskCache;
   }
 
@@ -123,7 +124,7 @@ public final class EvictionManager {
 
   /** Disk presence callback for async check. */
   public interface DiskPresenceCallback {
-    void onResult(boolean sourcePresent, boolean transformedPresent);
+    void onResult(boolean present);
   }
 
   // -----------------------
@@ -138,7 +139,7 @@ public final class EvictionManager {
     diskExecutor.execute(() -> {
       boolean success = true;
       Exception ex = null;
-      DiskCache dc;
+      ModelSignatureDiskLruCacheWrapper dc;
       synchronized (EvictionManager.this) {
         dc = diskCache;
       }
@@ -210,7 +211,7 @@ public final class EvictionManager {
     diskExecutor.execute(() -> {
       boolean diskSuccess = true;
       Exception firstEx = null;
-      DiskCache dc;
+      ModelSignatureDiskLruCacheWrapper dc;
       synchronized (EvictionManager.this) {
         dc = diskCache;
       }
@@ -292,15 +293,12 @@ public final class EvictionManager {
     }
     
     // Check if we have an enhanced disk cache
-    DiskCache dc;
+    ModelSignatureDiskLruCacheWrapper dc;
     synchronized (this) {
       dc = diskCache;
     }
     
-    final boolean useEfficientEviction = 
-        dc instanceof com.bumptech.glide.load.engine.cache.ModelSignatureDiskLruCacheWrapper;
-    
-    if (useEfficientEviction && s.sourceKey != null && s.signature != null) {
+    if (s.sourceKey != null && s.signature != null) {
       // Use efficient model/signature-based eviction
       Log.i(TAG, "EvictionManager evictAllForId using efficient disk cache eviction for: " + id);
       evictDiskByModelAndSignature(s.sourceKey, s.signature, new EvictionCallback() {
@@ -334,53 +332,6 @@ public final class EvictionManager {
           });
         }
       });
-    } else {
-      // Fallback to key-by-key eviction
-      Log.i(TAG, "EvictionManager evictAllForId using key-by-key eviction for: " + id);
-      final byte[] transformationBytes = getTransformationBytesFromStoredKeys(s);
-      final byte[] optionsBytes = s.optionsKeyBytes;
-      
-      performEvictionTasks(
-          s.sourceKey,
-          s.signature,
-          s.width,
-          s.height,
-          transformationBytes,
-          s.decodedResourceClass,
-          optionsBytes,
-          new EvictionCallback() {
-            @Override
-            public void onComplete(boolean diskSuccess, @Nullable Exception diskError) {
-              // After disk eviction completes, evict from memory cache
-              // Memory eviction must be done on main thread
-              mainHandler.post(() -> {
-                boolean memSuccess = true;
-                Exception memError = null;
-                
-                ModelSignatureMemoryCache mc;
-                synchronized (EvictionManager.this) {
-                  mc = memoryCache;
-                }
-                
-                if (mc != null && s.sourceKey != null && s.signature != null) {
-                  try {
-                    mc.removeByModelAndSignature(s.sourceKey, s.signature);
-                  } catch (Exception e) {
-                    memSuccess = false;
-                    memError = e;
-                  }
-                }
-                
-                // Combine results: both disk and memory must succeed
-                boolean combined = diskSuccess && memSuccess;
-                Exception combinedEx = diskError != null ? diskError : memError;
-                
-                if (callback != null) {
-                  callback.onComplete(combined, combinedEx);
-                }
-              });
-            }
-          });
     }
   }
 
@@ -400,7 +351,7 @@ public final class EvictionManager {
       diskExecutor.execute(() -> {
         boolean success = true;
         Exception ex = null;
-        DiskCache dc;
+        ModelSignatureDiskLruCacheWrapper dc;
         synchronized (EvictionManager.this) {
           dc = diskCache;
         }
@@ -424,34 +375,17 @@ public final class EvictionManager {
     diskExecutor.execute(() -> {
       boolean success = true;
       Exception ex = null;
-      DiskCache dc;
+      ModelSignatureDiskLruCacheWrapper dc;
       synchronized (EvictionManager.this) {
         dc = diskCache;
       }
       if (dc != null) {
         // Delete source data using DataCacheKey (sourceKey + signature)
         try {
-          CustomDataCacheKey dataCacheKey = new CustomDataCacheKey(s.sourceKey, s.signature);
-          dc.delete(dataCacheKey);
+          dc.removeByModelAndSignature(s.sourceKey, s.signature);
         } catch (Exception e) {
           success = false;
           ex = e;
-        }
-        // Delete transformed resource using ResourceCacheKey
-        try {
-          Key resourceKey = new RecreatedResourceKey(
-              s.sourceKey,
-              s.signature,
-              s.width,
-              s.height,
-              getTransformationBytesFromStoredKeys(s),
-              s.decodedResourceClass,
-              s.optionsKeyBytes);
-          dc.delete(resourceKey);
-        } catch (Exception e) {
-          if (ex == null)
-            ex = e;
-          success = false;
         }
       }
       if (callback != null) {
@@ -473,57 +407,19 @@ public final class EvictionManager {
     diskExecutor.execute(() -> {
       boolean success = true;
       Exception ex = null;
-      DiskCache dc;
+      ModelSignatureDiskLruCacheWrapper dc;
       synchronized (EvictionManager.this) {
         dc = diskCache;
       }
       if (dc != null) {
         try {
           if (hasValidStoredKeys(s)) {
-            // Use DataCacheKey for proper source data deletion
-            CustomDataCacheKey dataCacheKey = new CustomDataCacheKey(s.sourceKey, s.signature);
-            dc.delete(dataCacheKey);
+            dc.removeByModelAndSignature(s.sourceKey, s.signature);
           } else {
             // Fallback to ObjectKey if we don't have stored keys
             Key fallbackKey = new com.bumptech.glide.signature.ObjectKey(id);
             dc.delete(fallbackKey);
           }
-        } catch (Exception e) {
-          success = false;
-          ex = e;
-        }
-      }
-      if (callback != null) {
-        final boolean finalSuccess = success;
-        final Exception finalEx = ex;
-        mainHandler.post(() -> callback.onComplete(finalSuccess, finalEx));
-      }
-    });
-  }
-
-  /** Evict only the transformed resource (disk). */
-  public void evictTransformedForId(final String id, @Nullable final EvictionCallback callback) {
-    final CacheKeyStore.StoredKeys s = readStoredKeysPreferPersistent(id);
-    if (s == null) {
-      if (callback != null)
-        mainHandler.post(() -> callback.onComplete(false, null));
-      return;
-    }
-    final byte[] transformationBytes = getTransformationBytesFromStoredKeys(s);
-    final byte[] optionsBytes = s.optionsKeyBytes;
-
-    diskExecutor.execute(() -> {
-      boolean success = true;
-      Exception ex = null;
-      DiskCache dc;
-      synchronized (EvictionManager.this) {
-        dc = diskCache;
-      }
-      if (dc != null) {
-        try {
-          Key resourceKey = new RecreatedResourceKey(s.sourceKey, s.signature, s.width, s.height, transformationBytes,
-              s.decodedResourceClass, optionsBytes);
-          dc.delete(resourceKey);
         } catch (Exception e) {
           success = false;
           ex = e;
@@ -615,52 +511,20 @@ public final class EvictionManager {
       boolean transformedPresent = false;
 
       final CacheKeyStore.StoredKeys s = readStoredKeysPreferPersistent(id);
-      DiskCache dc;
+      ModelSignatureDiskLruCacheWrapper dc;
       synchronized (EvictionManager.this) {
         dc = diskCache;
       }
 
       if (dc == null) {
-        mainHandler.post(() -> callback.onResult(false, false));
+        mainHandler.post(() -> callback.onResult(false));
         return;
       }
 
       try {
         if (hasValidStoredKeys(s)) {
           Log.d("JS", "EvictionManager isInDiskCacheAsync " + id + " " + s.sourceKey+ " " + s.sourceKey.getClass().getName()+ " " + s.signature);
-
-          // For local files (ObjectKey), don't check source data cache since Glide doesn't cache local file bytes
-          // Only check the resource cache (decoded bitmap)
-          boolean isLocalFile = s.sourceKey instanceof com.bumptech.glide.signature.ObjectKey;
-          
-          if (!isLocalFile) {
-            // For network URLs, check source data cache with CustomDataCacheKey
-            CustomDataCacheKey cachekey = new CustomDataCacheKey(s.sourceKey, s.signature);
-            sourcePresent = dc.get(cachekey) != null;
-            Log.d("JS", "EvictionManager network source check: " + sourcePresent);
-          } else {
-            // Local files don't have source data cached (they're already on disk)
-            // We'll check the resource cache below
-            Log.d("JS", "EvictionManager local file - skipping source check");
-          }
-          
-          // Check for transformed/decoded resources in cache (for both network and local)
-          if (s.decodedResourceClass != null) {
-            byte[] transformationBytes = getTransformationBytesFromStoredKeys(s);
-            Key resourceKey = new RecreatedResourceKey(s.sourceKey, s.signature, s.width, s.height, transformationBytes,
-                s.decodedResourceClass, s.optionsKeyBytes);
-            transformedPresent = dc.get(resourceKey) != null;
-            Log.d("JS", "EvictionManager resource check: resourceKey=" + resourceKey + " present=" + transformedPresent);
-            
-            // For local files, if the decoded resource is present, consider it as "source present" 
-            // since the resource IS the cached version
-            if (isLocalFile && transformedPresent) {
-              sourcePresent = true;
-              Log.d("JS", "EvictionManager local file found in resource cache");
-            }
-          } else {
-            Log.w("JS", "EvictionManager cannot check resource cache - decodedResourceClass is null");
-          }
+          sourcePresent = dc.containsByModelAndSignature(s.sourceKey, s.signature);
         } else {
           // fallback: check ObjectKey(id) as source
           Key fallback = new com.bumptech.glide.signature.ObjectKey(id);
@@ -670,10 +534,8 @@ public final class EvictionManager {
       } catch (Exception e) {
         Log.w("JS", "EvictionManager isInDiskCacheAsync exception for " + id, e);
       }
-
-      final boolean finalSource = sourcePresent;
-      final boolean finalTransformed = transformedPresent;
-      mainHandler.post(() -> callback.onResult(finalSource, finalTransformed));
+      final Boolean result = sourcePresent;
+      mainHandler.post(() -> callback.onResult(result));
     });
   }
 
@@ -682,45 +544,26 @@ public final class EvictionManager {
    * only.
    * Returns array [sourcePresent, transformedPresent].
    */
-  public boolean[] isInDiskCacheBlocking(final String id) {
+  public boolean isInDiskCacheBlocking(final String id) {
     final CacheKeyStore.StoredKeys s = readStoredKeysPreferPersistent(id);
-    DiskCache dc;
+    ModelSignatureDiskLruCacheWrapper dc;
     synchronized (EvictionManager.this) {
       dc = diskCache;
     }
     boolean sourcePresent = false;
     boolean transformedPresent = false;
     if (dc == null)
-      return new boolean[] { false, false };
+      return false;
     try {
       if (hasValidStoredKeys(s)) {
-        // For local files (ObjectKey), don't check source data cache since Glide doesn't cache local file bytes
-        boolean isLocalFile = s.sourceKey instanceof com.bumptech.glide.signature.ObjectKey;
-        
-        if (!isLocalFile) {
-          // For network URLs, check source data cache
-          CustomDataCacheKey dataCacheKey = new CustomDataCacheKey(s.sourceKey, s.signature);
-          sourcePresent = dc.get(dataCacheKey) != null;
-        }
-        
-        // Check transformed/decoded resource (for both network and local)
-        if (s.decodedResourceClass != null) {
-          Key resourceKey = new RecreatedResourceKey(s.sourceKey, s.signature, s.width, s.height,
-              getTransformationBytesFromStoredKeys(s), s.decodedResourceClass, s.optionsKeyBytes);
-          transformedPresent = dc.get(resourceKey) != null;
-          
-          // For local files, if resource is present, consider it as source present
-          if (isLocalFile && transformedPresent) {
-            sourcePresent = true;
-          }
-        }
+          sourcePresent = dc.containsByModelAndSignature(s.sourceKey, s.signature);
       } else {
         Key fallback = new com.bumptech.glide.signature.ObjectKey(id);
         sourcePresent = dc.get(fallback) != null;
       }
     } catch (Exception ignored) {
     }
-    return new boolean[] { sourcePresent, transformedPresent };
+    return sourcePresent;
   }
 
   /**
@@ -853,8 +696,6 @@ public final class EvictionManager {
 
   /**
    * Evict all disk cache entries (both source and transformed) matching model and signature
-   * using the disk cache's efficient index-based removal.
-   * This is more efficient than performEvictionTasks when the disk cache supports it.
    *
    * @param model The model (e.g., URI)
    * @param signature The signature Key
@@ -929,25 +770,18 @@ public final class EvictionManager {
       Exception ex = null;
       int removed = 0;
       
-      DiskCache dc;
+      ModelSignatureDiskLruCacheWrapper dc;
       synchronized (EvictionManager.this) {
         dc = diskCache;
       }
       
-      if (dc instanceof com.bumptech.glide.load.engine.cache.ModelSignatureDiskLruCacheWrapper) {
-        try {
-          com.bumptech.glide.load.engine.cache.ModelSignatureDiskLruCacheWrapper wrapper =
-              (com.bumptech.glide.load.engine.cache.ModelSignatureDiskLruCacheWrapper) dc;
-          removed = wrapper.removeAllExceptSignature(currentSignature);
-          success = true;
-          Log.i(TAG, "EvictionManager evictDiskExceptSignature removed " + removed + " entries");
-        } catch (Exception e) {
-          ex = e;
-          Log.e(TAG, "EvictionManager evictDiskExceptSignature failed", e);
-        }
-      } else {
-        ex = new UnsupportedOperationException("Disk cache does not support signature-based eviction");
-        Log.w(TAG, "EvictionManager evictDiskExceptSignature: disk cache is not ModelSignatureDiskLruCacheWrapper");
+      try {
+        removed = dc.removeAllExceptSignature(currentSignature);
+        success = true;
+        Log.i(TAG, "EvictionManager evictDiskExceptSignature removed " + removed + " entries");
+      } catch (Exception e) {
+        ex = e;
+        Log.e(TAG, "EvictionManager evictDiskExceptSignature failed", e);
       }
       
       if (callback != null) {
@@ -959,66 +793,16 @@ public final class EvictionManager {
   }
 
   /**
-   * Check if disk cache contains entries matching model and signature.
-   *
-   * @param model The model
-   * @param signature The signature
-   * @param callback Callback with result (invoked on main thread)
-   */
-  public void containsInDiskCacheByModelAndSignature(
-      @Nullable final Object model,
-      @Nullable final Key signature,
-      @Nullable final DiskPresenceCallback callback) {
-    
-    if (model == null || signature == null) {
-      if (callback != null) {
-        mainHandler.post(() -> callback.onResult(false, false));
-      }
-      return;
-    }
-
-    diskExecutor.execute(() -> {
-      boolean found = false;
-      
-      DiskCache dc;
-      synchronized (EvictionManager.this) {
-        dc = diskCache;
-      }
-      
-      if (dc instanceof com.bumptech.glide.load.engine.cache.ModelSignatureDiskLruCacheWrapper) {
-        try {
-          com.bumptech.glide.load.engine.cache.ModelSignatureDiskLruCacheWrapper wrapper =
-              (com.bumptech.glide.load.engine.cache.ModelSignatureDiskLruCacheWrapper) dc;
-          found = wrapper.containsByModelAndSignature(model, signature);
-        } catch (Exception e) {
-          Log.e(TAG, "EvictionManager containsInDiskCacheByModelAndSignature failed", e);
-        }
-      }
-      
-      if (callback != null) {
-        final boolean finalFound = found;
-        mainHandler.post(() -> callback.onResult(finalFound, false));
-      }
-    });
-  }
-
-  /**
    * Get disk cache statistics.
    *
    * @return Array: [indexSize, diskCacheSize] or null if not supported
    */
   public long[] getDiskCacheStats() {
-    DiskCache dc;
+    ModelSignatureDiskLruCacheWrapper dc;
     synchronized (this) {
       dc = diskCache;
     }
     
-    if (dc instanceof com.bumptech.glide.load.engine.cache.ModelSignatureDiskLruCacheWrapper) {
-      com.bumptech.glide.load.engine.cache.ModelSignatureDiskLruCacheWrapper wrapper =
-          (com.bumptech.glide.load.engine.cache.ModelSignatureDiskLruCacheWrapper) dc;
-      return wrapper.getStats();
-    }
-    
-    return null;
+    return dc.getStats();
   }
 }

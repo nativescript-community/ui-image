@@ -26,7 +26,7 @@ import android.util.Log;
  * listeners or Glide's handling.
  */
 public class SaveKeysRequestListener implements RequestListener<Object> {
-    private static final String TAG = "SaveKeysRequestListener";
+    private static final String TAG = "JS";
     
     private final String id;
     private final Object model;
@@ -103,8 +103,8 @@ public class SaveKeysRequestListener implements RequestListener<Object> {
             }
 
             Log.i(TAG, "onResourceReady: id=" + normalizedId + 
-                      " sourceKey=" + actualSourceKey.getClass().getSimpleName() +
-                      " model=" + (model != null ? model.getClass().getSimpleName() : "null") +
+                      " sourceKey=" + actualSourceKey +
+                      " model=" + model +
                       " resourceClass=" + (actualDecodedResourceClass != null ? actualDecodedResourceClass.getSimpleName() : "null"));
 
             // Compute transformation bytes
