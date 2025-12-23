@@ -6,6 +6,8 @@ import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.util.Objects;
 
+import com.bumptech.glide.util.LruCache;
+
 /**
  * Recreates ResourceCacheKey updateDiskCacheKey ordering but accepts
  * precomputed transformation
@@ -21,6 +23,7 @@ import java.util.Objects;
  * md.update(decodedResourceClass.getName().getBytes(...))
  */
 public final class RecreatedResourceKey implements Key {
+  private static final LruCache<Class<?>, byte[]> RESOURCE_CLASS_BYTES = new LruCache<>(50);  
   private final Key sourceKey;
   private final Key signature;
   private final int width;
@@ -68,7 +71,9 @@ public final class RecreatedResourceKey implements Key {
     result = 31 * result + signature.hashCode();
     result = 31 * result + width;
     result = 31 * result + height;
-    result = 31 * result + java.util.Arrays.hashCode(transformationKeyBytes);
+    if (transformationKeyBytes != null) {
+      result = 31 * result + java.util.Arrays.hashCode(transformationKeyBytes);
+    }
     result = 31 * result + decodedResourceClass.hashCode();
     result = 31 * result + java.util.Arrays.hashCode(optionsKeyBytes);
     return result;
@@ -77,7 +82,6 @@ public final class RecreatedResourceKey implements Key {
   @Override
   public void updateDiskCacheKey(@NonNull MessageDigest messageDigest) {
     byte[] dimensions = ByteBuffer.allocate(8).putInt(width).putInt(height).array();
-
     signature.updateDiskCacheKey(messageDigest);
     sourceKey.updateDiskCacheKey(messageDigest);
     messageDigest.update(dimensions);
@@ -85,11 +89,35 @@ public final class RecreatedResourceKey implements Key {
     if (transformationKeyBytes != null) {
       messageDigest.update(transformationKeyBytes);
     }
-
-    if (optionsKeyBytes != null) {
-      messageDigest.update(optionsKeyBytes);
+    messageDigest.update(optionsKeyBytes);
+    messageDigest.update(getResourceClassBytes());
+  }
+  private byte[] getResourceClassBytes() {
+    byte[] result = RESOURCE_CLASS_BYTES.get(decodedResourceClass);
+    if (result == null) {
+      result = decodedResourceClass.getName().getBytes(CHARSET);
+      RESOURCE_CLASS_BYTES.put(decodedResourceClass, result);
     }
+    return result;
+  }
 
-    messageDigest.update(decodedResourceClass.getName().getBytes(CHARSET));
+  @Override
+  public String toString() {
+    return "RecreatedResourceKey{"
+        + "sourceKey="
+        + sourceKey
+        + ", signature="
+        + signature
+        + ", width="
+        + width
+        + ", height="
+        + height
+        + ", decodedResourceClass="
+        + decodedResourceClass
+        + ", transformation="
+        + transformationKeyBytes
+        + ", options="
+        + optionsKeyBytes
+        + '}';
   }
 }

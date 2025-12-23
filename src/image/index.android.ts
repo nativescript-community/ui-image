@@ -170,13 +170,11 @@ export class ImagePipeline {
 
     async evictFromCache(uri: string | android.net.Uri): Promise<void> {
         const url = this.toUri(uri);
-        console.log('evictFromCache ', uri, url, await this.isInDiskCache(url), this.isInBitmapMemoryCache(url));
         return new Promise<void>((resolve, reject) => {
             com.nativescript.image.EvictionManager.get().evictAllForId(
                 url,
                 new com.nativescript.image.EvictionManager.EvictionCallback({
                     async onComplete(success: boolean, error) {
-                        console.log('evictFromCache done', uri, success, error);
                         if (error) {
                             if (Trace.isEnabled()) {
                                 CLog(CLogTypes.error, error);

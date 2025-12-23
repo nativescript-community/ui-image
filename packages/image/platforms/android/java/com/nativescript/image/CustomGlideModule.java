@@ -13,7 +13,7 @@ import com.bumptech.glide.load.engine.cache.MemorySizeCalculator;
 import com.bumptech.glide.load.engine.cache.DiskCache;
 import com.bumptech.glide.load.engine.cache.DiskLruCacheWrapper;
 import com.bumptech.glide.load.engine.cache.MemoryCache;
-import com.bumptech.glide.load.engine.CapturingEngineKeyFactory;
+import com.bumptech.glide.load.engine.cache.ModelSignatureDiskLruCacheWrapper;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.module.AppGlideModule;
 import com.bumptech.glide.RequestBuilder;
@@ -91,7 +91,7 @@ public class CustomGlideModule extends AppGlideModule {
     builder.setDiskCache(new DiskCache.Factory() {
       @Override
       public DiskCache build() {
-        DiskCache dc = DiskLruCacheWrapper.create(getCacheDirectory(context, config.getDiskCacheName()), config.getDiskCacheSize());
+        DiskCache dc = ModelSignatureDiskLruCacheWrapper.create(getCacheDirectory(context, config.getDiskCacheName()), config.getDiskCacheSize());
         EvictionManager.get().setDiskCache(dc);
         return dc;
       }

@@ -100,7 +100,7 @@ public final class EvictionManager {
 
       // 2) Just save the new keys directly
       CacheKeyStore.StoredKeys toPersist = newStored;
-    Log.d("JS", "EvictionManager saveKeys " + id + " " + toPersist.sourceKey+ " " + toPersist.sourceKey.getClass().getName()+ " " + toPersist.signature);
+    Log.d("JS", "EvictionManager saveKeys " + id + " " + toPersist);
       // 3) Save to both stores
       inMemoryKeyStore.put(id, toPersist);
       if (persistentStore != null) {

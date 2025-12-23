@@ -142,7 +142,7 @@ public class SaveKeysRequestListener implements RequestListener<Object> {
             );
 
             EvictionManager.get().saveKeys(normalizedId, s);
-            Log.i(TAG, "Keys saved for: " + normalizedId);
+            Log.i(TAG, "Keys saved for: " + normalizedId + " s=" +s);
         } catch (Throwable t) {
             Log.e(TAG, "Failed to save keys", t);
         }

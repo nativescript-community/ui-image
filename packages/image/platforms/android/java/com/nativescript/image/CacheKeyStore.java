@@ -44,6 +44,30 @@ public class CacheKeyStore {
       this.options = options;
       this.optionsKeyBytes = optionsKeyBytes;
     }
+
+
+    public String toString() {
+      return "CacheKeyStore.StoredKeys {"
+          + "sourceKey="
+          + sourceKey
+          + ", signature="
+          + signature
+          + ", width="
+          + width
+          + ", height="
+          + height
+          + ", decodedResourceClass="
+          + decodedResourceClass
+          + ", transformation="
+          + transformation
+          + ", transformationKeyBytes="
+          + transformationKeyBytes
+          + ", options="
+          + options
+          + ", optionsKeyBytes="
+          + optionsKeyBytes
+          + '}';
+    }
   }
 
   private final Map<String, StoredKeys> map = new ConcurrentHashMap<>();
@@ -62,4 +86,5 @@ public class CacheKeyStore {
   public void clearAll() {
     map.clear();
   }
+
 }
