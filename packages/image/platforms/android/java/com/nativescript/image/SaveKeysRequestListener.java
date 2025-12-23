@@ -95,9 +95,17 @@ public class SaveKeysRequestListener implements RequestListener<Object> {
             final String normalizedId = normalizeIdFromModel(model, this.id);
             final Key actualSourceKey = sourceKeyFromModel(model, this.fallbackSourceKey);
 
+            // Determine the actual decoded resource class from the resource if not provided
+            Class<?> actualDecodedResourceClass = this.decodedResourceClass;
+            if (actualDecodedResourceClass == null && resource != null) {
+                actualDecodedResourceClass = resource.getClass();
+                Log.i(TAG, "onResourceReady: detected resource class=" + actualDecodedResourceClass.getName());
+            }
+
             Log.i(TAG, "onResourceReady: id=" + normalizedId + 
                       " sourceKey=" + actualSourceKey.getClass().getSimpleName() +
-                      " model=" + (model != null ? model.getClass().getSimpleName() : "null"));
+                      " model=" + (model != null ? model.getClass().getSimpleName() : "null") +
+                      " resourceClass=" + (actualDecodedResourceClass != null ? actualDecodedResourceClass.getSimpleName() : "null"));
 
             // Compute transformation bytes
             byte[] transformBytes = null;
@@ -128,7 +136,7 @@ public class SaveKeysRequestListener implements RequestListener<Object> {
                 this.height,
                 this.transform,
                 transformBytes,
-                this.decodedResourceClass,
+                actualDecodedResourceClass,
                 this.options,
                 optionsBytes
             );
