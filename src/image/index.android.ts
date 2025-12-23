@@ -176,7 +176,7 @@ export class ImagePipeline {
                 url,
                 new com.nativescript.image.EvictionManager.EvictionCallback({
                     async onComplete(success: boolean, error) {
-                        console.log('evictFromCache done', uri, await this.isInDiskCache(uri), this.isInBitmapMemoryCache(uri), success, error);
+                        console.log('evictFromCache done', uri, success, error);
                         if (error) {
                             if (Trace.isEnabled()) {
                                 CLog(CLogTypes.error, error);
