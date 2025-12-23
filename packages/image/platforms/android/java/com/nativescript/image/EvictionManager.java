@@ -582,50 +582,46 @@ public final class EvictionManager {
         if (hasValidStoredKeys(s)) {
           Log.d("JS", "EvictionManager isInDiskCacheAsync " + id + " " + s.sourceKey+ " " + s.sourceKey.getClass().getName()+ " " + s.signature);
 
-          // Special handling for local file:// URIs (identified by ObjectKey sourceKey)
-          // For local files, check if the file exists on disk instead of Glide's cache
-          // since local files are not copied to Glide's disk cache
-          if (s.sourceKey instanceof com.bumptech.glide.signature.ObjectKey && id.startsWith("file://")) {
-            try {
-              // Extract file path from file:// URI
-              String filePath = id.substring(7); // Remove "file://" prefix
-              java.io.File file = new java.io.File(filePath);
-              sourcePresent = file.exists() && file.isFile();
-              Log.d("JS", "EvictionManager local file check: " + filePath + " exists=" + sourcePresent);
-            } catch (Exception e) {
-              Log.w("JS", "EvictionManager failed to check local file: " + id, e);
-              sourcePresent = false;
-            }
-          } else {
-            // For network URLs, check Glide's disk cache
+          // For local files (ObjectKey), don't check source data cache since Glide doesn't cache local file bytes
+          // Only check the resource cache (decoded bitmap)
+          boolean isLocalFile = s.sourceKey instanceof com.bumptech.glide.signature.ObjectKey;
+          
+          if (!isLocalFile) {
+            // For network URLs, check source data cache with CustomDataCacheKey
             CustomDataCacheKey cachekey = new CustomDataCacheKey(s.sourceKey, s.signature);
             sourcePresent = dc.get(cachekey) != null;
+            Log.d("JS", "EvictionManager network source check: " + sourcePresent);
+          } else {
+            // Local files don't have source data cached (they're already on disk)
+            // We'll check the resource cache below
+            Log.d("JS", "EvictionManager local file - skipping source check");
           }
           
-          // Always check for transformed versions in cache
-          byte[] transformationBytes = getTransformationBytesFromStoredKeys(s);
-          Key resourceKey = new RecreatedResourceKey(s.sourceKey, s.signature, s.width, s.height, transformationBytes,
-              s.decodedResourceClass, s.optionsKeyBytes);
-          transformedPresent = dc.get(resourceKey) != null;
-        } else {
-          // fallback: check ObjectKey(id) as source
-          // Also handle file:// URIs in fallback case
-          if (id.startsWith("file://")) {
-            try {
-              String filePath = id.substring(7);
-              java.io.File file = new java.io.File(filePath);
-              sourcePresent = file.exists() && file.isFile();
-              Log.d("JS", "EvictionManager fallback local file check: " + filePath + " exists=" + sourcePresent);
-            } catch (Exception e) {
-              sourcePresent = false;
+          // Check for transformed/decoded resources in cache (for both network and local)
+          if (s.decodedResourceClass != null) {
+            byte[] transformationBytes = getTransformationBytesFromStoredKeys(s);
+            Key resourceKey = new RecreatedResourceKey(s.sourceKey, s.signature, s.width, s.height, transformationBytes,
+                s.decodedResourceClass, s.optionsKeyBytes);
+            transformedPresent = dc.get(resourceKey) != null;
+            Log.d("JS", "EvictionManager resource check: resourceKey=" + resourceKey + " present=" + transformedPresent);
+            
+            // For local files, if the decoded resource is present, consider it as "source present" 
+            // since the resource IS the cached version
+            if (isLocalFile && transformedPresent) {
+              sourcePresent = true;
+              Log.d("JS", "EvictionManager local file found in resource cache");
             }
           } else {
-            Key fallback = new com.bumptech.glide.signature.ObjectKey(id);
-            sourcePresent = dc.get(fallback) != null;
+            Log.w("JS", "EvictionManager cannot check resource cache - decodedResourceClass is null");
           }
+        } else {
+          // fallback: check ObjectKey(id) as source
+          Key fallback = new com.bumptech.glide.signature.ObjectKey(id);
+          sourcePresent = dc.get(fallback) != null;
+          Log.d("JS", "EvictionManager fallback check with ObjectKey: " + sourcePresent);
         }
-      } catch (Exception ignored) {
-        Log.w("JS", "EvictionManager isInDiskCacheAsync exception for " + id, ignored);
+      } catch (Exception e) {
+        Log.w("JS", "EvictionManager isInDiskCacheAsync exception for " + id, e);
       }
 
       final boolean finalSource = sourcePresent;
@@ -651,38 +647,29 @@ public final class EvictionManager {
       return new boolean[] { false, false };
     try {
       if (hasValidStoredKeys(s)) {
-        // Special handling for local file:// URIs
-        if (s.sourceKey instanceof com.bumptech.glide.signature.ObjectKey && id.startsWith("file://")) {
-          try {
-            String filePath = id.substring(7);
-            java.io.File file = new java.io.File(filePath);
-            sourcePresent = file.exists() && file.isFile();
-          } catch (Exception e) {
-            sourcePresent = false;
-          }
-        } else {
-          // For network URLs, check Glide's disk cache
+        // For local files (ObjectKey), don't check source data cache since Glide doesn't cache local file bytes
+        boolean isLocalFile = s.sourceKey instanceof com.bumptech.glide.signature.ObjectKey;
+        
+        if (!isLocalFile) {
+          // For network URLs, check source data cache
           CustomDataCacheKey dataCacheKey = new CustomDataCacheKey(s.sourceKey, s.signature);
           sourcePresent = dc.get(dataCacheKey) != null;
         }
-        // Check transformed resource
-        Key resourceKey = new RecreatedResourceKey(s.sourceKey, s.signature, s.width, s.height,
-            getTransformationBytesFromStoredKeys(s), s.decodedResourceClass, s.optionsKeyBytes);
-        transformedPresent = dc.get(resourceKey) != null;
-      } else {
-        // Fallback case - also handle file:// URIs
-        if (id.startsWith("file://")) {
-          try {
-            String filePath = id.substring(7);
-            java.io.File file = new java.io.File(filePath);
-            sourcePresent = file.exists() && file.isFile();
-          } catch (Exception e) {
-            sourcePresent = false;
+        
+        // Check transformed/decoded resource (for both network and local)
+        if (s.decodedResourceClass != null) {
+          Key resourceKey = new RecreatedResourceKey(s.sourceKey, s.signature, s.width, s.height,
+              getTransformationBytesFromStoredKeys(s), s.decodedResourceClass, s.optionsKeyBytes);
+          transformedPresent = dc.get(resourceKey) != null;
+          
+          // For local files, if resource is present, consider it as source present
+          if (isLocalFile && transformedPresent) {
+            sourcePresent = true;
           }
-        } else {
-          Key fallback = new com.bumptech.glide.signature.ObjectKey(id);
-          sourcePresent = dc.get(fallback) != null;
         }
+      } else {
+        Key fallback = new com.bumptech.glide.signature.ObjectKey(id);
+        sourcePresent = dc.get(fallback) != null;
       }
     } catch (Exception ignored) {
     }
