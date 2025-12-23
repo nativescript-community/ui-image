@@ -290,51 +290,98 @@ public final class EvictionManager {
       });
       return;
     }
-    final byte[] transformationBytes = getTransformationBytesFromStoredKeys(s);
-    final byte[] optionsBytes = s.optionsKeyBytes;
     
-    // First evict from disk (source + transformed)
-    performEvictionTasks(
-        s.sourceKey,
-        s.signature,
-        s.width,
-        s.height,
-        transformationBytes,
-        s.decodedResourceClass,
-        optionsBytes,
-        new EvictionCallback() {
-          @Override
-          public void onComplete(boolean diskSuccess, @Nullable Exception diskError) {
-            // After disk eviction completes, evict from memory cache
-            // Memory eviction must be done on main thread
-            mainHandler.post(() -> {
-              boolean memSuccess = true;
-              Exception memError = null;
-              
-              ModelSignatureMemoryCache mc;
-              synchronized (EvictionManager.this) {
-                mc = memoryCache;
+    // Check if we have an enhanced disk cache
+    DiskCache dc;
+    synchronized (this) {
+      dc = diskCache;
+    }
+    
+    final boolean useEfficientEviction = 
+        dc instanceof com.bumptech.glide.load.engine.cache.ModelSignatureDiskLruCacheWrapper;
+    
+    if (useEfficientEviction && s.sourceKey != null && s.signature != null) {
+      // Use efficient model/signature-based eviction
+      Log.i(TAG, "EvictionManager evictAllForId using efficient disk cache eviction for: " + id);
+      evictDiskByModelAndSignature(s.sourceKey, s.signature, new EvictionCallback() {
+        @Override
+        public void onComplete(boolean diskSuccess, @Nullable Exception diskError) {
+          // After disk eviction, evict from memory
+          mainHandler.post(() -> {
+            boolean memSuccess = true;
+            Exception memError = null;
+            
+            ModelSignatureMemoryCache mc;
+            synchronized (EvictionManager.this) {
+              mc = memoryCache;
+            }
+            
+            if (mc != null && s.sourceKey != null && s.signature != null) {
+              try {
+                mc.removeByModelAndSignature(s.sourceKey, s.signature);
+              } catch (Exception e) {
+                memSuccess = false;
+                memError = e;
               }
-              
-              if (mc != null && s.sourceKey != null && s.signature != null) {
-                try {
-                  mc.removeByModelAndSignature(s.sourceKey, s.signature);
-                } catch (Exception e) {
-                  memSuccess = false;
-                  memError = e;
+            }
+            
+            boolean combined = diskSuccess && memSuccess;
+            Exception combinedEx = diskError != null ? diskError : memError;
+            
+            if (callback != null) {
+              callback.onComplete(combined, combinedEx);
+            }
+          });
+        }
+      });
+    } else {
+      // Fallback to key-by-key eviction
+      Log.i(TAG, "EvictionManager evictAllForId using key-by-key eviction for: " + id);
+      final byte[] transformationBytes = getTransformationBytesFromStoredKeys(s);
+      final byte[] optionsBytes = s.optionsKeyBytes;
+      
+      performEvictionTasks(
+          s.sourceKey,
+          s.signature,
+          s.width,
+          s.height,
+          transformationBytes,
+          s.decodedResourceClass,
+          optionsBytes,
+          new EvictionCallback() {
+            @Override
+            public void onComplete(boolean diskSuccess, @Nullable Exception diskError) {
+              // After disk eviction completes, evict from memory cache
+              // Memory eviction must be done on main thread
+              mainHandler.post(() -> {
+                boolean memSuccess = true;
+                Exception memError = null;
+                
+                ModelSignatureMemoryCache mc;
+                synchronized (EvictionManager.this) {
+                  mc = memoryCache;
                 }
-              }
-              
-              // Combine results: both disk and memory must succeed
-              boolean combined = diskSuccess && memSuccess;
-              Exception combinedEx = diskError != null ? diskError : memError;
-              
-              if (callback != null) {
-                callback.onComplete(combined, combinedEx);
-              }
-            });
-          }
-        });
+                
+                if (mc != null && s.sourceKey != null && s.signature != null) {
+                  try {
+                    mc.removeByModelAndSignature(s.sourceKey, s.signature);
+                  } catch (Exception e) {
+                    memSuccess = false;
+                    memError = e;
+                  }
+                }
+                
+                // Combine results: both disk and memory must succeed
+                boolean combined = diskSuccess && memSuccess;
+                Exception combinedEx = diskError != null ? diskError : memError;
+                
+                if (callback != null) {
+                  callback.onComplete(combined, combinedEx);
+                }
+              });
+            }
+          });
+    }
   }
 
   /** Backwards-compatible no-callback variant */
@@ -797,6 +844,181 @@ public final class EvictionManager {
       } catch (Exception ignored) {
       }
     }
+    return null;
+  }
+
+  // -----------------------
+  // Enhanced disk cache eviction methods using ModelSignatureDiskLruCacheWrapper
+  // -----------------------
+
+  /**
+   * Evict all disk cache entries (both source and transformed) matching model and signature
+   * using the disk cache's efficient index-based removal.
+   * This is more efficient than performEvictionTasks when the disk cache supports it.
+   *
+   * @param model The model (e.g., URI)
+   * @param signature The signature Key
+   * @param callback Optional callback invoked on main thread
+   */
+  public void evictDiskByModelAndSignature(
+      @Nullable final Object model,
+      @Nullable final Key signature,
+      @Nullable final EvictionCallback callback) {
+    
+    if (model == null || signature == null) {
+      if (callback != null) {
+        mainHandler.post(() -> callback.onComplete(false, new IllegalArgumentException("model and signature must not be null")));
+      }
+      return;
+    }
+
+    diskExecutor.execute(() -> {
+      boolean success = false;
+      Exception ex = null;
+      int removed = 0;
+      
+      DiskCache dc;
+      synchronized (EvictionManager.this) {
+        dc = diskCache;
+      }
+      
+      if (dc instanceof com.bumptech.glide.load.engine.cache.ModelSignatureDiskLruCacheWrapper) {
+        try {
+          com.bumptech.glide.load.engine.cache.ModelSignatureDiskLruCacheWrapper wrapper =
+              (com.bumptech.glide.load.engine.cache.ModelSignatureDiskLruCacheWrapper) dc;
+          removed = wrapper.removeByModelAndSignature(model, signature);
+          success = true;
+          Log.i(TAG, "EvictionManager evictDiskByModelAndSignature removed " + removed + " entries");
+        } catch (Exception e) {
+          ex = e;
+          Log.e(TAG, "EvictionManager evictDiskByModelAndSignature failed", e);
+        }
+      } else {
+        ex = new UnsupportedOperationException("Disk cache does not support model/signature eviction");
+        Log.w(TAG, "EvictionManager evictDiskByModelAndSignature: disk cache is not ModelSignatureDiskLruCacheWrapper");
+      }
+      
+      if (callback != null) {
+        final boolean finalSuccess = success;
+        final Exception finalEx = ex;
+        mainHandler.post(() -> callback.onComplete(finalSuccess, finalEx));
+      }
+    });
+  }
+
+  /**
+   * Remove all disk cache entries that do NOT match the given signature.
+   * Useful for cache invalidation when changing signature versions.
+   *
+   * @param currentSignature The current/valid signature to keep
+   * @param callback Optional callback invoked on main thread
+   */
+  public void evictDiskExceptSignature(
+      @Nullable final Key currentSignature,
+      @Nullable final EvictionCallback callback) {
+    
+    if (currentSignature == null) {
+      if (callback != null) {
+        mainHandler.post(() -> callback.onComplete(false, new IllegalArgumentException("currentSignature must not be null")));
+      }
+      return;
+    }
+
+    diskExecutor.execute(() -> {
+      boolean success = false;
+      Exception ex = null;
+      int removed = 0;
+      
+      DiskCache dc;
+      synchronized (EvictionManager.this) {
+        dc = diskCache;
+      }
+      
+      if (dc instanceof com.bumptech.glide.load.engine.cache.ModelSignatureDiskLruCacheWrapper) {
+        try {
+          com.bumptech.glide.load.engine.cache.ModelSignatureDiskLruCacheWrapper wrapper =
+              (com.bumptech.glide.load.engine.cache.ModelSignatureDiskLruCacheWrapper) dc;
+          removed = wrapper.removeAllExceptSignature(currentSignature);
+          success = true;
+          Log.i(TAG, "EvictionManager evictDiskExceptSignature removed " + removed + " entries");
+        } catch (Exception e) {
+          ex = e;
+          Log.e(TAG, "EvictionManager evictDiskExceptSignature failed", e);
+        }
+      } else {
+        ex = new UnsupportedOperationException("Disk cache does not support signature-based eviction");
+        Log.w(TAG, "EvictionManager evictDiskExceptSignature: disk cache is not ModelSignatureDiskLruCacheWrapper");
+      }
+      
+      if (callback != null) {
+        final boolean finalSuccess = success;
+        final Exception finalEx = ex;
+        mainHandler.post(() -> callback.onComplete(finalSuccess, finalEx));
+      }
+    });
+  }
+
+  /**
+   * Check if disk cache contains entries matching model and signature.
+   *
+   * @param model The model
+   * @param signature The signature
+   * @param callback Callback with result (invoked on main thread)
+   */
+  public void containsInDiskCacheByModelAndSignature(
+      @Nullable final Object model,
+      @Nullable final Key signature,
+      @Nullable final DiskPresenceCallback callback) {
+    
+    if (model == null || signature == null) {
+      if (callback != null) {
+        mainHandler.post(() -> callback.onResult(false, false));
+      }
+      return;
+    }
+
+    diskExecutor.execute(() -> {
+      boolean found = false;
+      
+      DiskCache dc;
+      synchronized (EvictionManager.this) {
+        dc = diskCache;
+      }
+      
+      if (dc instanceof com.bumptech.glide.load.engine.cache.ModelSignatureDiskLruCacheWrapper) {
+        try {
+          com.bumptech.glide.load.engine.cache.ModelSignatureDiskLruCacheWrapper wrapper =
+              (com.bumptech.glide.load.engine.cache.ModelSignatureDiskLruCacheWrapper) dc;
+          found = wrapper.containsByModelAndSignature(model, signature);
+        } catch (Exception e) {
+          Log.e(TAG, "EvictionManager containsInDiskCacheByModelAndSignature failed", e);
+        }
+      }
+      
+      if (callback != null) {
+        final boolean finalFound = found;
+        mainHandler.post(() -> callback.onResult(finalFound, false));
+      }
+    });
+  }
+
+  /**
+   * Get disk cache statistics.
+   *
+   * @return Array: [indexSize, diskCacheSize] or null if not supported
+   */
+  public long[] getDiskCacheStats() {
+    DiskCache dc;
+    synchronized (this) {
+      dc = diskCache;
+    }
+    
+    if (dc instanceof com.bumptech.glide.load.engine.cache.ModelSignatureDiskLruCacheWrapper) {
+      com.bumptech.glide.load.engine.cache.ModelSignatureDiskLruCacheWrapper wrapper =
+          (com.bumptech.glide.load.engine.cache.ModelSignatureDiskLruCacheWrapper) dc;
+      return wrapper.getStats();
+    }
+    
     return null;
   }
 }

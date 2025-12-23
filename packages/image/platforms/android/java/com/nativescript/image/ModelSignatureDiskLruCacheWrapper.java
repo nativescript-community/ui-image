@@ -1,17 +1,27 @@
 package com.bumptech.glide.load.engine.cache;
 
 import android.util.Log;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.bumptech.glide.disklrucache.DiskLruCache;
 import com.bumptech.glide.disklrucache.DiskLruCache.Value;
 import com.bumptech.glide.load.Key;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * The default DiskCache implementation. There must be no more than one active instance for a given
- * directory at a time.
+ * A disk cache wrapper that tracks cache keys for efficient querying and eviction based on
+ * model/signature pairs. Similar to ModelSignatureMemoryCache but for disk cache.
  *
- * @see #get(java.io.File, long)
+ * Features:
+ * - Tracks all cached keys with their string representations
+ * - Supports querying existence by model and signature
+ * - Supports bulk eviction by model/signature or signature version
+ * - Thread-safe operations with minimal overhead
  */
 public class ModelSignatureDiskLruCacheWrapper implements DiskCache {
   private static final String TAG = "JS";
@@ -25,6 +35,10 @@ public class ModelSignatureDiskLruCacheWrapper implements DiskCache {
   private final long maxSize;
   private final DiskCacheWriteLocker writeLocker = new DiskCacheWriteLocker();
   private DiskLruCache diskLruCache;
+  
+  // Index of safeKey -> original key string for efficient lookup
+  // This allows us to query and evict based on model/signature without iterating the entire cache
+  private final Map<String, String> keyIndex = new ConcurrentHashMap<>();
 
   /**
    * Get a DiskCache in the given directory and size. If a disk cache has already been created with
@@ -81,9 +95,7 @@ public class ModelSignatureDiskLruCacheWrapper implements DiskCache {
   @Override
   public File get(Key key) {
     String safeKey = safeKeyGenerator.getSafeKey(key);
-    // if (Log.isLoggable(TAG, Log.VERBOSE)) {
-      Log.v(TAG, "Get: Obtained: " + safeKey + " for for Key: " + key);
-    // }
+    Log.v(TAG, "DiskCache Get: " + safeKey + " for Key: " + key);
     File result = null;
     try {
       // It is possible that the there will be a put in between these two gets. If so that shouldn't
@@ -108,9 +120,7 @@ public class ModelSignatureDiskLruCacheWrapper implements DiskCache {
     String safeKey = safeKeyGenerator.getSafeKey(key);
     writeLocker.acquire(safeKey);
     try {
-    //   if (Log.isLoggable(TAG, Log.VERBOSE)) {
-        Log.v(TAG, "Put: Obtained: " + safeKey + " for for Key: " + key);
-    //   }
+      Log.v(TAG, "DiskCache Put: " + safeKey + " for Key: " + key);
       try {
         // We assume we only need to put once, so if data was written while we were trying to get
         // the lock, we can simply abort.
@@ -128,6 +138,9 @@ public class ModelSignatureDiskLruCacheWrapper implements DiskCache {
           File file = editor.getFile(0);
           if (writer.write(file)) {
             editor.commit();
+            // Track the key in our index after successful write
+            keyIndex.put(safeKey, key.toString());
+            Log.v(TAG, "DiskCache indexed key: " + safeKey + " -> " + key.toString());
           }
         } finally {
           editor.abortUnlessCommitted();
@@ -147,6 +160,9 @@ public class ModelSignatureDiskLruCacheWrapper implements DiskCache {
     String safeKey = safeKeyGenerator.getSafeKey(key);
     try {
       getDiskCache().remove(safeKey);
+      // Remove from index
+      keyIndex.remove(safeKey);
+      Log.v(TAG, "DiskCache deleted: " + safeKey);
     } catch (IOException e) {
       if (Log.isLoggable(TAG, Log.WARN)) {
         Log.w(TAG, "Unable to delete from disk cache", e);
@@ -158,6 +174,9 @@ public class ModelSignatureDiskLruCacheWrapper implements DiskCache {
   public synchronized void clear() {
     try {
       getDiskCache().delete();
+      // Clear the index
+      keyIndex.clear();
+      Log.i(TAG, "DiskCache cleared");
     } catch (IOException e) {
       if (Log.isLoggable(TAG, Log.WARN)) {
         Log.w(TAG, "Unable to clear disk cache or disk cache cleared externally", e);
@@ -172,5 +191,139 @@ public class ModelSignatureDiskLruCacheWrapper implements DiskCache {
 
   private synchronized void resetDiskCache() {
     diskLruCache = null;
+  }
+
+  /**
+   * Check if an entry exists in the cache by model and signature.
+   * This is more efficient than trying to get the actual file.
+   *
+   * @param model The model (e.g., URI)
+   * @param signature The signature Key
+   * @return true if at least one matching entry exists
+   */
+  public boolean containsByModelAndSignature(@NonNull Object model, @NonNull Key signature) {
+    final String modelStr = model.toString();
+    final String signatureStr = signature.toString();
+
+    for (String keyStr : keyIndex.values()) {
+      if (matchesModelAndSignature(keyStr, modelStr, signatureStr)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Remove all entries matching the given model and signature.
+   * This removes both raw (source) and transformed (resource) cache entries.
+   *
+   * @param model The model to match
+   * @param signature The signature to match
+   * @return Number of entries removed
+   */
+  public int removeByModelAndSignature(@NonNull Object model, @NonNull Key signature) {
+    final String modelStr = model.toString();
+    final String signatureStr = signature.toString();
+    
+    Log.i(TAG, "DiskCache removeByModelAndSignature: model=" + modelStr + " signature=" + signatureStr);
+
+    List<String> safeKeysToRemove = new ArrayList<>();
+    
+    // Find all matching keys
+    for (Map.Entry<String, String> entry : keyIndex.entrySet()) {
+      String keyStr = entry.getValue();
+      if (matchesModelAndSignature(keyStr, modelStr, signatureStr)) {
+        safeKeysToRemove.add(entry.getKey());
+      }
+    }
+
+    // Remove them from disk cache
+    int removed = 0;
+    for (String safeKey : safeKeysToRemove) {
+      try {
+        getDiskCache().remove(safeKey);
+        keyIndex.remove(safeKey);
+        removed++;
+        Log.v(TAG, "DiskCache removed: " + safeKey);
+      } catch (IOException e) {
+        Log.w(TAG, "Failed to remove disk cache entry: " + safeKey, e);
+      }
+    }
+
+    Log.i(TAG, "DiskCache removed " + removed + " entries for model/signature");
+    return removed;
+  }
+
+  /**
+   * Remove all entries that do NOT match the given signature.
+   * Useful for cache invalidation when changing signature versions (e.g., v1 -> v2).
+   *
+   * @param currentSignature The current/valid signature to keep
+   * @return Number of entries removed
+   */
+  public int removeAllExceptSignature(@NonNull Key currentSignature) {
+    final String signatureStr = currentSignature.toString();
+    
+    Log.i(TAG, "DiskCache removeAllExceptSignature: keeping signature=" + signatureStr);
+
+    List<String> safeKeysToRemove = new ArrayList<>();
+    
+    // Find all keys that don't match the current signature
+    for (Map.Entry<String, String> entry : keyIndex.entrySet()) {
+      String keyStr = entry.getValue();
+      if (!keyStr.contains(signatureStr) && !keyStr.contains("signature=" + signatureStr)) {
+        safeKeysToRemove.add(entry.getKey());
+      }
+    }
+
+    // Remove them
+    int removed = 0;
+    for (String safeKey : safeKeysToRemove) {
+      try {
+        getDiskCache().remove(safeKey);
+        keyIndex.remove(safeKey);
+        removed++;
+      } catch (IOException e) {
+        Log.w(TAG, "Failed to remove disk cache entry: " + safeKey, e);
+      }
+    }
+
+    Log.i(TAG, "DiskCache removed " + removed + " entries with different signatures");
+    return removed;
+  }
+
+  /**
+   * Get statistics about the cache index.
+   *
+   * @return Array: [indexSize, diskCacheSize]
+   */
+  public long[] getStats() {
+    long indexSize = keyIndex.size();
+    long diskSize = 0;
+    try {
+      diskSize = getDiskCache().size();
+    } catch (IOException e) {
+      Log.w(TAG, "Failed to get disk cache size", e);
+    }
+    return new long[] { indexSize, diskSize };
+  }
+
+  /**
+   * Helper method to check if a key string matches a model and signature.
+   * Uses multiple matching strategies for robustness.
+   */
+  private boolean matchesModelAndSignature(String keyStr, String modelStr, String signatureStr) {
+    // Strategy 1: Exact pattern matching for known key formats (e.g., DataCacheKey, ResourceCacheKey)
+    if (keyStr.contains("model=" + modelStr) && keyStr.contains("signature=" + signatureStr)) {
+      return true;
+    }
+    
+    // Strategy 2: Substring matching (fallback for other key formats)
+    // Only match if both model and signature are present
+    if (keyStr.contains(modelStr) && keyStr.contains(signatureStr)) {
+      return true;
+    }
+    
+    return false;
   }
 }
