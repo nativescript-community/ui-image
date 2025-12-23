@@ -517,6 +517,7 @@ export class Img extends ImageBase {
     private isNetworkRequest = false;
     private progressCallback: any = null;
     private loadSourceCallback: any = null;
+    private skipMemoryCacheOnNextLoad = false;
 
     public createNativeView() {
         if (!initialized) {
@@ -542,6 +543,28 @@ export class Img extends ImageBase {
     }
 
     public async updateImageUri() {
+        this.handleImageSrc(null);
+        this.initImage();
+    }
+
+    /**
+     * Force reload the image, bypassing memory cache and evicting from all caches.
+     * Use this when the image file content has changed but the URI remains the same.
+     * This ensures Glide loads the fresh content instead of serving cached data.
+     */
+    public async forceReloadImage() {
+        const imagePipeLine = getImagePipeline();
+        const cacheKey = this.cacheKey;
+        
+        // Set flag to skip memory cache on next load
+        this.skipMemoryCacheOnNextLoad = true;
+        
+        // Evict from all caches
+        if (cacheKey) {
+            await imagePipeLine.evictFromCache(cacheKey);
+        }
+        
+        // Clear current image and reload
         this.handleImageSrc(null);
         this.initImage();
     }
@@ -790,8 +813,13 @@ export class Img extends ImageBase {
             requestBuilder = requestBuilder.transition(com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade(factory));
         }
         // Cache settings
-        if (this.noCache) {
+        if (this.noCache || this.skipMemoryCacheOnNextLoad) {
             requestBuilder = requestBuilder.skipMemoryCache(true).diskCacheStrategy(com.bumptech.glide.load.engine.DiskCacheStrategy.NONE);
+        }
+        
+        // Reset the flag after using it
+        if (this.skipMemoryCacheOnNextLoad) {
+            this.skipMemoryCacheOnNextLoad = false;
         }
 
         // Decode size
