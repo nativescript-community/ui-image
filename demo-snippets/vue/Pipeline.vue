@@ -4,8 +4,9 @@
         <StackLayout padding="12">
             <Label text="ImagePipeline API" class="h2" />
             <TextField v-model="url" hint="Image URL" keyboardType="url" />
-            <NSImg ref="opacityImg" height="100" width="100%" :src="url" @finalImageSet="onFinalImageSet" @failure="onFailure" />
+            <NSImg ref="opacityImg" :decodeWidth="decodeWidth" height="100" width="100%" :src="url" @finalImageSet="onFinalImageSet" @failure="onFailure" />
             <WrapLayout marginTop="8">
+                <Button text="switchDecodeWidth" @tap="switchDecodeWidth" />
                 <Button text="prefetchToMemory" @tap="prefetchMem" />
                 <Button text="prefetchToDisk" @tap="prefetchDisk" />
                 <Button text="evictFromCache" @tap="evictFromCache" />
@@ -32,12 +33,16 @@ import { getImagePipeline } from '@nativescript-community/ui-image';
 export default {
     data() {
         return {
-            url: 'https://images.pexels.com/photos/842711/pexels-photo-842711.jpeg',
+            decodeWidth: 100,
+            url: '~/assets/images/dessert.jpg',
             logs: [] as string[],
             result: ''
         };
     },
     methods: {
+        switchDecodeWidth() {
+            this.decodeWidth = this.decodeWidth === 10 ? 100 : 10;
+        },
         onFinalImageSet(e: any) {
             const info = e.imageInfo;
             this.addLog('loaded: ' + (info ? `${info.getWidth()}x${info.getHeight()}` : 'unknown') + ' from: ' + e.source);
@@ -57,7 +62,7 @@ export default {
             try {
                 await getImagePipeline().prefetchToMemoryCache(this.url, {
                     decodeWidth: 300,
-                    decodeHeight: 300,
+                    decodeHeight: 300
                 });
                 this.addLog('prefetchToMemoryCache success');
                 this.result = 'prefetchToMemoryCache success';

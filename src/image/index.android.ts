@@ -58,7 +58,6 @@ export function initialize(config?: ImagePipelineConfigSetting): void {
         if (config?.memoryCacheScreens > 0) {
             glideConfig.setMemoryCacheScreens(config.memoryCacheScreens);
         }
-
         if (config?.usePersistentCacheKeyStore) {
             com.nativescript.image.EvictionManager.get().setPersistentStore(new com.nativescript.image.SharedPrefCacheKeyStore(Utils.android.getApplicationContext()));
         }
@@ -67,6 +66,7 @@ export function initialize(config?: ImagePipelineConfigSetting): void {
 
         // Now initialize Glide (which will read from GlideConfiguration)
         glideInstance = com.bumptech.glide.Glide.get(context);
+        com.nativescript.image.EvictionManager.get().setGlideInstance(glideInstance);
 
         // this is needed for further buildKey to trigger ...
         com.bumptech.glide.Glide.with(context).load('toto').apply(new com.bumptech.glide.request.RequestOptions().signature(signature)).preload();
@@ -76,26 +76,40 @@ export function initialize(config?: ImagePipelineConfigSetting): void {
     }
 }
 
+/**
+ * Helper function to determine if a URI is a network request.
+ * Only http:// and https:// URLs are considered network requests.
+ * @param uri The URI to check
+ * @returns true if the URI is a network request, false otherwise
+ */
+function isNetworkUri(uri: string): boolean {
+    // Defensive check for runtime safety (uri should always be a string by TypeScript typing)
+    if (!uri) {
+        return false;
+    }
+    return uri.startsWith('http://') || uri.startsWith('https://');
+}
+
 export class ImagePipeline {
     toUri(value: string | android.net.Uri) {
         if (value instanceof android.net.Uri) {
             return value.toString();
         }
-        return value;
+        return getUri(value);
     }
 
-    getCacheKey(uri: string, context) {
-        return uri;
+    getCacheKey(uri: string | android.net.Uri) {
+        return this.toUri(uri);
     }
 
     isInDiskCache(uri: string | android.net.Uri): Promise<boolean> {
-        const url = this.toUri(uri);
+        const url = this.getCacheKey(uri);
         return new Promise<boolean>((resolve, reject) => {
             com.nativescript.image.EvictionManager.get().isInDiskCacheAsync(
                 url,
                 new com.nativescript.image.EvictionManager.DiskPresenceCallback({
-                    onResult(source, transform) {
-                        resolve(source || transform);
+                    onResult(present) {
+                        resolve(present);
                     }
                 })
             );
@@ -104,12 +118,12 @@ export class ImagePipeline {
 
     isInBitmapMemoryCache(uri: string | android.net.Uri): boolean {
         // Still not directly accessible, but we can check if it's registered
-        const url = this.toUri(uri);
+        const url = this.getCacheKey(uri);
         return com.nativescript.image.EvictionManager.get().isInMemoryCache(url);
     }
 
     evictFromMemoryCache(uri: string | android.net.Uri): Promise<void> {
-        const url = this.toUri(uri);
+        const url = this.getCacheKey(uri);
         return new Promise<void>((resolve, reject) => {
             com.nativescript.image.EvictionManager.get().evictMemoryForId(
                 url,
@@ -130,7 +144,7 @@ export class ImagePipeline {
     }
 
     evictFromDiskCache(uri: string | android.net.Uri): Promise<void> {
-        const url = this.toUri(uri);
+        const url = this.getCacheKey(uri);
         return new Promise<void>((resolve, reject) => {
             com.nativescript.image.EvictionManager.get().evictDiskForId(
                 url,
@@ -150,13 +164,13 @@ export class ImagePipeline {
         });
     }
 
-    evictFromCache(uri: string | android.net.Uri): Promise<void> {
+    async evictFromCache(uri: string | android.net.Uri): Promise<void> {
         const url = this.toUri(uri);
         return new Promise<void>((resolve, reject) => {
             com.nativescript.image.EvictionManager.get().evictAllForId(
                 url,
                 new com.nativescript.image.EvictionManager.EvictionCallback({
-                    onComplete(success: boolean, error) {
+                    async onComplete(success: boolean, error) {
                         if (error) {
                             if (Trace.isEnabled()) {
                                 CLog(CLogTypes.error, error);
@@ -239,26 +253,37 @@ export class ImagePipeline {
     private prefetchToCache(uri: string, toDiskCache: boolean, options?: PrefetchOptions): Promise<void> {
         return new Promise((resolve, reject) => {
             try {
+                const url = this.toUri(uri);
                 const context = Utils.android.getApplicationContext();
                 const requestManager = com.bumptech.glide.Glide.with(context);
 
-                // Build headers map if provided
-                let headersMap = null;
-                if (options?.headers) {
-                    headersMap = new java.util.HashMap();
-                    for (const key in options.headers) {
-                        headersMap.put(key, options.headers[key]);
-                    }
-                }
+                // Determine if this is a network request
+                const isNetworkRequest = isNetworkUri(uri);
 
-                // CRITICAL: Use CustomGlideUrl for both disk and memory preload to ensure
-                // the cache keys match those used during normal image loading
-                const loadModel = new com.nativescript.image.CustomGlideUrl(
-                    uri,
-                    headersMap,
-                    null, // progressCallback
-                    null // loadSourceCallback
-                );
+                // Build the load model
+                let loadModel: any;
+
+                // Only use CustomGlideUrl for network requests to ensure cache key consistency
+                // For local files (file://), use plain URI string to avoid OkHttp requirement
+                if (isNetworkRequest) {
+                    let headersMap = null;
+                    if (options?.headers) {
+                        headersMap = new java.util.HashMap();
+                        for (const key in options.headers) {
+                            headersMap.put(key, options.headers[key]);
+                        }
+                    }
+
+                    loadModel = new com.nativescript.image.CustomGlideUrl(
+                        url,
+                        headersMap,
+                        null, // progressCallback
+                        null // loadSourceCallback
+                    );
+                } else {
+                    // For local files, use plain URI string
+                    loadModel = url;
+                }
 
                 // Use the same model for both disk and memory to ensure key consistency
                 let requestBuilder = toDiskCache ? requestManager.downloadOnly().load(loadModel) : requestManager.asBitmap().load(loadModel);
@@ -334,15 +359,10 @@ export class ImagePipeline {
 
                 // Add SaveKeysRequestListener to capture keys during preload
                 objectArr[0] = new com.nativescript.image.SaveKeysRequestListener(
-                    uri,
+                    url,
                     loadModel,
-                    new com.bumptech.glide.signature.ObjectKey(uri), // fallback only
-                    signature,
-                    options?.decodeWidth || com.bumptech.glide.request.target.Target.SIZE_ORIGINAL,
-                    options?.decodeHeight || com.bumptech.glide.request.target.Target.SIZE_ORIGINAL,
-                    multiTransform, // transformations applied
-                    ro,
-                    null // decodedResourceClass
+                    new com.bumptech.glide.signature.ObjectKey(url), // fallback only
+                    signature
                 );
 
                 objectArr[1] = new com.bumptech.glide.request.RequestListener({
@@ -488,6 +508,7 @@ export class Img extends ImageBase {
     private isNetworkRequest = false;
     private progressCallback: any = null;
     private loadSourceCallback: any = null;
+    private skipMemoryCacheOnNextLoad = false;
 
     public createNativeView() {
         if (!initialized) {
@@ -513,11 +534,26 @@ export class Img extends ImageBase {
     }
 
     public async updateImageUri() {
+        return this.forceReloadImage();
+    }
+
+    /**
+     * Force reload the image, bypassing memory cache and evicting from all caches.
+     * Use this when the image file content has changed but the URI remains the same.
+     * This ensures Glide loads the fresh content instead of serving cached data.
+     */
+    public async forceReloadImage() {
         const imagePipeLine = getImagePipeline();
         const cacheKey = this.cacheKey;
+        // Set flag to skip memory cache on next load
+        this.skipMemoryCacheOnNextLoad = true;
+
+        // Evict from all caches
         if (cacheKey) {
             await imagePipeLine.evictFromCache(cacheKey);
         }
+
+        // Clear current image and reload
         this.handleImageSrc(null);
         this.initImage();
     }
@@ -637,7 +673,7 @@ export class Img extends ImageBase {
         // Cancel any prior Glide request/target for this view before starting a new one.
         this.cancelCurrentRequest();
         // Determine if this is a network request
-        this.isNetworkRequest = typeof uri === 'string' && (uri.startsWith('http://') || uri.startsWith('https://'));
+        this.isNetworkRequest = isNetworkUri(uri);
 
         let requestBuilder: com.bumptech.glide.RequestBuilder<globalAndroid.graphics.drawable.Drawable>;
         let loadModel: any = uri;
@@ -677,23 +713,28 @@ export class Img extends ImageBase {
                 }
             });
         }
-        // Use CustomGlideUrl if we need headers, progress, or load source
-        let headersMap;
+        // Use CustomGlideUrl ONLY for network requests (http/https)
+        // For local file:// URIs, use the string directly to avoid CustomDataFetcher's OkHttp requirement
         if (this.isNetworkRequest && (this.headers || this.progressCallback || this.loadSourceCallback)) {
-            headersMap = new java.util.HashMap();
+            let headersMap = null;
 
             if (this.headers) {
+                headersMap = new java.util.HashMap();
                 for (const key in this.headers) {
                     headersMap.put(key, this.headers[key]);
                 }
             }
+
+            loadModel = new com.nativescript.image.CustomGlideUrl(
+                uri,
+                headersMap,
+                this.progressCallback, // Can be null
+                this.loadSourceCallback // Can be null
+            );
+        } else {
+            // For local files or network requests without callbacks/headers, use plain URI
+            loadModel = uri;
         }
-        loadModel = new com.nativescript.image.CustomGlideUrl(
-            uri,
-            headersMap,
-            this.progressCallback, // Can be null
-            this.loadSourceCallback // Can be null
-        );
         requestBuilder = com.bumptech.glide.Glide.with(context).load(loadModel);
 
         // Apply transformations (blur, rounded corners, etc.)
@@ -759,7 +800,7 @@ export class Img extends ImageBase {
             requestBuilder = requestBuilder.transition(com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade(factory));
         }
         // Cache settings
-        if (this.noCache) {
+        if (this.noCache || this.skipMemoryCacheOnNextLoad) {
             requestBuilder = requestBuilder.skipMemoryCache(true).diskCacheStrategy(com.bumptech.glide.load.engine.DiskCacheStrategy.NONE);
         }
 
@@ -785,17 +826,16 @@ export class Img extends ImageBase {
             uri,
             loadModel,
             new com.bumptech.glide.signature.ObjectKey(uri), // fallback only
-            signature,
-            this.decodeWidth || com.bumptech.glide.request.target.Target.SIZE_ORIGINAL,
-            this.decodeHeight || com.bumptech.glide.request.target.Target.SIZE_ORIGINAL,
-            multiTransform,
-            ro,
-            null
+            signature
         );
         objectArr[1] = new com.bumptech.glide.request.RequestListener({
             onLoadFailed(e: any, model: any, target: any, isFirstResource: boolean): boolean {
                 const instance = owner.get();
                 if (instance) {
+                    if (instance.skipMemoryCacheOnNextLoad) {
+                        getImagePipeline().evictFromMemoryCache(uri);
+                        instance.skipMemoryCacheOnNextLoad = false;
+                    }
                     // If this callback is for a previously canceled request, swallow it to avoid
                     // emitting/logging errors for obsolete requests.
                     if (instance.currentTarget && target !== instance.currentTarget) {
@@ -813,7 +853,12 @@ export class Img extends ImageBase {
             },
             onResourceReady(resource: android.graphics.drawable.Drawable, model: any, target: any, dataSource: any, isFirstResource: boolean): boolean {
                 const instance = owner.get();
+
                 if (instance) {
+                    if (instance.skipMemoryCacheOnNextLoad) {
+                        getImagePipeline().evictFromMemoryCache(uri);
+                        instance.skipMemoryCacheOnNextLoad = false;
+                    }
                     // Ignore if the callback is from a previous request (stale).
                     if (instance.currentTarget && target !== instance.currentTarget) {
                         instance.progressCallback = null;

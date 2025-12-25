@@ -8,23 +8,6 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import android.util.Log;
 
-/**
- * RequestListener that records the disk & transformation key bytes used for a
- * request
- * and persists them via EvictionManager so later evictions / presence checks
- * can recreate
- * the exact disk keys without needing to recreate Transformation objects.
- *
- * Usage:
- * - Preferred: pass a RequestOptions instance; this listener will extract the
- * internal Options
- * via ExtractRequestOptions (cached reflection) so your existing RequestOptions
- * usage continues to work.
- * - Alternative: pass an Options instance directly if you already have it.
- *
- * The listener returns false from callbacks so it does not short-circuit other
- * listeners or Glide's handling.
- */
 public class SaveKeysRequestListener implements RequestListener<Object> {
     private static final String TAG = "SaveKeysRequestListener";
     
@@ -32,12 +15,6 @@ public class SaveKeysRequestListener implements RequestListener<Object> {
     private final Object model;
     private final Key fallbackSourceKey;
     private final Key signature;
-    private final int width;
-    private final int height;
-    private final Transformation<?> transform;
-    private final Options options;
-    private final Class<?> decodedResourceClass;
-
     /**
      * Construct directly with an Options instance.
      */
@@ -45,21 +22,11 @@ public class SaveKeysRequestListener implements RequestListener<Object> {
             String id,
             Object model,
             Key fallbackSourceKey,
-            Key signature,
-            int width,
-            int height,
-            Transformation<?> transform,
-            com.bumptech.glide.request.RequestOptions options,
-            Class<?> decodedResourceClass) {
+            Key signature) {
         this.id = id;
         this.model = model;
         this.fallbackSourceKey = fallbackSourceKey;
         this.signature = signature;
-        this.width = width;
-        this.height = height;
-        this.transform = transform;
-        this.options = (options == null) ? new Options() : ExtractRequestOptions.getFrom(options);
-        this.decodedResourceClass = decodedResourceClass;
     }
 
     private static String normalizeIdFromModel(Object model, String fallback) {
@@ -95,46 +62,18 @@ public class SaveKeysRequestListener implements RequestListener<Object> {
             final String normalizedId = normalizeIdFromModel(model, this.id);
             final Key actualSourceKey = sourceKeyFromModel(model, this.fallbackSourceKey);
 
-            Log.i(TAG, "onResourceReady: id=" + normalizedId + 
-                      " sourceKey=" + actualSourceKey.getClass().getSimpleName() +
-                      " model=" + (model != null ? model.getClass().getSimpleName() : "null"));
+            // Log.i(TAG, "onResourceReady: id=" + normalizedId + 
+            //           " sourceKey=" + actualSourceKey +
+            //           " model=" + model);
 
-            // Compute transformation bytes
-            byte[] transformBytes = null;
-            if (this.transform != null) {
-                try {
-                    RecordingDigest d = new RecordingDigest();
-                    this.transform.updateDiskCacheKey(d);
-                    transformBytes = d.digest();
-                } catch (Throwable t) {
-                    Log.w(TAG, "Failed to record transform bytes", t);
-                }
-            }
-
-            // Compute options bytes
-            byte[] optionsBytes = null;
-            try {
-                RecordingDigest d2 = new RecordingDigest();
-                this.options.updateDiskCacheKey(d2);
-                optionsBytes = d2.digest();
-            } catch (Throwable t) {
-                Log.w(TAG, "Failed to record options bytes", t);
-            }
 
             CacheKeyStore.StoredKeys s = new CacheKeyStore.StoredKeys(
                 actualSourceKey,
-                this.signature,
-                this.width,
-                this.height,
-                this.transform,
-                transformBytes,
-                this.decodedResourceClass,
-                this.options,
-                optionsBytes
+                this.signature
             );
 
             EvictionManager.get().saveKeys(normalizedId, s);
-            Log.i(TAG, "Keys saved for: " + normalizedId);
+            // Log.i(TAG, "Keys saved for: " + normalizedId + " s=" +s);
         } catch (Throwable t) {
             Log.e(TAG, "Failed to save keys", t);
         }

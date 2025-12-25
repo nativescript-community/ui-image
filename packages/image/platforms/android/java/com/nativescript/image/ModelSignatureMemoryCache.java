@@ -18,17 +18,10 @@ import android.util.Log;
 /**
  * An LRU memory cache that keeps a small index of the string form of each Key so callers can
  * evict all entries matching a model + signature pair.
- *
- * Notes / limitations:
- * - This implementation indexes Key.toString() and matches by substring. It relies on
- *   EngineKey.toString() containing both the model and signature information (which current Glide
- *   versions do). This is somewhat fragile (internal toString formats may change across versions)
- *   but is safe and does not use reflection.
- * - To use it, install this cache via your AppGlideModule (see MyAppGlideModule.java below).
- * - When you call removeByModelAndSignature(model, signature) the code looks for cache keys whose
- *   toString() contains the model.toString() and signature.toString() values and removes them.
  */
 public final class ModelSignatureMemoryCache extends LruResourceCache {
+  private static final String TAG = "JS";
+ 
   // Map of the Key -> cached key string (avoid calling toString() repeatedly and to have a quick
   // snapshot of what's in cache). Entries are added on put and removed on remove / eviction.
   private final Map<Key, String> keyStrings = new ConcurrentHashMap<>();
@@ -46,12 +39,14 @@ public final class ModelSignatureMemoryCache extends LruResourceCache {
   public Resource<?> put(@NonNull Key key, @Nullable Resource<?> resource) {
     // Save string representation for indexing before delegating.
     keyStrings.put(key, key.toString());
+    // Log.w(TAG, "MemoryCache put " + key.toString() + " "  + keyStrings.size());
     return super.put(key, resource);
   }
 
   @Nullable
   @Override
   public Resource<?> remove(@NonNull Key key) {
+    // Log.w(TAG, "MemoryCache remove " + key + " "  + keyStrings.size());
     keyStrings.remove(key);
     return super.remove(key);
   }
@@ -75,19 +70,20 @@ public final class ModelSignatureMemoryCache extends LruResourceCache {
    */
   public int removeByModelAndSignature(@NonNull Object model, @NonNull Key signature) {
     final String modelStr = model.toString();
+    final String modelCleanStr = (modelStr.startsWith("ObjectKey{object=") && modelStr.endsWith("}")) ? modelStr.substring(17, modelStr.length() - 1) : null;
     final String signatureStr = signature.toString();
 
     List<Key> toRemove = new ArrayList<>();
     for (Map.Entry<Key, String> e : keyStrings.entrySet()) {
       String s = e.getValue();
-      // There are two checks: a direct "model=" / "signature=" pattern check (matches EngineKey.toString
+// There are two checks: a direct "model=" / "signature=" pattern check (matches EngineKey.toString
       // format currently used), and a fallback that simply checks both substrings exist. The first
       // reduces false positives.
-      if ((s.contains("model=" + modelStr) && s.contains("signature=" + signatureStr))
-          || (s.contains(modelStr) && s.contains(signatureStr))) {
+      if (((s.contains("model=" + modelStr) || (modelCleanStr != null && s.contains("model=" + modelCleanStr)))&& s.contains("signature=" + signatureStr))) {
         toRemove.add(e.getKey());
       }
     }
+    // Log.w(TAG, "ModelSignatureMemoryCache removeByModelAndSignature will remove " + toRemove.size() + " items from " + keyStrings.size() );
 
     for (Key k : toRemove) {
       remove(k);
@@ -100,12 +96,12 @@ public final class ModelSignatureMemoryCache extends LruResourceCache {
    *
    * This is less type-safe (signatures should be Key), but may be helpful in some cases.
    */
-  public int removeByModelAndSignatureStrings(@NonNull String modelString, @NonNull String signatureString) {
+  public int removeByModelAndSignatureStrings(@NonNull String modelStr, @NonNull String signatureStr) {
     List<Key> toRemove = new ArrayList<>();
+    final String modelCleanStr = (modelStr.startsWith("ObjectKey{object=") && modelStr.endsWith("}")) ? modelStr.substring(17, modelStr.length() - 1) : null;
     for (Map.Entry<Key, String> e : keyStrings.entrySet()) {
       String s = e.getValue();
-      if ((s.contains("model=" + modelString) && s.contains("signature=" + signatureString))
-          || (s.contains(modelString) && s.contains(signatureString))) {
+      if (((s.contains("model=" + modelStr) || (modelCleanStr != null && s.contains("model=" + modelCleanStr)))&& s.contains("signature=" + signatureStr))) {
         toRemove.add(e.getKey());
       }
     }
@@ -128,11 +124,12 @@ public final class ModelSignatureMemoryCache extends LruResourceCache {
    */
   public boolean containsByModelAndSignature(@NonNull Object model, @NonNull Key signature) {
     final String modelStr = model.toString();
+    final String modelCleanStr = (modelStr.startsWith("ObjectKey{object=") && modelStr.endsWith("}")) ? modelStr.substring(17, modelStr.length() - 1) : null;
     final String signatureStr = signature.toString();
+    // Log.i(TAG, "ModelSignatureMemoryCache containsByModelAndSignature " + modelStr + " " +  signatureStr + " " +  keyStrings.size());
 
     for (String s : keyStrings.values()) {
-      if ((s.contains("model=" + modelStr) && s.contains("signature=" + signatureStr))
-          || (s.contains(modelStr) && s.contains(signatureStr))) {
+      if (((s.contains("model=" + modelStr) || (modelCleanStr != null && s.contains("model=" + modelCleanStr)))&& s.contains("signature=" + signatureStr))) {
         return true;
       }
     }
@@ -146,10 +143,10 @@ public final class ModelSignatureMemoryCache extends LruResourceCache {
    * @param signatureString signature.toString() or similar representation.
    * @return true if at least one matching entry exists in memory cache.
    */
-  public boolean containsByModelAndSignatureStrings(@NonNull String modelString, @NonNull String signatureString) {
+  public boolean containsByModelAndSignatureStrings(@NonNull String modelStr, @NonNull String signatureStr) {
+    final String modelCleanStr = (modelStr.startsWith("ObjectKey{object=") && modelStr.endsWith("}")) ? modelStr.substring(17, modelStr.length() - 1) : null;
     for (String s : keyStrings.values()) {
-      if ((s.contains("model=" + modelString) && s.contains("signature=" + signatureString))
-          || (s.contains(modelString) && s.contains(signatureString))) {
+      if (((s.contains("model=" + modelStr) || (modelCleanStr != null && s.contains("model=" + modelCleanStr)))&& s.contains("signature=" + signatureStr))) {
         return true;
       }
     }

@@ -126,6 +126,7 @@ declare namespace com {
 			export class EvictionManager {
 				public static class: java.lang.Class<com.nativescript.image.EvictionManager>;
 				public clearAll(): void;
+				public setGlideInstance(glideInstance: com.bumptech.glide.Glide);
 				public static get(): com.nativescript.image.EvictionManager;
 				public clearMemory(callback: com.nativescript.image.EvictionManager.EvictionCallback): void;
 				public clearAll(callback: com.nativescript.image.EvictionManager.EvictionCallback): void;
@@ -136,7 +137,6 @@ declare namespace com {
 				public setDiskCache(diskCache: com.bumptech.glide.load.engine.cache.DiskCache): void;
 				public isInMemoryCache(this_: string): boolean;
 				public evictAllForId(id: string): void;
-				public evictSourceForId(id: string, callback: com.nativescript.image.EvictionManager.EvictionCallback): void;
 				public evictDiskForId(this_: string, id: com.nativescript.image.EvictionManager.EvictionCallback): void;
 				public isInDiskCacheBlocking(resourceKey: string): androidNative.Array<boolean>;
 				public clearDiskCache(): void;
@@ -173,6 +173,14 @@ declare namespace com {
 					public constructor();
 					public onComplete(param0: boolean, param1: java.lang.Exception): void;
 				}
+
+                export function setGlideInstance(glideInstance: bumptech.glide.Glide) {
+                    throw new Error('Function not implemented.');
+                }
+
+                export function setGlideInstance(glideInstance: bumptech.glide.Glide) {
+                    throw new Error('Function not implemented.');
+                }
 			}
 			export class ExtractRequestOptions {
 				public static class: java.lang.Class<com.nativescript.image.ExtractRequestOptions>;
@@ -488,24 +496,9 @@ declare namespace com {
 				public source(): okio.BufferedSource;
 				public contentType(): okhttp3.MediaType;
 			}
-			export class RecordingDigest {
-				public static class: java.lang.Class<com.nativescript.image.RecordingDigest>;
-				public engineUpdate(input: number): void;
-				public engineUpdate(input: androidNative.Array<number>, offset: number, len: number): void;
-				public engineDigest(): androidNative.Array<number>;
-				public engineReset(): void;
-				public constructor();
-			}
-			export class RecreatedResourceKey {
-				public static class: java.lang.Class<com.nativescript.image.RecreatedResourceKey>;
-				public hashCode(): number;
-				public constructor(sourceKey: com.bumptech.glide.load.Key, signature: com.bumptech.glide.load.Key, width: number, height: number, transformationKeyBytes: androidNative.Array<number>, decodedResourceClass: java.lang.Class<any>, optionsKeyBytes: androidNative.Array<number>);
-				public equals(o: any): boolean;
-				public updateDiskCacheKey(messageDigest: java.security.MessageDigest): void;
-			}
 			export class SaveKeysRequestListener extends com.bumptech.glide.request.RequestListener<globalAndroid.graphics.drawable.Drawable> {
 				public static class: java.lang.Class<com.nativescript.image.SaveKeysRequestListener>;
-				public constructor(id: string, model: any, sourceKey: com.bumptech.glide.load.Key, signature: com.bumptech.glide.load.Key, width: number, height: number, transformation: com.bumptech.glide.load.Transformation<any>, options: com.bumptech.glide.request.RequestOptions, decodedResourceClass: java.lang.Class<any>);
+				public constructor(id: string, model: any, sourceKey: com.bumptech.glide.load.Key, signature: com.bumptech.glide.load.Key);
 				public onLoadFailed(e: com.bumptech.glide.load.engine.GlideException, model: any, target: com.bumptech.glide.request.target.Target<globalAndroid.graphics.drawable.Drawable>, isFirstResource: boolean): boolean;
 				public onResourceReady(t: globalAndroid.graphics.drawable.Drawable, rd2: any, t_1: com.bumptech.glide.request.target.Target<globalAndroid.graphics.drawable.Drawable>, existing: com.bumptech.glide.load.DataSource, t_2: boolean): boolean;
 			}

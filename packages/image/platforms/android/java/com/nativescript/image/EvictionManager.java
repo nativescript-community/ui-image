@@ -5,12 +5,14 @@ import android.os.Looper;
 import androidx.annotation.GuardedBy;
 import androidx.annotation.MainThread;
 import androidx.annotation.Nullable;
+import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.Key;
 import com.bumptech.glide.load.Options;
 import com.bumptech.glide.load.Transformation;
 import com.bumptech.glide.load.engine.cache.DiskCache;
 import com.bumptech.glide.load.engine.cache.MemoryCache;
 import com.bumptech.glide.load.engine.cache.LruResourceCache;
+import com.bumptech.glide.load.engine.cache.ModelSignatureDiskLruCacheWrapper;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -37,15 +39,26 @@ import android.util.Log;
  */
 public final class EvictionManager {
   private static final String TAG = "JS";
+  
   private static final EvictionManager INSTANCE = new EvictionManager();
+
+  // Cached reflection fields/methods for ActiveResources access
+  private static volatile java.lang.reflect.Field engineField;
+  private static volatile java.lang.reflect.Field activeResourcesField;
+  private static volatile java.lang.reflect.Field activeEngineResourcesField;
+
+  private static volatile boolean reflectionInitialized = false;
+  private static volatile boolean reflectionFailed = false;
 
   private final ExecutorService diskExecutor = Executors.newSingleThreadExecutor();
   private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
   @GuardedBy("this")
-  private DiskCache diskCache;
+  private ModelSignatureDiskLruCacheWrapper diskCache;
   @GuardedBy("this")
   private ModelSignatureMemoryCache memoryCache;
+
+  private Glide glideInstance;
 
   // in-memory store for captured info
   private final CacheKeyStore inMemoryKeyStore = new CacheKeyStore();
@@ -61,7 +74,11 @@ public final class EvictionManager {
     return INSTANCE;
   }
 
-  public synchronized void setDiskCache(DiskCache diskCache) {
+  public void setGlideInstance(Glide glideInstance) {
+    this.glideInstance = glideInstance;
+  }
+
+  public synchronized void setDiskCache(ModelSignatureDiskLruCacheWrapper diskCache) {
     this.diskCache = diskCache;
   }
 
@@ -100,7 +117,7 @@ public final class EvictionManager {
 
       // 2) Just save the new keys directly
       CacheKeyStore.StoredKeys toPersist = newStored;
-
+    // Log.d(TAG, "EvictionManager saveKeys " + id + " " + toPersist);
       // 3) Save to both stores
       inMemoryKeyStore.put(id, toPersist);
       if (persistentStore != null) {
@@ -123,12 +140,8 @@ public final class EvictionManager {
 
   /** Disk presence callback for async check. */
   public interface DiskPresenceCallback {
-    void onResult(boolean sourcePresent, boolean transformedPresent);
+    void onResult(boolean present);
   }
-
-  // -----------------------
-  // New: clear APIs
-  // -----------------------
 
   /**
    * Clear the entire disk cache. Runs on a background thread. Callback invoked on
@@ -138,7 +151,7 @@ public final class EvictionManager {
     diskExecutor.execute(() -> {
       boolean success = true;
       Exception ex = null;
-      DiskCache dc;
+      ModelSignatureDiskLruCacheWrapper dc;
       synchronized (EvictionManager.this) {
         dc = diskCache;
       }
@@ -182,6 +195,7 @@ public final class EvictionManager {
       if (mc != null) {
         try {
           mc.clearMemory();
+          clearAllActiveResources();
         } catch (Exception e) {
           success = false;
           ex = e;
@@ -210,7 +224,7 @@ public final class EvictionManager {
     diskExecutor.execute(() -> {
       boolean diskSuccess = true;
       Exception firstEx = null;
-      DiskCache dc;
+      ModelSignatureDiskLruCacheWrapper dc;
       synchronized (EvictionManager.this) {
         dc = diskCache;
       }
@@ -234,15 +248,16 @@ public final class EvictionManager {
         if (mc != null) {
           try {
             mc.clearMemory();
+            clearAllActiveResources();
           } catch (Exception e) {
             memSuccess = false;
             if (finalFirstEx == null)
               memEx = e;
           }
         }
-        inMemoryKeyStore.clearAll();
         boolean combined = finalDiskSuccess && memSuccess;
         Exception combinedEx = finalFirstEx != null ? finalFirstEx : memEx;
+        inMemoryKeyStore.clearAll();
         if (persistentStore != null) {
           persistentStore.clearAll();
         }
@@ -257,10 +272,6 @@ public final class EvictionManager {
     clearAll(null);
   }
 
-  // -----------------------
-  // Eviction-by-id APIs
-  // -----------------------
-
   /**
    * Evict both disk (source + transformed) and memory for id. Callback invoked on
    * main thread.
@@ -268,21 +279,70 @@ public final class EvictionManager {
   public void evictAllForId(final String id, @Nullable final EvictionCallback callback) {
     final CacheKeyStore.StoredKeys s = readStoredKeysPreferPersistent(id);
     if (s == null) {
-      // fallback conservative attempt (source only)
-      evictDiskForId(id, callback);
+      // fallback conservative attempt (disk only, then memory)
+      evictDiskForId(id, new EvictionCallback() {
+        @Override
+        public void onComplete(boolean diskSuccess, @Nullable Exception diskError) {
+          // After disk eviction, try memory eviction (will fail gracefully if no keys)
+          mainHandler.post(() -> {
+            evictMemoryForId(id, new EvictionCallback() {
+              @Override
+              public void onComplete(boolean memSuccess, @Nullable Exception memError) {
+                // Combine results: success only if both succeeded (or memory failed gracefully)
+                boolean combined = diskSuccess && memSuccess;
+                Exception combinedEx = diskError != null ? diskError : memError;
+                if (callback != null) {
+                  callback.onComplete(combined, combinedEx);
+                }
+              }
+            });
+          });
+        }
+      });
       return;
     }
-    final byte[] transformationBytes = getTransformationBytesFromStoredKeys(s);
-    final byte[] optionsBytes = s.optionsKeyBytes;
-    performEvictionTasks(
-        s.sourceKey,
-        s.signature,
-        s.width,
-        s.height,
-        transformationBytes,
-        s.decodedResourceClass,
-        optionsBytes,
-        callback);
+    
+    // Check if we have an enhanced disk cache
+    ModelSignatureDiskLruCacheWrapper dc;
+    synchronized (this) {
+      dc = diskCache;
+    }
+    
+    if (s.sourceKey != null && s.signature != null) {
+      // Use efficient model/signature-based eviction
+      // Log.i(TAG, "EvictionManager evictAllForId using efficient disk cache eviction for: " + id);
+      evictDiskByModelAndSignature(s.sourceKey, s.signature, new EvictionCallback() {
+        @Override
+        public void onComplete(boolean diskSuccess, @Nullable Exception diskError) {
+          // After disk eviction, evict from memory
+          mainHandler.post(() -> {
+            boolean memSuccess = true;
+            Exception memError = null;
+            
+            ModelSignatureMemoryCache mc;
+            synchronized (EvictionManager.this) {
+              mc = memoryCache;
+            }
+            
+            if (mc != null && s.sourceKey != null && s.signature != null) {
+              try {
+                mc.removeByModelAndSignature(s.sourceKey, s.signature);
+              } catch (Exception e) {
+                memSuccess = false;
+                memError = e;
+              }
+            }
+            
+            boolean combined = diskSuccess && memSuccess;
+            Exception combinedEx = diskError != null ? diskError : memError;
+            
+            if (callback != null) {
+              callback.onComplete(combined, combinedEx);
+            }
+          });
+        }
+      });
+    }
   }
 
   /** Backwards-compatible no-callback variant */
@@ -296,63 +356,23 @@ public final class EvictionManager {
   public void evictDiskForId(final String id, @Nullable final EvictionCallback callback) {
     final CacheKeyStore.StoredKeys s = readStoredKeysPreferPersistent(id);
     if (s == null) {
-      // fallback to deleting source by id-only ObjectKey
-      final Key fallbackSource = new com.bumptech.glide.signature.ObjectKey(id);
-      diskExecutor.execute(() -> {
-        boolean success = true;
-        Exception ex = null;
-        DiskCache dc;
-        synchronized (EvictionManager.this) {
-          dc = diskCache;
-        }
-        if (dc != null) {
-          try {
-            dc.delete(fallbackSource);
-          } catch (Exception e) {
-            success = false;
-            ex = e;
-          }
-        }
-        if (callback != null) {
-          final boolean finalSuccess = success;
-          final Exception finalEx = ex;
-          mainHandler.post(() -> callback.onComplete(finalSuccess, finalEx));
-        }
-      });
       return;
     }
 
     diskExecutor.execute(() -> {
       boolean success = true;
       Exception ex = null;
-      DiskCache dc;
+      ModelSignatureDiskLruCacheWrapper dc;
       synchronized (EvictionManager.this) {
         dc = diskCache;
       }
       if (dc != null) {
         // Delete source data using DataCacheKey (sourceKey + signature)
         try {
-          CustomDataCacheKey dataCacheKey = new CustomDataCacheKey(s.sourceKey, s.signature);
-          dc.delete(dataCacheKey);
+          dc.removeByModelAndSignature(s.sourceKey, s.signature);
         } catch (Exception e) {
           success = false;
           ex = e;
-        }
-        // Delete transformed resource using ResourceCacheKey
-        try {
-          Key resourceKey = new RecreatedResourceKey(
-              s.sourceKey,
-              s.signature,
-              s.width,
-              s.height,
-              getTransformationBytesFromStoredKeys(s),
-              s.decodedResourceClass,
-              s.optionsKeyBytes);
-          dc.delete(resourceKey);
-        } catch (Exception e) {
-          if (ex == null)
-            ex = e;
-          success = false;
         }
       }
       if (callback != null) {
@@ -366,76 +386,6 @@ public final class EvictionManager {
   /** Evict disk-only, no callback. */
   public void evictDiskForId(final String id) {
     evictDiskForId(id, null);
-  }
-
-  /** Evict only source/raw bytes (disk). */
-  public void evictSourceForId(final String id, @Nullable final EvictionCallback callback) {
-    final CacheKeyStore.StoredKeys s = readStoredKeysPreferPersistent(id);
-    diskExecutor.execute(() -> {
-      boolean success = true;
-      Exception ex = null;
-      DiskCache dc;
-      synchronized (EvictionManager.this) {
-        dc = diskCache;
-      }
-      if (dc != null) {
-        try {
-          if (hasValidStoredKeys(s)) {
-            // Use DataCacheKey for proper source data deletion
-            CustomDataCacheKey dataCacheKey = new CustomDataCacheKey(s.sourceKey, s.signature);
-            dc.delete(dataCacheKey);
-          } else {
-            // Fallback to ObjectKey if we don't have stored keys
-            Key fallbackKey = new com.bumptech.glide.signature.ObjectKey(id);
-            dc.delete(fallbackKey);
-          }
-        } catch (Exception e) {
-          success = false;
-          ex = e;
-        }
-      }
-      if (callback != null) {
-        final boolean finalSuccess = success;
-        final Exception finalEx = ex;
-        mainHandler.post(() -> callback.onComplete(finalSuccess, finalEx));
-      }
-    });
-  }
-
-  /** Evict only the transformed resource (disk). */
-  public void evictTransformedForId(final String id, @Nullable final EvictionCallback callback) {
-    final CacheKeyStore.StoredKeys s = readStoredKeysPreferPersistent(id);
-    if (s == null) {
-      if (callback != null)
-        mainHandler.post(() -> callback.onComplete(false, null));
-      return;
-    }
-    final byte[] transformationBytes = getTransformationBytesFromStoredKeys(s);
-    final byte[] optionsBytes = s.optionsKeyBytes;
-
-    diskExecutor.execute(() -> {
-      boolean success = true;
-      Exception ex = null;
-      DiskCache dc;
-      synchronized (EvictionManager.this) {
-        dc = diskCache;
-      }
-      if (dc != null) {
-        try {
-          Key resourceKey = new RecreatedResourceKey(s.sourceKey, s.signature, s.width, s.height, transformationBytes,
-              s.decodedResourceClass, optionsBytes);
-          dc.delete(resourceKey);
-        } catch (Exception e) {
-          success = false;
-          ex = e;
-        }
-      }
-      if (callback != null) {
-        final boolean finalSuccess = success;
-        final Exception finalEx = ex;
-        mainHandler.post(() -> callback.onComplete(finalSuccess, finalEx));
-      }
-    });
   }
 
   /**
@@ -465,6 +415,7 @@ public final class EvictionManager {
     }
     try {
       mc.removeByModelAndSignature(s.sourceKey, s.signature );
+      clearAllActiveResources();
     } catch (Exception e) {
       success = false;
       ex = e;
@@ -516,35 +467,31 @@ public final class EvictionManager {
       boolean transformedPresent = false;
 
       final CacheKeyStore.StoredKeys s = readStoredKeysPreferPersistent(id);
-      DiskCache dc;
+      ModelSignatureDiskLruCacheWrapper dc;
       synchronized (EvictionManager.this) {
         dc = diskCache;
       }
 
       if (dc == null) {
-        mainHandler.post(() -> callback.onResult(false, false));
+        mainHandler.post(() -> callback.onResult(false));
         return;
       }
 
       try {
         if (hasValidStoredKeys(s)) {
-          CustomDataCacheKey cachekey = new CustomDataCacheKey(s.sourceKey, s.signature);
-          sourcePresent = dc.get(cachekey) != null;
-          byte[] transformationBytes = getTransformationBytesFromStoredKeys(s);
-          Key resourceKey = new RecreatedResourceKey(s.sourceKey, s.signature, s.width, s.height, transformationBytes,
-              s.decodedResourceClass, s.optionsKeyBytes);
-          transformedPresent = dc.get(resourceKey) != null;
+          // Log.d(TAG, "EvictionManager isInDiskCacheAsync " + id + " " + s.sourceKey+ " " + s.sourceKey.getClass().getName()+ " " + s.signature);
+          sourcePresent = dc.containsByModelAndSignature(s.sourceKey, s.signature);
         } else {
           // fallback: check ObjectKey(id) as source
           Key fallback = new com.bumptech.glide.signature.ObjectKey(id);
           sourcePresent = dc.get(fallback) != null;
+          // Log.d(TAG, "EvictionManager fallback check with ObjectKey: " + sourcePresent);
         }
-      } catch (Exception ignored) {
+      } catch (Exception e) {
+        Log.e(TAG, "EvictionManager isInDiskCacheAsync exception for " + id, e);
       }
-
-      final boolean finalSource = sourcePresent;
-      final boolean finalTransformed = transformedPresent;
-      mainHandler.post(() -> callback.onResult(finalSource, finalTransformed));
+      final Boolean result = sourcePresent;
+      mainHandler.post(() -> callback.onResult(result));
     });
   }
 
@@ -553,114 +500,26 @@ public final class EvictionManager {
    * only.
    * Returns array [sourcePresent, transformedPresent].
    */
-  public boolean[] isInDiskCacheBlocking(final String id) {
+  public boolean isInDiskCacheBlocking(final String id) {
     final CacheKeyStore.StoredKeys s = readStoredKeysPreferPersistent(id);
-    DiskCache dc;
+    ModelSignatureDiskLruCacheWrapper dc;
     synchronized (EvictionManager.this) {
       dc = diskCache;
     }
     boolean sourcePresent = false;
     boolean transformedPresent = false;
     if (dc == null)
-      return new boolean[] { false, false };
+      return false;
     try {
       if (hasValidStoredKeys(s)) {
-        // Check source data using DataCacheKey
-        CustomDataCacheKey dataCacheKey = new CustomDataCacheKey(s.sourceKey, s.signature);
-        sourcePresent = dc.get(dataCacheKey) != null;
-        // Check transformed resource
-        Key resourceKey = new RecreatedResourceKey(s.sourceKey, s.signature, s.width, s.height,
-            getTransformationBytesFromStoredKeys(s), s.decodedResourceClass, s.optionsKeyBytes);
-        transformedPresent = dc.get(resourceKey) != null;
+          sourcePresent = dc.containsByModelAndSignature(s.sourceKey, s.signature);
       } else {
         Key fallback = new com.bumptech.glide.signature.ObjectKey(id);
         sourcePresent = dc.get(fallback) != null;
       }
     } catch (Exception ignored) {
     }
-    return new boolean[] { sourcePresent, transformedPresent };
-  }
-
-  /**
-   * Helper used by the eviction methods to coordinate deletes + memory removal.
-   */
-  private void performEvictionTasks(
-      final Key sourceKey,
-      final Key signature,
-      final int width,
-      final int height,
-      final byte[] transformationKeyBytes,
-      final Class<?> decodedResourceClass,
-      final byte[] optionsKeyBytes,
-      @Nullable final EvictionCallback callback) {
-
-    int tasks = 0;
-    if (sourceKey != null)
-      tasks++;
-    if (signature != null && sourceKey != null)
-      tasks++;
-    if (tasks == 0) {
-      // No disk tasks - just complete
-      if (callback != null)
-        mainHandler.post(() -> callback.onComplete(true, null));
-      return;
-    }
-
-    final AtomicInteger remaining = new AtomicInteger(tasks);
-    final AtomicBoolean failed = new AtomicBoolean(false);
-    final AtomicReference<Exception> firstException = new AtomicReference<>(null);
-
-    // delete source bytes using DataCacheKey
-    if (sourceKey != null) {
-      diskExecutor.execute(() -> {
-        DiskCache dc;
-        synchronized (EvictionManager.this) {
-          dc = diskCache;
-        }
-        if (dc != null) {
-          try {
-            // Use DataCacheKey to match Glide's internal source data storage
-            CustomDataCacheKey dataCacheKey = new CustomDataCacheKey(sourceKey, signature);
-            dc.delete(dataCacheKey);
-          } catch (Exception e) {
-            failed.set(true);
-            firstException.compareAndSet(null, e);
-          }
-        }
-        if (remaining.decrementAndGet() == 0) {
-          mainHandler.post(() -> {
-            if (callback != null)
-              callback.onComplete(!failed.get(), firstException.get());
-          });
-        }
-      });
-    }
-
-    // delete transformed resource
-    if (signature != null && sourceKey != null) {
-      diskExecutor.execute(() -> {
-        DiskCache dc;
-        synchronized (EvictionManager.this) {
-          dc = diskCache;
-        }
-        if (dc != null) {
-          try {
-            Key resourceKey = new RecreatedResourceKey(sourceKey, signature, width, height, transformationKeyBytes,
-                decodedResourceClass, optionsKeyBytes);
-            dc.delete(resourceKey);
-          } catch (Exception e) {
-            failed.set(true);
-            firstException.compareAndSet(null, e);
-          }
-        }
-        if (remaining.decrementAndGet() == 0) {
-          mainHandler.post(() -> {
-            if (callback != null)
-              callback.onComplete(!failed.get(), firstException.get());
-          });
-        }
-      });
-    }
+    return sourcePresent;
   }
 
   @Nullable
@@ -688,20 +547,187 @@ public final class EvictionManager {
     return s != null && s.sourceKey != null && s.signature != null;
   }
 
-  @Nullable
-  private static byte[] getTransformationBytesFromStoredKeys(CacheKeyStore.StoredKeys s) {
-    if (s == null)
-      return null;
-    if (s.transformationKeyBytes != null)
-      return s.transformationKeyBytes;
-    if (s.transformation != null) {
+
+  // -----------------------
+  // Enhanced disk cache eviction methods using ModelSignatureDiskLruCacheWrapper
+  // -----------------------
+
+  /**
+   * Evict all disk cache entries (both source and transformed) matching model and signature
+   *
+   * @param model The model (e.g., URI)
+   * @param signature The signature Key
+   * @param callback Optional callback invoked on main thread
+   */
+  public void evictDiskByModelAndSignature(
+      @Nullable final Object model,
+      @Nullable final Key signature,
+      @Nullable final EvictionCallback callback) {
+    
+    if (model == null || signature == null) {
+      if (callback != null) {
+        mainHandler.post(() -> callback.onComplete(false, new IllegalArgumentException("model and signature must not be null")));
+      }
+      return;
+    }
+
+    diskExecutor.execute(() -> {
+      boolean success = false;
+      Exception ex = null;
+      int removed = 0;
+      
+      ModelSignatureDiskLruCacheWrapper dc;
+      synchronized (EvictionManager.this) {
+        dc = diskCache;
+      }
+      
+      removed = dc.removeByModelAndSignature(model, signature);
+      success = true;
+      
+      if (callback != null) {
+        final boolean finalSuccess = success;
+        final Exception finalEx = ex;
+        mainHandler.post(() -> callback.onComplete(finalSuccess, finalEx));
+      }
+    });
+  }
+
+  /**
+   * Remove all disk cache entries that do NOT match the given signature.
+   * Useful for cache invalidation when changing signature versions.
+   *
+   * @param currentSignature The current/valid signature to keep
+   * @param callback Optional callback invoked on main thread
+   */
+  public void evictDiskExceptSignature(
+      @Nullable final Key currentSignature,
+      @Nullable final EvictionCallback callback) {
+    
+    if (currentSignature == null) {
+      if (callback != null) {
+        mainHandler.post(() -> callback.onComplete(false, new IllegalArgumentException("currentSignature must not be null")));
+      }
+      return;
+    }
+
+    diskExecutor.execute(() -> {
+      boolean success = false;
+      Exception ex = null;
+      int removed = 0;
+      
+      ModelSignatureDiskLruCacheWrapper dc;
+      synchronized (EvictionManager.this) {
+        dc = diskCache;
+      }
+      
+      removed = dc.removeAllExceptSignature(currentSignature);
+      success = true;
+      
+      if (callback != null) {
+        final boolean finalSuccess = success;
+        final Exception finalEx = ex;
+        mainHandler.post(() -> callback.onComplete(finalSuccess, finalEx));
+      }
+    });
+  }
+
+  /**
+   * Get disk cache statistics.
+   *
+   * @return Array: [indexSize, diskCacheSize] or null if not supported
+   */
+  public long[] getDiskCacheStats() {
+    ModelSignatureDiskLruCacheWrapper dc;
+    synchronized (this) {
+      dc = diskCache;
+    }
+    
+    return dc.getStats();
+  }
+
+  /**
+   * Initialize reflection fields/methods for ActiveResources access (once only)
+   */
+  private static void initActiveResourcesReflection() {
+    if (reflectionInitialized || reflectionFailed) {
+      return;
+    }
+    synchronized (EvictionManager.class) {
+      if (reflectionInitialized || reflectionFailed) {
+        return;
+      }
       try {
-        RecordingDigest rd = new RecordingDigest();
-        s.transformation.updateDiskCacheKey(rd);
-        return rd.digest();
-      } catch (Exception ignored) {
+        // Get Glide.engine field
+        engineField = com.bumptech.glide.Glide.class.getDeclaredField("engine");
+        engineField.setAccessible(true);
+        
+        // Get Engine.activeResources field
+        Class<?> engineClass = Class.forName("com.bumptech.glide.load.engine.Engine");
+        activeResourcesField = engineClass.getDeclaredField("activeResources");
+        activeResourcesField.setAccessible(true);
+        
+        Class<?> activeResourcesClass = Class.forName("com.bumptech.glide.load.engine.ActiveResources");
+
+        // Get ActiveResources.activeEngineResources field (the actual map)
+        try {
+          activeEngineResourcesField = activeResourcesClass.getDeclaredField("activeEngineResources");
+          activeEngineResourcesField.setAccessible(true);
+        } catch (NoSuchFieldException e) {
+          // Try alternative field names in different Glide versions
+          try {
+            activeEngineResourcesField = activeResourcesClass.getDeclaredField("activeResources");
+            activeEngineResourcesField.setAccessible(true);
+          } catch (NoSuchFieldException e2) {
+            Log.w(TAG, "Could not find activeEngineResources map field");
+          }
+        }
+        
+        reflectionInitialized = true;
+        // Log.i(TAG, "ActiveResources reflection initialized successfully");
+      } catch (Throwable t) {
+        reflectionFailed = true;
+        Log.w(TAG, "Failed to initialize ActiveResources reflection (may not exist in this Glide version)", t);
       }
     }
-    return null;
+  }
+
+  /**
+   * Clear all entries from Glide's ActiveResources cache.
+   * Must be called on main thread.
+   * 
+   * @return true if successfully cleared, false if reflection failed
+   */
+  @MainThread
+  public boolean clearAllActiveResources() {
+    try {
+      initActiveResourcesReflection();
+    
+      if (reflectionFailed) {
+        return false;
+      }
+      
+      Object engine = engineField.get(glideInstance);
+      
+      if (engine != null) {
+        Object activeResources = activeResourcesField.get(engine);
+        
+        if (activeResources != null && activeEngineResourcesField != null) {
+          // Get the map and clear it
+          Object mapObject = activeEngineResourcesField.get(activeResources);
+          
+          if (mapObject instanceof java.util.Map) {
+            java.util.Map<?, ?> map = (java.util.Map<?, ?>) mapObject;
+            int size = map.size();
+            map.clear();
+            // Log.i(TAG, "Cleared " + size + " entries from ActiveResources map");
+            return true;
+          }
+        }
+      }
+    } catch (Throwable t) {
+      Log.w(TAG, "Failed to clear ActiveResources map", t);
+    }
+    
+    return false;
   }
 }

@@ -385,17 +385,6 @@ export class Img extends ImageBase {
     }
 
     public async updateImageUri() {
-        const imagePipeLine = getImagePipeline();
-        const src = this.src;
-        const srcType = typeof src;
-        if (src && (srcType === 'string' || src instanceof ImageAsset)) {
-            // const isInCache = imagePipeLine.isInBitmapMemoryCache(cachekKey);
-            // if (isInCache) {
-            await imagePipeLine.evictFromCache(getUri(src as string | ImageAsset).absoluteString);
-            // }
-        }
-        // this.src = null;
-        // ensure we clear the image as
         this._setNativeImage(null, false);
         this.initImage();
     }

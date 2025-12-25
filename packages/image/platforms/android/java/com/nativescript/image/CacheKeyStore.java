@@ -16,33 +16,20 @@ public class CacheKeyStore {
   public static class StoredKeys {
     public final Key sourceKey;
     public final Key signature;
-    public final int width;
-    public final int height;
-    public final Transformation<?> transformation; // optional in-memory only
-    public final byte[] transformationKeyBytes; // raw bytes written by transformation.updateDiskCacheKey
-    public final Class<?> decodedResourceClass;
-    public final Options options; // may be null or placeholder for in-memory
-    public final byte[] optionsKeyBytes; // raw bytes from options.updateDiskCacheKey
-
     public StoredKeys(
         Key sourceKey,
-        Key signature,
-        int width,
-        int height,
-        Transformation<?> transformation,
-        byte[] transformationKeyBytes,
-        Class<?> decodedResourceClass,
-        Options options,
-        byte[] optionsKeyBytes) {
+        Key signature) {
       this.sourceKey = sourceKey;
       this.signature = signature;
-      this.width = width;
-      this.height = height;
-      this.transformation = transformation;
-      this.transformationKeyBytes = transformationKeyBytes;
-      this.decodedResourceClass = decodedResourceClass;
-      this.options = options;
-      this.optionsKeyBytes = optionsKeyBytes;
+    }
+
+    public String toString() {
+      return "CacheKeyStore.StoredKeys {"
+          + "sourceKey="
+          + sourceKey
+          + ", signature="
+          + signature
+          + '}';
     }
   }
 
@@ -62,4 +49,5 @@ public class CacheKeyStore {
   public void clearAll() {
     map.clear();
   }
+
 }
