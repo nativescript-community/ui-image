@@ -58,7 +58,6 @@ export function initialize(config?: ImagePipelineConfigSetting): void {
         if (config?.memoryCacheScreens > 0) {
             glideConfig.setMemoryCacheScreens(config.memoryCacheScreens);
         }
-
         if (config?.usePersistentCacheKeyStore) {
             com.nativescript.image.EvictionManager.get().setPersistentStore(new com.nativescript.image.SharedPrefCacheKeyStore(Utils.android.getApplicationContext()));
         }
@@ -67,6 +66,7 @@ export function initialize(config?: ImagePipelineConfigSetting): void {
 
         // Now initialize Glide (which will read from GlideConfiguration)
         glideInstance = com.bumptech.glide.Glide.get(context);
+        com.nativescript.image.EvictionManager.get().setGlideInstance(glideInstance);
 
         // this is needed for further buildKey to trigger ...
         com.bumptech.glide.Glide.with(context).load('toto').apply(new com.bumptech.glide.request.RequestOptions().signature(signature)).preload();
@@ -104,7 +104,6 @@ export class ImagePipeline {
 
     isInDiskCache(uri: string | android.net.Uri): Promise<boolean> {
         const url = this.getCacheKey(uri);
-        console.log('isInDiskCache', uri, url);
         return new Promise<boolean>((resolve, reject) => {
             com.nativescript.image.EvictionManager.get().isInDiskCacheAsync(
                 url,
@@ -120,13 +119,11 @@ export class ImagePipeline {
     isInBitmapMemoryCache(uri: string | android.net.Uri): boolean {
         // Still not directly accessible, but we can check if it's registered
         const url = this.getCacheKey(uri);
-        console.log('isInBitmapMemoryCache', uri, url);
         return com.nativescript.image.EvictionManager.get().isInMemoryCache(url);
     }
 
     evictFromMemoryCache(uri: string | android.net.Uri): Promise<void> {
         const url = this.getCacheKey(uri);
-        console.log('evictFromMemoryCache', uri, url);
         return new Promise<void>((resolve, reject) => {
             com.nativescript.image.EvictionManager.get().evictMemoryForId(
                 url,
@@ -148,7 +145,6 @@ export class ImagePipeline {
 
     evictFromDiskCache(uri: string | android.net.Uri): Promise<void> {
         const url = this.getCacheKey(uri);
-        console.log('evictFromDiskCache', uri, url);
         return new Promise<void>((resolve, reject) => {
             com.nativescript.image.EvictionManager.get().evictDiskForId(
                 url,
@@ -366,12 +362,7 @@ export class ImagePipeline {
                     url,
                     loadModel,
                     new com.bumptech.glide.signature.ObjectKey(url), // fallback only
-                    signature,
-                    options?.decodeWidth || com.bumptech.glide.request.target.Target.SIZE_ORIGINAL,
-                    options?.decodeHeight || com.bumptech.glide.request.target.Target.SIZE_ORIGINAL,
-                    multiTransform, // transformations applied
-                    ro,
-                    null // decodedResourceClass
+                    signature
                 );
 
                 objectArr[1] = new com.bumptech.glide.request.RequestListener({
@@ -543,8 +534,7 @@ export class Img extends ImageBase {
     }
 
     public async updateImageUri() {
-        this.handleImageSrc(null);
-        this.initImage();
+        return this.forceReloadImage();
     }
 
     /**
@@ -555,15 +545,14 @@ export class Img extends ImageBase {
     public async forceReloadImage() {
         const imagePipeLine = getImagePipeline();
         const cacheKey = this.cacheKey;
-        
         // Set flag to skip memory cache on next load
         this.skipMemoryCacheOnNextLoad = true;
-        
+
         // Evict from all caches
         if (cacheKey) {
             await imagePipeLine.evictFromCache(cacheKey);
         }
-        
+
         // Clear current image and reload
         this.handleImageSrc(null);
         this.initImage();
@@ -681,7 +670,6 @@ export class Img extends ImageBase {
     private loadImageWithGlide(uri: string) {
         const view = this.nativeViewProtected;
         const context = this._context;
-        console.log('loadImageWithGlide', uri);
         // Cancel any prior Glide request/target for this view before starting a new one.
         this.cancelCurrentRequest();
         // Determine if this is a network request
@@ -748,7 +736,6 @@ export class Img extends ImageBase {
             loadModel = uri;
         }
         requestBuilder = com.bumptech.glide.Glide.with(context).load(loadModel);
-        console.info('🚀 ~ Img ~ loadImageWithGlide ~ loadModel:', uri, loadModel);
 
         // Apply transformations (blur, rounded corners, etc.)
         const transformations = [];
@@ -816,11 +803,6 @@ export class Img extends ImageBase {
         if (this.noCache || this.skipMemoryCacheOnNextLoad) {
             requestBuilder = requestBuilder.skipMemoryCache(true).diskCacheStrategy(com.bumptech.glide.load.engine.DiskCacheStrategy.NONE);
         }
-        
-        // Reset the flag after using it
-        if (this.skipMemoryCacheOnNextLoad) {
-            this.skipMemoryCacheOnNextLoad = false;
-        }
 
         // Decode size
         if (this.decodeWidth || this.decodeHeight) {
@@ -844,18 +826,16 @@ export class Img extends ImageBase {
             uri,
             loadModel,
             new com.bumptech.glide.signature.ObjectKey(uri), // fallback only
-            signature,
-            this.decodeWidth || com.bumptech.glide.request.target.Target.SIZE_ORIGINAL,
-            this.decodeHeight || com.bumptech.glide.request.target.Target.SIZE_ORIGINAL,
-            multiTransform,
-            ro,
-            null
+            signature
         );
         objectArr[1] = new com.bumptech.glide.request.RequestListener({
             onLoadFailed(e: any, model: any, target: any, isFirstResource: boolean): boolean {
-                console.info('🚀 ~ Img ~ loadImageWithGlide ~ onLoadFailed:', e, model);
                 const instance = owner.get();
                 if (instance) {
+                    if (instance.skipMemoryCacheOnNextLoad) {
+                        getImagePipeline().evictFromMemoryCache(uri);
+                        instance.skipMemoryCacheOnNextLoad = false;
+                    }
                     // If this callback is for a previously canceled request, swallow it to avoid
                     // emitting/logging errors for obsolete requests.
                     if (instance.currentTarget && target !== instance.currentTarget) {
@@ -872,10 +852,13 @@ export class Img extends ImageBase {
                 return false;
             },
             onResourceReady(resource: android.graphics.drawable.Drawable, model: any, target: any, dataSource: any, isFirstResource: boolean): boolean {
-                console.info('🚀 ~ Img ~ loadImageWithGlide ~ onResourceReady:', resource, model, dataSource);
                 const instance = owner.get();
 
                 if (instance) {
+                    if (instance.skipMemoryCacheOnNextLoad) {
+                        getImagePipeline().evictFromMemoryCache(uri);
+                        instance.skipMemoryCacheOnNextLoad = false;
+                    }
                     // Ignore if the callback is from a previous request (stale).
                     if (instance.currentTarget && target !== instance.currentTarget) {
                         instance.progressCallback = null;

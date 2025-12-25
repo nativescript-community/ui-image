@@ -53,8 +53,6 @@ public class ModelSignatureDiskLruCacheWrapper implements DiskCache {
   @SuppressWarnings("deprecation")
   @Deprecated
   public static synchronized DiskCache get(File directory, long maxSize) {
-    // TODO calling twice with different arguments makes it return the cache for the same
-    // directory, it's public!
     if (wrapper == null) {
       wrapper = new ModelSignatureDiskLruCacheWrapper(directory, maxSize);
     }
@@ -101,7 +99,7 @@ public class ModelSignatureDiskLruCacheWrapper implements DiskCache {
       // be a problem because we will always put the same value at the same key so our input streams
       // will still represent the same data.
       final DiskLruCache.Value value = getDiskCache().get(safeKey);
-    Log.v(TAG, "DiskCache Get: " + safeKey + " for Key: " + key + " found: " + value);
+    // Log.v(TAG, "DiskCache Get: " + safeKey + " for Key: " + key + " found: " + value);
       if (value != null) {
         result = value.getFile(0);
       }
@@ -120,7 +118,6 @@ public class ModelSignatureDiskLruCacheWrapper implements DiskCache {
     String safeKey = safeKeyGenerator.getSafeKey(key);
     writeLocker.acquire(safeKey);
     try {
-      Log.v(TAG, "DiskCache Put: " + safeKey + " for Key: " + key);
       try {
         // We assume we only need to put once, so if data was written while we were trying to get
         // the lock, we can simply abort.
@@ -140,7 +137,7 @@ public class ModelSignatureDiskLruCacheWrapper implements DiskCache {
             editor.commit();
             // Track the key in our index after successful write
             keyIndex.put(safeKey, key.toString());
-            Log.v(TAG, "DiskCache indexed key: " + safeKey + " -> " + key.toString());
+      // Log.w(TAG, "DiskCache Put: " + safeKey + " for Key: " + key + " size: " + keyIndex.size());
           }
         } finally {
           editor.abortUnlessCommitted();
@@ -162,7 +159,7 @@ public class ModelSignatureDiskLruCacheWrapper implements DiskCache {
       getDiskCache().remove(safeKey);
       // Remove from index
       keyIndex.remove(safeKey);
-      Log.v(TAG, "DiskCache deleted: " + safeKey);
+      // Log.w(TAG, "DiskCache deleted: " + safeKey + " size: " +  keyIndex.size());
     } catch (IOException e) {
       if (Log.isLoggable(TAG, Log.WARN)) {
         Log.w(TAG, "Unable to delete from disk cache", e);
@@ -176,11 +173,8 @@ public class ModelSignatureDiskLruCacheWrapper implements DiskCache {
       getDiskCache().delete();
       // Clear the index
       keyIndex.clear();
-      Log.i(TAG, "DiskCache cleared");
     } catch (IOException e) {
-      if (Log.isLoggable(TAG, Log.WARN)) {
         Log.w(TAG, "Unable to clear disk cache or disk cache cleared externally", e);
-      }
     } finally {
       // Delete can close the cache but still throw. If we don't null out the disk cache here, every
       // subsequent request will try to act on a closed disk cache and fail. By nulling out the disk
@@ -206,7 +200,6 @@ public class ModelSignatureDiskLruCacheWrapper implements DiskCache {
     final String signatureStr = signature.toString();
 
     for (String keyStr : keyIndex.values()) {
-        Log.v(TAG, "DiskCache containsByModelAndSignature: " + model + " signature: " + signature + " keyStr: " + keyStr);
         if (matchesModelAndSignature(keyStr, modelStr, signatureStr)) {
             return true;
         }
@@ -226,7 +219,7 @@ public class ModelSignatureDiskLruCacheWrapper implements DiskCache {
     final String modelStr = model.toString();
     final String signatureStr = signature.toString();
     
-    Log.i(TAG, "DiskCache removeByModelAndSignature: model=" + modelStr + " signature=" + signatureStr + " cacheCount=" + keyIndex.size());
+    // Log.w(TAG, "DiskCache removeByModelAndSignature: model=" + modelStr + " signature=" + signatureStr + " cacheCount=" + keyIndex.size());
 
     List<String> safeKeysToRemove = new ArrayList<>();
     
@@ -245,13 +238,13 @@ public class ModelSignatureDiskLruCacheWrapper implements DiskCache {
         getDiskCache().remove(safeKey);
         keyIndex.remove(safeKey);
         removed++;
-        Log.v(TAG, "DiskCache removed: " + safeKey);
+        // Log.v(TAG, "DiskCache removed: " + safeKey);
       } catch (IOException e) {
         Log.w(TAG, "Failed to remove disk cache entry: " + safeKey, e);
       }
     }
 
-    Log.i(TAG, "DiskCache removed " + removed + " entries for model/signature");
+    // Log.w(TAG, "DiskCache removed " + removed + " entries for model/signature");
     return removed;
   }
 
@@ -265,8 +258,6 @@ public class ModelSignatureDiskLruCacheWrapper implements DiskCache {
   public int removeAllExceptSignature(@NonNull Key currentSignature) {
     final String signatureStr = currentSignature.toString();
     
-    Log.i(TAG, "DiskCache removeAllExceptSignature: keeping signature=" + signatureStr);
-
     List<String> safeKeysToRemove = new ArrayList<>();
     
     // Find all keys that don't match the current signature
@@ -289,7 +280,7 @@ public class ModelSignatureDiskLruCacheWrapper implements DiskCache {
       }
     }
 
-    Log.i(TAG, "DiskCache removed " + removed + " entries with different signatures");
+    // Log.i(TAG, "DiskCache removed " + removed + " entries with different signatures");
     return removed;
   }
 
@@ -315,7 +306,6 @@ public class ModelSignatureDiskLruCacheWrapper implements DiskCache {
    */
   private boolean matchesModelAndSignature(String keyStr, String modelStr, String signatureStr) {
     // Strategy 1: Exact pattern matching for known key formats (e.g., DataCacheKey, ResourceCacheKey)
-    Log.v(TAG, "DiskCache matchesModelAndSignature: " + keyStr + " modelStr: " + modelStr + " signatureStr: " + signatureStr);
     if (keyStr.contains("model=" + modelStr) && keyStr.contains("signature=" + signatureStr)) {
       return true;
     }
