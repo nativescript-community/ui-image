@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/ui-zoomimage",
-    "version": "4.6.7",
+    "version": "4.6.8",
     "description": "Zoomable image view based on @nativescript-community/ui-image",
     "main": "./index",
     "sideEffects": false,
@@ -43,9 +43,9 @@
         "url": "https://github.com/nativescript-community/ui-image"
     },
     "dependencies": {
-        "@nativescript-community/ui-image": "^4.6.7"
+        "@nativescript-community/ui-image": "^4.6.8"
     },
     "license": "Apache-2.0",
     "readmeFilename": "README.md",
-    "gitHead": "e97c94836db13b09c15553f71ddac95f6d8a38f3"
+    "gitHead": "43d8df37c1564098f3c73acd8ab35df9245d0136"
 }
