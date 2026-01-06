@@ -18,6 +18,7 @@
         "com.facebook.imagepipeline.core:ImagePipeline",
         "com.facebook.imagepipeline.common:RotationOptions",
         "com.facebook.imagepipeline.common:ResizeOptions",
+        "com.facebook.imagepipeline.listener:RequestListener",
         "com.facebook.drawee.backends.pipeline:Fresco",
         "com.facebook.drawee.backends.pipeline:PipelineDraweeControllerBuilder",
         "com.facebook.drawee.backends.pipeline:PipelineDraweeController",
