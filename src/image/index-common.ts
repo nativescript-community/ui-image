@@ -134,6 +134,37 @@ export function wrapNativeException(ex, errorType = typeof ex) {
     return ex;
 }
 
+
+/**
+ * Options for prefetching images with transformations and request options
+ */
+export interface PrefetchOptions {
+    /** Custom headers for the request */
+    headers?: Record<string, string>;
+    /** Decode width for downsampling */
+    decodeWidth?: number;
+    /** Decode height for downsampling */
+    decodeHeight?: number;
+    /** Blur radius */
+    blurRadius?: number;
+    /** Blur downsampling factor (Android only) */
+    blurDownSampling?: number;
+    /** Round image as circle */
+    roundAsCircle?: boolean;
+    /** Tint color */
+    tintColor?: Color;
+    /** Round corner radius for top left */
+    roundTopLeftRadius?: number;
+    /** Round corner radius for top right */
+    roundTopRightRadius?: number;
+    /** Round corner radius for bottom left */
+    roundBottomLeftRadius?: number;
+    /** Round corner radius for bottom right */
+    roundBottomRightRadius?: number;
+    /** image rotation, iOS only */
+    imageRotation?: number;
+}
+
 export interface ImagePipelineConfigSetting {
     isDownsampleEnabled?: boolean;
     leakTracker?: any;
@@ -252,7 +283,7 @@ export const loadModeProperty = new Property<ImageBase, 'sync' | 'async'>({
 export const clipToBoundsProperty = new Property<ImageBase, boolean>({ name: 'clipToBounds', defaultValue: true, valueConverter: booleanConverter });
 export const animatedImageViewProperty = new Property<ImageBase, boolean>({ name: 'animatedImageView', defaultValue: false, valueConverter: booleanConverter });
 
-export const needRequestImage = function (target: any, propertyKey: string | Symbol, descriptor: PropertyDescriptor) {
+export const needRequestImage = function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
     descriptor.value = function (...args: any[]) {
         if (!this.mCanRequestImage) {
