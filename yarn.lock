@@ -3457,11 +3457,11 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@nativescript-community/ui-image-colorfilter@workspace:packages/image-colorfilter"
   dependencies:
-    "@nativescript-community/ui-image": "npm:^5.0.6"
+    "@nativescript-community/ui-image": "npm:^5.0.13"
   languageName: unknown
   linkType: soft
 
-"@nativescript-community/ui-image@npm:*, @nativescript-community/ui-image@npm:^5.0.6, @nativescript-community/ui-image@workspace:packages/image":
+"@nativescript-community/ui-image@npm:*, @nativescript-community/ui-image@npm:^5.0.13, @nativescript-community/ui-image@workspace:packages/image":
   version: 0.0.0-use.local
   resolution: "@nativescript-community/ui-image@workspace:packages/image"
   languageName: unknown
@@ -3471,7 +3471,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@nativescript-community/ui-zoomimage@workspace:packages/zoomimage"
   dependencies:
-    "@nativescript-community/ui-image": "npm:^5.0.6"
+    "@nativescript-community/ui-image": "npm:^5.0.13"
   languageName: unknown
   linkType: soft
 
