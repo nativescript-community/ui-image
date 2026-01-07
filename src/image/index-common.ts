@@ -134,7 +134,6 @@ export function wrapNativeException(ex, errorType = typeof ex) {
     return ex;
 }
 
-
 /**
  * Options for prefetching images with transformations and request options
  */
