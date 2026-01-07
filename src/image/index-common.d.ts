@@ -85,6 +85,37 @@ export declare function wrapNativeException(ex: any, errorType?: "string" | "num
 export interface ImagePipelineConfigSetting {
     usePersistentCacheKeyStore?: boolean;
     globalSignatureKey?: string;
+    memoryCacheSize?: number;
+    memoryCacheScreens?: number;
+}
+/**
+ * Options for prefetching images with transformations and request options
+ */
+export interface PrefetchOptions {
+    /** Custom headers for the request */
+    headers?: Record<string, string>;
+    /** Decode width for downsampling */
+    decodeWidth?: number;
+    /** Decode height for downsampling */
+    decodeHeight?: number;
+    /** Blur radius */
+    blurRadius?: number;
+    /** Blur downsampling factor (Android only) */
+    blurDownSampling?: number;
+    /** Round image as circle */
+    roundAsCircle?: boolean;
+    /** Tint color */
+    tintColor?: Color;
+    /** Round corner radius for top left */
+    roundTopLeftRadius?: number;
+    /** Round corner radius for top right */
+    roundTopRightRadius?: number;
+    /** Round corner radius for bottom left */
+    roundBottomLeftRadius?: number;
+    /** Round corner radius for bottom right */
+    roundBottomRightRadius?: number;
+    /** image rotation, iOS only */
+    imageRotation?: number;
 }
 export type Stretch = 'none' | 'fill' | 'aspectFill' | 'aspectFit';
 export declare const srcProperty: Property<ImageBase, string | ImageSource | ImageAsset>;
@@ -162,7 +193,7 @@ export declare abstract class ImageBase extends View {
     get nativeImageViewProtected(): any;
     mCanRequestImage: boolean;
     mNeedRequestImage: boolean;
-    protected abstract initImage(): any;
+    protected abstract initImage(): Promise<void>;
     onResumeNativeUpdates(): void;
     protected handleImageProgress(value: number, totalSize?: number): void;
     private static needsSizeAdjustment;

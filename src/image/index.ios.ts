@@ -17,6 +17,7 @@ import {
     ScaleType,
     SrcType,
     Stretch,
+    decodeWidthProperty,
     failureImageUriProperty,
     headersProperty,
     imageRotationProperty,
@@ -26,6 +27,7 @@ import {
     wrapNativeException
 } from './index-common';
 import { GetContextFromOptionsCallback } from '.';
+import { decodeHeightProperty } from '@nativescript/core/ui/image';
 
 export class ImageInfo implements ImageInfoBase {
     constructor(
@@ -166,16 +168,19 @@ export class ImagePipeline {
     private mIos: SDImageCache = SDImageCache.sharedImageCache;
     constructor() {}
 
-    getCacheKey(uri: string, options: Partial<Img>) {
-        const context = getContextFromOptions(options);
-        return SDWebImageManager.sharedManager.cacheKeyForURLContext(NSURL.URLWithString(uri), context);
+    getCacheKey(url: string, options: PrefetchOptions = {}) {
+        const uri = getUri(url);
+        const context = getContextFromOptions(options as any);
+        return SDWebImageManager.sharedManager.cacheKeyForURLContext(uri, context);
     }
 
-    isInDiskCache(key: string): boolean {
+    async isInDiskCache(url: string, options?: PrefetchOptions): Promise<boolean> {
+        const key = this.getCacheKey(url, options);
         return this.mIos.diskImageDataExistsWithKey(key);
     }
 
-    isInBitmapMemoryCache(key: string): boolean {
+    isInBitmapMemoryCache(url: string, options?: PrefetchOptions): boolean {
+        const key = this.getCacheKey(url, options);
         return this.mIos.imageFromMemoryCacheForKey(key) !== null;
     }
 
@@ -226,7 +231,7 @@ export class ImagePipeline {
         return this.prefetchToCacheType(uri, SDImageCacheType.Memory, options);
     }
 
-    private prefetchToCacheType(uri: string, cacheType: SDImageCacheType, options?: PrefetchOptions): Promise<void> {
+    private prefetchToCacheType(uri: string, cacheType: SDImageCacheType, options: PrefetchOptions = {}): Promise<void> {
         return new Promise((resolve, reject) => {
             const context = getContextFromOptions(options as any);
 
@@ -251,11 +256,9 @@ export const needRequestImage = function (target: any, propertyKey: string | sym
     descriptor.value = function (...args: any[]) {
         if (!this.mCanRequestImage) {
             this.mNeedRequestImage = true;
-            // we need to ensure a hierarchy is set or the default aspect ratio wont be set
-            // because aspectFit is the default (wanted) but then we wont go into stretchProperty.setNative
-            // this.mNeedUpdateHierarchy = true;
             return;
         }
+        this.initImage();
         return originalMethod.apply(this, args);
     };
 };
@@ -615,6 +618,7 @@ export class Img extends ImageBase {
                 }
 
                 this.mCacheKey = SDWebImageManager.sharedManager.cacheKeyForURLContext(uri, context);
+                console.log('loading image', uri, this.mCacheKey);
                 if (ImagePipeline.iosComplexCacheEviction) {
                     registerCacheKey(this.mCacheKey, uri);
                 }
@@ -640,13 +644,14 @@ export class Img extends ImageBase {
     [imageRotationProperty.setNative](value) {}
     @needRequestImage
     [placeholderImageUriProperty.setNative]() {}
-
+    @needRequestImage
+    [decodeWidthProperty.setNative]() {}
+    @needRequestImage
+    [decodeHeightProperty.setNative]() {}
     @needRequestImage
     [headersProperty.setNative](value) {}
-
-    [failureImageUriProperty.setNative]() {
-        // this.updateHierarchy();
-    }
+    @needRequestImage
+    [failureImageUriProperty.setNative]() {}
 
     [stretchProperty.setNative](value: Stretch) {
         if (!this.nativeView) {
