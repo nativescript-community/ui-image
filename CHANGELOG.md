@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.14](https://github.com/@nativescript-community/ui-image/compare/v5.0.13...v5.0.14) (2026-01-07)
+
+### Bug Fixes
+
+* **image:** ios fix for image not updating. Pipeline fixes ([052459a](https://github.com/@nativescript-community/ui-image/commit/052459adffb5d84c830c17d7f3b8f949687d1f7a))
+
 ## [5.0.13](https://github.com/@nativescript-community/ui-image/compare/v5.0.12...v5.0.13) (2025-12-26)
 
 **Note:** Version bump only for package ui-image
