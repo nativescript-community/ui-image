@@ -101,13 +101,15 @@
                 </StackLayout>
 
                 <Label text="Pipeline helpers" class="h3" />
-                <StackLayout orientation="horizontal">
+                <WrapLayout orientation="horizontal">
                     <Button text="Prefetch mem" @tap="onPrefetchMemory" />
                     <Button text="Prefetch disk" @tap="onPrefetchDisk" />
+                    <Button text="isInDiskCache" @tap="isInDiskCache" />
+                    <Button text="isInMemoryCache" @tap="isInMemoryCache" />
                     <Button text="Evict cache" @tap="onEvictFromCache" />
                     <Button text="Clear caches" @tap="onClearCaches" />
                     <Button text="Get cache key" @tap="onGetCacheKey" />
-                </StackLayout>
+                </WrapLayout>
 
                 <Label text="Event logs" class="h3" />
                 <StackLayout>
@@ -169,8 +171,9 @@ export default {
         };
     },
     methods: {
-        addLog(msg: string) {
-            this.logs.unshift(new Date().toLocaleTimeString() + ' - ' + msg);
+        addLog(...msgs) {
+            console.log(...msgs);
+            this.logs.unshift(new Date().toLocaleTimeString() + ' - ' + msgs.join(' '));
             if (this.logs.length > 100) {
                 this.logs.length = 100;
             }
@@ -244,7 +247,7 @@ export default {
                 view.startAnimating();
                 this.addLog('startAnimating');
             } catch (err) {
-                this.addLog('startAnimating error: ' + err);
+                this.addLog('startAnimating error: ' + err, err.stack);
             }
         },
         onStopAnimating() {
@@ -253,7 +256,7 @@ export default {
                 view.stopAnimating();
                 this.addLog('stopAnimating');
             } catch (err) {
-                this.addLog('stopAnimating error: ' + err);
+                this.addLog('stopAnimating error: ' + err, err.stack);
             }
         },
 
@@ -272,7 +275,7 @@ export default {
                 await getImagePipeline().prefetchToMemoryCache(this.currentSrc);
                 this.addLog('prefetchToMemoryCache success');
             } catch (err) {
-                this.addLog('prefetchToMemoryCache error: ' + err);
+                this.addLog('prefetchToMemoryCache error: ' + err, err.stack);
             }
         },
         async onPrefetchDisk() {
@@ -280,7 +283,27 @@ export default {
                 await getImagePipeline().prefetchToDiskCache(this.currentSrc);
                 this.addLog('prefetchToDiskCache success');
             } catch (err) {
-                this.addLog('prefetchToDiskCache error: ' + err);
+                this.addLog('prefetchToDiskCache error: ' + err, err.stack);
+            }
+        },
+        async isInDiskCache() {
+            try {
+                const v = await getImagePipeline().isInDiskCache(this.currentSrc);
+                this.addLog('isInDiskCache: ' + v);
+                this.result = 'isInDiskCache: ' + v;
+            } catch (err) {
+                this.addLog('isInDiskCache error: ' + err);
+                this.result = 'error: ' + err;
+            }
+        },
+        async isInMemoryCache() {
+            try {
+                const v = getImagePipeline().isInBitmapMemoryCache(this.currentSrc);
+                this.addLog('isInBitmapMemoryCache: ' + v);
+                this.result = 'isInBitmapMemoryCache: ' + v;
+            } catch (err) {
+                this.addLog('isInBitmapMemoryCache error: ' + err);
+                this.result = 'error: ' + err;
             }
         },
         async onEvictFromCache() {
@@ -288,7 +311,7 @@ export default {
                 await getImagePipeline().evictFromCache(this.currentSrc);
                 this.addLog('evictFromCache success');
             } catch (err) {
-                this.addLog('evictFromCache error: ' + err);
+                this.addLog('evictFromCache error: ' + err, err.stack);
             }
         },
         async onClearCaches() {
@@ -296,7 +319,7 @@ export default {
                 await getImagePipeline().clearCaches();
                 this.addLog('clearCaches success');
             } catch (err) {
-                this.addLog('clearCaches error: ' + err);
+                this.addLog('clearCaches error: ' + err, err.stack);
             }
         },
         async onGetCacheKey() {
@@ -304,7 +327,7 @@ export default {
                 const key = getImagePipeline().getCacheKey(this.currentSrc + '', this.$refs.mainImg.nativeView);
                 this.addLog('getCacheKey: ' + key);
             } catch (err) {
-                this.addLog('getCacheKey error: ' + (err && err.message ? err.message : err));
+                this.addLog('getCacheKey error: ' + err, err.stack);
             }
         },
 
@@ -315,7 +338,7 @@ export default {
                 const size = info ? `${info.getWidth()}x${info.getHeight()}` : 'unknown';
                 this.addLog('finalImageSet: ' + size + (e.source ? ' source:' + e.source : ''));
             } catch (err) {
-                this.addLog('finalImageSet: ' + JSON.stringify(e));
+                this.addLog('finalImageSet: '  + err, err.stack);
             }
         },
         onFailure(e: any) {
@@ -324,7 +347,7 @@ export default {
                 const msg = err && err.getMessage ? err.getMessage() : err;
                 this.addLog('failure: ' + msg);
             } catch (err) {
-                this.addLog('failure: ' + JSON.stringify(e));
+                this.addLog('failure: '  + err, err.stack);
             }
         },
         onProgress(e: any) {
@@ -335,7 +358,7 @@ export default {
                 const info = e.imageInfo;
                 this.addLog('intermediateImageSet ' + (info ? `${info.getWidth()}x${info.getHeight()}` : '?'));
             } catch (err) {
-                this.addLog('intermediateImageSet ' + JSON.stringify(e));
+                this.addLog('intermediateImageSet ' + err, err.stack);
             }
         },
         onIntermediateImageFailed(e: any) {

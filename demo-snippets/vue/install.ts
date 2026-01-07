@@ -3,7 +3,7 @@ import Vue from 'nativescript-vue';
 import { Trace } from '@nativescript/core';
 import ImageModule from '@nativescript-community/ui-image/vue';
 import ZoomImageModule from '@nativescript-community/ui-zoomimage/vue';
-import { getImagePipeline, initialize } from '@nativescript-community/ui-image';
+import { getImagePipeline, initialize, ImageViewTraceCategory } from '@nativescript-community/ui-image';
 import { installMixins } from '@nativescript-community/ui-image-colorfilter';
 
 import Simple from './Simple.vue';
@@ -23,8 +23,8 @@ import Failure from './Failure.vue';
 import NavigationTest from './NavigationTest.vue';
 import CrossFadeTest from './CrossFadeTest.vue';
 
-// Trace.addCategories('NativescriptImage');
-// Trace.enable();
+Trace.addCategories(ImageViewTraceCategory);
+Trace.enable();
 
 export function installPlugin() {
     installMixins();
