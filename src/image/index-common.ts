@@ -78,18 +78,54 @@ export const CLog = (type: CLogTypes, ...args) => {
 
 export type Transition = 'fade' | 'curlUp';
 
+/**
+ * Options for scaling the child bounds to the parent bounds
+ */
 export enum ScaleType {
     None = 'none',
+    /**
+     * Scales width and height independently, so that the child matches the parent exactly.
+     */
     Fill = 'fill',
+    /**
+     * Scales the child so that it fits entirely inside the parent.
+     */
     AspectFill = 'aspectFill',
+    /**
+     * Scales the child so that it fits entirely inside the parent.
+     */
     AspectFit = 'aspectFit',
+    /**
+     * Performs no scaling.
+     */
     Center = 'center',
+    /**
+     * Scales the child so that both dimensions will be greater than or equal to the corresponding dimension of the parent.
+     */
     CenterCrop = 'centerCrop',
+    /**
+     * Scales the child so that it fits entirely inside the parent.
+     */
     CenterInside = 'centerInside',
+    /**
+     * Scales the child so that it fits entirely inside the parent.
+     */
     FitCenter = 'fitCenter',
+    /**
+     * Scales the child so that it fits entirely inside the parent.
+     */
     FitEnd = 'fitEnd',
+    /**
+     * Scales the child so that it fits entirely inside the parent.
+     */
     FitStart = 'fitStart',
+    /**
+     * Scales width and height independently, so that the child matches the parent exactly.
+     */
     FitXY = 'fitXY',
+    /**
+     * Scales the child so that both dimensions will be greater than or equal to the corresponding dimension of the parent.
+     */
     FocusCrop = 'focusCrop'
 }
 
@@ -99,9 +135,25 @@ export interface AnimatedImage {
     isRunning(): boolean;
 }
 
+/**
+ * Encapsulates the common abstraction behind a platform specific object (typically a Bitmap) quality.
+ */
+export interface QualityInfo {
+    getQuality(): number;
+
+    isOfFullQuality(): boolean;
+
+    isOfGoodEnoughQuality(): boolean;
+}
+
+/**
+ * Encapsulates the common abstraction behind a platform specific object (typically a Bitmap's quality) details.
+ */
 export interface ImageInfo {
     getHeight(): number;
     getWidth(): number;
+
+    getQualityInfo(): QualityInfo; // Android Only
 }
 
 export interface ImageError {
@@ -166,8 +218,8 @@ export interface PrefetchOptions {
 
 export interface ImagePipelineConfigSetting {
     isDownsampleEnabled?: boolean;
-    leakTracker?: any;
-    useOkhttp?: boolean;
+    leakTracker?: any; // Android only
+    useOkhttp?: boolean; // Android only
     onInitialize?: Function;
 }
 

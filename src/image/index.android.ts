@@ -11,6 +11,7 @@ import {
     ImageError as ImageErrorBase,
     ImageInfo as ImageInfoBase,
     ImagePipelineConfigSetting,
+    QualityInfo,
     ScaleType,
     SrcType,
     aspectRatioProperty,
@@ -306,14 +307,6 @@ export class ImageError implements ImageErrorBase {
     toString(): string {
         return this._stringValue;
     }
-}
-
-export interface QualityInfo {
-    getQuality();
-
-    isOfFullQuality();
-
-    isOfGoodEnoughQuality();
 }
 
 export class ImageInfo implements ImageInfoBase {
