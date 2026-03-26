@@ -394,4 +394,4 @@ export class ImagePipeline {
 
 export type GetContextFromOptionsCallback = (context: NSDictionary<string, any>, transformers: any[], options: Partial<Img>) => void;
 
-declare function registerPluginGetContextFromOptions(callback: GetContextFromOptionsCallback); // iOS only for plugins
+export function registerPluginGetContextFromOptions(callback: GetContextFromOptionsCallback); // iOS only for plugins
