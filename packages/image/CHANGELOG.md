@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.6.10](https://github.com/nativescript-community/ui-image/compare/v4.6.9...v4.6.10) (2026-03-26)
+
+**Note:** Version bump only for package @nativescript-community/ui-image
+
 ## [4.6.9](https://github.com/nativescript-community/ui-image/compare/v4.6.8...v4.6.9) (2026-03-25)
 
 ### Bug Fixes
