@@ -168,6 +168,7 @@ export interface ImagePipelineConfigSetting {
     isDownsampleEnabled?: boolean;
     leakTracker?: any;
     useOkhttp?: boolean;
+    onInitialize?: Function;
 }
 
 export class EventData implements IEventData {

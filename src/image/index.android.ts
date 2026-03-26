@@ -69,7 +69,9 @@ export function initialize(config?: ImagePipelineConfigSetting): void {
         if (config?.leakTracker) {
             builder.setCloseableReferenceLeakTracker(config.leakTracker);
         }
-
+        if (config.onInitialize) {
+            config.onInitialize(builder, config);
+        }
         // builder.experiment().setNativeCodeDisabled(true);
         const imagePipelineConfig = builder.build();
         com.facebook.drawee.backends.pipeline.Fresco.initialize(context, imagePipelineConfig);

@@ -106,7 +106,11 @@ function getUIImageScaleType(scaleType: string) {
 }
 
 export function initialize(config?: ImagePipelineConfigSetting): void {
-    SDImageLoadersManager.sharedManager.loaders = NSArray.arrayWithArray([SDWebImageDownloader.sharedDownloader, SDImagePhotosLoader.sharedLoader]);
+    const loaders = [SDWebImageDownloader.sharedDownloader, SDImagePhotosLoader.sharedLoader];
+    if (config.onInitialize) {
+        config.onInitialize(SDImageLoadersManager.sharedManager, loaders, config);
+    }
+    SDImageLoadersManager.sharedManager.loaders = NSArray.arrayWithArray(loaders);
 }
 export function shutDown(): void {}
 
