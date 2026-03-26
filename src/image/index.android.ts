@@ -55,8 +55,8 @@ export function initialize(config?: ImagePipelineConfigSetting): void {
             //@ts-ignore
             let client: okhttp3.OkHttpClient;
             //@ts-ignore
-            if (useOkhttp instanceof okhttp3.OkHttpClient) {
-                client = useOkhttp;
+            if (config?.useOkhttp instanceof okhttp3.OkHttpClient) {
+                client = config?.useOkhttp;
             } else {
                 //@ts-ignore
                 client = new okhttp3.OkHttpClient();
@@ -1105,7 +1105,8 @@ class GenericDraweeHierarchyBuilder {
             drawable.setColor(android.graphics.Color.parseColor(color));
         }
 
-        this.nativeBuilder.setProgressBarImage(drawable, getScaleType(stretch));
+        this.nativeBuilder.setProgressBarImage(drawable);
+        this.nativeBuilder.setProgressBarImageScaleType(getScaleType(stretch) as com.facebook.drawee.drawable.ScalingUtils.ScaleType);
 
         return this;
     }
