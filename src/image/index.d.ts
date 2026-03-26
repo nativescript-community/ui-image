@@ -1,3 +1,4 @@
+import { ImageInfo, ImagePipelineConfigSetting } from './index-common';
 import { ImageAsset, ImageSource, View } from '@nativescript/core';
 
 export * from './index-common';
