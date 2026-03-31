@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.6.12](https://github.com/nativescript-community/ui-image/compare/v4.6.11...v4.6.12) (2026-03-26)
+
+**Note:** Version bump only for package @nativescript-community/ui-zoomimage
+
+## [4.6.11](https://github.com/nativescript-community/ui-image/compare/v4.6.10...v4.6.11) (2026-03-26)
+
+**Note:** Version bump only for package @nativescript-community/ui-zoomimage
+
+## [4.6.10](https://github.com/nativescript-community/ui-image/compare/v4.6.9...v4.6.10) (2026-03-26)
+
+**Note:** Version bump only for package @nativescript-community/ui-zoomimage
+
+## [4.6.9](https://github.com/nativescript-community/ui-image/compare/v4.6.8...v4.6.9) (2026-03-25)
+
+**Note:** Version bump only for package @nativescript-community/ui-zoomimage
+
 ## [4.6.8](https://github.com/nativescript-community/ui-image/compare/v4.6.7...v4.6.8) (2026-01-06)
 
 **Note:** Version bump only for package @nativescript-community/ui-zoomimage

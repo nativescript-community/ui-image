@@ -11,6 +11,7 @@ import {
     ImageError as ImageErrorBase,
     ImageInfo as ImageInfoBase,
     ImagePipelineConfigSetting,
+    QualityInfo,
     ScaleType,
     SrcType,
     aspectRatioProperty,
@@ -54,8 +55,8 @@ export function initialize(config?: ImagePipelineConfigSetting): void {
             //@ts-ignore
             let client: okhttp3.OkHttpClient;
             //@ts-ignore
-            if (useOkhttp instanceof okhttp3.OkHttpClient) {
-                client = useOkhttp;
+            if (config?.useOkhttp instanceof okhttp3.OkHttpClient) {
+                client = config?.useOkhttp;
             } else {
                 //@ts-ignore
                 client = new okhttp3.OkHttpClient();
@@ -69,7 +70,9 @@ export function initialize(config?: ImagePipelineConfigSetting): void {
         if (config?.leakTracker) {
             builder.setCloseableReferenceLeakTracker(config.leakTracker);
         }
-
+        if (config.onInitialize) {
+            config.onInitialize(builder, config);
+        }
         // builder.experiment().setNativeCodeDisabled(true);
         const imagePipelineConfig = builder.build();
         com.facebook.drawee.backends.pipeline.Fresco.initialize(context, imagePipelineConfig);
@@ -306,14 +309,6 @@ export class ImageError implements ImageErrorBase {
     }
 }
 
-export interface QualityInfo {
-    getQuality();
-
-    isOfFullQuality();
-
-    isOfGoodEnoughQuality();
-}
-
 export class ImageInfo implements ImageInfoBase {
     private _nativeImageInfo: com.facebook.imagepipeline.image.ImageInfo;
 
@@ -370,9 +365,9 @@ export class IntermediateEventData extends EventData {
     }
 }
 
-export const needUpdateHierarchy = function (targetOrNeedsLayout: any, propertyKey?: string | Symbol, descriptor?: PropertyDescriptor): any {
+export const needUpdateHierarchy = function (targetOrNeedsLayout: any, propertyKey?: string | symbol, descriptor?: PropertyDescriptor): any {
     if (typeof targetOrNeedsLayout === 'boolean') {
-        return function (target2: any, propertyKey: string | Symbol, descriptor: PropertyDescriptor) {
+        return function (target2: any, propertyKey: string | symbol, descriptor: PropertyDescriptor) {
             const originalMethod = descriptor.value;
             descriptor.value = function (...args: any[]) {
                 if (!this.mCanUpdateHierarchy) {
@@ -574,9 +569,12 @@ export class Img extends ImageBase {
         this.initImage();
     }
 
-    @needRequestImage
-    [aspectRatioProperty.setNative]() {
-        this.initImage();
+    [aspectRatioProperty.setNative](value) {
+        if (value) {
+            this.nativeViewProtected.setAspectRatio(value);
+        } else {
+            this.nativeViewProtected.setAspectRatio(0);
+        }
     }
 
     @needRequestImage
@@ -773,37 +771,37 @@ export class Img extends ImageBase {
                 }
                 if (!this.requestListener && this.hasListeners(ImageBase.fetchingFromEvent)) {
                     const that: WeakRef<Img> = new WeakRef(this);
-                    this.requestListener =  new com.facebook.imagepipeline.listener.RequestListener({
-                        onRequestStart(request, callerContext, requestId, isPrefetch) {
-                            
-                        },
+                    this.requestListener = new com.facebook.imagepipeline.listener.RequestListener({
+                        onRequestStart(request, callerContext, requestId, isPrefetch) {},
                         onRequestSuccess(param0: com.facebook.imagepipeline.request.ImageRequest, param1: string, param2: boolean) {},
                         onRequestFailure(param0: com.facebook.imagepipeline.request.ImageRequest, param1: string, param2: java.lang.Throwable, param3: boolean) {},
                         onRequestCancellation(param0: string) {},
                         onProducerStart(param0: string, param1: string) {},
                         onProducerEvent(param0: string, param1: string, param2: string) {},
-                        onProducerFinishWithSuccess(requestId: string, producerName: string, extraMap: java.util.Map<string,string>) {
+                        onProducerFinishWithSuccess(requestId: string, producerName: string, extraMap: java.util.Map<string, string>) {
                             const owner = that?.get();
                             const eventName = ImageBase.fetchingFromEvent;
-                           
+
                             if (owner?.hasListeners(eventName)) {
-                                 let source = 'local';
+                                let source = 'local';
                                 if (producerName.indexOf('Network') !== -1) {
-                                    source = 'network'
+                                    source = 'network';
                                 } else if (producerName.indexOf('Cache') !== -1) {
-                                    source = 'cache'
-                                }  
+                                    source = 'cache';
+                                }
                                 owner.notify({
                                     eventName,
                                     source
                                 });
                             }
                         },
-                        onProducerFinishWithFailure(param0: string, param1: string, param2: java.lang.Throwable, param3: java.util.Map<string,string>) {},
-                        onProducerFinishWithCancellation(param0: string, param1: string, param2: java.util.Map<string,string>) {},
+                        onProducerFinishWithFailure(param0: string, param1: string, param2: java.lang.Throwable, param3: java.util.Map<string, string>) {},
+                        onProducerFinishWithCancellation(param0: string, param1: string, param2: java.util.Map<string, string>) {},
                         onUltimateProducerReached(param0: string, param1: string, param2: boolean) {},
-                        requiresExtraMap(param0: string) { return false},
-                    })
+                        requiresExtraMap(param0: string) {
+                            return false;
+                        }
+                    });
                 }
                 const options = JSON.stringify({
                     progressiveRenderingEnabled: this.blurRadius,
@@ -1107,7 +1105,8 @@ class GenericDraweeHierarchyBuilder {
             drawable.setColor(android.graphics.Color.parseColor(color));
         }
 
-        this.nativeBuilder.setProgressBarImage(drawable, getScaleType(stretch));
+        this.nativeBuilder.setProgressBarImage(drawable);
+        this.nativeBuilder.setProgressBarImageScaleType(getScaleType(stretch) as com.facebook.drawee.drawable.ScalingUtils.ScaleType);
 
         return this;
     }

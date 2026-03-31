@@ -1,22 +1,25 @@
+import { ImageInfo, ImagePipelineConfigSetting } from './index-common';
 import { ImageAsset, ImageSource, View } from '@nativescript/core';
+
+export * from './index-common';
 
 /**
  * When called, initializes the android Image library. Calling this method is required.
  * A good place to call it is at the application onLaunch() method.
  */
-declare function initialize(config?: ImagePipelineConfigSetting): void;
+export function initialize(config?: ImagePipelineConfigSetting): void;
 
 /**
  * Shuts the native Image and SimpleDraweeView down. By design this method should not be called manually as it is handled by the Image library internally.
  * NOTE: Be careful when manuallycalling this method as it will completely shutdown the functionality of Image.
  */
-declare function shutDown(): void;
+export function shutDown(): void;
 
 /**
  * When called, initializes the android Image library. Calling this method is required.
  * A good place to call it is at the application onLaunch() method.
  */
-declare function getImagePipeline(): ImagePipeline;
+export function getImagePipeline(): ImagePipeline;
 
 /**
  * Encapsulates the common abstraction behind a platform specific object (typically a Bitmap) that is used view to show remote or local images.
@@ -218,28 +221,6 @@ export class Img extends View {
 }
 
 /**
- * Encapsulates the common abstraction behind a platform specific object (typically a Bitmap) quality.
- */
-export interface QualityInfo {
-    getQuality(): number;
-
-    isOfFullQuality(): boolean;
-
-    isOfGoodEnoughQuality(): boolean;
-}
-
-/**
- * Encapsulates the common abstraction behind a platform specific object (typically a Bitmap's quality) details.
- */
-export class ImageInfo {
-    getHeight(): number;
-
-    getWidth(): number;
-
-    getQualityInfo(): QualityInfo;
-}
-
-/**
  * Interface of the common abstraction behind a platform specific error object that is used by the Image's events.
  */
 export interface ImageError {
@@ -412,55 +393,6 @@ export class ImagePipeline {
     prefetchToMemoryCache(uri: string): Promise<void>;
 }
 
-/**
- * Options for scaling the child bounds to the parent bounds
- */
-export enum ScaleType {
-    /**
-     * Performs no scaling.
-     */
-    center,
-    /**
-     * Scales the child so that both dimensions will be greater than or equal to the corresponding dimension of the parent.
-     */
-    centerCrop,
-    /**
-     * Scales the child so that it fits entirely inside the parent.
-     */
-    centerInside,
-    /**
-     * Scales the child so that it fits entirely inside the parent.
-     */
-    fitCenter,
-    /**
-     * Scales the child so that it fits entirely inside the parent.
-     */
-    fitEnd,
-    /**
-     * Scales the child so that it fits entirely inside the parent.
-     */
-    fitStart,
-    /**
-     * Scales width and height independently, so that the child matches the parent exactly.
-     */
-    fitXY,
-    /**
-     * Scales the child so that both dimensions will be greater than or equal to the corresponding dimension of the parent.
-     */
-    focusCrop
-}
-
-/**
- * Advanced Configurations used for initializing Image
- * For more details, see http://frescolib.org/docs/configure-image-pipeline.html
- */
-export interface ImagePipelineConfigSetting {
-    isDownsampleEnabled?: boolean;
-    leakTracker?: any; // Android only
-    useOkhttp?: boolean; // Android only
-}
-export const ImageViewTraceCategory;
-
 export type GetContextFromOptionsCallback = (context: NSDictionary<string, any>, transformers: any[], options: Partial<Img>) => void;
 
-declare function registerPluginGetContextFromOptions(callback: GetContextFromOptionsCallback); // iOS only for plugins
+export function registerPluginGetContextFromOptions(callback: GetContextFromOptionsCallback); // iOS only for plugins

@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.6.12](https://github.com/@nativescript-community/ui-image/compare/v4.6.11...v4.6.12) (2026-03-26)
+
+### Bug Fixes
+
+* more typings... ([af8d0c6](https://github.com/@nativescript-community/ui-image/commit/af8d0c6412181ec2b743aeef2e4a236034adbf9c))
+
+## [4.6.11](https://github.com/@nativescript-community/ui-image/compare/v4.6.10...v4.6.11) (2026-03-26)
+
+### Bug Fixes
+
+* typings ([02d7042](https://github.com/@nativescript-community/ui-image/commit/02d7042154479abfe7dcac802b435091147b965f))
+
+## [4.6.10](https://github.com/@nativescript-community/ui-image/compare/v4.6.9...v4.6.10) (2026-03-26)
+
+### Features
+
+* `initialize` new param `onInitialize` for very custom native hadnling ([c0ec38c](https://github.com/@nativescript-community/ui-image/commit/c0ec38ccb8a785fdc5b155079b44a890ee2fca8b))
+
+## [4.6.9](https://github.com/@nativescript-community/ui-image/compare/v4.6.8...v4.6.9) (2026-03-25)
+
+### Bug Fixes
+
+* **image:** android aspectRatio works even if no image set. It aspect ratio the view if width/height is defined ([6a28000](https://github.com/@nativescript-community/ui-image/commit/6a280005b0c5a100883fb711bdc636a6070abe1f))
+* **image:** ios fix for image not updating. Pipeline fixes ([d733709](https://github.com/@nativescript-community/ui-image/commit/d73370943b8aec3f1a288839eb57f69ca80a604d))
+
 ## [4.6.8](https://github.com/@nativescript-community/ui-image/compare/v4.6.7...v4.6.8) (2026-01-06)
 
 **Note:** Version bump only for package ui-image
