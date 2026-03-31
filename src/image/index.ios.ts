@@ -584,7 +584,6 @@ export class Img extends ImageBase {
                 }
 
                 this.mCacheKey = SDWebImageManager.sharedManager.cacheKeyForURLContext(uri, context);
-                console.log('loading image', uri, this.mCacheKey);
                 if (ImagePipeline.iosComplexCacheEviction) {
                     registerCacheKey(this.mCacheKey, uri);
                 }
