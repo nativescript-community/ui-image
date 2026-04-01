@@ -42,7 +42,7 @@ import { FailureEventData } from '@nativescript-community/ui-image';
 
 let initialized = false;
 let initializeConfig: ImagePipelineConfigSetting;
-export function initialize(config?: ImagePipelineConfigSetting): void {
+export function initialize(config: ImagePipelineConfigSetting = {}): void {
     if (!initialized) {
         const context = Utils.android.getApplicationContext();
         if (!context) {
@@ -70,7 +70,7 @@ export function initialize(config?: ImagePipelineConfigSetting): void {
         if (config?.leakTracker) {
             builder.setCloseableReferenceLeakTracker(config.leakTracker);
         }
-        if (config.onInitialize) {
+        if (config?.onInitialize) {
             config.onInitialize(builder, config);
         }
         // builder.experiment().setNativeCodeDisabled(true);
