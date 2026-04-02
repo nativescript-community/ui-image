@@ -56,30 +56,6 @@ const supportedLocalFormats = ['png', 'jpg', 'gif', 'jpeg', 'webp'];
 
 let screenScale = -1;
 
-function getScaleType(scaleType: string) {
-    if (isString(scaleType)) {
-        switch (scaleType) {
-            case ScaleType.Center:
-            case ScaleType.CenterCrop:
-            case ScaleType.AspectFill:
-                return SDImageScaleMode.AspectFill;
-            case ScaleType.CenterInside:
-            case ScaleType.FitCenter:
-            case ScaleType.FitEnd:
-            case ScaleType.FitStart:
-            case ScaleType.AspectFit:
-                return SDImageScaleMode.AspectFit;
-            case ScaleType.FitXY:
-            case ScaleType.FocusCrop:
-            case ScaleType.Fill:
-                return SDImageScaleMode.Fill;
-            default:
-                break;
-        }
-    }
-    return null;
-}
-
 function getUIImageScaleType(scaleType: string) {
     if (isString(scaleType)) {
         switch (scaleType) {
@@ -109,7 +85,7 @@ function getUIImageScaleType(scaleType: string) {
     return null;
 }
 
-export function initialize(config?: ImagePipelineConfigSetting): void {
+export function initialize(config: ImagePipelineConfigSetting = {}): void {
     const loaders = [SDWebImageDownloader.sharedDownloader, SDImagePhotosLoader.sharedLoader];
     if (config.onInitialize) {
         config.onInitialize(SDImageLoadersManager.sharedManager, loaders, config);

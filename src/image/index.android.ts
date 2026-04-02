@@ -50,13 +50,13 @@ export function initialize(config: ImagePipelineConfigSetting = {}): void {
             return;
         }
         let builder: com.facebook.imagepipeline.core.ImagePipelineConfig.Builder;
-        const useOkhttp = config?.useOkhttp !== false;
+        const useOkhttp = config.useOkhttp !== false;
         if (useOkhttp) {
             //@ts-ignore
             let client: okhttp3.OkHttpClient;
             //@ts-ignore
-            if (config?.useOkhttp instanceof okhttp3.OkHttpClient) {
-                client = config?.useOkhttp;
+            if (config.useOkhttp instanceof okhttp3.OkHttpClient) {
+                client = config.useOkhttp;
             } else {
                 //@ts-ignore
                 client = new okhttp3.OkHttpClient();
@@ -66,11 +66,11 @@ export function initialize(config: ImagePipelineConfigSetting = {}): void {
         } else {
             builder = com.facebook.imagepipeline.core.ImagePipelineConfig.newBuilder(context);
         }
-        builder.setDownsampleEnabled(config?.isDownsampleEnabled === true);
-        if (config?.leakTracker) {
+        builder.setDownsampleEnabled(config.isDownsampleEnabled === true);
+        if (config.leakTracker) {
             builder.setCloseableReferenceLeakTracker(config.leakTracker);
         }
-        if (config?.onInitialize) {
+        if (config.onInitialize) {
             config.onInitialize(builder, config);
         }
         // builder.experiment().setNativeCodeDisabled(true);
