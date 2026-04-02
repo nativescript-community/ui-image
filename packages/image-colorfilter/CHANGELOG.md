@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.6.13](https://github.com/nativescript-community/ui-image/compare/v4.6.12...v4.6.13) (2026-04-02)
+
+**Note:** Version bump only for package @nativescript-community/ui-image-colorfilter
+
 ## [4.6.12](https://github.com/nativescript-community/ui-image/compare/v4.6.11...v4.6.12) (2026-03-26)
 
 **Note:** Version bump only for package @nativescript-community/ui-image-colorfilter

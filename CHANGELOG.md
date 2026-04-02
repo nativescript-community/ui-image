@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.6.13](https://github.com/@nativescript-community/ui-image/compare/v4.6.12...v4.6.13) (2026-04-02)
+
+### Bug Fixes
+
+* **ui-image:** android fix for custom okhttp3 client ([959fc5c](https://github.com/@nativescript-community/ui-image/commit/959fc5cf20aeb63d31e79ceb6256452ede1ab6f7))
+* **ui-image:** android initialize fix ([a6b6809](https://github.com/@nativescript-community/ui-image/commit/a6b680906e03aaf4ff3b9ad82725fd536eb9284a))
+
 ## [4.6.12](https://github.com/@nativescript-community/ui-image/compare/v4.6.11...v4.6.12) (2026-03-26)
 
 ### Bug Fixes
