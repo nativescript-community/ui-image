@@ -1,4 +1,4 @@
-import { Color, CoreTypes, Length, Property, Trace, View, booleanConverter } from '@nativescript/core';
+import { CSSType, Color, CoreTypes, Length, Property, Trace, View, booleanConverter } from '@nativescript/core';
 import { EventData as IEventData } from '@nativescript/core/data/observable';
 // import { colorConverter } from '@nativescript/core/ui/styling/style-properties';
 import { ImageAsset } from '@nativescript/core/image-asset';
@@ -348,6 +348,7 @@ export const needRequestImage = function (target: any, propertyKey: string | sym
 
 export type BasicSrcType = string | ImageSource | ImageAsset;
 export type SrcType = BasicSrcType | (() => BasicSrcType | PromiseLike<BasicSrcType>) | PromiseLike<BasicSrcType>;
+@CSSType('Img')
 export abstract class ImageBase extends View {
     public static finalImageSetEvent: string = 'finalImageSet';
     public static failureEvent: string = 'failure';

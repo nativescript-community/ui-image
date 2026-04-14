@@ -4,6 +4,9 @@
 declare namespace com {
     export namespace nativescript {
         export namespace image {
+            class DrawableUtils {
+                static tryLoadExternalDrawable(context: globalAndroid.content.Context, uri: globalAndroid.net.Uri)
+            }
             class DraweeView extends facebook.drawee.view.SimpleDraweeView {
                 noRatioEnforce: boolean;
                 imageWidth: number;

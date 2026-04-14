@@ -150,7 +150,6 @@ function getBitmapFromVectorDrawable(context: android.content.Context, drawableI
     const canvas = new android.graphics.Canvas(bitmap);
     drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
     drawable.draw(canvas);
-    console.log('getBitmapFromVectorDrawable', bitmap, bitmap.getWidth(), bitmap.getHeight);
 
     return new android.graphics.drawable.BitmapDrawable(context.getResources(), bitmap);
 }
@@ -627,13 +626,9 @@ export class Img extends ImageBase {
                 let drawable: android.graphics.drawable.Drawable;
                 if (typeof src === 'string') {
                     // disabled for now: loading vector drawables
-                    // if (src.indexOf(Utils.RESOURCE_PREFIX) === 0) {
-                    //     const identifier = Utils.android.resources.getDrawableId(src.substring(Utils.RESOURCE_PREFIX.length));
-                    //     if (identifier >= 0 && isVectorDrawable(this._context, identifier)) {
-                    //         drawable = getBitmapFromVectorDrawable(this._context, identifier);
-                    //     }
-                    // } else
-                    if (Utils.isFontIconURI(src)) {
+                    if (src.startsWith('android.resource://')) {
+                        drawable = com.nativescript.image.DrawableUtils.tryLoadExternalDrawable(Utils.android.getApplicationContext(), android.net.Uri.parse(src));
+                    } else if (Utils.isFontIconURI(src)) {
                         const fontIconCode = src.split('//')[1];
                         if (fontIconCode !== undefined) {
                             // support sync mode only
@@ -650,6 +645,10 @@ export class Img extends ImageBase {
                     this.updateViewSize(src.android);
                 }
                 if (drawable) {
+                    // this.updateViewSize(drawable);
+                    if (drawable instanceof android.graphics.drawable.BitmapDrawable) {
+                        this.updateViewSize(drawable.getBitmap());
+                    }
                     const hierarchy: com.facebook.drawee.generic.GenericDraweeHierarchy = this.nativeImageViewProtected.getHierarchy();
                     hierarchy.setImage(drawable, 1, hierarchy.getFadeDuration() === 0);
                     return;
@@ -865,6 +864,12 @@ export class Img extends ImageBase {
     }
 
     protected async initImage() {
+        // we need hierarchy first for local drawables
+        if (this.mNeedUpdateHierarchy) {
+            this.mNeedUpdateHierarchy = false;
+            this.mCanUpdateHierarchy = true;
+            this.updateHierarchy();
+        }
         // this.nativeImageViewProtected.setImageURI(null);
         this.handleImageSrc(this.src);
     }
