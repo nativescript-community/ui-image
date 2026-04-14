@@ -642,7 +642,6 @@ export class Img extends ImageBase {
                     }
                 } else if (src instanceof ImageSource) {
                     drawable = new android.graphics.drawable.BitmapDrawable(Utils.android.getApplicationContext().getResources(), src.android as android.graphics.Bitmap);
-                    this.updateViewSize(src.android);
                 }
                 if (drawable) {
                     // this.updateViewSize(drawable);

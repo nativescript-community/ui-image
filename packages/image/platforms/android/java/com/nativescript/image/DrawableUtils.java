@@ -29,7 +29,7 @@ public class DrawableUtils {
             int resId = remoteCtx.getResources().getIdentifier(name, type, pkg);
             if (resId == 0) return null;
 
-            return remoteCtx.getDrawable(resId);
+            return androidx.core.content.ContextCompat.getDrawable(remoteCtx, resId);
 
         } catch (Exception e) {
             Log.w("DraweeView", "External load failed: " + uri, e);
