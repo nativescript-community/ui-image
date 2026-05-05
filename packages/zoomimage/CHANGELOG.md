@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.6.15](https://github.com/nativescript-community/ui-image/compare/v4.6.14...v4.6.15) (2026-05-05)
+
+### Bug Fixes
+
+* **ui-zoomimage:** android fix for when using ImageSource ([f36d082](https://github.com/nativescript-community/ui-image/commit/f36d082e5761f1062d07c3925bab1a3c91d739e7))
+* **ui-zoomimage:** transform event to get native CGAffineTransform and Matrix ([b0706d0](https://github.com/nativescript-community/ui-image/commit/b0706d0b1f15e489e258ef7857dfa3fab3a3e298))
+
 ## [4.6.14](https://github.com/nativescript-community/ui-image/compare/v4.6.13...v4.6.14) (2026-04-14)
 
 **Note:** Version bump only for package @nativescript-community/ui-zoomimage
