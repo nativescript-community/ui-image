@@ -12,6 +12,7 @@ import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Animatable;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
@@ -26,6 +27,9 @@ import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 import com.facebook.drawee.generic.GenericDraweeHierarchyInflater;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.nativescript.image.DraweeView;
+import java.util.List;
+import java.util.ArrayList;
+import android.util.Log;
 
 /**
  * DraweeView that has zoomable capabilities.
@@ -361,7 +365,22 @@ public class ZoomableDraweeView extends DraweeView
     mZoomableController.setEnabled(false);
   }
 
+  public interface TransformListener {
+    void onTransformChanged(Matrix transform);
+  }
+  private final List<TransformListener> mListeners = new ArrayList<>();
+  public synchronized void addTransformListener(TransformListener listener) {
+    mListeners.add(listener);
+  }
+
+  public synchronized void removeTransformListener(TransformListener listener) {
+    mListeners.remove(listener);
+  }
+
   protected void onTransformChanged(Matrix transform) {
+    for (TransformListener listener : mListeners) {
+      listener.onTransformChanged(transform);
+    }
     maybeSetHugeImageController();
     invalidate();
   }
@@ -387,4 +406,10 @@ public class ZoomableDraweeView extends DraweeView
     // this is to try and support setting image without controller
     ensureZoomableControls();
   }
+
+  @Override
+  public void setDrawable(Drawable drawable) {
+      super.setDrawable(drawable);
+      ensureZoomableControls();
+    }
 }
