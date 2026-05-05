@@ -648,8 +648,7 @@ export class Img extends ImageBase {
                     if (drawable instanceof android.graphics.drawable.BitmapDrawable) {
                         this.updateViewSize(drawable.getBitmap());
                     }
-                    const hierarchy: com.facebook.drawee.generic.GenericDraweeHierarchy = this.nativeImageViewProtected.getHierarchy();
-                    hierarchy.setImage(drawable, 1, hierarchy.getFadeDuration() === 0);
+                    this.nativeImageViewProtected.setDrawable(drawable);
                     return;
                 }
                 const uri = getUri(src as string) as android.net.Uri;

@@ -12,6 +12,7 @@ declare namespace com {
                 imageWidth: number;
                 imageHeight: number;
                 setUri(uri: globalAndroid.net.Uri, options: string, listener: facebook.drawee.controller.ControllerListener, requestListener: com.facebook.imagepipeline.listener.RequestListener);
+                setDrawable(drawable: globalAndroid.graphics.drawable.Drawable);
             }
             class ScalingBlurPostprocessor extends facebook.imagepipeline.request.BasePostprocessor {
                 public constructor(iterations: number, blurRadius: number, scaleRatio: number);

@@ -375,5 +375,10 @@ public class DraweeView extends SimpleDraweeView {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
           updateOutlineProvider();
-  }
+    }
+
+    public void setDrawable(Drawable drawable) {
+        GenericDraweeHierarchy hierarchy = this.getHierarchy();
+        hierarchy.setImage(drawable, 1, hierarchy.getFadeDuration() == 0);
+    }
 }
