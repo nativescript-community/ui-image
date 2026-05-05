@@ -18,6 +18,56 @@ export class ZoomImg extends ZoomImageBase {
         return this.nativeViewProtected?.getZoomableController() as com.facebook.samples.zoomable.DefaultZoomableController;
     }
 
+    disposeNativeView(): void {
+        super.disposeNativeView();
+        this.detachTransformListenerIfNecessary(true);
+    }
+    initNativeView(): void {
+        super.initNativeView();
+        this.attachTransformListenerIfNecessary();
+    }
+
+    private _transformChangeCount = 0;
+    private _nTransformListener: com.facebook.samples.zoomable.ZoomableDraweeView.TransformListener;
+    public addEventListener(arg: string, callback: any, thisArg?: any) {
+        super.addEventListener(arg, callback, thisArg);
+        if (arg === ZoomImageBase.transformEvent) {
+            this._transformChangeCount++;
+            this.attachTransformListenerIfNecessary();
+        }
+    }
+
+    public removeEventListener(arg: string, callback: any, thisArg?: any) {
+        super.removeEventListener(arg, callback, thisArg);
+
+        if (arg === ZoomImageBase.transformEvent) {
+            this._transformChangeCount--;
+            this.detachTransformListenerIfNecessary();
+        }
+    }
+
+    attachTransformListenerIfNecessary() {
+        const nativeView = this.nativeViewProtected;
+        if (this._transformChangeCount > 0 && nativeView && !this._nTransformListener) {
+            this._nTransformListener = new com.facebook.samples.zoomable.ZoomableDraweeView.TransformListener({
+                onTransformChanged: this.onTransformChanged.bind(this)
+            });
+            nativeView.addTransformListener(this._nTransformListener);
+        }
+    }
+    onTransformChanged(matrix: android.graphics.Matrix) {
+        this.notify({ eventName: ZoomImageBase.transformEvent, android: matrix });
+    }
+    detachTransformListenerIfNecessary(force = false) {
+        const nativeView = this.nativeViewProtected;
+        if (force || (this._transformChangeCount === 0 && nativeView)) {
+            if (this._nTransformListener) {
+                this.nativeView.removeTransformListener(this._nTransformListener);
+                this._nTransformListener = null;
+            }
+        }
+    }
+
     updateImageUri() {
         // this prevents the controller from reseting the current transform
         this.getController().ignoreNextResetUntilEnabled = true;

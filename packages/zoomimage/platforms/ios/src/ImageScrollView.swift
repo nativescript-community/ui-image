@@ -49,6 +49,27 @@ open class ImageScrollView: UIScrollView {
         zoomView!.addGestureRecognizer(tapGesture)
       }
     }
+
+    @objc var currentTransform: CGAffineTransform {
+        guard let view = zoomView else { return .identity }
+
+        // base transform applied by scroll view zoom
+        var t = CGAffineTransform.identity
+
+        // 1. apply zoom
+        t = t.scaledBy(x: zoomScale, y: zoomScale)
+
+        // 2. apply pan (contentOffset compensates zoom scaling)
+        t = t.translatedBy(
+            x: -contentOffset.x / zoomScale,
+            y: -contentOffset.y / zoomScale
+        )
+
+        // 3. include view positioning inside scrollView
+        t = t.translatedBy(x: view.frame.origin.x, y: view.frame.origin.y)
+
+        return t
+    }
     
     @objc open weak var imageScrollViewDelegate: ImageScrollViewDelegate?
 

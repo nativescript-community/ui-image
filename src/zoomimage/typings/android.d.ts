@@ -458,7 +458,19 @@ declare namespace com {
     export namespace facebook {
         export namespace samples {
             export namespace zoomable {
+                export namespace ZoomableDraweeView { 
+                    export class TransformListener {
+                        constructor(impl:{
+                            onTransformChanged(matrix: globalAndroid.graphics.Matrix)
+                        })
+                        onTransformChanged(matrix: globalAndroid.graphics.Matrix)
+                    }
+                }
+                
                 export class ZoomableDraweeView extends androidx.core.view.ScrollingView {
+                    
+                    addTransformListener(transformListener: TransformListener)
+                    removeTransformListener(transformListener: TransformListener)
                     public static class: java.lang.Class<zoomable.ZoomableDraweeView>;
                     public setControllers(param0: drawee.interfaces.DraweeController, param1: drawee.interfaces.DraweeController): void;
                     public setZoomingEnabled(param0: boolean): void;

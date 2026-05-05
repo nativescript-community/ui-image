@@ -17,6 +17,33 @@ export class UIZoomImgScrollViewDelegateImpl extends NSObject implements UIScrol
     }
 }
 
+declare interface ImageScrollViewDelegate extends UIScrollViewDelegate {}
+
+export class ImageScrollViewDelegateImpl extends NSObject implements ImageScrollViewDelegate {
+    private owner: WeakRef<ZoomImg>;
+    public static ObjCProtocols = [ImageScrollViewDelegateImpl];
+
+    public static initWithOwner(owner: WeakRef<ZoomImg>): ImageScrollViewDelegateImpl {
+        const delegate = new ImageScrollViewDelegateImpl();
+        delegate.owner = owner;
+        return delegate;
+    }
+
+    viewForZoomingInScrollView(scrollView: UIScrollView) {
+        const owner = this.owner.get();
+        return owner?.nativeImageViewProtected;
+    }
+
+    scrollViewDidZoom(scrollView: UIScrollView): void {
+        const owner = this.owner.get();
+        return owner?.notifyTransformChanged();
+    }
+    scrollViewDidScroll(scrollView: UIScrollView): void {
+        const owner = this.owner.get();
+        return owner?.notifyTransformChanged();
+    }
+}
+
 export class ZoomImg extends ZoomImageBase {
     nativeViewProtected: ImageScrollView;
     _image: SDAnimatedImageView | UIImageView;
@@ -55,6 +82,11 @@ export class ZoomImg extends ZoomImageBase {
         super.disposeNativeView();
         this._image = null;
         this.nativeViewProtected.delegate = this.delegate = null;
+    }
+    notifyTransformChanged() {
+        if (this.hasListeners(ZoomImageBase.transformEvent)) {
+            this.notify({ eventName: ZoomImageBase.transformEvent, ios: this.nativeViewProtected.currentTransform });
+        }
     }
 
     public onLayout(left: number, top: number, right: number, bottom: number): void {

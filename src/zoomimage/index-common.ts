@@ -4,6 +4,8 @@ import { Property } from '@nativescript/core';
 export { initialize };
 
 export abstract class ZoomImageBase extends Img {
+    public static transformEvent = 'transformChanged';
+
     zoomScale: number;
     minZoom: number;
     maxZoom: number;
