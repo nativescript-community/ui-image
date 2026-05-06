@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.6.16](https://github.com/nativescript-community/ui-image/compare/v4.6.15...v4.6.16) (2026-05-06)
+
+### Bug Fixes
+
+* **ui-zoomimage:** ios new native method getImageDisplayRect ([35cc689](https://github.com/nativescript-community/ui-image/commit/35cc68981946002357258f5118c2f889af8c199c))
+
 ## [4.6.15](https://github.com/nativescript-community/ui-image/compare/v4.6.14...v4.6.15) (2026-05-05)
 
 ### Bug Fixes
