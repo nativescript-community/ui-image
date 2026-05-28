@@ -555,10 +555,12 @@ export class Img extends ImageBase {
                 }
 
                 if (this.headers) {
+                    const headers = typeof this.headers === 'function' ? await this.headers() : this.headers;
+
                     const requestModifier = SDWebImageDownloaderRequestModifier.requestModifierWithBlock((request: NSURLRequest): NSURLRequest => {
                         const newRequest = request.mutableCopy() as NSMutableURLRequest;
-                        Object.keys(this.headers).forEach((k) => {
-                            newRequest.addValueForHTTPHeaderField(this.headers[k], k);
+                        Object.keys(headers).forEach((k) => {
+                            newRequest.addValueForHTTPHeaderField(headers[k], k);
                         });
 
                         return newRequest.copy();

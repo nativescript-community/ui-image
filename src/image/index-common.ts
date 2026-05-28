@@ -388,7 +388,7 @@ export abstract class ImageBase extends View {
     public noCache: boolean;
     public noRatioEnforce: boolean;
     public tintColor: Color;
-    headers: Record<string, string>;
+    headers: Record<string, string> | (() => Promise<Record<string, string>>);
 
     public readonly isLoading: boolean;
 

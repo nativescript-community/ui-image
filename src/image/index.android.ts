@@ -800,6 +800,8 @@ export class Img extends ImageBase {
                         }
                     });
                 }
+                const headers = typeof this.headers === 'function' ? await this.headers() : this.headers;
+                console.log('headers', headers);
                 const options = JSON.stringify({
                     progressiveRenderingEnabled: this.blurRadius,
                     localThumbnailPreviewsEnabled: this.blurRadius,
@@ -810,8 +812,9 @@ export class Img extends ImageBase {
                     blurDownSampling: this.blurDownSampling,
                     autoPlayAnimations: this.autoPlayAnimations,
                     tapToRetryEnabled: this.tapToRetryEnabled,
-                    headers: this.headers
+                    headers
                 });
+
                 view.setUri(uri, options, this.controllerListener, this.requestListener);
                 // const async = this.loadMode === 'async';
                 // if (async) {
