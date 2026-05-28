@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.6.16](https://github.com/nativescript-community/ui-image/compare/v4.6.15...v4.6.16) (2026-05-06)
+
+**Note:** Version bump only for package @nativescript-community/ui-image
+
+## [4.6.15](https://github.com/nativescript-community/ui-image/compare/v4.6.14...v4.6.15) (2026-05-05)
+
+### Bug Fixes
+
+* **ui-image:** android use androidx to load drawables ([66a395a](https://github.com/nativescript-community/ui-image/commit/66a395a85aa3302abd149a27b150903e02446e0f))
+
 ## [4.6.14](https://github.com/nativescript-community/ui-image/compare/v4.6.13...v4.6.14) (2026-04-14)
 
 ### Bug Fixes
