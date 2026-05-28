@@ -129,7 +129,7 @@ function getContextFromOptions(options: PrefetchOptions) {
             )
         );
     }
-    pluginsGetContextFromOptions.forEach((c) => c(context, transformers, options));
+    pluginsGetContextFromOptions.forEach((c) => c(context, transformers, options as any));
 
     if (transformers.length > 0) {
         context.setValueForKey(SDImagePipelineTransformer.transformerWithTransformers(transformers), SDWebImageContextImageTransformer);

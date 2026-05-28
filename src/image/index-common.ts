@@ -191,7 +191,7 @@ export function wrapNativeException(ex, errorType = typeof ex) {
  */
 export interface PrefetchOptions {
     /** Custom headers for the request */
-    headers?: Record<string, string>;
+    headers?: Record<string, string> | (() => Promise<Record<string, string>>);
     /** Decode width for downsampling */
     decodeWidth?: number;
     /** Decode height for downsampling */
