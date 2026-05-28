@@ -801,7 +801,6 @@ export class Img extends ImageBase {
                     });
                 }
                 const headers = typeof this.headers === 'function' ? await this.headers() : this.headers;
-                console.log('headers', headers);
                 const options = JSON.stringify({
                     progressiveRenderingEnabled: this.blurRadius,
                     localThumbnailPreviewsEnabled: this.blurRadius,
