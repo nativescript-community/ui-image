@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.6.19](https://github.com/@nativescript-community/ui-image/compare/v4.6.18...v4.6.19) (2026-06-01)
+
+### Bug Fixes
+
+* when src is a function, pass the Image view as an arg ([a99d3dd](https://github.com/@nativescript-community/ui-image/commit/a99d3dd4ac240e99cd5290814e66caad6890e44d))
+
 ## [4.6.18](https://github.com/@nativescript-community/ui-image/compare/v4.6.17...v4.6.18) (2026-05-28)
 
 ### Bug Fixes
