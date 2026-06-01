@@ -347,7 +347,7 @@ export const needRequestImage = function (target: any, propertyKey: string | sym
 };
 
 export type BasicSrcType = string | ImageSource | ImageAsset;
-export type SrcType = BasicSrcType | (() => BasicSrcType | PromiseLike<BasicSrcType>) | PromiseLike<BasicSrcType>;
+export type SrcType = BasicSrcType | ((ImageView: ImageBase) => BasicSrcType | PromiseLike<BasicSrcType>) | PromiseLike<BasicSrcType>;
 @CSSType('Img')
 export abstract class ImageBase extends View {
     public static finalImageSetEvent: string = 'finalImageSet';

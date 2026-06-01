@@ -492,7 +492,7 @@ export class Img extends ImageBase {
                 this.handleImageSrc(await src);
                 return;
             } else if (typeof src === 'function') {
-                const newSrc = src();
+                const newSrc = src(this);
                 if (newSrc instanceof Promise) {
                     await newSrc;
                 }
