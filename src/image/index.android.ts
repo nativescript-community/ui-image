@@ -11,6 +11,7 @@ import {
     ImageError as ImageErrorBase,
     ImageInfo as ImageInfoBase,
     ImagePipelineConfigSetting,
+    PrefetchOptions,
     QualityInfo,
     ScaleType,
     SrcType,
@@ -201,19 +202,19 @@ export class ImagePipeline {
         this._android.clearDiskCaches();
     }
 
-    prefetchToDiskCache(uri: string): Promise<void> {
-        return this.prefetchToCache(uri, true);
+    prefetchToDiskCache(uri: string, options?: PrefetchOptions): Promise<void> {
+        return this.prefetchToCache(uri, true, options);
     }
 
-    prefetchToMemoryCache(uri: string): Promise<void> {
-        return this.prefetchToCache(uri, false);
+    prefetchToMemoryCache(uri: string, options?: PrefetchOptions): Promise<void> {
+        return this.prefetchToCache(uri, false, options);
     }
 
-    private prefetchToCache(uri: string, toDiskCache: boolean): Promise<void> {
+    private prefetchToCache(uri: string, toDiskCache: boolean, options: PrefetchOptions = {}): Promise<void> {
         return new Promise((resolve, reject) => {
             try {
                 const nativeUri = android.net.Uri.parse(uri);
-                const request = com.facebook.imagepipeline.request.ImageRequestBuilder.newBuilderWithSource(nativeUri).build();
+                const request = com.nativescript.image.NetworkImageRequest.fromUriWithOptions(nativeUri, JSON.stringify(options), null);
                 let datasource: com.facebook.datasource.DataSource<java.lang.Void>;
                 if (toDiskCache) {
                     datasource = this._android.prefetchToDiskCache(request, uri);
@@ -224,13 +225,16 @@ export class ImagePipeline {
                 datasource.subscribe(
                     new com.nativescript.image.BaseDataSubscriber(
                         new com.nativescript.image.BaseDataSubscriberListener({
-                            onFailure: reject,
+                            onFailure: (datasource) => {
+                                reject(new Error(`failed to prefetch image ${uri} with options ${JSON.stringify(options)}: ${datasource.getFailureCause()}`));
+                            },
                             onNewResult: resolve as any
                         })
                     ),
                     com.facebook.common.executors.CallerThreadExecutor.getInstance()
                 );
             } catch (error) {
+                console.log('error prefetchToCache', error, error.stack);
                 reject(error);
             }
         });
@@ -800,7 +804,7 @@ export class Img extends ImageBase {
                         }
                     });
                 }
-                const headers = typeof this.headers === 'function' ? await this.headers() : this.headers;
+                const headers = typeof this.headers === 'function' ? this.headers() : this.headers;
                 const options = JSON.stringify({
                     progressiveRenderingEnabled: this.blurRadius,
                     localThumbnailPreviewsEnabled: this.blurRadius,

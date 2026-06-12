@@ -191,7 +191,7 @@ export function wrapNativeException(ex, errorType = typeof ex) {
  */
 export interface PrefetchOptions {
     /** Custom headers for the request */
-    headers?: Record<string, string> | (() => Promise<Record<string, string>>);
+    headers?: Record<string, string> | (() => Record<string, string>);
     /** Decode width for downsampling */
     decodeWidth?: number;
     /** Decode height for downsampling */
@@ -388,7 +388,7 @@ export abstract class ImageBase extends View {
     public noCache: boolean;
     public noRatioEnforce: boolean;
     public tintColor: Color;
-    headers: Record<string, string> | (() => Promise<Record<string, string>>);
+    headers: Record<string, string> | (() => Record<string, string>);
 
     public readonly isLoading: boolean;
 
@@ -489,6 +489,7 @@ export abstract class ImageBase extends View {
         return { width: scaleW, height: scaleH };
     }
 }
+
 srcProperty.register(ImageBase);
 headersProperty.register(ImageBase);
 lowerResSrcProperty.register(ImageBase);

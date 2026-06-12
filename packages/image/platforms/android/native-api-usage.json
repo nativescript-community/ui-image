@@ -1,5 +1,7 @@
 {
     "uses": [
+        "com.facebook.datasource:DataSource",
+        "com.facebook.datasource.DataSubscriber",
         "com.facebook.drawee.drawable:ScalingUtils",
         "com.facebook.drawee.drawable:ScalingUtils.ScaleType",
         "com.facebook.drawee.generic:RoundingParams",
@@ -27,10 +29,15 @@
         "com.facebook.drawee.backends.pipeline.info:ImagePerfDataListener",
         "com.facebook.drawee.backends.pipeline.info:ImagePerfData",
         "com.facebook.drawee.controller:ControllerListener",
+        "com.facebook.common.executors:CallerThreadExecutor",
+        "java.util.concurrent:Executor",
         "com.nativescript.image:ScalingUtils*",
         "com.nativescript.image:DraweeView",
         "com.nativescript.image:OkHttpNetworkFetcher",
         "com.nativescript.image:ScalingBlurPostprocessor",
+        "com.nativescript.image:NetworkImageRequest",
+        "com.nativescript.image:BaseDataSubscriber",
+        "com.nativescript.image:BaseDataSubscriberListener",
         "com.facebook.imagepipeline.producers:NetworkFetcher",
         "com.facebook.imagepipeline.backends.okhttp3:OkHttpImagePipelineConfigFactory",
         "okhttp3:OkHttpClient",

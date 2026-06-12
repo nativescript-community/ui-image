@@ -5,7 +5,7 @@ declare namespace com {
     export namespace nativescript {
         export namespace image {
             class DrawableUtils {
-                static tryLoadExternalDrawable(context: globalAndroid.content.Context, uri: globalAndroid.net.Uri)
+                static tryLoadExternalDrawable(context: globalAndroid.content.Context, uri: globalAndroid.net.Uri);
             }
             class DraweeView extends facebook.drawee.view.SimpleDraweeView {
                 noRatioEnforce: boolean;
@@ -26,6 +26,10 @@ declare namespace com {
                 public constructor(listener: BaseDataSubscriberListener);
             }
             class OkHttpNetworkFetcher extends facebook.imagepipeline.backends.okhttp3.OkHttpNetworkFetcher {}
+
+            class NetworkImageRequest extends com.facebook.imagepipeline.request.ImageRequest {
+                static fromUriWithOptions(uri: globalAndroid.net.Uri, options: string, requestListener: com.facebook.imagepipeline.listener.RequestListener): NetworkImageRequest;
+            }
         }
     }
 }

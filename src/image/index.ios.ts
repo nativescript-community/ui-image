@@ -134,6 +134,22 @@ function getContextFromOptions(options: PrefetchOptions) {
     if (transformers.length > 0) {
         context.setValueForKey(SDImagePipelineTransformer.transformerWithTransformers(transformers), SDWebImageContextImageTransformer);
     }
+
+    if (options.headers) {
+        const headers = typeof options.headers === 'function' ? options.headers() : options.headers;
+
+        const requestModifier = SDWebImageDownloaderRequestModifier.requestModifierWithBlock((request: NSURLRequest): NSURLRequest => {
+            const newRequest = request.mutableCopy() as NSMutableURLRequest;
+            Object.keys(headers).forEach((k) => {
+                newRequest.addValueForHTTPHeaderField(headers[k], k);
+            });
+
+            return newRequest.copy();
+        });
+
+        context.setValueForKey(requestModifier, SDWebImageContextDownloadRequestModifier);
+    }
+
     return context;
 }
 
@@ -211,12 +227,12 @@ export class ImagePipeline {
         this.mIos.clearDiskOnCompletion(null);
     }
 
-    prefetchToDiskCache(uri: string): Promise<void> {
-        return this.prefetchToCacheType(uri, SDImageCacheType.Disk);
+    prefetchToDiskCache(uri: string, options: PrefetchOptions): Promise<void> {
+        return this.prefetchToCacheType(uri, SDImageCacheType.Disk, options);
     }
 
-    prefetchToMemoryCache(uri: string): Promise<void> {
-        return this.prefetchToCacheType(uri, SDImageCacheType.Memory);
+    prefetchToMemoryCache(uri: string, options: PrefetchOptions): Promise<void> {
+        return this.prefetchToCacheType(uri, SDImageCacheType.Memory, options);
     }
 
     private prefetchToCacheType(uri: string, cacheType: SDImageCacheType, options: PrefetchOptions = {}): Promise<void> {
@@ -552,21 +568,6 @@ export class Img extends ImageBase {
                         const value = this.contextOptions[k];
                         context.setValueForKey(value, k);
                     });
-                }
-
-                if (this.headers) {
-                    const headers = typeof this.headers === 'function' ? await this.headers() : this.headers;
-
-                    const requestModifier = SDWebImageDownloaderRequestModifier.requestModifierWithBlock((request: NSURLRequest): NSURLRequest => {
-                        const newRequest = request.mutableCopy() as NSMutableURLRequest;
-                        Object.keys(headers).forEach((k) => {
-                            newRequest.addValueForHTTPHeaderField(headers[k], k);
-                        });
-
-                        return newRequest.copy();
-                    });
-
-                    context.setValueForKey(requestModifier, SDWebImageContextDownloadRequestModifier);
                 }
 
                 this.mCacheKey = SDWebImageManager.sharedManager.cacheKeyForURLContext(uri, context);

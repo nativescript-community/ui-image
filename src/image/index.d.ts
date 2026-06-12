@@ -1,4 +1,4 @@
-import { ImageInfo, ImagePipelineConfigSetting } from './index-common';
+import { ImageInfo, ImagePipelineConfigSetting, PrefetchOptions } from './index-common';
 import { ImageAsset, ImageSource, View } from '@nativescript/core';
 
 export * from './index-common';
@@ -385,12 +385,12 @@ export class ImagePipeline {
     /**
      * Prefetch to disk cache.
      */
-    prefetchToDiskCache(uri: string): Promise<void>;
+    prefetchToDiskCache(uri: string, options?: PrefetchOptions): Promise<void>;
 
     /**
      * Prefetch to memory cache.
      */
-    prefetchToMemoryCache(uri: string): Promise<void>;
+    prefetchToMemoryCache(uri: string, options?: PrefetchOptions): Promise<void>;
 }
 
 export type GetContextFromOptionsCallback = (context: NSDictionary<string, any>, transformers: any[], options: Partial<Img>) => void;
