@@ -146,6 +146,17 @@ function getContextFromOptions(options: Partial<Img>) {
     if (transformers.length > 0) {
         context.setValueForKey(SDImagePipelineTransformer.transformerWithTransformers(transformers), SDWebImageContextImageTransformer);
     }
+    if (options.headers) {
+        const requestModifier = SDWebImageDownloaderRequestModifier.requestModifierWithBlock((request: NSURLRequest): NSURLRequest => {
+            const newRequest = request.mutableCopy() as NSMutableURLRequest;
+            Object.keys(options.headers).forEach((k) => {
+                newRequest.addValueForHTTPHeaderField(options.headers[k], k);
+            });
+
+            return newRequest.copy();
+        });
+        context.setValueForKey(requestModifier, SDWebImageContextDownloadRequestModifier);
+    }
     return context;
 }
 
@@ -234,7 +245,8 @@ export class ImagePipeline {
     private prefetchToCacheType(uri: string, cacheType: SDImageCacheType, options: PrefetchOptions = {}): Promise<void> {
         return new Promise((resolve, reject) => {
             const context = getContextFromOptions(options as any);
-
+            context.setObjectForKey(cacheType, SDWebImageContextStoreCacheType);
+            context.setObjectForKey(cacheType, SDWebImageContextOriginalStoreCacheType);
             SDWebImagePrefetcher.sharedImagePrefetcher.context = context;
             SDWebImagePrefetcher.sharedImagePrefetcher.prefetchURLsProgressCompleted([getUri(uri)], null, (finished, skipped) => {
                 if (finished && !skipped) {
