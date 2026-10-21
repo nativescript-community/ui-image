@@ -12,7 +12,7 @@
     "author": "",
     "scripts": {
         "build": "lerna run build",
-        "build.all": "lerna run build.all",
+        "build.all": "npm run build.native --if-present && lerna run build.all",
         "build.angular": "lerna run build.angular",
         "build.win": "lerna run build-win",
         "clean": "rimraf -g 'packages/**/*.d.ts' 'packages/**/*.tsbuildinfo' 'packages/**/*.js' 'packages/**/*.mjs' 'packages/**/*.js.map' 'packages/**/*.mjs.map' 'packages/**/*.metada' 'packages/**/angular/ng-package.json'",
