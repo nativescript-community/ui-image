@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.18](https://github.com/@nativescript-community/ui-image/compare/v5.0.17...v5.0.18) (2026-10-21)
+
+### Bug Fixes
+
+* **ios:** honor cacheType and headers in ImagePipeline prefetch ([25898dd](https://github.com/@nativescript-community/ui-image/commit/25898dd8e7602d55134b6740969849f7499b263c))
+
 ## [5.0.17](https://github.com/@nativescript-community/ui-image/compare/v5.0.16...v5.0.17) (2026-05-05)
 
 **Note:** Version bump only for package ui-image
