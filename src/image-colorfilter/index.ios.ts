@@ -3,9 +3,8 @@ import { applyMixins, colorMatrixProperty, cssProperty } from './index-common';
 
 declare module '@nativescript-community/ui-image' {
     interface Img {
-        mCIFilter: CIFilter;
-        colorMatrix: number[];
-        initImage();
+        mCIFilter?: CIFilter;
+        colorMatrix?: number[];
     }
 }
 
@@ -45,7 +44,7 @@ class ImgExtended {
             if (!this.mCanRequestImage) {
                 this.mNeedRequestImage = true;
             } else {
-                (this as Img).initImage();
+                (this as any).initImage();
             }
         } else {
             (this as any as ImgExtended3).applyColorFilter();

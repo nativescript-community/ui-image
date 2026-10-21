@@ -128,29 +128,12 @@ export class Img extends View {
     roundAsCircle: boolean;
 
     /**
-     * Boolean value used for determining if the image's bottom right corner should be rounded.
-     */
-    roundBottomRight: boolean;
-
-    /**
-     * Boolean value used for determining if the image's bottom left corner should be rounded.
-     */
-    roundBottomLeft: boolean;
-
-    /**
-     * Boolean value used for determining if the image's top left corner should be rounded.
-     */
-    roundTopLeft: boolean;
-
-    /**
-     * Boolean value used for determining if the image's top right corner should be rounded.
-     */
-    roundTopRight: boolean;
-
-    /**
      * Number value used as radius for rounding the image's corners.
      */
-    roundedCornerRadius: number;
+    roundTopLeftRadius: number;
+    roundTopRightRadius: number;
+    roundBottomRightRadius: number;
+    roundBottomLeftRadius: number;
 
     /**
      * Number value used as input for the blur function. Larger value means slower processing.

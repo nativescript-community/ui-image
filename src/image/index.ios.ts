@@ -27,6 +27,7 @@ import {
     wrapNativeException
 } from './index-common';
 import { GetContextFromOptionsCallback } from '.';
+import type { Img as ImgType } from '.';
 import { decodeHeightProperty } from '@nativescript/core/ui/image';
 
 export class ImageInfo implements ImageInfoBase {
@@ -110,8 +111,8 @@ const pluginsGetContextFromOptions = new Set<GetContextFromOptionsCallback>();
 export function registerPluginGetContextFromOptions(callback: GetContextFromOptionsCallback) {
     pluginsGetContextFromOptions.add(callback);
 }
-function getContextFromOptions(options: Partial<Img>) {
-    const context: NSDictionary<string, any> = NSMutableDictionary.dictionary();
+function getContextFromOptions(options: Partial<ImgType>) {
+    const context: NSMutableDictionary<string, any> = NSMutableDictionary.dictionary();
     const transformers = [];
     if (options.decodeWidth || options.decodeHeight) {
         //@ts-ignore
@@ -181,7 +182,7 @@ export class ImagePipeline {
 
     getCacheKey(url: string, options: PrefetchOptions = {}) {
         const uri = getUri(url);
-        const context = getContextFromOptions(options as any);
+        const context = getContextFromOptions(options);
         return SDWebImageManager.sharedManager.cacheKeyForURLContext(uri, context);
     }
 
@@ -244,7 +245,7 @@ export class ImagePipeline {
 
     private prefetchToCacheType(uri: string, cacheType: SDImageCacheType, options: PrefetchOptions = {}): Promise<void> {
         return new Promise((resolve, reject) => {
-            const context = getContextFromOptions(options as any);
+            const context = getContextFromOptions(options);
             context.setObjectForKey(cacheType, SDWebImageContextStoreCacheType);
             context.setObjectForKey(cacheType, SDWebImageContextOriginalStoreCacheType);
             SDWebImagePrefetcher.sharedImagePrefetcher.context = context;
