@@ -179,30 +179,21 @@ public class DraweeView extends SimpleDraweeView {
                     aspectRatio = 1.0f / aspectRatio;
                 }
             }
-            if (imageWidth != 0 && imageHeight != 0) {
-                if (!finiteWidth && finiteHeight) {
-                    widthMeasureSpec = android.view.View.MeasureSpec.makeMeasureSpec((int) (height * aspectRatio),
-                            android.view.View.MeasureSpec.EXACTLY);
-                } else if (!finiteHeight && finiteWidth) {
-                    heightMeasureSpec = android.view.View.MeasureSpec.makeMeasureSpec((int) (width / aspectRatio),
-                            android.view.View.MeasureSpec.EXACTLY);
-                } else if (!finiteWidth &&  !finiteHeight ) {
-                    float viewRatio = width / (float)height;
-                    if (viewRatio < aspectRatio) {
-                        widthMeasureSpec = android.view.View.MeasureSpec.makeMeasureSpec((int) width, android.view.View.MeasureSpec.EXACTLY);
-                        heightMeasureSpec = android.view.View.MeasureSpec.makeMeasureSpec((int) (width / aspectRatio), android.view.View.MeasureSpec.EXACTLY);
-                    } else {
-                        widthMeasureSpec = android.view.View.MeasureSpec.makeMeasureSpec((int) (height * aspectRatio), android.view.View.MeasureSpec.EXACTLY);
-                        heightMeasureSpec = android.view.View.MeasureSpec.makeMeasureSpec((int) height, android.view.View.MeasureSpec.EXACTLY);
-                    }
-                }
-            } else {
-                if (!finiteWidth && finiteHeight) {
-                    widthMeasureSpec = android.view.View.MeasureSpec.makeMeasureSpec((int) (height * aspectRatio),
-                            android.view.View.MeasureSpec.EXACTLY);
-                } else if (!finiteHeight && finiteWidth) {
-                    heightMeasureSpec = android.view.View.MeasureSpec.makeMeasureSpec((int) (width / aspectRatio),
-                            android.view.View.MeasureSpec.EXACTLY);
+            if (!finiteWidth && finiteHeight) {
+                widthMeasureSpec = android.view.View.MeasureSpec.makeMeasureSpec((int) (height * aspectRatio),
+                        android.view.View.MeasureSpec.EXACTLY);
+            } else if (!finiteHeight && finiteWidth) {
+                heightMeasureSpec = android.view.View.MeasureSpec.makeMeasureSpec((int) (width / aspectRatio),
+                        android.view.View.MeasureSpec.EXACTLY);
+            } else if (!finiteWidth && !finiteHeight && width > 0 && height > 0) {
+                // fit in the available size: the ratio is enough, the image does not have to be loaded
+                float viewRatio = width / (float) height;
+                if (viewRatio < aspectRatio) {
+                    widthMeasureSpec = android.view.View.MeasureSpec.makeMeasureSpec((int) width, android.view.View.MeasureSpec.EXACTLY);
+                    heightMeasureSpec = android.view.View.MeasureSpec.makeMeasureSpec((int) (width / aspectRatio), android.view.View.MeasureSpec.EXACTLY);
+                } else {
+                    widthMeasureSpec = android.view.View.MeasureSpec.makeMeasureSpec((int) (height * aspectRatio), android.view.View.MeasureSpec.EXACTLY);
+                    heightMeasureSpec = android.view.View.MeasureSpec.makeMeasureSpec((int) height, android.view.View.MeasureSpec.EXACTLY);
                 }
             }
         } else {
