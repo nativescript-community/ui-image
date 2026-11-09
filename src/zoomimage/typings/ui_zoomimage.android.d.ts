@@ -29,6 +29,8 @@ declare namespace com {
 				public setImageRotation(after: number): void;
 				public isHoldCenterDuringAnimation(): boolean;
 				public setOnZoomChangeListener(l: com.nativescript.image.ZoomableMatrixImageView.OnZoomChangeListener): void;
+				public addTransformListener(l: com.nativescript.image.ZoomableMatrixImageView.TransformListener): void;
+				public removeTransformListener(l: com.nativescript.image.ZoomableMatrixImageView.TransformListener): void;
 				public setDoubleTapPanSensitivity(sensitivity: number): void;
 				public cancelCenterAnimation(): void;
 				public isDoubleTapCenteringEnabled(): boolean;
@@ -86,6 +88,14 @@ declare namespace com {
 					});
 					public constructor();
 					public onTap(param0: number, param1: number, param2: number, param3: number): void;
+				}
+				export class TransformListener {
+					public static class: java.lang.Class<com.nativescript.image.ZoomableMatrixImageView.TransformListener>;
+					public constructor(implementation: {
+						onTransformChanged(param0: globalAndroid.graphics.Matrix): void;
+					});
+					public constructor();
+					public onTransformChanged(param0: globalAndroid.graphics.Matrix): void;
 				}
 				export class OnZoomChangeListener {
 					public static class: java.lang.Class<com.nativescript.image.ZoomableMatrixImageView.OnZoomChangeListener>;

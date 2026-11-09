@@ -77,6 +77,27 @@ open class ImageScrollView: UIScrollView {
         doubleTapRecognizer = doubleTap
       }
     }
+
+    @objc var currentTransform: CGAffineTransform {
+        guard let view = zoomView else { return .identity }
+
+        // base transform applied by scroll view zoom
+        var t = CGAffineTransform.identity
+
+        // 1. apply zoom
+        t = t.scaledBy(x: zoomScale, y: zoomScale)
+
+        // 2. apply pan (contentOffset compensates zoom scaling)
+        t = t.translatedBy(
+            x: -contentOffset.x / zoomScale,
+            y: -contentOffset.y / zoomScale
+        )
+
+        // 3. include view positioning inside scrollView
+        t = t.translatedBy(x: view.frame.origin.x, y: view.frame.origin.y)
+
+        return t
+    }
     
     @objc open weak var imageScrollViewDelegate: ImageScrollViewDelegate?
 
@@ -116,6 +137,7 @@ open class ImageScrollView: UIScrollView {
     }
     
     private func initialize() {
+        contentInsetAdjustmentBehavior = .never
         showsVerticalScrollIndicator = false
         showsHorizontalScrollIndicator = false
         bouncesZoom = true
@@ -354,6 +376,149 @@ open class ImageScrollView: UIScrollView {
         DispatchQueue.main.async {
             self.updateForImage(self.imageSize)
             self.imageScrollViewDelegate?.imageScrollViewDidChangeOrientation?(imageScrollView: self)
+        }
+    }
+
+    // Image rect in the (unzoomed) coordinates of the zoom view, following its contentMode
+    private func imageRectInZoomView() -> CGRect {
+        guard let imageView = zoomView,
+            let image = imageView.image else {
+            return .zero
+        }
+
+        let imageSize = image.size
+        let viewSize = imageView.bounds.size
+
+        // 1. Base image rect (like RectF(0,0,w,h))
+        var imageRect = CGRect(origin: .zero, size: imageSize)
+
+        // 2. Compute ScaleType transform (UIImageView.contentMode)
+        let imageAspect = imageSize.width / imageSize.height
+        let viewAspect = viewSize.width / viewSize.height
+
+        var scaleX: CGFloat = 1.0
+        var scaleY: CGFloat = 1.0
+        var tx: CGFloat = 0.0
+        var ty: CGFloat = 0.0
+
+        switch imageView.contentMode {
+
+        case .scaleAspectFit:
+            let scale = (imageAspect > viewAspect)
+                ? viewSize.width / imageSize.width
+                : viewSize.height / imageSize.height
+
+            scaleX = scale
+            scaleY = scale
+
+            let scaledW = imageSize.width * scale
+            let scaledH = imageSize.height * scale
+
+            tx = (viewSize.width - scaledW) * 0.5
+            ty = (viewSize.height - scaledH) * 0.5
+
+        case .scaleAspectFill:
+            let scale = (imageAspect > viewAspect)
+                ? viewSize.height / imageSize.height
+                : viewSize.width / imageSize.width
+
+            scaleX = scale
+            scaleY = scale
+
+            let scaledW = imageSize.width * scale
+            let scaledH = imageSize.height * scale
+
+            tx = (viewSize.width - scaledW) * 0.5
+            ty = (viewSize.height - scaledH) * 0.5
+
+        case .scaleToFill:
+            scaleX = viewSize.width / imageSize.width
+            scaleY = viewSize.height / imageSize.height
+
+        case .center:
+            tx = (viewSize.width - imageSize.width) * 0.5
+            ty = (viewSize.height - imageSize.height) * 0.5
+
+        case .top:
+            tx = (viewSize.width - imageSize.width) * 0.5
+            ty = 0
+
+        case .bottom:
+            tx = (viewSize.width - imageSize.width) * 0.5
+            ty = viewSize.height - imageSize.height
+
+        case .left:
+            tx = 0
+            ty = (viewSize.height - imageSize.height) * 0.5
+
+        case .right:
+            tx = viewSize.width - imageSize.width
+            ty = (viewSize.height - imageSize.height) * 0.5
+
+        case .topLeft:
+            tx = 0
+            ty = 0
+
+        case .topRight:
+            tx = viewSize.width - imageSize.width
+            ty = 0
+
+        case .bottomLeft:
+            tx = 0
+            ty = viewSize.height - imageSize.height
+
+        case .bottomRight:
+            tx = viewSize.width - imageSize.width
+            ty = viewSize.height - imageSize.height
+
+        default:
+            break
+        }
+
+        // 3. Build ScaleType transform (like Fresco matrix)
+        let scaleTypeTransform = CGAffineTransform.identity
+            .translatedBy(x: tx, y: ty)
+            .scaledBy(x: scaleX, y: scaleY)
+
+        // Apply it
+        imageRect = imageRect.applying(scaleTypeTransform)
+
+        return imageRect
+    }
+
+    @objc public func getImageDisplayRect() -> CGRect {
+        // Apply zoom/pan transform (your controller equivalent)
+        return imageRectInZoomView().applying(currentTransform)
+    }
+
+    // Limit the panning to the image: the zoom view also contains the empty bands around the image
+    // (eg aspectFit), which must not be reachable. Negative insets shrink the scrollable range.
+    @objc public func updateContentInsetsForImage() {
+        guard let view = _zoomView, view.image != nil, bounds.width > 0, bounds.height > 0 else {
+            contentInset = .zero
+            return
+        }
+        let imageRect = imageRectInZoomView()
+        if imageRect.isEmpty {
+            return
+        }
+        let scale = zoomScale
+        let content = contentSize
+        func range(_ minEdge: CGFloat, _ maxEdge: CGFloat, _ viewLength: CGFloat, _ contentLength: CGFloat) -> (CGFloat, CGFloat) {
+            let low = minEdge * scale
+            let high = maxEdge * scale - viewLength
+            if high < low {
+                // the image is smaller than the view: keep it centered
+                let center = (low + high) / 2
+                return (-center, -(contentLength - viewLength - center))
+            }
+            return (-low, -(contentLength - viewLength - high))
+        }
+        let horizontal = range(imageRect.minX, imageRect.maxX, bounds.width, content.width)
+        let vertical = range(imageRect.minY, imageRect.maxY, bounds.height, content.height)
+        let insets = UIEdgeInsets(top: vertical.0, left: horizontal.0, bottom: vertical.1, right: horizontal.1)
+        if insets != contentInset {
+            contentInset = insets
         }
     }
 }

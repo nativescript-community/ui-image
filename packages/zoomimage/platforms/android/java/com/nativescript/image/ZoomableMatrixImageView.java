@@ -127,6 +127,32 @@ public class ZoomableMatrixImageView extends MatrixImageView {
         void onZoomChanged(float newZoom);
     }
 
+    // Transform change listeners
+    public interface TransformListener {
+        void onTransformChanged(Matrix transform);
+    }
+
+    private final java.util.List<TransformListener> mTransformListeners = new java.util.concurrent.CopyOnWriteArrayList<>();
+
+    public void addTransformListener(TransformListener listener) {
+        mTransformListeners.add(listener);
+    }
+
+    public void removeTransformListener(TransformListener listener) {
+        mTransformListeners.remove(listener);
+    }
+
+    @Override
+    protected void onComposedMatrixChanged(Matrix composed) {
+        if (mTransformListeners.isEmpty()) {
+            return;
+        }
+        Matrix copy = new Matrix(composed);
+        for (TransformListener listener : mTransformListeners) {
+            listener.onTransformChanged(copy);
+        }
+    }
+
     // Temporary for combined animator: stores mapped-before position of the
     // drawable point
     private float[] mMappedBeforeForAnimator = null;

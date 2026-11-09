@@ -552,8 +552,16 @@ private final Matrix mLastComposedMatrix = new Matrix();
             // Fallback: if drawable is not wrapped, fall back on ImageView's matrix
             super.setImageMatrix(composed);
         }
+        onComposedMatrixChanged(composed);
         // Use VSync-friendly invalidation.
         postInvalidateOnAnimation();
+    }
+
+    /**
+     * Called each time the matrix (rotation + scale type + extra transform) applied to the drawable changed.
+     * The matrix maps the drawable intrinsic bounds to view coordinates.
+     */
+    protected void onComposedMatrixChanged(Matrix composed) {
     }
 
     /**

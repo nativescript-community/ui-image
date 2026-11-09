@@ -15,6 +15,16 @@ export class UIZoomImgScrollViewDelegateImpl extends NSObject implements UIScrol
         const owner = this.owner.get();
         return owner?.nativeImageViewProtected;
     }
+
+    scrollViewDidZoom(scrollView: UIScrollView): void {
+        const owner = this.owner.get();
+        owner?.nativeViewProtected?.updateContentInsetsForImage();
+        owner?.notifyTransformChanged();
+    }
+
+    scrollViewDidScroll(scrollView: UIScrollView): void {
+        this.owner.get()?.notifyTransformChanged();
+    }
 }
 
 export class ZoomImg extends ZoomImageBase {
@@ -41,6 +51,7 @@ export class ZoomImg extends ZoomImageBase {
         if (nativeImage) {
             this.nativeViewProtected.updateForImage(nativeImage.size);
         }
+        this.nativeViewProtected?.updateContentInsetsForImage();
     }
     get nativeImageViewProtected() {
         return this._image;
@@ -58,10 +69,17 @@ export class ZoomImg extends ZoomImageBase {
         this.nativeViewProtected.delegate = this.delegate = null;
     }
 
+    notifyTransformChanged() {
+        if (this.hasListeners(ZoomImageBase.transformEvent)) {
+            this.notify({ eventName: ZoomImageBase.transformEvent, ios: this.nativeViewProtected.currentTransform });
+        }
+    }
+
     public onLayout(left: number, top: number, right: number, bottom: number): void {
         super.onLayout(left, top, right, bottom);
         if (this.nativeViewProtected) {
             this.nativeImageViewProtected.frame = this.nativeViewProtected.bounds;
+            this.nativeViewProtected.updateContentInsetsForImage();
         }
     }
 

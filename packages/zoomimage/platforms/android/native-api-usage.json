@@ -1,14 +1,8 @@
 {
     "uses": [
-        "com.facebook.samples.zoomable:AbstractAnimatedZoomableController*",
-        "com.facebook.samples.zoomable:AnimatedZoomableController*",
-        "com.facebook.samples.zoomable:DefaultZoomableController*",
-        "com.facebook.samples.zoomable:DoubleTapGestureListener*",
-        "com.facebook.samples.zoomable:GestureListenerWrapper*",
-        "com.facebook.samples.zoomable:MultiGestureListener*",
-        "com.facebook.samples.zoomable:MultiZoomableControllerListener*",
-        "com.facebook.samples.zoomable:ZoomableController*",
-        "com.facebook.samples.zoomable:ZoomableDraweeView*"
-       
+        "android.graphics:Matrix",
+        "com.nativescript.image:ZoomableMatrixImageView",
+        "com.nativescript.image:ZoomableMatrixImageView.OnZoomChangeListener",
+        "com.nativescript.image:ZoomableMatrixImageView.TransformListener"
     ]
 }
