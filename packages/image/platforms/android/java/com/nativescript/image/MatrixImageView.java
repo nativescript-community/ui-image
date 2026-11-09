@@ -316,6 +316,35 @@ public class MatrixImageView extends AppCompatImageView {
     }
 
     /**
+     * The scale type applied by this view. The ImageView scale type is always MATRIX.
+     */
+    public ScaleType getAppliedScaleType() {
+        return mAppliedScaleType;
+    }
+
+    public interface BlendProgressProvider {
+        /**
+         * @return fraction (0..1) between the "from" and the "to" scale type for the given view size
+         */
+        float getProgress(int viewWidth, int viewHeight);
+    }
+
+    private ScaleType mBlendFromScaleType;
+    private ScaleType mBlendToScaleType;
+    private BlendProgressProvider mBlendProgressProvider;
+
+    /**
+     * Draw the image with a matrix interpolated between the fit of two scale types, the fraction being
+     * recomputed at each size change. Used by shared element transitions. Pass nulls to stop blending.
+     */
+    public void setScaleTypeBlend(@Nullable ScaleType from, @Nullable ScaleType to, @Nullable BlendProgressProvider provider) {
+        mBlendFromScaleType = from;
+        mBlendToScaleType = to;
+        mBlendProgressProvider = provider;
+        updateBaseMatrix();
+    }
+
+    /**
      * Set rotation (degrees) applied to the drawable before fitting to view.
      * This is an immediate set (no animation).
      *
@@ -486,7 +515,22 @@ private final Matrix mLastComposedMatrix = new Matrix();
 
         Matrix base = new Matrix();
         if (vw > 0 && vh > 0) {
-            ScaleUtils.getImageMatrix(d, vw, vh, mImageRotation, mAppliedScaleType, base);
+            if (mBlendProgressProvider != null && mBlendFromScaleType != null && mBlendToScaleType != null) {
+                Matrix fromMatrix = new Matrix();
+                ScaleUtils.getImageMatrix(d, vw, vh, mImageRotation, mBlendFromScaleType, fromMatrix);
+                ScaleUtils.getImageMatrix(d, vw, vh, mImageRotation, mBlendToScaleType, base);
+                float fraction = mBlendProgressProvider.getProgress(vw, vh);
+                float[] fromValues = new float[9];
+                float[] toValues = new float[9];
+                fromMatrix.getValues(fromValues);
+                base.getValues(toValues);
+                for (int i = 0; i < 9; i++) {
+                    fromValues[i] += (toValues[i] - fromValues[i]) * fraction;
+                }
+                base.setValues(fromValues);
+            } else {
+                ScaleUtils.getImageMatrix(d, vw, vh, mImageRotation, mAppliedScaleType, base);
+            }
         }
         mBaseMatrix.set(base);
 

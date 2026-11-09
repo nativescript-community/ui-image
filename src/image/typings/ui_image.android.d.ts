@@ -457,6 +457,8 @@ declare namespace com {
 				public mBaseMatrix: globalAndroid.graphics.Matrix;
 				public mExtraMatrix: globalAndroid.graphics.Matrix;
 				public isUsingOutlineProvider: boolean;
+				public getAppliedScaleType(): globalAndroid.widget.ImageView.ScaleType;
+				public setScaleTypeBlend(from: globalAndroid.widget.ImageView.ScaleType, to: globalAndroid.widget.ImageView.ScaleType, provider: com.nativescript.image.MatrixImageView.BlendProgressProvider): void;
 				public constructor(context: globalAndroid.content.Context);
 				public cancelRotationAnimation(): void;
 				public setImageRotation(degrees: number): void;
@@ -485,6 +487,13 @@ declare namespace com {
 				public getImageWidth(): number;
 				public onAttachedToWindow(): void;
 				public onDraw(saveCount: globalAndroid.graphics.Canvas): void;
+			}
+			export namespace MatrixImageView {
+				export class BlendProgressProvider {
+					public static class: java.lang.Class<com.nativescript.image.MatrixImageView.BlendProgressProvider>;
+					public constructor(implementation: { getProgress(viewWidth: number, viewHeight: number): number });
+					public getProgress(viewWidth: number, viewHeight: number): number;
+				}
 			}
 			export class ProgressInterceptor {
 				public static class: java.lang.Class<com.nativescript.image.ProgressInterceptor>;

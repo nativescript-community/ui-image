@@ -41,6 +41,7 @@ import {
     tintColorProperty,
     wrapNativeException
 } from './index-common';
+import { registerSharedTransitionHandler } from './shared-transition.android';
 
 let initialized = false;
 let glideInstance: com.bumptech.glide.Glide;
@@ -1156,3 +1157,5 @@ function getScaleType(scaleType: ScaleType): android.widget.ImageView.ScaleType 
     }
     return android.widget.ImageView.ScaleType.FIT_CENTER;
 }
+
+registerSharedTransitionHandler(Img);
