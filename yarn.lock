@@ -3471,6 +3471,7 @@ __metadata:
   dependencies:
     "@nativescript-community/ui-image": "npm:*"
     "@nativescript-community/ui-image-colorfilter": "npm:*"
+    "@nativescript-community/ui-pager": "npm:14.1.42"
     "@nativescript-community/ui-zoomimage": "npm:*"
   languageName: unknown
   linkType: soft
@@ -3495,6 +3496,13 @@ __metadata:
   resolution: "@nativescript-community/ui-image@workspace:packages/image"
   languageName: unknown
   linkType: soft
+
+"@nativescript-community/ui-pager@npm:14.1.42":
+  version: 14.1.42
+  resolution: "@nativescript-community/ui-pager@npm:14.1.42"
+  checksum: 10/0c88d84dd4298ce24f353925476a33c46a5ad9cb4f92567367641972e4d0165b31dffcb4639489efa2aa0e5c63a51792b6b2afb2b9749362356b94168b9ab43e
+  languageName: node
+  linkType: hard
 
 "@nativescript-community/ui-zoomimage@npm:*, @nativescript-community/ui-zoomimage@workspace:packages/zoomimage":
   version: 0.0.0-use.local
