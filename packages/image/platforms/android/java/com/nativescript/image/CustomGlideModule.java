@@ -18,7 +18,6 @@ import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.module.AppGlideModule;
 import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.signature.ObjectKey;
-import okhttp3.OkHttpClient;
 import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -101,15 +100,11 @@ public class CustomGlideModule extends AppGlideModule {
   @Override
   public void registerComponents(@NonNull Context context, @NonNull Glide glide, @NonNull Registry registry) {
 
-    OkHttpClient client = GlideConfiguration.getInstance().getOkHttpClient();
-    if (client == null) {
-      client = new OkHttpClient.Builder().build();
+    if (OkHttpSupport.isAvailable()) {
+      OkHttpSupport.register(registry);
+    } else {
+      registry.replace(GlideUrl.class, InputStream.class, new UrlConnectionLoader.Factory());
     }
-
-    registry.replace(
-        GlideUrl.class,
-        InputStream.class,
-        new CustomUrlLoader.Factory(client));
   }
 
   @Override

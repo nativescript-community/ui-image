@@ -6,13 +6,22 @@ dependencies {
 	def glideCompilerVersion =  project.hasProperty("glideCompilerVersion") ? project.glideCompilerVersion : "4.16.0"
 	def glideTransformationsVersion =  project.hasProperty("glideTransformationsVersion") ? project.glideTransformationsVersion : "4.3.0"
 	def glideOkHttpVersion =  project.hasProperty("glideOkHttpVersion") ? project.glideOkHttpVersion : "4.11.0"
+	def okHttpVersion =  project.hasProperty("okHttpVersion") ? project.okHttpVersion : "4.12.0"
 	def androidXAppCompatVersion =  project.hasProperty("androidXAppCompat") ? project.androidXAppCompat : "1.1.0"
 
     implementation "androidx.appcompat:appcompat:$androidXAppCompatVersion"
     implementation "com.github.bumptech.glide:glide:$glideVersion"
     annotationProcessor "com.github.bumptech.glide:compiler:$glideCompilerVersion"
     implementation "jp.wasabeef:glide-transformations:$glideTransformationsVersion"
-    implementation "com.github.bumptech.glide:okhttp3-integration:$glideOkHttpVersion"
+    // OkHttp is optional: set `glideUseOkHttp=false` in the app gradle.properties to not ship it.
+    // Images are then downloaded with HttpURLConnection and `useOkhttp` is ignored.
+    def useOkHttp = !project.hasProperty("glideUseOkHttp") || project.glideUseOkHttp.toString() != "false"
+    if (useOkHttp) {
+        implementation "com.github.bumptech.glide:okhttp3-integration:$glideOkHttpVersion"
+    } else {
+        // only to compile: the integration must not be on the classpath, Glide would reference its library module
+        compileOnly "com.squareup.okhttp3:okhttp:$okHttpVersion"
+    }
 
     if (project.hasProperty("tempBuild")) {
 		// we need to copy the code in both places as N main gradle system does not support top level code

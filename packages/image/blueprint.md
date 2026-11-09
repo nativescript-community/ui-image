@@ -29,6 +29,18 @@ imageModule.initialize();
 - `onInitialize` (Android and iOS): called before the native library is initialized, for very custom native handling.
   Android gets `(glideConfiguration, config)`, iOS gets `(loadersManager, loaders, config)`.
 
+### Android: OkHttp is optional
+
+Images are downloaded with OkHttp by default. To not ship it, set this in the app `gradle.properties`
+(or `ext.glideUseOkHttp = "false"` in `before-plugins.gradle`):
+
+```
+glideUseOkHttp=false
+```
+
+Images are then downloaded with `HttpURLConnection`: headers, `progress` and `loadSource` events still work,
+but `useOkhttp` is ignored and you lose OkHttp's HTTP/2 and connection pooling.
+
 ## API
 
 ### Events

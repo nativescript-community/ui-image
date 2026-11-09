@@ -1,6 +1,5 @@
 package com.nativescript.image;
 
-import okhttp3.OkHttpClient;
 
 /**
  * Singleton to hold Glide configuration values that must be set before Glide initializes.
@@ -14,7 +13,7 @@ public class GlideConfiguration {
     private long memoryCacheSize = -1; // -1 means use default
     private float memoryCacheScreens = 2.0f;
     private String diskCacheName = null;
-    private OkHttpClient okHttpClient = null;
+    private Object okHttpClient = null;
     
     private GlideConfiguration() {
     }
@@ -80,13 +79,15 @@ public class GlideConfiguration {
     /**
      * Set a custom OkHttp client used to download images.
      * Must be called before Glide is initialized (before first image load).
-     * @param client OkHttpClient, or null to use a default client
+     * Ignored when OkHttp is not part of the app (see `glideUseOkHttp`).
+     * Typed as Object so this class does not need OkHttp to load.
+     * @param client okhttp3.OkHttpClient, or null to use a default client
      */
-    public void setOkHttpClient(OkHttpClient client) {
+    public void setOkHttpClient(Object client) {
         this.okHttpClient = client;
     }
 
-    public OkHttpClient getOkHttpClient() {
+    public Object getOkHttpClient() {
         return okHttpClient;
     }
 }

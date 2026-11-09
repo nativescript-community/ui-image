@@ -197,6 +197,7 @@ export interface ImagePipelineConfigSetting {
     /**
      * Android: a custom `okhttp3.OkHttpClient` used by Glide to download images.
      * `false` or `undefined`: a default client is used.
+     * Ignored when OkHttp is not part of the app (`glideUseOkHttp=false`, see the blueprint).
      * @platform android
      */
     useOkhttp?: boolean | any;

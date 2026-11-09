@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.data.DataFetcher;
+import com.bumptech.glide.load.model.GlideUrl;
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -21,14 +22,17 @@ import java.io.PrintWriter;
 
 public class CustomDataFetcher implements DataFetcher<InputStream> {
     private final Call.Factory client;
-    private final CustomGlideUrl url;
+    private final GlideUrl url;
+    private final CustomGlideUrl customUrl;
     private InputStream stream;
     private ResponseBody responseBody;
     private Call call;
 
-    public CustomDataFetcher(Call.Factory client, CustomGlideUrl url) {
+    // progress and load source are only reported for a CustomGlideUrl
+    public CustomDataFetcher(Call.Factory client, GlideUrl url) {
         this.client = client;
         this.url = url;
+        this.customUrl = url instanceof CustomGlideUrl ? (CustomGlideUrl) url : null;
     }
 
     // Buffer-less wrapper that masks cancel/reset IOExceptions so they don't yield large stack traces
@@ -112,7 +116,7 @@ public class CustomDataFetcher implements DataFetcher<InputStream> {
         // Create client with interceptors if needed
         Call.Factory effectiveClient = client;
 
-        if (url.hasProgressListener() || url.hasLoadSourceListener()) {
+        if (customUrl != null && (customUrl.hasProgressListener() || customUrl.hasLoadSourceListener())) {
             OkHttpClient.Builder clientBuilder;
 
             if (client instanceof OkHttpClient) {
@@ -122,15 +126,15 @@ public class CustomDataFetcher implements DataFetcher<InputStream> {
             }
 
             // Add load source interceptor first (before request)
-            if (url.hasLoadSourceListener()) {
+            if (customUrl.hasLoadSourceListener()) {
                 clientBuilder.addInterceptor(
-                        new LoadSourceInterceptor(url.toStringUrl(), url.getLoadSourceCallback()));
+                        new LoadSourceInterceptor(url.toStringUrl(), customUrl.getLoadSourceCallback()));
             }
 
             // Add progress interceptor (wraps response body)
-            if (url.hasProgressListener()) {
+            if (customUrl.hasProgressListener()) {
                 clientBuilder.addNetworkInterceptor(
-                        new ProgressInterceptor(url.toStringUrl(), url.getProgressCallback()));
+                        new ProgressInterceptor(url.toStringUrl(), customUrl.getProgressCallback()));
             }
 
             effectiveClient = clientBuilder.build();

@@ -61,7 +61,7 @@ export function initialize(config: ImagePipelineConfigSetting = {}): void {
             glideConfig.setMemoryCacheScreens(config.memoryCacheScreens);
         }
         // @ts-ignore okhttp3 only exists in the app
-        if (config.useOkhttp instanceof okhttp3.OkHttpClient) {
+        if (config?.useOkhttp && config.useOkhttp instanceof okhttp3.OkHttpClient) {
             glideConfig.setOkHttpClient(config.useOkhttp);
         }
         if (config?.usePersistentCacheKeyStore) {
