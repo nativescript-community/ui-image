@@ -271,7 +271,7 @@ export const tapToRetryEnabledProperty = new Property<ImageBase, boolean>({ name
 export const aspectRatioProperty = new Property<ImageBase, number>({ name: 'aspectRatio', affectsLayout: true, valueConverter: (v) => parseFloat(v) });
 export const decodeWidthProperty = new Property<ImageBase, number>({ name: 'decodeWidth', valueConverter: (v) => parseFloat(v) });
 export const decodeHeightProperty = new Property<ImageBase, number>({ name: 'decodeHeight', valueConverter: (v) => parseFloat(v) });
-export const tintColorProperty = new Property<ImageBase, Color>({ name: 'tintColor' });
+export const tintColorProperty = new Property<ImageBase, Color>({ name: 'tintColor', valueConverter: colorConverter });
 export const alwaysFadeProperty = new Property<ImageBase, boolean>({ name: 'alwaysFade', valueConverter: booleanConverter, defaultValue: false });
 export const fadeDurationProperty = new Property<ImageBase, number>({ name: 'fadeDuration', valueConverter: (v) => parseFloat(v) });
 export const noCacheProperty = new Property<ImageBase, boolean>({ name: 'noCache', defaultValue: false, valueConverter: booleanConverter });

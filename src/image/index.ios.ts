@@ -18,13 +18,20 @@ import {
     ScaleType,
     SrcType,
     Stretch,
+    blurRadiusProperty,
     decodeWidthProperty,
     failureImageUriProperty,
     headersProperty,
     imageRotationProperty,
     placeholderImageUriProperty,
+    roundAsCircleProperty,
+    roundBottomLeftRadiusProperty,
+    roundBottomRightRadiusProperty,
+    roundTopLeftRadiusProperty,
+    roundTopRightRadiusProperty,
     srcProperty,
     stretchProperty,
+    tintColorProperty,
     wrapNativeException
 } from './index-common';
 import { GetContextFromOptionsCallback } from '.';
@@ -165,6 +172,12 @@ function registerCacheKey(cacheKey: string, uri: any) {
     cacheKeyMap[uri] = [...set];
     saveCacheKeys();
 }
+// the keys are registered with the URL string, but callers can use a file path
+function getKeysToEvict(key: string) {
+    const url = getUri(key)?.absoluteString;
+    return [...new Set([...(cacheKeyMap[key] || []), ...(url ? cacheKeyMap[url] || [] : []), key, ...(url ? [url] : [])])];
+}
+
 export class ImagePipeline {
     static iosComplexCacheEviction = false;
     private mIos: SDImageCache = SDImageCache.sharedImageCache;
@@ -187,7 +200,7 @@ export class ImagePipeline {
     }
 
     evictFromMemoryCache(key: string): void {
-        const cachekKeys = (cacheKeyMap[key] || []).concat([key]);
+        const cachekKeys = getKeysToEvict(key);
         cachekKeys.forEach((k) => {
             this.mIos.removeImageFromMemoryForKey(k);
         });
@@ -198,7 +211,7 @@ export class ImagePipeline {
     }
 
     async evictFromCache(key: string, type = SDImageCacheType.All) {
-        const cachekKeys = (cacheKeyMap[key] || []).concat([key]);
+        const cachekKeys = getKeysToEvict(key);
         delete cacheKeyMap[key];
         return Promise.all(
             cachekKeys.map(
@@ -391,6 +404,10 @@ export class Img extends ImageBase {
     }
 
     public async updateImageUri() {
+        const src = this.src;
+        if (typeof src === 'string' || src instanceof ImageAsset) {
+            await getImagePipeline().evictFromCache(getUri(src).absoluteString);
+        }
         this._setNativeImage(null, false);
         this.initImage();
     }
@@ -442,6 +459,10 @@ export class Img extends ImageBase {
 
     private handleImageLoaded = (image: UIImage, error: NSError, cacheType: number) => {
         if (!this.nativeViewProtected) {
+            return;
+        }
+        if (error && error.domain === SDWebImageErrorDomain && error.code === SDWebImageError.Cancelled) {
+            // a newer request replaced this one (several properties can request the image at once)
             return;
         }
         const animate = (this.alwaysFade || cacheType !== SDImageCacheType.Memory) && this.fadeDuration > 0;
@@ -585,7 +606,8 @@ export class Img extends ImageBase {
                 this._isRemote = scheme === 'http' || scheme === 'https';
                 // reset network-start notification guard for this new request
                 this._notifiedLoadSourceNetworkStart = false;
-                let options = SDWebImageOptions.ScaleDownLargeImages | SDWebImageOptions.AvoidAutoSetImage;
+                // DelayPlaceholder: without it SDWebImage sets a nil placeholder, which blanks the current image while the new one loads
+                let options = SDWebImageOptions.ScaleDownLargeImages | SDWebImageOptions.AvoidAutoSetImage | SDWebImageOptions.DelayPlaceholder;
 
                 if (this.placeholderImageUri) {
                     this.placeholderImage = this.getUIImage(this.placeholderImageUri);
@@ -654,6 +676,20 @@ export class Img extends ImageBase {
     [headersProperty.setNative](value) {}
     @needRequestImage
     [failureImageUriProperty.setNative]() {}
+    @needRequestImage
+    [blurRadiusProperty.setNative]() {}
+    @needRequestImage
+    [tintColorProperty.setNative]() {}
+    @needRequestImage
+    [roundAsCircleProperty.setNative]() {}
+    @needRequestImage
+    [roundTopLeftRadiusProperty.setNative]() {}
+    @needRequestImage
+    [roundTopRightRadiusProperty.setNative]() {}
+    @needRequestImage
+    [roundBottomLeftRadiusProperty.setNative]() {}
+    @needRequestImage
+    [roundBottomRightRadiusProperty.setNative]() {}
 
     [stretchProperty.setNative](value: Stretch) {
         if (!this.nativeView) {

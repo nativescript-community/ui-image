@@ -1,4 +1,4 @@
-import { Color, CoreTypes, Property, View } from '@nativescript/core';
+import { AnimationDefinition, AnimationPromise, Color, CoreTypes, Property, View } from '@nativescript/core';
 import { EventData as IEventData } from '@nativescript/core/data/observable';
 import { ImageAsset } from '@nativescript/core/image-asset';
 import { ImageSource } from '@nativescript/core/image-source';
@@ -53,18 +53,54 @@ export declare enum CLogTypes {
 export declare const ImageViewTraceCategory = "NativescriptImage";
 export declare const CLog: (type: CLogTypes, ...args: any[]) => void;
 export type Transition = 'fade' | 'curlUp';
+/**
+ * Options for scaling the child bounds to the parent bounds
+ */
 export declare enum ScaleType {
     None = "none",
+    /**
+     * Scales width and height independently, so that the child matches the parent exactly.
+     */
     Fill = "fill",
+    /**
+     * Scales the child so that both dimensions will be greater than or equal to the corresponding dimension of the parent.
+     */
     AspectFill = "aspectFill",
+    /**
+     * Scales the child so that it fits entirely inside the parent.
+     */
     AspectFit = "aspectFit",
+    /**
+     * Performs no scaling.
+     */
     Center = "center",
+    /**
+     * Scales the child so that both dimensions will be greater than or equal to the corresponding dimension of the parent.
+     */
     CenterCrop = "centerCrop",
+    /**
+     * Scales the child so that it fits entirely inside the parent.
+     */
     CenterInside = "centerInside",
+    /**
+     * Scales the child so that it fits entirely inside the parent.
+     */
     FitCenter = "fitCenter",
+    /**
+     * Scales the child so that it fits entirely inside the parent.
+     */
     FitEnd = "fitEnd",
+    /**
+     * Scales the child so that it fits entirely inside the parent.
+     */
     FitStart = "fitStart",
+    /**
+     * Scales width and height independently, so that the child matches the parent exactly.
+     */
     FitXY = "fitXY",
+    /**
+     * Scales the child so that both dimensions will be greater than or equal to the corresponding dimension of the parent.
+     */
     FocusCrop = "focusCrop"
 }
 export interface AnimatedImage {
@@ -72,9 +108,24 @@ export interface AnimatedImage {
     stop(): void;
     isRunning(): boolean;
 }
+/**
+ * Encapsulates the common abstraction behind a platform specific object (typically a Bitmap) quality.
+ */
+export interface QualityInfo {
+    getQuality(): number;
+    isOfFullQuality(): boolean;
+    isOfGoodEnoughQuality(): boolean;
+}
+/**
+ * Encapsulates the common abstraction behind a platform specific object (typically a Bitmap's quality) details.
+ */
 export interface ImageInfo {
     getHeight(): number;
     getWidth(): number;
+    /**
+     * @platform android
+     */
+    getQualityInfo(): QualityInfo;
 }
 export interface ImageError {
     getMessage(): string;
@@ -87,13 +138,35 @@ export interface ImagePipelineConfigSetting {
     globalSignatureKey?: string;
     memoryCacheSize?: number;
     memoryCacheScreens?: number;
+    /**
+     * Android: a custom `okhttp3.OkHttpClient` used by Glide to download images.
+     * `false` or `undefined`: a default client is used.
+     * @platform android
+     */
+    useOkhttp?: boolean | any;
+    /**
+     * Called before the native library is initialized, to allow very custom native handling.
+     * - Android: `(glideConfiguration: com.nativescript.image.GlideConfiguration, config: ImagePipelineConfigSetting)`
+     * - iOS: `(loadersManager: SDImageLoadersManager, loaders: any[], config: ImagePipelineConfigSetting)`. `loaders` is the array that will be set, you can modify it.
+     */
+    onInitialize?: Function;
+    /**
+     * @deprecated Fresco only (4.x). Ignored: the Glide based plugin always downsamples.
+     * @platform android
+     */
+    isDownsampleEnabled?: boolean;
+    /**
+     * @deprecated Fresco only (4.x). Ignored.
+     * @platform android
+     */
+    leakTracker?: any;
 }
 /**
  * Options for prefetching images with transformations and request options
  */
 export interface PrefetchOptions {
     /** Custom headers for the request */
-    headers?: Record<string, string>;
+    headers?: Record<string, string> | (() => Record<string, string>);
     /** Decode width for downsampling */
     decodeWidth?: number;
     /** Decode height for downsampling */
@@ -119,7 +192,7 @@ export interface PrefetchOptions {
 }
 export type Stretch = 'none' | 'fill' | 'aspectFill' | 'aspectFit';
 export declare const srcProperty: Property<ImageBase, string | ImageSource | ImageAsset>;
-export declare const headersProperty: Property<ImageBase, Record<string, string>>;
+export declare const headersProperty: Property<ImageBase, Record<string, string> | (() => Record<string, string>)>;
 export declare const lowerResSrcProperty: Property<ImageBase, string>;
 export declare const placeholderImageUriProperty: Property<ImageBase, string>;
 export declare const failureImageUriProperty: Property<ImageBase, string>;
@@ -150,7 +223,7 @@ export declare const clipToBoundsProperty: Property<ImageBase, boolean>;
 export declare const animatedImageViewProperty: Property<ImageBase, boolean>;
 export declare const needRequestImage: (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor) => void;
 export type BasicSrcType = string | ImageSource | ImageAsset;
-export type SrcType = BasicSrcType | (() => BasicSrcType | PromiseLike<BasicSrcType>) | PromiseLike<BasicSrcType>;
+export type SrcType = BasicSrcType | ((ImageView: ImageBase) => BasicSrcType | PromiseLike<BasicSrcType>) | PromiseLike<BasicSrcType>;
 export declare abstract class ImageBase extends View {
     static finalImageSetEvent: string;
     static failureEvent: string;
@@ -188,12 +261,20 @@ export declare abstract class ImageBase extends View {
     noCache: boolean;
     noRatioEnforce: boolean;
     tintColor: Color;
-    headers: Record<string, string>;
+    headers: Record<string, string> | (() => Record<string, string>);
     readonly isLoading: boolean;
     get nativeImageViewProtected(): any;
     mCanRequestImage: boolean;
     mNeedRequestImage: boolean;
     protected abstract initImage(): Promise<void>;
+    protected abstract animateImageRotation(imageRotation: number, duration: number): void;
+    /**
+     * Same as `View.animate` but `imageRotation` can be animated, without the need of a patched @nativescript/core.
+     * Android rotates the image, iOS cross fades between the previous and the rotated image.
+     */
+    animate(animation: AnimationDefinition & {
+        imageRotation?: number;
+    }): AnimationPromise;
     onResumeNativeUpdates(): void;
     protected handleImageProgress(value: number, totalSize?: number): void;
     private static needsSizeAdjustment;
