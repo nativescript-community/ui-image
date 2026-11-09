@@ -75,10 +75,42 @@ export class ZoomImg extends ZoomImageBase {
         }
     }
 
+    /**
+     * Fits the image view to the scroll view while keeping the zoom and the visible center.
+     * The image view is scaled by a transform: its frame must not be set again while zoomed, and the scroll view
+     * can be resized while zoomed (eg the transformers of a pager resize its pages).
+     */
+    private layoutZoomView() {
+        const scrollView = this.nativeViewProtected;
+        const zoomView = this.nativeImageViewProtected;
+        const size = scrollView.bounds.size;
+        const zoomSize = zoomView.bounds.size;
+        if (size.width <= 0 || size.height <= 0 || (zoomSize.width === size.width && zoomSize.height === size.height)) {
+            return;
+        }
+        const scale = scrollView.zoomScale;
+        let ratioX = 0.5;
+        let ratioY = 0.5;
+        if (zoomSize.width > 0 && zoomSize.height > 0) {
+            const visibleCenter = scrollView.convertPointToView(CGPointMake(scrollView.bounds.origin.x + size.width / 2, scrollView.bounds.origin.y + size.height / 2), zoomView);
+            ratioX = visibleCenter.x / zoomSize.width;
+            ratioY = visibleCenter.y / zoomSize.height;
+        }
+        zoomView.transform = CGAffineTransformIdentity;
+        zoomView.frame = CGRectMake(0, 0, size.width, size.height);
+        zoomView.transform = CGAffineTransformMakeScale(scale, scale);
+        zoomView.center = CGPointMake((size.width * scale) / 2, (size.height * scale) / 2);
+        scrollView.contentSize = CGSizeMake(size.width * scale, size.height * scale);
+        scrollView.contentOffset = CGPointMake(
+            Math.max(0, Math.min(size.width * (scale - 1), ratioX * size.width * scale - size.width / 2)),
+            Math.max(0, Math.min(size.height * (scale - 1), ratioY * size.height * scale - size.height / 2))
+        );
+    }
+
     public onLayout(left: number, top: number, right: number, bottom: number): void {
         super.onLayout(left, top, right, bottom);
         if (this.nativeViewProtected) {
-            this.nativeImageViewProtected.frame = this.nativeViewProtected.bounds;
+            this.layoutZoomView();
             this.nativeViewProtected.updateContentInsetsForImage();
         }
     }

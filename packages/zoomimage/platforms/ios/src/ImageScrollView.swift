@@ -197,7 +197,7 @@ open class ImageScrollView: UIScrollView {
         // restore center point, first making sure it is within the allowable range.
         
         // convert our desired center point back to our own coordinate space
-        let boundsCenter = convert(pointToCenterAfterResize, to: _zoomView)
+        let boundsCenter = convert(pointToCenterAfterResize, from: _zoomView)
         
         // calculate the content offset that would yield that center point
         var offset = CGPoint(x: boundsCenter.x - bounds.size.width/2.0, y: boundsCenter.y - bounds.size.height/2.0)
