@@ -40,6 +40,7 @@ import {
     wrapNativeException
 } from './index-common';
 import { FailureEventData } from '@nativescript-community/ui-image';
+import { registerSharedTransitionHandler } from './shared-transition.android';
 
 let initialized = false;
 let initializeConfig: ImagePipelineConfigSetting;
@@ -1181,3 +1182,5 @@ function getScaleType(scaleType: ScaleType) {
 
     return null;
 }
+
+registerSharedTransitionHandler(Img);
