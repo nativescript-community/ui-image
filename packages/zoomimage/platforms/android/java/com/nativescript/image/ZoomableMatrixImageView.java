@@ -410,7 +410,14 @@ public class ZoomableMatrixImageView extends MatrixImageView {
 
         final int action = event.getActionMasked();
         switch (action) {
+            case MotionEvent.ACTION_POINTER_DOWN:
+                // a pinch must not be taken over by a scrolling parent
+                disallowParentIntercept(true);
+                break;
+
             case MotionEvent.ACTION_DOWN:
+                // when zoomed in the drag pans the image: parents (ScrollView, pager...) must not steal it
+                disallowParentIntercept(mCurrentScale > mMinScale * 1.001f);
                 mLastTouch.set(event.getX(), event.getY());
                 mIsDragging = false;
                 // reset move-during-pending flags for this new touch
@@ -454,6 +461,7 @@ public class ZoomableMatrixImageView extends MatrixImageView {
                 break;
 
             case MotionEvent.ACTION_UP:
+                disallowParentIntercept(false);
                 // Only accept the pending double-tap if there was no dragging/move.
                 if (mPendingDoubleTap && !mIsDragging && !mPendingDoubleTapWasMoved) {
                     // clear pending immediately to avoid duplicate handling by secondary UPs
@@ -520,6 +528,7 @@ public class ZoomableMatrixImageView extends MatrixImageView {
                 break;
 
             case MotionEvent.ACTION_CANCEL:
+                 disallowParentIntercept(false);
                  mPendingDoubleTap = false;
                  mIsDragging = false;
                  cancelFling();
@@ -538,6 +547,13 @@ public class ZoomableMatrixImageView extends MatrixImageView {
         }
 
         return true;
+    }
+
+    private void disallowParentIntercept(boolean disallow) {
+        android.view.ViewParent parent = getParent();
+        if (parent != null) {
+            parent.requestDisallowInterceptTouchEvent(disallow);
+        }
     }
 
     private void performPan(float dx, float dy) {
