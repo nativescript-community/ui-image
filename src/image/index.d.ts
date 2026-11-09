@@ -1,5 +1,5 @@
-import { ImageAsset, ImageSource, View } from '@nativescript/core';
-import { ImagePipelineConfigSetting } from './index-common';
+import { AnimationDefinition, AnimationPromise, ImageAsset, ImageSource, View } from '@nativescript/core';
+import { ImagePipelineConfigSetting, PrefetchOptions, SrcType } from './index-common';
 
 export * from './index-common';
 
@@ -75,7 +75,7 @@ export class Img extends View {
     android: any;
 
     /**
-     * String value used for the image URI.
+     * The image to show. Can be a path/URI, an `ImageSource`/`ImageAsset`, a `Promise` of those, or a function called with this view that returns one of those (or a `Promise`).
      */
     src: SrcType;
 
@@ -171,9 +171,10 @@ export class Img extends View {
     decodeHeight: number;
 
     /**
-     * add custom headers to the image download request
+     * add custom headers to the image download request.
+     * Can be a function returning the headers, called each time the image is requested.
      */
-    headers: Record<string, string>;
+    headers: Record<string, string> | (() => Record<string, string>);
 
     /**
      * IOS: if you want to show animated images you need to set this to true

@@ -47,7 +47,7 @@ let glideInstance: com.bumptech.glide.Glide;
 let signature: com.bumptech.glide.signature.ObjectKey;
 const globalSignatureKey = 'v1';
 
-export function initialize(config?: ImagePipelineConfigSetting): void {
+export function initialize(config: ImagePipelineConfigSetting = {}): void {
     if (!initialized) {
         const context = Utils.android.getApplicationContext();
         const glideConfig = com.nativescript.image.GlideConfiguration.getInstance();
@@ -58,8 +58,16 @@ export function initialize(config?: ImagePipelineConfigSetting): void {
         if (config?.memoryCacheScreens > 0) {
             glideConfig.setMemoryCacheScreens(config.memoryCacheScreens);
         }
+        // @ts-ignore okhttp3 only exists in the app
+        if (config.useOkhttp instanceof okhttp3.OkHttpClient) {
+            glideConfig.setOkHttpClient(config.useOkhttp);
+        }
         if (config?.usePersistentCacheKeyStore) {
             com.nativescript.image.EvictionManager.get().setPersistentStore(new com.nativescript.image.SharedPrefCacheKeyStore(Utils.android.getApplicationContext()));
+        }
+
+        if (config.onInitialize) {
+            config.onInitialize(glideConfig, config);
         }
 
         signature = new com.bumptech.glide.signature.ObjectKey(config?.globalSignatureKey || globalSignatureKey);
@@ -267,10 +275,11 @@ export class ImagePipeline {
                 // For local files (file://), use plain URI string to avoid OkHttp requirement
                 if (isNetworkRequest) {
                     let headersMap = null;
-                    if (options?.headers) {
+                    const headers = typeof options?.headers === 'function' ? options.headers() : options?.headers;
+                    if (headers) {
                         headersMap = new java.util.HashMap();
-                        for (const key in options.headers) {
-                            headersMap.put(key, options.headers[key]);
+                        for (const key in headers) {
+                            headersMap.put(key, headers[key]);
                         }
                     }
 
@@ -718,10 +727,11 @@ export class Img extends ImageBase {
         if (this.isNetworkRequest && (this.headers || this.progressCallback || this.loadSourceCallback)) {
             let headersMap = null;
 
-            if (this.headers) {
+            const headers = typeof this.headers === 'function' ? this.headers() : this.headers;
+            if (headers) {
                 headersMap = new java.util.HashMap();
-                for (const key in this.headers) {
-                    headersMap.put(key, this.headers[key]);
+                for (const key in headers) {
+                    headersMap.put(key, headers[key]);
                 }
             }
 
@@ -1016,7 +1026,7 @@ export class Img extends ImageBase {
             this.handleImageSrc(await src);
             return;
         } else if (typeof src === 'function') {
-            const newSrc = src();
+            const newSrc = src(this);
             if (newSrc instanceof Promise) {
                 await newSrc;
             }

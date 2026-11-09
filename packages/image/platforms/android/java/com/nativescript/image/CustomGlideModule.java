@@ -101,8 +101,10 @@ public class CustomGlideModule extends AppGlideModule {
   @Override
   public void registerComponents(@NonNull Context context, @NonNull Glide glide, @NonNull Registry registry) {
 
-    // Create base OkHttp client
-    OkHttpClient client = new OkHttpClient.Builder().build();
+    OkHttpClient client = GlideConfiguration.getInstance().getOkHttpClient();
+    if (client == null) {
+      client = new OkHttpClient.Builder().build();
+    }
 
     registry.replace(
         GlideUrl.class,

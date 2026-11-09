@@ -49,6 +49,8 @@ declare namespace com {
                 setMemoryCacheScreens(memoryCacheScreens: number);
                 getMemoryCacheSize(): number;
                 setMemoryCacheSize(memoryCacheSize: number);
+                setOkHttpClient(client: okhttp3.OkHttpClient);
+                getOkHttpClient(): okhttp3.OkHttpClient;
 				static getInstance():GlideConfiguration;
 			}
 			export class CacheKeyStore {

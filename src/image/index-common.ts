@@ -138,6 +138,32 @@ export interface ImagePipelineConfigSetting {
 
     memoryCacheSize?: number; // in bytes
     memoryCacheScreens?: number; // multiplier for auto-calculation
+
+    /**
+     * Android: a custom `okhttp3.OkHttpClient` used by Glide to download images.
+     * `false` or `undefined`: a default client is used.
+     * @platform android
+     */
+    useOkhttp?: boolean | any;
+
+    /**
+     * Called before the native library is initialized, to allow very custom native handling.
+     * - Android: `(glideConfiguration: com.nativescript.image.GlideConfiguration, config: ImagePipelineConfigSetting)`
+     * - iOS: `(loadersManager: SDImageLoadersManager, loaders: any[], config: ImagePipelineConfigSetting)`. `loaders` is the array that will be set, you can modify it.
+     */
+    onInitialize?: Function;
+
+    /**
+     * @deprecated Fresco only (4.x). Ignored: the Glide based plugin always downsamples.
+     * @platform android
+     */
+    isDownsampleEnabled?: boolean;
+
+    /**
+     * @deprecated Fresco only (4.x). Ignored.
+     * @platform android
+     */
+    leakTracker?: any;
 }
 
 /**
@@ -145,7 +171,7 @@ export interface ImagePipelineConfigSetting {
  */
 export interface PrefetchOptions {
     /** Custom headers for the request */
-    headers?: Record<string, string>;
+    headers?: Record<string, string> | (() => Record<string, string>);
     /** Decode width for downsampling */
     decodeWidth?: number;
     /** Decode height for downsampling */
@@ -173,7 +199,7 @@ export interface PrefetchOptions {
 export type Stretch = 'none' | 'fill' | 'aspectFill' | 'aspectFit';
 
 export const srcProperty = new Property<ImageBase, string | ImageSource | ImageAsset>({ name: 'src' });
-export const headersProperty = new Property<ImageBase, Record<string, string>>({ name: 'headers' });
+export const headersProperty = new Property<ImageBase, Record<string, string> | (() => Record<string, string>)>({ name: 'headers' });
 export const lowerResSrcProperty = new Property<ImageBase, string>({ name: 'lowerResSrc' });
 export const placeholderImageUriProperty = new Property<ImageBase, string>({ name: 'placeholderImageUri' });
 export const failureImageUriProperty = new Property<ImageBase, string>({ name: 'failureImageUri' });
@@ -273,7 +299,7 @@ export const needRequestImage = function (target: any, propertyKey: string | sym
 };
 
 export type BasicSrcType = string | ImageSource | ImageAsset;
-export type SrcType = BasicSrcType | (() => BasicSrcType | PromiseLike<BasicSrcType>) | PromiseLike<BasicSrcType>;
+export type SrcType = BasicSrcType | ((ImageView: ImageBase) => BasicSrcType | PromiseLike<BasicSrcType>) | PromiseLike<BasicSrcType>;
 export abstract class ImageBase extends View {
     public static finalImageSetEvent: string = 'finalImageSet';
     public static failureEvent: string = 'failure';
@@ -312,7 +338,7 @@ export abstract class ImageBase extends View {
     public noCache: boolean;
     public noRatioEnforce: boolean;
     public tintColor: Color;
-    headers: Record<string, string>;
+    headers: Record<string, string> | (() => Record<string, string>);
 
     public readonly isLoading: boolean;
 

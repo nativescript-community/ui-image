@@ -23,6 +23,12 @@ import imageModule = require("@nativescript-community/ui-image");
 imageModule.initialize();
 ```
 
+`initialize` accepts an optional config:
+
+- `useOkhttp` (Android): a custom `okhttp3.OkHttpClient` used to download images.
+- `onInitialize` (Android and iOS): called before the native library is initialized, for very custom native handling.
+  Android gets `(glideConfiguration, config)`, iOS gets `(loadersManager, loaders, config)`.
+
 ## API
 
 ### Events
@@ -253,6 +259,7 @@ export function onSubmit(args: EventData) {
 - **src** 
 
 String value used for the image URI. You can use this property to set the image to be loaded from remote location (http, https), from the resources and local files of your {N} application.
+It can also be an `ImageSource`/`ImageAsset`, a `Promise`, or a function called with the view as argument and returning one of those (or a `Promise` of those).
 
 ```xml
 <@nativescript-community/ui-image:Img src="https://docs.nativescript.org/angular/img/cli-getting-started/angular/chapter0/NativeScript_logo.png"/>
@@ -375,6 +382,7 @@ Number value used as the downsampled width of the imageModule drawable.
 - **headers**
 
 Object that defines custom request headers to be sent with the image download request.
+It can also be a function returning the headers, called each time the image is requested (for example to always send a fresh token).
 
 ```xml
 <@nativescript-community/ui-image:Img headers="{Authorization: 'bearer abcdefghijk'}"/>

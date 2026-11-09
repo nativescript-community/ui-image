@@ -102,8 +102,12 @@ function getUIImageScaleType(scaleType: string) {
     return null;
 }
 
-export function initialize(config?: ImagePipelineConfigSetting): void {
-    SDImageLoadersManager.sharedManager.loaders = NSArray.arrayWithArray([SDWebImageDownloader.sharedDownloader, SDImagePhotosLoader.sharedLoader]);
+export function initialize(config: ImagePipelineConfigSetting = {}): void {
+    const loaders = [SDWebImageDownloader.sharedDownloader, SDImagePhotosLoader.sharedLoader];
+    if (config.onInitialize) {
+        config.onInitialize(SDImageLoadersManager.sharedManager, loaders, config);
+    }
+    SDImageLoadersManager.sharedManager.loaders = NSArray.arrayWithArray(loaders);
 }
 export function shutDown(): void {}
 
@@ -148,10 +152,11 @@ function getContextFromOptions(options: Partial<ImgType>) {
         context.setValueForKey(SDImagePipelineTransformer.transformerWithTransformers(transformers), SDWebImageContextImageTransformer);
     }
     if (options.headers) {
+        const headers = typeof options.headers === 'function' ? options.headers() : options.headers;
         const requestModifier = SDWebImageDownloaderRequestModifier.requestModifierWithBlock((request: NSURLRequest): NSURLRequest => {
             const newRequest = request.mutableCopy() as NSMutableURLRequest;
-            Object.keys(options.headers).forEach((k) => {
-                newRequest.addValueForHTTPHeaderField(options.headers[k], k);
+            Object.keys(headers).forEach((k) => {
+                newRequest.addValueForHTTPHeaderField(headers[k], k);
             });
 
             return newRequest.copy();
@@ -551,7 +556,7 @@ export class Img extends ImageBase {
                 this.handleImageSrc(await src);
                 return;
             } else if (typeof src === 'function') {
-                const newSrc = src();
+                const newSrc = src(this);
                 if (newSrc instanceof Promise) {
                     await newSrc;
                 }
@@ -617,21 +622,7 @@ export class Img extends ImageBase {
                     });
                 }
 
-                if (this.headers) {
-                    const requestModifier = SDWebImageDownloaderRequestModifier.requestModifierWithBlock((request: NSURLRequest): NSURLRequest => {
-                        const newRequest = request.mutableCopy() as NSMutableURLRequest;
-                        Object.keys(this.headers).forEach((k) => {
-                            newRequest.addValueForHTTPHeaderField(this.headers[k], k);
-                        });
-
-                        return newRequest.copy();
-                    });
-
-                    context.setValueForKey(requestModifier, SDWebImageContextDownloadRequestModifier);
-                }
-
                 this.mCacheKey = SDWebImageManager.sharedManager.cacheKeyForURLContext(uri, context);
-                console.log('loading image', uri, this.mCacheKey);
                 if (ImagePipeline.iosComplexCacheEviction) {
                     registerCacheKey(this.mCacheKey, uri);
                 }
