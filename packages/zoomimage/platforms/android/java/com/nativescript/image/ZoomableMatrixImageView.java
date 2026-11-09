@@ -142,8 +142,11 @@ public class ZoomableMatrixImageView extends MatrixImageView {
         mTransformListeners.remove(listener);
     }
 
+    private final Matrix mComposedMatrix = new Matrix();
+
     @Override
     protected void onComposedMatrixChanged(Matrix composed) {
+        mComposedMatrix.set(composed);
         if (mTransformListeners.isEmpty()) {
             return;
         }
@@ -450,6 +453,12 @@ public class ZoomableMatrixImageView extends MatrixImageView {
                         mIsDragging = true;
                         // movement after double-tap implies a cancel; already handled above
                     }
+                    if (mIsDragging && isHorizontalDragAtImageEdge(dx, dy)) {
+                        // the image can not move further: let a parent pager take the swipe
+                        disallowParentIntercept(false);
+                        mLastTouch.set(event.getX(), event.getY());
+                        break;
+                    }
                     if (mIsDragging) {
                         // pan sensitivity used for translation; do not mix with the double-tap scale
                         performPan(dx * mPanSensitivity, dy * mPanSensitivity);
@@ -547,6 +556,17 @@ public class ZoomableMatrixImageView extends MatrixImageView {
         }
 
         return true;
+    }
+
+    private boolean isHorizontalDragAtImageEdge(float dx, float dy) {
+        Drawable d = getDrawable();
+        if (d == null || mCurrentScale <= mMinScale * 1.001f || Math.abs(dx) <= Math.abs(dy)) {
+            return false;
+        }
+        RectF mapped = new RectF(0f, 0f, Math.max(1, d.getIntrinsicWidth()), Math.max(1, d.getIntrinsicHeight()));
+        mComposedMatrix.mapRect(mapped);
+        final float eps = 1f;
+        return dx > 0 ? mapped.left >= getContentLeft() - eps : mapped.right <= getContentRight() + eps;
     }
 
     private void disallowParentIntercept(boolean disallow) {
