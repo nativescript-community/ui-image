@@ -744,7 +744,12 @@ private final Matrix mLastComposedMatrix = new Matrix();
                 canvas.restoreToCount(saveCount);
                 return;
             }
-        } 
+        }
+        // The image matrix can make the drawable larger than the view (centerCrop...) and a parent
+        // with clipChildren=false (eg NativeScript layouts) would not clip it.
+        int saveCount = canvas.save();
+        canvas.clipRect(0, 0, getWidth(), getHeight());
         super.onDraw(canvas);
+        canvas.restoreToCount(saveCount);
     }
 }
