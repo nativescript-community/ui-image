@@ -14,6 +14,7 @@ import {
     LoadSourceEventData,
     PrefetchOptions,
     ProgressEventData,
+    QualityInfo,
     ScaleType,
     SrcType,
     aspectRatioProperty,
@@ -467,12 +468,6 @@ export class ImageError implements ImageErrorBase {
     toString(): string {
         return this._stringValue;
     }
-}
-
-export interface QualityInfo {
-    getQuality();
-    isOfFullQuality();
-    isOfGoodEnoughQuality();
 }
 
 export class ImageInfo implements ImageInfoBase {

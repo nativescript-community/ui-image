@@ -14,6 +14,7 @@ import {
     LoadSourceEventData,
     PrefetchOptions,
     ProgressEventData,
+    QualityInfo,
     ScaleType,
     SrcType,
     Stretch,
@@ -43,35 +44,19 @@ export class ImageInfo implements ImageInfoBase {
     getWidth(): number {
         return this.width;
     }
+
+    getQualityInfo(): QualityInfo {
+        return {
+            getQuality: () => 1,
+            isOfFullQuality: () => true,
+            isOfGoodEnoughQuality: () => true
+        };
+    }
 }
 
 const supportedLocalFormats = ['png', 'jpg', 'gif', 'jpeg', 'webp'];
 
 let screenScale = -1;
-
-function getScaleType(scaleType: string) {
-    if (isString(scaleType)) {
-        switch (scaleType) {
-            case ScaleType.Center:
-            case ScaleType.CenterCrop:
-            case ScaleType.AspectFill:
-                return SDImageScaleMode.AspectFill;
-            case ScaleType.CenterInside:
-            case ScaleType.FitCenter:
-            case ScaleType.FitEnd:
-            case ScaleType.FitStart:
-            case ScaleType.AspectFit:
-                return SDImageScaleMode.AspectFit;
-            case ScaleType.FitXY:
-            case ScaleType.FocusCrop:
-            case ScaleType.Fill:
-                return SDImageScaleMode.Fill;
-            default:
-                break;
-        }
-    }
-    return null;
-}
 
 function getUIImageScaleType(scaleType: string) {
     if (isString(scaleType)) {

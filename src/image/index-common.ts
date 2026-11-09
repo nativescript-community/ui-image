@@ -1,4 +1,4 @@
-import { Color, CoreTypes, Length, Property, Trace, View, booleanConverter } from '@nativescript/core';
+import { AnimationDefinition, AnimationPromise, CSSType, Color, CoreTypes, Length, Property, Trace, View, booleanConverter } from '@nativescript/core';
 import { EventData as IEventData } from '@nativescript/core/data/observable';
 // import { colorConverter } from '@nativescript/core/ui/styling/style-properties';
 import { ImageAsset } from '@nativescript/core/image-asset';
@@ -74,18 +74,54 @@ export const CLog = (type: CLogTypes, ...args) => {
 
 export type Transition = 'fade' | 'curlUp';
 
+/**
+ * Options for scaling the child bounds to the parent bounds
+ */
 export enum ScaleType {
     None = 'none',
+    /**
+     * Scales width and height independently, so that the child matches the parent exactly.
+     */
     Fill = 'fill',
+    /**
+     * Scales the child so that both dimensions will be greater than or equal to the corresponding dimension of the parent.
+     */
     AspectFill = 'aspectFill',
+    /**
+     * Scales the child so that it fits entirely inside the parent.
+     */
     AspectFit = 'aspectFit',
+    /**
+     * Performs no scaling.
+     */
     Center = 'center',
+    /**
+     * Scales the child so that both dimensions will be greater than or equal to the corresponding dimension of the parent.
+     */
     CenterCrop = 'centerCrop',
+    /**
+     * Scales the child so that it fits entirely inside the parent.
+     */
     CenterInside = 'centerInside',
+    /**
+     * Scales the child so that it fits entirely inside the parent.
+     */
     FitCenter = 'fitCenter',
+    /**
+     * Scales the child so that it fits entirely inside the parent.
+     */
     FitEnd = 'fitEnd',
+    /**
+     * Scales the child so that it fits entirely inside the parent.
+     */
     FitStart = 'fitStart',
+    /**
+     * Scales width and height independently, so that the child matches the parent exactly.
+     */
     FitXY = 'fitXY',
+    /**
+     * Scales the child so that both dimensions will be greater than or equal to the corresponding dimension of the parent.
+     */
     FocusCrop = 'focusCrop'
 }
 
@@ -95,9 +131,28 @@ export interface AnimatedImage {
     isRunning(): boolean;
 }
 
+/**
+ * Encapsulates the common abstraction behind a platform specific object (typically a Bitmap) quality.
+ */
+export interface QualityInfo {
+    getQuality(): number;
+
+    isOfFullQuality(): boolean;
+
+    isOfGoodEnoughQuality(): boolean;
+}
+
+/**
+ * Encapsulates the common abstraction behind a platform specific object (typically a Bitmap's quality) details.
+ */
 export interface ImageInfo {
     getHeight(): number;
     getWidth(): number;
+
+    /**
+     * @platform android
+     */
+    getQualityInfo(): QualityInfo;
 }
 
 export interface ImageError {
@@ -300,6 +355,7 @@ export const needRequestImage = function (target: any, propertyKey: string | sym
 
 export type BasicSrcType = string | ImageSource | ImageAsset;
 export type SrcType = BasicSrcType | ((ImageView: ImageBase) => BasicSrcType | PromiseLike<BasicSrcType>) | PromiseLike<BasicSrcType>;
+@CSSType('Img')
 export abstract class ImageBase extends View {
     public static finalImageSetEvent: string = 'finalImageSet';
     public static failureEvent: string = 'failure';
