@@ -395,13 +395,26 @@ export class Img extends ImageBase {
         this.initImage();
     }
 
+    // set by `animate({imageRotation})`: the next image is cross faded in, even from the memory cache
+    private pendingFadeDuration = 0;
+
+    protected animateImageRotation(imageRotation: number, duration: number) {
+        this.pendingFadeDuration = duration;
+        this.imageRotation = imageRotation;
+    }
+
     public _setNativeImage(nativeImage: UIImage, animated = true) {
-        if (animated && this.fadeDuration) {
+        const fadeDuration = this.pendingFadeDuration || this.fadeDuration;
+        if (nativeImage && this.pendingFadeDuration) {
+            this.pendingFadeDuration = 0;
+            animated = true;
+        }
+        if (animated && fadeDuration) {
             // Crossfade from the currently visible content (placeholder/previous image) to the new image.
             try {
                 UIView.transitionWithViewDurationOptionsAnimationsCompletion(
                     this.nativeImageViewProtected,
-                    this.fadeDuration / 1000,
+                    fadeDuration / 1000,
                     UIViewAnimationOptions.TransitionCrossDissolve,
                     () => {
                         this.nativeImageViewProtected.image = nativeImage;
@@ -412,7 +425,7 @@ export class Img extends ImageBase {
                 // Fall back to an alpha fade if transition isn't available for some reason.
                 this.nativeImageViewProtected.alpha = 0.0;
                 this.nativeImageViewProtected.image = nativeImage;
-                UIView.animateWithDurationAnimations(this.fadeDuration / 1000, () => {
+                UIView.animateWithDurationAnimations(fadeDuration / 1000, () => {
                     this.nativeImageViewProtected.alpha = this.opacity;
                 });
             }

@@ -192,6 +192,12 @@ export class Img extends View {
     imageRotation: number;
 
     cacheKey: string;
+
+    /**
+     * Same as `View.animate` but `imageRotation` can be animated, without a patched @nativescript/core.
+     * Android rotates the image. iOS cross fades between the previous and the rotated image.
+     */
+    animate(animation: AnimationDefinition & { imageRotation?: number }): AnimationPromise;
 }
 
 /**

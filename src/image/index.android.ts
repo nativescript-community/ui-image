@@ -563,6 +563,10 @@ export class Img extends ImageBase {
         this.initImage();
     }
 
+    protected animateImageRotation(imageRotation: number, duration: number) {
+        this.nativeViewProtected?.animateImageRotation(imageRotation, duration);
+    }
+
     @needRequestImage
     [placeholderImageUriProperty.setNative]() {}
 

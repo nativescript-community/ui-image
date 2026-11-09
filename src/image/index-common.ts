@@ -407,6 +407,31 @@ export abstract class ImageBase extends View {
     mCanRequestImage = true;
     mNeedRequestImage = false;
     protected abstract initImage(): Promise<void>;
+    protected abstract animateImageRotation(imageRotation: number, duration: number): void;
+
+    /**
+     * Same as `View.animate` but `imageRotation` can be animated, without the need of a patched @nativescript/core.
+     * Android rotates the image, iOS cross fades between the previous and the rotated image.
+     */
+    public animate(animation: AnimationDefinition & { imageRotation?: number }): AnimationPromise {
+        const { imageRotation, ...viewAnimation } = animation;
+        if (imageRotation === undefined) {
+            return super.animate(animation);
+        }
+        const duration = animation.duration ?? 300;
+        this.animateImageRotation(imageRotation, duration);
+        const rotationDone = new Promise<void>((resolve) => {
+            setTimeout(() => {
+                this.imageRotation = imageRotation;
+                resolve();
+            }, duration);
+        });
+        const otherProperties = Object.keys(viewAnimation).filter((key) => !['curve', 'delay', 'duration', 'iterations', 'target'].includes(key));
+        const viewDone = otherProperties.length ? super.animate(viewAnimation) : null;
+        // the result is only awaited or cancelled: a plain promise with a no-op cancel is enough
+        const result = Promise.all([rotationDone, viewDone]).then(() => undefined);
+        return Object.assign(result, { cancel: () => viewDone?.cancel() }) as unknown as AnimationPromise;
+    }
     public onResumeNativeUpdates(): void {
         // {N} suspends properties update on `_suspendNativeUpdates`. So we only need to do this in onResumeNativeUpdates
         this.mCanRequestImage = false;
