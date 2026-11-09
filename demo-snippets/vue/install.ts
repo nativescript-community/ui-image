@@ -3,6 +3,8 @@ import Vue from 'nativescript-vue';
 import { Trace } from '@nativescript/core';
 import ImageModule from '@nativescript-community/ui-image/vue';
 import ZoomImageModule from '@nativescript-community/ui-zoomimage/vue';
+import PagerModule from '@nativescript-community/ui-pager/vue';
+import { Pager } from '@nativescript-community/ui-pager';
 import { getImagePipeline, initialize, ImageViewTraceCategory } from '@nativescript-community/ui-image';
 import { installMixins } from '@nativescript-community/ui-image-colorfilter';
 
@@ -22,6 +24,9 @@ import ColorFilter from './ColorFilter.vue';
 import Failure from './Failure.vue';
 import NavigationTest from './NavigationTest.vue';
 import CrossFadeTest from './CrossFadeTest.vue';
+import DocumentScanner from './DocumentScanner.vue';
+import ZoomInPager from './ZoomInPager.vue';
+import ZoomOutTransformer from './transformers/ZoomOutTransformer';
 
 Trace.addCategories(ImageViewTraceCategory);
 Trace.enable();
@@ -34,6 +39,8 @@ export function installPlugin() {
     });
     Vue.use(ImageModule);
     Vue.use(ZoomImageModule);
+    Vue.use(PagerModule);
+    Pager.registerTransformer('zoomOut', ZoomOutTransformer);
     setTimeout(() => {
         // we need to wait for the diskcache to be set
         getImagePipeline()
@@ -60,5 +67,7 @@ export const demos = [
     { name: 'Failure', path: 'failure', component: Failure },
     { name: 'ZoomImage', path: 'zoom', component: ZoomImage },
     { name: 'ColorFilter', path: 'color-filter', component: ColorFilter },
-    { name: 'Navigation', path: 'navigation', component: NavigationTest }
+    { name: 'Navigation', path: 'navigation', component: NavigationTest },
+    { name: 'DocumentScanner usage', path: 'document-scanner', component: DocumentScanner },
+    { name: 'ZoomImg in a Pager', path: 'zoom-in-pager', component: ZoomInPager }
 ];

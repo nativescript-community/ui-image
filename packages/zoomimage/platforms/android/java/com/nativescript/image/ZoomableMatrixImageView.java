@@ -127,6 +127,35 @@ public class ZoomableMatrixImageView extends MatrixImageView {
         void onZoomChanged(float newZoom);
     }
 
+    // Transform change listeners
+    public interface TransformListener {
+        void onTransformChanged(Matrix transform);
+    }
+
+    private final java.util.List<TransformListener> mTransformListeners = new java.util.concurrent.CopyOnWriteArrayList<>();
+
+    public void addTransformListener(TransformListener listener) {
+        mTransformListeners.add(listener);
+    }
+
+    public void removeTransformListener(TransformListener listener) {
+        mTransformListeners.remove(listener);
+    }
+
+    private final Matrix mComposedMatrix = new Matrix();
+
+    @Override
+    protected void onComposedMatrixChanged(Matrix composed) {
+        mComposedMatrix.set(composed);
+        if (mTransformListeners.isEmpty()) {
+            return;
+        }
+        Matrix copy = new Matrix(composed);
+        for (TransformListener listener : mTransformListeners) {
+            listener.onTransformChanged(copy);
+        }
+    }
+
     // Temporary for combined animator: stores mapped-before position of the
     // drawable point
     private float[] mMappedBeforeForAnimator = null;
@@ -384,7 +413,14 @@ public class ZoomableMatrixImageView extends MatrixImageView {
 
         final int action = event.getActionMasked();
         switch (action) {
+            case MotionEvent.ACTION_POINTER_DOWN:
+                // a pinch must not be taken over by a scrolling parent
+                disallowParentIntercept(true);
+                break;
+
             case MotionEvent.ACTION_DOWN:
+                // when zoomed in the drag pans the image: parents (ScrollView, pager...) must not steal it
+                disallowParentIntercept(mCurrentScale > mMinScale * 1.001f);
                 mLastTouch.set(event.getX(), event.getY());
                 mIsDragging = false;
                 // reset move-during-pending flags for this new touch
@@ -417,6 +453,12 @@ public class ZoomableMatrixImageView extends MatrixImageView {
                         mIsDragging = true;
                         // movement after double-tap implies a cancel; already handled above
                     }
+                    if (mIsDragging && isHorizontalDragAtImageEdge(dx, dy)) {
+                        // the image can not move further: let a parent pager take the swipe
+                        disallowParentIntercept(false);
+                        mLastTouch.set(event.getX(), event.getY());
+                        break;
+                    }
                     if (mIsDragging) {
                         // pan sensitivity used for translation; do not mix with the double-tap scale
                         performPan(dx * mPanSensitivity, dy * mPanSensitivity);
@@ -428,6 +470,7 @@ public class ZoomableMatrixImageView extends MatrixImageView {
                 break;
 
             case MotionEvent.ACTION_UP:
+                disallowParentIntercept(false);
                 // Only accept the pending double-tap if there was no dragging/move.
                 if (mPendingDoubleTap && !mIsDragging && !mPendingDoubleTapWasMoved) {
                     // clear pending immediately to avoid duplicate handling by secondary UPs
@@ -494,6 +537,7 @@ public class ZoomableMatrixImageView extends MatrixImageView {
                 break;
 
             case MotionEvent.ACTION_CANCEL:
+                 disallowParentIntercept(false);
                  mPendingDoubleTap = false;
                  mIsDragging = false;
                  cancelFling();
@@ -512,6 +556,24 @@ public class ZoomableMatrixImageView extends MatrixImageView {
         }
 
         return true;
+    }
+
+    private boolean isHorizontalDragAtImageEdge(float dx, float dy) {
+        Drawable d = getDrawable();
+        if (d == null || mCurrentScale <= mMinScale * 1.001f || Math.abs(dx) <= Math.abs(dy)) {
+            return false;
+        }
+        RectF mapped = new RectF(0f, 0f, Math.max(1, d.getIntrinsicWidth()), Math.max(1, d.getIntrinsicHeight()));
+        mComposedMatrix.mapRect(mapped);
+        final float eps = 1f;
+        return dx > 0 ? mapped.left >= getContentLeft() - eps : mapped.right <= getContentRight() + eps;
+    }
+
+    private void disallowParentIntercept(boolean disallow) {
+        android.view.ViewParent parent = getParent();
+        if (parent != null) {
+            parent.requestDisallowInterceptTouchEvent(disallow);
+        }
     }
 
     private void performPan(float dx, float dy) {

@@ -27,6 +27,12 @@ This component directly inherint `@nativescript-community/ui-image` so you can f
 
 It adds a few properties
 
+### Events
+
+- **transformChanged**
+
+Fired each time the zoom/pan transform changes. The event data has the native transform: `android` (`android.graphics.Matrix`, drawable bounds to view) or `ios` (`CGAffineTransform`).
+
 ## Demos
 This repository includes Angular, Vue.js demos. In order to run these execute the following in your shell:
 ```shell

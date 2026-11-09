@@ -14,16 +14,24 @@ import {
     LoadSourceEventData,
     PrefetchOptions,
     ProgressEventData,
+    QualityInfo,
     ScaleType,
     SrcType,
     Stretch,
+    blurRadiusProperty,
     decodeWidthProperty,
     failureImageUriProperty,
     headersProperty,
     imageRotationProperty,
     placeholderImageUriProperty,
+    roundAsCircleProperty,
+    roundBottomLeftRadiusProperty,
+    roundBottomRightRadiusProperty,
+    roundTopLeftRadiusProperty,
+    roundTopRightRadiusProperty,
     srcProperty,
     stretchProperty,
+    tintColorProperty,
     wrapNativeException
 } from './index-common';
 import { GetContextFromOptionsCallback } from '.';
@@ -43,35 +51,19 @@ export class ImageInfo implements ImageInfoBase {
     getWidth(): number {
         return this.width;
     }
+
+    getQualityInfo(): QualityInfo {
+        return {
+            getQuality: () => 1,
+            isOfFullQuality: () => true,
+            isOfGoodEnoughQuality: () => true
+        };
+    }
 }
 
 const supportedLocalFormats = ['png', 'jpg', 'gif', 'jpeg', 'webp'];
 
 let screenScale = -1;
-
-function getScaleType(scaleType: string) {
-    if (isString(scaleType)) {
-        switch (scaleType) {
-            case ScaleType.Center:
-            case ScaleType.CenterCrop:
-            case ScaleType.AspectFill:
-                return SDImageScaleMode.AspectFill;
-            case ScaleType.CenterInside:
-            case ScaleType.FitCenter:
-            case ScaleType.FitEnd:
-            case ScaleType.FitStart:
-            case ScaleType.AspectFit:
-                return SDImageScaleMode.AspectFit;
-            case ScaleType.FitXY:
-            case ScaleType.FocusCrop:
-            case ScaleType.Fill:
-                return SDImageScaleMode.Fill;
-            default:
-                break;
-        }
-    }
-    return null;
-}
 
 function getUIImageScaleType(scaleType: string) {
     if (isString(scaleType)) {
@@ -102,8 +94,12 @@ function getUIImageScaleType(scaleType: string) {
     return null;
 }
 
-export function initialize(config?: ImagePipelineConfigSetting): void {
-    SDImageLoadersManager.sharedManager.loaders = NSArray.arrayWithArray([SDWebImageDownloader.sharedDownloader, SDImagePhotosLoader.sharedLoader]);
+export function initialize(config: ImagePipelineConfigSetting = {}): void {
+    const loaders = [SDWebImageDownloader.sharedDownloader, SDImagePhotosLoader.sharedLoader];
+    if (config.onInitialize) {
+        config.onInitialize(SDImageLoadersManager.sharedManager, loaders, config);
+    }
+    SDImageLoadersManager.sharedManager.loaders = NSArray.arrayWithArray(loaders);
 }
 export function shutDown(): void {}
 
@@ -148,10 +144,11 @@ function getContextFromOptions(options: Partial<ImgType>) {
         context.setValueForKey(SDImagePipelineTransformer.transformerWithTransformers(transformers), SDWebImageContextImageTransformer);
     }
     if (options.headers) {
+        const headers = typeof options.headers === 'function' ? options.headers() : options.headers;
         const requestModifier = SDWebImageDownloaderRequestModifier.requestModifierWithBlock((request: NSURLRequest): NSURLRequest => {
             const newRequest = request.mutableCopy() as NSMutableURLRequest;
-            Object.keys(options.headers).forEach((k) => {
-                newRequest.addValueForHTTPHeaderField(options.headers[k], k);
+            Object.keys(headers).forEach((k) => {
+                newRequest.addValueForHTTPHeaderField(headers[k], k);
             });
 
             return newRequest.copy();
@@ -175,6 +172,12 @@ function registerCacheKey(cacheKey: string, uri: any) {
     cacheKeyMap[uri] = [...set];
     saveCacheKeys();
 }
+// the keys are registered with the URL string, but callers can use a file path
+function getKeysToEvict(key: string) {
+    const url = getUri(key)?.absoluteString;
+    return [...new Set([...(cacheKeyMap[key] || []), ...(url ? cacheKeyMap[url] || [] : []), key, ...(url ? [url] : [])])];
+}
+
 export class ImagePipeline {
     static iosComplexCacheEviction = false;
     private mIos: SDImageCache = SDImageCache.sharedImageCache;
@@ -197,7 +200,7 @@ export class ImagePipeline {
     }
 
     evictFromMemoryCache(key: string): void {
-        const cachekKeys = (cacheKeyMap[key] || []).concat([key]);
+        const cachekKeys = getKeysToEvict(key);
         cachekKeys.forEach((k) => {
             this.mIos.removeImageFromMemoryForKey(k);
         });
@@ -208,7 +211,7 @@ export class ImagePipeline {
     }
 
     async evictFromCache(key: string, type = SDImageCacheType.All) {
-        const cachekKeys = (cacheKeyMap[key] || []).concat([key]);
+        const cachekKeys = getKeysToEvict(key);
         delete cacheKeyMap[key];
         return Promise.all(
             cachekKeys.map(
@@ -401,17 +404,34 @@ export class Img extends ImageBase {
     }
 
     public async updateImageUri() {
+        const src = this.src;
+        if (typeof src === 'string' || src instanceof ImageAsset) {
+            await getImagePipeline().evictFromCache(getUri(src).absoluteString);
+        }
         this._setNativeImage(null, false);
         this.initImage();
     }
 
+    // set by `animate({imageRotation})`: the next image is cross faded in, even from the memory cache
+    private pendingFadeDuration = 0;
+
+    protected animateImageRotation(imageRotation: number, duration: number) {
+        this.pendingFadeDuration = duration;
+        this.imageRotation = imageRotation;
+    }
+
     public _setNativeImage(nativeImage: UIImage, animated = true) {
-        if (animated && this.fadeDuration) {
+        const fadeDuration = this.pendingFadeDuration || this.fadeDuration;
+        if (nativeImage && this.pendingFadeDuration) {
+            this.pendingFadeDuration = 0;
+            animated = true;
+        }
+        if (animated && fadeDuration) {
             // Crossfade from the currently visible content (placeholder/previous image) to the new image.
             try {
                 UIView.transitionWithViewDurationOptionsAnimationsCompletion(
                     this.nativeImageViewProtected,
-                    this.fadeDuration / 1000,
+                    fadeDuration / 1000,
                     UIViewAnimationOptions.TransitionCrossDissolve,
                     () => {
                         this.nativeImageViewProtected.image = nativeImage;
@@ -422,7 +442,7 @@ export class Img extends ImageBase {
                 // Fall back to an alpha fade if transition isn't available for some reason.
                 this.nativeImageViewProtected.alpha = 0.0;
                 this.nativeImageViewProtected.image = nativeImage;
-                UIView.animateWithDurationAnimations(this.fadeDuration / 1000, () => {
+                UIView.animateWithDurationAnimations(fadeDuration / 1000, () => {
                     this.nativeImageViewProtected.alpha = this.opacity;
                 });
             }
@@ -439,6 +459,10 @@ export class Img extends ImageBase {
 
     private handleImageLoaded = (image: UIImage, error: NSError, cacheType: number) => {
         if (!this.nativeViewProtected) {
+            return;
+        }
+        if (error && error.domain === SDWebImageErrorDomain && error.code === SDWebImageError.Cancelled) {
+            // a newer request replaced this one (several properties can request the image at once)
             return;
         }
         const animate = (this.alwaysFade || cacheType !== SDImageCacheType.Memory) && this.fadeDuration > 0;
@@ -551,7 +575,7 @@ export class Img extends ImageBase {
                 this.handleImageSrc(await src);
                 return;
             } else if (typeof src === 'function') {
-                const newSrc = src();
+                const newSrc = src(this);
                 if (newSrc instanceof Promise) {
                     await newSrc;
                 }
@@ -582,7 +606,8 @@ export class Img extends ImageBase {
                 this._isRemote = scheme === 'http' || scheme === 'https';
                 // reset network-start notification guard for this new request
                 this._notifiedLoadSourceNetworkStart = false;
-                let options = SDWebImageOptions.ScaleDownLargeImages | SDWebImageOptions.AvoidAutoSetImage;
+                // DelayPlaceholder: without it SDWebImage sets a nil placeholder, which blanks the current image while the new one loads
+                let options = SDWebImageOptions.ScaleDownLargeImages | SDWebImageOptions.AvoidAutoSetImage | SDWebImageOptions.DelayPlaceholder;
 
                 if (this.placeholderImageUri) {
                     this.placeholderImage = this.getUIImage(this.placeholderImageUri);
@@ -617,21 +642,7 @@ export class Img extends ImageBase {
                     });
                 }
 
-                if (this.headers) {
-                    const requestModifier = SDWebImageDownloaderRequestModifier.requestModifierWithBlock((request: NSURLRequest): NSURLRequest => {
-                        const newRequest = request.mutableCopy() as NSMutableURLRequest;
-                        Object.keys(this.headers).forEach((k) => {
-                            newRequest.addValueForHTTPHeaderField(this.headers[k], k);
-                        });
-
-                        return newRequest.copy();
-                    });
-
-                    context.setValueForKey(requestModifier, SDWebImageContextDownloadRequestModifier);
-                }
-
                 this.mCacheKey = SDWebImageManager.sharedManager.cacheKeyForURLContext(uri, context);
-                console.log('loading image', uri, this.mCacheKey);
                 if (ImagePipeline.iosComplexCacheEviction) {
                     registerCacheKey(this.mCacheKey, uri);
                 }
@@ -665,6 +676,20 @@ export class Img extends ImageBase {
     [headersProperty.setNative](value) {}
     @needRequestImage
     [failureImageUriProperty.setNative]() {}
+    @needRequestImage
+    [blurRadiusProperty.setNative]() {}
+    @needRequestImage
+    [tintColorProperty.setNative]() {}
+    @needRequestImage
+    [roundAsCircleProperty.setNative]() {}
+    @needRequestImage
+    [roundTopLeftRadiusProperty.setNative]() {}
+    @needRequestImage
+    [roundTopRightRadiusProperty.setNative]() {}
+    @needRequestImage
+    [roundBottomLeftRadiusProperty.setNative]() {}
+    @needRequestImage
+    [roundBottomRightRadiusProperty.setNative]() {}
 
     [stretchProperty.setNative](value: Stretch) {
         if (!this.nativeView) {

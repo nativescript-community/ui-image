@@ -4,6 +4,12 @@ import { Property } from '@nativescript/core';
 export { initialize };
 
 export abstract class ZoomImageBase extends Img {
+    /**
+     * Fired each time the zoom/pan transform changes. The event data contains the native transform:
+     * `android` (`android.graphics.Matrix`, drawable bounds to view) or `ios` (`CGAffineTransform`).
+     */
+    public static transformEvent = 'transformChanged';
+
     zoomScale: number;
     minZoom: number;
     maxZoom: number;

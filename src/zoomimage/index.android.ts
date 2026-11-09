@@ -9,8 +9,49 @@ export class ZoomImg extends ZoomImageBase {
         return new com.nativescript.image.ZoomableMatrixImageView(this._context);
     }
 
+    private transformListenerCount = 0;
+    private nativeTransformListener: com.nativescript.image.ZoomableMatrixImageView.TransformListener;
+
+    public addEventListener(arg: string, callback: any, thisArg?: any) {
+        super.addEventListener(arg, callback, thisArg);
+        if (arg === ZoomImageBase.transformEvent) {
+            this.transformListenerCount++;
+            this.attachTransformListenerIfNecessary();
+        }
+    }
+
+    public removeEventListener(arg: string, callback: any, thisArg?: any) {
+        super.removeEventListener(arg, callback, thisArg);
+        if (arg === ZoomImageBase.transformEvent) {
+            this.transformListenerCount--;
+            this.detachTransformListenerIfNecessary();
+        }
+    }
+
+    private attachTransformListenerIfNecessary() {
+        const nativeView = this.nativeViewProtected;
+        if (this.transformListenerCount > 0 && nativeView && !this.nativeTransformListener) {
+            const owner = new WeakRef(this);
+            this.nativeTransformListener = new com.nativescript.image.ZoomableMatrixImageView.TransformListener({
+                onTransformChanged(matrix) {
+                    owner.get()?.notify({ eventName: ZoomImageBase.transformEvent, android: matrix });
+                }
+            });
+            nativeView.addTransformListener(this.nativeTransformListener);
+        }
+    }
+
+    private detachTransformListenerIfNecessary(force = false) {
+        const nativeView = this.nativeViewProtected;
+        if (nativeView && this.nativeTransformListener && (force || this.transformListenerCount <= 0)) {
+            nativeView.removeTransformListener(this.nativeTransformListener);
+            this.nativeTransformListener = null;
+        }
+    }
+
     public initNativeView() {
         super.initNativeView();
+        this.attachTransformListenerIfNecessary();
 
         // Set up TouchImageView zoom listener
         const owner = new WeakRef(this);
@@ -29,6 +70,7 @@ export class ZoomImg extends ZoomImageBase {
     }
 
     public disposeNativeView() {
+        this.detachTransformListenerIfNecessary(true);
         this.nativeViewProtected.setOnZoomChangeListener(null);
         // Clean up
         // if (this.nativeViewProtected) {

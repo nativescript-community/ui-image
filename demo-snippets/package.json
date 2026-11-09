@@ -8,6 +8,7 @@
     "dependencies": {
         "@nativescript-community/ui-image": "*",
         "@nativescript-community/ui-image-colorfilter": "*",
+        "@nativescript-community/ui-pager": "14.1.42",
         "@nativescript-community/ui-zoomimage": "*"
     }
 }

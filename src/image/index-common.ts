@@ -1,4 +1,4 @@
-import { Color, CoreTypes, Length, Property, Trace, View, booleanConverter } from '@nativescript/core';
+import { AnimationDefinition, AnimationPromise, CSSType, Color, CoreTypes, Length, Property, Trace, View, booleanConverter } from '@nativescript/core';
 import { EventData as IEventData } from '@nativescript/core/data/observable';
 // import { colorConverter } from '@nativescript/core/ui/styling/style-properties';
 import { ImageAsset } from '@nativescript/core/image-asset';
@@ -74,18 +74,54 @@ export const CLog = (type: CLogTypes, ...args) => {
 
 export type Transition = 'fade' | 'curlUp';
 
+/**
+ * Options for scaling the child bounds to the parent bounds
+ */
 export enum ScaleType {
     None = 'none',
+    /**
+     * Scales width and height independently, so that the child matches the parent exactly.
+     */
     Fill = 'fill',
+    /**
+     * Scales the child so that both dimensions will be greater than or equal to the corresponding dimension of the parent.
+     */
     AspectFill = 'aspectFill',
+    /**
+     * Scales the child so that it fits entirely inside the parent.
+     */
     AspectFit = 'aspectFit',
+    /**
+     * Performs no scaling.
+     */
     Center = 'center',
+    /**
+     * Scales the child so that both dimensions will be greater than or equal to the corresponding dimension of the parent.
+     */
     CenterCrop = 'centerCrop',
+    /**
+     * Scales the child so that it fits entirely inside the parent.
+     */
     CenterInside = 'centerInside',
+    /**
+     * Scales the child so that it fits entirely inside the parent.
+     */
     FitCenter = 'fitCenter',
+    /**
+     * Scales the child so that it fits entirely inside the parent.
+     */
     FitEnd = 'fitEnd',
+    /**
+     * Scales the child so that it fits entirely inside the parent.
+     */
     FitStart = 'fitStart',
+    /**
+     * Scales width and height independently, so that the child matches the parent exactly.
+     */
     FitXY = 'fitXY',
+    /**
+     * Scales the child so that both dimensions will be greater than or equal to the corresponding dimension of the parent.
+     */
     FocusCrop = 'focusCrop'
 }
 
@@ -95,9 +131,28 @@ export interface AnimatedImage {
     isRunning(): boolean;
 }
 
+/**
+ * Encapsulates the common abstraction behind a platform specific object (typically a Bitmap) quality.
+ */
+export interface QualityInfo {
+    getQuality(): number;
+
+    isOfFullQuality(): boolean;
+
+    isOfGoodEnoughQuality(): boolean;
+}
+
+/**
+ * Encapsulates the common abstraction behind a platform specific object (typically a Bitmap's quality) details.
+ */
 export interface ImageInfo {
     getHeight(): number;
     getWidth(): number;
+
+    /**
+     * @platform android
+     */
+    getQualityInfo(): QualityInfo;
 }
 
 export interface ImageError {
@@ -138,6 +193,33 @@ export interface ImagePipelineConfigSetting {
 
     memoryCacheSize?: number; // in bytes
     memoryCacheScreens?: number; // multiplier for auto-calculation
+
+    /**
+     * Android: a custom `okhttp3.OkHttpClient` used by Glide to download images.
+     * `false` or `undefined`: a default client is used.
+     * Ignored when OkHttp is not part of the app (`glideUseOkHttp=false`, see the blueprint).
+     * @platform android
+     */
+    useOkhttp?: boolean | any;
+
+    /**
+     * Called before the native library is initialized, to allow very custom native handling.
+     * - Android: `(glideConfiguration: com.nativescript.image.GlideConfiguration, config: ImagePipelineConfigSetting)`
+     * - iOS: `(loadersManager: SDImageLoadersManager, loaders: any[], config: ImagePipelineConfigSetting)`. `loaders` is the array that will be set, you can modify it.
+     */
+    onInitialize?: Function;
+
+    /**
+     * @deprecated Fresco only (4.x). Ignored: the Glide based plugin always downsamples.
+     * @platform android
+     */
+    isDownsampleEnabled?: boolean;
+
+    /**
+     * @deprecated Fresco only (4.x). Ignored.
+     * @platform android
+     */
+    leakTracker?: any;
 }
 
 /**
@@ -145,7 +227,7 @@ export interface ImagePipelineConfigSetting {
  */
 export interface PrefetchOptions {
     /** Custom headers for the request */
-    headers?: Record<string, string>;
+    headers?: Record<string, string> | (() => Record<string, string>);
     /** Decode width for downsampling */
     decodeWidth?: number;
     /** Decode height for downsampling */
@@ -173,7 +255,7 @@ export interface PrefetchOptions {
 export type Stretch = 'none' | 'fill' | 'aspectFill' | 'aspectFit';
 
 export const srcProperty = new Property<ImageBase, string | ImageSource | ImageAsset>({ name: 'src' });
-export const headersProperty = new Property<ImageBase, Record<string, string>>({ name: 'headers' });
+export const headersProperty = new Property<ImageBase, Record<string, string> | (() => Record<string, string>)>({ name: 'headers' });
 export const lowerResSrcProperty = new Property<ImageBase, string>({ name: 'lowerResSrc' });
 export const placeholderImageUriProperty = new Property<ImageBase, string>({ name: 'placeholderImageUri' });
 export const failureImageUriProperty = new Property<ImageBase, string>({ name: 'failureImageUri' });
@@ -190,7 +272,7 @@ export const tapToRetryEnabledProperty = new Property<ImageBase, boolean>({ name
 export const aspectRatioProperty = new Property<ImageBase, number>({ name: 'aspectRatio', affectsLayout: true, valueConverter: (v) => parseFloat(v) });
 export const decodeWidthProperty = new Property<ImageBase, number>({ name: 'decodeWidth', valueConverter: (v) => parseFloat(v) });
 export const decodeHeightProperty = new Property<ImageBase, number>({ name: 'decodeHeight', valueConverter: (v) => parseFloat(v) });
-export const tintColorProperty = new Property<ImageBase, Color>({ name: 'tintColor' });
+export const tintColorProperty = new Property<ImageBase, Color>({ name: 'tintColor', valueConverter: colorConverter });
 export const alwaysFadeProperty = new Property<ImageBase, boolean>({ name: 'alwaysFade', valueConverter: booleanConverter, defaultValue: false });
 export const fadeDurationProperty = new Property<ImageBase, number>({ name: 'fadeDuration', valueConverter: (v) => parseFloat(v) });
 export const noCacheProperty = new Property<ImageBase, boolean>({ name: 'noCache', defaultValue: false, valueConverter: booleanConverter });
@@ -273,7 +355,8 @@ export const needRequestImage = function (target: any, propertyKey: string | sym
 };
 
 export type BasicSrcType = string | ImageSource | ImageAsset;
-export type SrcType = BasicSrcType | (() => BasicSrcType | PromiseLike<BasicSrcType>) | PromiseLike<BasicSrcType>;
+export type SrcType = BasicSrcType | ((ImageView: ImageBase) => BasicSrcType | PromiseLike<BasicSrcType>) | PromiseLike<BasicSrcType>;
+@CSSType('Img')
 export abstract class ImageBase extends View {
     public static finalImageSetEvent: string = 'finalImageSet';
     public static failureEvent: string = 'failure';
@@ -312,7 +395,7 @@ export abstract class ImageBase extends View {
     public noCache: boolean;
     public noRatioEnforce: boolean;
     public tintColor: Color;
-    headers: Record<string, string>;
+    headers: Record<string, string> | (() => Record<string, string>);
 
     public readonly isLoading: boolean;
 
@@ -325,6 +408,31 @@ export abstract class ImageBase extends View {
     mCanRequestImage = true;
     mNeedRequestImage = false;
     protected abstract initImage(): Promise<void>;
+    protected abstract animateImageRotation(imageRotation: number, duration: number): void;
+
+    /**
+     * Same as `View.animate` but `imageRotation` can be animated, without the need of a patched @nativescript/core.
+     * Android rotates the image, iOS cross fades between the previous and the rotated image.
+     */
+    public animate(animation: AnimationDefinition & { imageRotation?: number }): AnimationPromise {
+        const { imageRotation, ...viewAnimation } = animation;
+        if (imageRotation === undefined) {
+            return super.animate(animation);
+        }
+        const duration = animation.duration ?? 300;
+        this.animateImageRotation(imageRotation, duration);
+        const rotationDone = new Promise<void>((resolve) => {
+            setTimeout(() => {
+                this.imageRotation = imageRotation;
+                resolve();
+            }, duration);
+        });
+        const otherProperties = Object.keys(viewAnimation).filter((key) => !['curve', 'delay', 'duration', 'iterations', 'target'].includes(key));
+        const viewDone = otherProperties.length ? super.animate(viewAnimation) : null;
+        // the result is only awaited or cancelled: a plain promise with a no-op cancel is enough
+        const result = Promise.all([rotationDone, viewDone]).then(() => undefined);
+        return Object.assign(result, { cancel: () => viewDone?.cancel() }) as unknown as AnimationPromise;
+    }
     public onResumeNativeUpdates(): void {
         // {N} suspends properties update on `_suspendNativeUpdates`. So we only need to do this in onResumeNativeUpdates
         this.mCanRequestImage = false;

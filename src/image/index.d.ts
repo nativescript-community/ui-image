@@ -1,5 +1,5 @@
-import { ImageAsset, ImageSource, View } from '@nativescript/core';
-import { ImagePipelineConfigSetting } from './index-common';
+import { AnimationDefinition, AnimationPromise, ImageAsset, ImageSource, View } from '@nativescript/core';
+import { ImagePipelineConfigSetting, PrefetchOptions, SrcType } from './index-common';
 
 export * from './index-common';
 
@@ -75,7 +75,7 @@ export class Img extends View {
     android: any;
 
     /**
-     * String value used for the image URI.
+     * The image to show. Can be a path/URI, an `ImageSource`/`ImageAsset`, a `Promise` of those, or a function called with this view that returns one of those (or a `Promise`).
      */
     src: SrcType;
 
@@ -171,9 +171,10 @@ export class Img extends View {
     decodeHeight: number;
 
     /**
-     * add custom headers to the image download request
+     * add custom headers to the image download request.
+     * Can be a function returning the headers, called each time the image is requested.
      */
-    headers: Record<string, string>;
+    headers: Record<string, string> | (() => Record<string, string>);
 
     /**
      * IOS: if you want to show animated images you need to set this to true
@@ -191,28 +192,12 @@ export class Img extends View {
     imageRotation: number;
 
     cacheKey: string;
-}
 
-/**
- * Encapsulates the common abstraction behind a platform specific object (typically a Bitmap) quality.
- */
-export interface QualityInfo {
-    getQuality(): number;
-
-    isOfFullQuality(): boolean;
-
-    isOfGoodEnoughQuality(): boolean;
-}
-
-/**
- * Encapsulates the common abstraction behind a platform specific object (typically a Bitmap's quality) details.
- */
-export class ImageInfo {
-    getHeight(): number;
-
-    getWidth(): number;
-
-    getQualityInfo(): QualityInfo;
+    /**
+     * Same as `View.animate` but `imageRotation` can be animated, without a patched @nativescript/core.
+     * Android rotates the image. iOS cross fades between the previous and the rotated image.
+     */
+    animate(animation: AnimationDefinition & { imageRotation?: number }): AnimationPromise;
 }
 
 /**
@@ -320,46 +305,6 @@ export class ImagePipeline {
      */
     prefetchToMemoryCache(uri: string, options?: PrefetchOptions): Promise<void>;
 }
-
-/**
- * Options for scaling the child bounds to the parent bounds
- */
-export enum ScaleType {
-    /**
-     * Performs no scaling.
-     */
-    center,
-    /**
-     * Scales the child so that both dimensions will be greater than or equal to the corresponding dimension of the parent.
-     */
-    centerCrop,
-    /**
-     * Scales the child so that it fits entirely inside the parent.
-     */
-    centerInside,
-    /**
-     * Scales the child so that it fits entirely inside the parent.
-     */
-    fitCenter,
-    /**
-     * Scales the child so that it fits entirely inside the parent.
-     */
-    fitEnd,
-    /**
-     * Scales the child so that it fits entirely inside the parent.
-     */
-    fitStart,
-    /**
-     * Scales width and height independently, so that the child matches the parent exactly.
-     */
-    fitXY,
-    /**
-     * Scales the child so that both dimensions will be greater than or equal to the corresponding dimension of the parent.
-     */
-    focusCrop
-}
-
-export const ImageViewTraceCategory;
 
 export type GetContextFromOptionsCallback = (context: NSDictionary<string, any>, transformers: any[], options: Partial<Img>) => void;
 

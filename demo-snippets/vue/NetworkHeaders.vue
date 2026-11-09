@@ -7,9 +7,10 @@
             <WrapLayout marginTop="6">
                 <Button text="Set sample URL" @tap="setSample" />
                 <Button text="Toggle Authorization header" @tap="toggleAuth" />
+                <Button :text="'headers as function: ' + headersAsFunction" @tap="headersAsFunction = !headersAsFunction" />
             </WrapLayout>
 
-            <NSImg ref="img" :src="url" :headers="headers" width="100%" height="220" stretch="aspectFit" backgroundColor="red" @progress="onProgress" @finalImageSet="onFinal" @failure="onFailure" />
+            <NSImg ref="img" :src="url" :headers="headersProp" width="100%" height="220" stretch="aspectFit" backgroundColor="red" @progress="onProgress" @finalImageSet="onFinal" @failure="onFailure" />
 
             <WrapLayout marginTop="8">
                 <Button text="prefetch memory" @tap="prefetchMem" />
@@ -35,8 +36,14 @@ export default {
             url: 'http://10.0.2.2:3000/image',
             headers: { 'User-Agent': 'NSImgTest/1.0' },
             logs: [] as string[],
-            authOn: false
+            authOn: false,
+            headersAsFunction: false
         };
+    },
+    computed: {
+        headersProp() {
+            return this.headersAsFunction ? () => ({ ...this.headers }) : this.headers;
+        }
     },
     methods: {
         addLog(msg: string) {
@@ -74,7 +81,7 @@ export default {
 
         async prefetchMem() {
             try {
-                await getImagePipeline().prefetchToMemoryCache(this.url);
+                await getImagePipeline().prefetchToMemoryCache(this.url, { headers: this.headersProp });
                 this.addLog('prefetchToMemoryCache done');
             } catch (err) {
                 this.addLog('prefetch mem error: ' + err);
@@ -82,7 +89,7 @@ export default {
         },
         async prefetchDisk() {
             try {
-                await getImagePipeline().prefetchToDiskCache(this.url);
+                await getImagePipeline().prefetchToDiskCache(this.url, { headers: this.headersProp });
                 this.addLog('prefetchToDiskCache done');
             } catch (err) {
                 this.addLog('prefetch disk error: ' + err);

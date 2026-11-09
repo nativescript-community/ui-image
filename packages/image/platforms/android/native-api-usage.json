@@ -43,6 +43,8 @@
         "jp.wasabeef.glide.transformations:BlurTransformation",
         "jp.wasabeef.glide.transformations:CropCircleTransformation",
         "jp.wasabeef.glide.transformations:RoundedCornersTransformation",
-        "jp.wasabeef.glide.transformations:ColorFilterTransformation"
+        "jp.wasabeef.glide.transformations:ColorFilterTransformation",
+        "com.nativescript.image:MatrixImageView.BlendProgressProvider",
+        "okhttp3:OkHttpClient"
     ]
 }

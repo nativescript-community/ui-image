@@ -14,8 +14,7 @@ import java.io.InputStream;
 import android.util.Log;
 
 /**
- * Unified ModelLoader that handles both CustomGlideUrl and standard GlideUrl.
- * This eliminates the need for UrlTrackingModelLoader.
+ * ModelLoader that downloads both CustomGlideUrl and standard GlideUrl with OkHttp.
  */
 public class CustomUrlLoader implements ModelLoader<GlideUrl, InputStream> {
     private final Call.Factory client;
@@ -32,18 +31,7 @@ public class CustomUrlLoader implements ModelLoader<GlideUrl, InputStream> {
             int height,
             @NonNull Options options) {
 
-        // Create the appropriate data fetcher
-        DataFetcher<InputStream> fetcher;
-
-        if (model instanceof CustomGlideUrl) {
-            // Use CustomDataFetcher for CustomGlideUrl (supports progress/load source)
-            fetcher = new CustomDataFetcher(client, (CustomGlideUrl) model);
-        } else {
-            // Use standard OkHttp fetcher for regular GlideUrl
-            fetcher = new com.bumptech.glide.integration.okhttp3.OkHttpStreamFetcher(
-                    client,
-                    model);
-        }
+        DataFetcher<InputStream> fetcher = new CustomDataFetcher(client, model);
 
         return new LoadData<>(model, fetcher);
     }
