@@ -22,6 +22,7 @@ import ColorFilter from './ColorFilter.vue';
 import Failure from './Failure.vue';
 import NavigationTest from './NavigationTest.vue';
 import CrossFadeTest from './CrossFadeTest.vue';
+import DocumentScanner from './DocumentScanner.vue';
 
 Trace.addCategories(ImageViewTraceCategory);
 Trace.enable();
@@ -60,5 +61,6 @@ export const demos = [
     { name: 'Failure', path: 'failure', component: Failure },
     { name: 'ZoomImage', path: 'zoom', component: ZoomImage },
     { name: 'ColorFilter', path: 'color-filter', component: ColorFilter },
-    { name: 'Navigation', path: 'navigation', component: NavigationTest }
+    { name: 'Navigation', path: 'navigation', component: NavigationTest },
+    { name: 'DocumentScanner usage', path: 'document-scanner', component: DocumentScanner }
 ];
