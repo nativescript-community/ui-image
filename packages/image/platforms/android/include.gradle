@@ -2,10 +2,10 @@ import groovy.json.JsonSlurper
 
 
 dependencies {
-	def glideVersion =  project.hasProperty("glideVersion") ? project.glideVersion : "5.0.5"
-	def glideCompilerVersion =  project.hasProperty("glideCompilerVersion") ? project.glideCompilerVersion : "4.16.0"
+	def glideVersion =  project.hasProperty("glideVersion") ? project.glideVersion : "5.0.7"
+	def glideCompilerVersion =  project.hasProperty("glideCompilerVersion") ? project.glideCompilerVersion : "5.0.7"
 	def glideTransformationsVersion =  project.hasProperty("glideTransformationsVersion") ? project.glideTransformationsVersion : "4.3.0"
-	def glideOkHttpVersion =  project.hasProperty("glideOkHttpVersion") ? project.glideOkHttpVersion : "4.11.0"
+	def glideOkHttpVersion =  project.hasProperty("glideOkHttpVersion") ? project.glideOkHttpVersion : "5.0.7"
 	def okHttpVersion =  project.hasProperty("okHttpVersion") ? project.okHttpVersion : "4.12.0"
 	def androidXAppCompatVersion =  project.hasProperty("androidXAppCompat") ? project.androidXAppCompat : "1.1.0"
 
