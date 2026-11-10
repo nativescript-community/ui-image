@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.1.0](https://github.com/nativescript-community/ui-image/compare/v5.0.18...v5.1.0) (2026-11-10)
+
+### Features
+
+* **android:** make OkHttp optional ([1c0b9b9](https://github.com/nativescript-community/ui-image/commit/1c0b9b9763848fe4a760ee85394d1fe7ae2ae7cd))
+* **android:** shared element transition handler for MatrixImageView ([8a1afb5](https://github.com/nativescript-community/ui-image/commit/8a1afb53da8a94946c6c8d9e0b3250f1c56202b4))
+* **image:** support headers and src as functions, add onInitialize and custom OkHttp client ([e5bf826](https://github.com/nativescript-community/ui-image/commit/e5bf82687f9aa23b240346c2575702622b705f14))
+* **zoomimage:** add transformChanged event and limit iOS panning to the image ([99c40d1](https://github.com/nativescript-community/ui-image/commit/99c40d19670c8654482ad7162609fa694109d234))
+
+### Bug Fixes
+
+* **android:** clip image drawing to the view bounds ([fefb78e](https://github.com/nativescript-community/ui-image/commit/fefb78e37a9055a3d44d2cf444ac6458a0dd0847))
+
 ## [5.0.18](https://github.com/nativescript-community/ui-image/compare/v5.0.17...v5.0.18) (2026-10-21)
 
 **Note:** Version bump only for package @nativescript-community/ui-image

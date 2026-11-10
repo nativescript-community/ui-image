@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.1.0](https://github.com/nativescript-community/ui-image/compare/v5.0.18...v5.1.0) (2026-11-10)
+
+### Features
+
+* **zoomimage:** add transformChanged event and limit iOS panning to the image ([99c40d1](https://github.com/nativescript-community/ui-image/commit/99c40d19670c8654482ad7162609fa694109d234))
+
+### Bug Fixes
+
+* **zoomimage:** hand horizontal swipes to a parent pager at the image edge on Android ([ca827b5](https://github.com/nativescript-community/ui-image/commit/ca827b52f4c0285619ab99cce215cd81ad238570))
+* **zoomimage:** keep parents from stealing pan gestures on Android ([9aea312](https://github.com/nativescript-community/ui-image/commit/9aea312503cdbb6f219b7c6db4ea589715de42a4))
+* **zoomimage:** keep the zoom and position when the view is resized on iOS ([6cad52e](https://github.com/nativescript-community/ui-image/commit/6cad52e8e0ff465dc3f1cbf6db82ad64814ca4d8))
+
 ## [5.0.18](https://github.com/nativescript-community/ui-image/compare/v5.0.17...v5.0.18) (2026-10-21)
 
 **Note:** Version bump only for package @nativescript-community/ui-zoomimage
