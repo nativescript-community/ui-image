@@ -50,6 +50,7 @@
 
 * [Installation](#installation)
 * [setup](#setup)
+	* [Android: OkHttp is optional](#android-okhttp-is-optional)
 * [API](#api)
 	* [Events](#events)
 		* [Event arguments](#event-arguments)
@@ -99,6 +100,24 @@ import imageModule = require("@nativescript-community/ui-image");
 //do this before creating any image view
 imageModule.initialize();
 ```
+
+`initialize` accepts an optional config:
+
+- `useOkhttp` (Android): a custom `okhttp3.OkHttpClient` used to download images.
+- `onInitialize` (Android and iOS): called before the native library is initialized, for very custom native handling.
+  Android gets `(glideConfiguration, config)`, iOS gets `(loadersManager, loaders, config)`.
+
+### Android: OkHttp is optional
+
+Images are downloaded with OkHttp by default. To not ship it, set this in the app `gradle.properties`
+(or `ext.glideUseOkHttp = "false"` in `before-plugins.gradle`):
+
+```
+glideUseOkHttp=false
+```
+
+Images are then downloaded with `HttpURLConnection`: headers, `progress` and `loadSource` events still work,
+but `useOkhttp` is ignored and you lose OkHttp's HTTP/2 and connection pooling.
 
 
 [](#api)
@@ -336,6 +355,7 @@ export function onSubmit(args: EventData) {
 - **src** 
 
 String value used for the image URI. You can use this property to set the image to be loaded from remote location (http, https), from the resources and local files of your {N} application.
+It can also be an `ImageSource`/`ImageAsset`, a `Promise`, or a function called with the view as argument and returning one of those (or a `Promise` of those).
 
 ```xml
 <@nativescript-community/ui-image:Img src="https://docs.nativescript.org/angular/img/cli-getting-started/angular/chapter0/NativeScript_logo.png"/>
@@ -458,6 +478,7 @@ Number value used as the downsampled width of the imageModule drawable.
 - **headers**
 
 Object that defines custom request headers to be sent with the image download request.
+It can also be a function returning the headers, called each time the image is requested (for example to always send a fresh token).
 
 ```xml
 <@nativescript-community/ui-image:Img headers="{Authorization: 'bearer abcdefghijk'}"/>
@@ -1022,6 +1043,7 @@ If you have any questions/issues/comments please feel free to create an issue or
 
 * [Installation](#installation)
 * [setup](#setup)
+	* [Events](#events)
 * [Demos](#demos)
 * [Demos and Development](#demos-and-development)
 	* [Repo Setup](#repo-setup)
@@ -1064,6 +1086,12 @@ imageModule.initialize();
 This component directly inherint `@nativescript-community/ui-image` so you can find the doc [here]()
 
 It adds a few properties
+
+### Events
+
+- **transformChanged**
+
+Fired each time the zoom/pan transform changes. The event data has the native transform: `android` (`android.graphics.Matrix`, drawable bounds to view) or `ios` (`CGAffineTransform`).
 
 
 [](#demos)
