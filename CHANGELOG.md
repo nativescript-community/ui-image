@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.6.21](https://github.com/@nativescript-community/ui-image/compare/v4.6.20...v4.6.21) (2026-11-12)
+
+### Bug Fixes
+
+* **android:** custom shared element transition support for @akylas/nativescript ([07c8224](https://github.com/@nativescript-community/ui-image/commit/07c822473e34449596b558fa50dcda87d03ce9cb))
+* **ios:** dissolve into the next image instead of clearing the current one ([262cc1f](https://github.com/@nativescript-community/ui-image/commit/262cc1f04533b87091e6ca99e4ecded444b9c4cc))
+
 ## [4.6.20](https://github.com/@nativescript-community/ui-image/compare/v4.6.19...v4.6.20) (2026-06-12)
 
 **Note:** Version bump only for package ui-image
