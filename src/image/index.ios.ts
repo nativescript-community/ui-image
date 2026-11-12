@@ -406,28 +406,24 @@ export class Img extends ImageBase {
 
     public _setNativeImage(nativeImage: UIImage, animated = true) {
         if (animated && this.fadeDuration) {
-            // switch (this.transition) {
-            //     case 'fade':
-            this.nativeImageViewProtected.alpha = 0.0;
-            this.nativeImageViewProtected.image = nativeImage;
-            UIView.animateWithDurationAnimations(this.fadeDuration / 1000, () => {
-                this.nativeImageViewProtected.alpha = this.opacity;
-            });
-            //     break;
-            // case 'curlUp':
-            //     UIView.transitionWithViewDurationOptionsAnimationsCompletion(
-            //        this.nativeImageViewProtected,
-            //         0.3,
-            //         UIViewAnimationOptions.TransitionCrossDissolve,
-            //         () => {
-            //             this._setNativeImage(image);
-            //         },
-            //         null
-            //     );
-            //     break;
-            // default:
-            //     this._setNativeImage(image);
-            // }
+            const imageView = this.nativeImageViewProtected;
+            if (imageView.image && nativeImage) {
+                UIView.transitionWithViewDurationOptionsAnimationsCompletion(
+                    imageView,
+                    this.fadeDuration / 1000,
+                    UIViewAnimationOptions.TransitionCrossDissolve | UIViewAnimationOptions.AllowUserInteraction,
+                    () => {
+                        imageView.image = nativeImage;
+                    },
+                    null
+                );
+            } else {
+                imageView.alpha = 0.0;
+                imageView.image = nativeImage;
+                UIView.animateWithDurationAnimations(this.fadeDuration / 1000, () => {
+                    imageView.alpha = this.opacity;
+                });
+            }
         } else {
             this.nativeImageViewProtected.image = nativeImage;
         }
@@ -540,6 +536,9 @@ export class Img extends ImageBase {
                 if (this.placeholderImageUri) {
                     this.placeholderImage = this.getUIImage(this.placeholderImageUri);
                     this._setNativeImage(this.placeholderImage, animate);
+                } else {
+                    // else SDWebImage clears the current image when the load starts
+                    options |= SDWebImageOptions.DelayPlaceholder;
                 }
 
                 if (this.noCache) {
