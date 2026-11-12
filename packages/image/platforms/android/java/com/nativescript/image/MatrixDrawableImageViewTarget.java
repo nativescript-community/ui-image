@@ -5,6 +5,8 @@ import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import android.view.ViewTreeObserver;
+import com.bumptech.glide.request.target.SizeReadyCallback;
 import com.bumptech.glide.request.target.ViewTarget;
 import com.bumptech.glide.request.transition.Transition;
 
@@ -45,6 +47,53 @@ public class MatrixDrawableImageViewTarget extends ViewTarget<ImageView, Drawabl
   public void setClearFirst(boolean value) {
       this.mClearFirst = value;
   }
+
+    /**
+     * A view measured from its image (eg width and height set to auto, or only one of them) is laid out
+     * with a size of 0 on that side until the image is loaded, and Glide waits for a size forever.
+     * When the view is laid out with only one positive side, that side is used for both.
+     */
+    @Override
+    public void getSize(@NonNull final SizeReadyCallback cb) {
+        final boolean[] done = new boolean[1];
+        final SizeReadyCallback once = new SizeReadyCallback() {
+            @Override
+            public void onSizeReady(int width, int height) {
+                if (!done[0]) {
+                    done[0] = true;
+                    cb.onSizeReady(width, height);
+                }
+            }
+        };
+        super.getSize(once);
+        if (done[0]) {
+            return;
+        }
+        final ViewTreeObserver observer = view.getViewTreeObserver();
+        if (!observer.isAlive()) {
+            return;
+        }
+        observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                if (!done[0] && view.isLaidOut() && !view.isLayoutRequested()) {
+                    int width = view.getWidth() - view.getPaddingLeft() - view.getPaddingRight();
+                    int height = view.getHeight() - view.getPaddingTop() - view.getPaddingBottom();
+                    if ((width > 0) != (height > 0)) {
+                        int side = Math.max(width, height);
+                        once.onSizeReady(side, side);
+                    }
+                }
+                if (done[0]) {
+                    ViewTreeObserver current = view.getViewTreeObserver();
+                    if (current.isAlive()) {
+                        current.removeOnPreDrawListener(this);
+                    }
+                }
+                return true;
+            }
+        });
+    }
 
     /**
      * Returns the current {@link android.graphics.drawable.Drawable} being
