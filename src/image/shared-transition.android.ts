@@ -34,7 +34,8 @@ export function registerSharedTransitionHandler(ImgClass: typeof Img) {
                 fromType,
                 toType,
                 new com.nativescript.image.MatrixImageView.BlendProgressProvider({
-                    getProgress: (width: number, height: number) => progress(width, height)
+                    // a whole number (0 or 1) would be marshalled as a Long and fail the cast to the native float
+                    getProgress: (width: number, height: number) => new java.lang.Float(progress(width, height)) as any
                 })
             );
 
