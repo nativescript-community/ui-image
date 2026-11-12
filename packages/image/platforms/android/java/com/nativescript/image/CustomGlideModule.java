@@ -17,6 +17,7 @@ import com.bumptech.glide.load.engine.cache.ModelSignatureDiskLruCacheWrapper;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.module.AppGlideModule;
 import com.bumptech.glide.RequestBuilder;
+import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.signature.ObjectKey;
 import java.io.File;
 import java.io.InputStream;
@@ -84,6 +85,8 @@ public class CustomGlideModule extends AppGlideModule {
     ModelSignatureMemoryCache memoryCache = new ModelSignatureMemoryCache(memoryCacheSize);
     EvictionManager.get().setMemoryCache(memoryCache);
     builder.setMemoryCache(memoryCache);
+
+    builder.setDefaultRequestOptions(new RequestOptions().downsample(new BoundedCenterOutside()));
     
     // Set a disk cache factory that also registers the disk cache instance with
     // EvictionManager.
