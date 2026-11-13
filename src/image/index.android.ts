@@ -1050,7 +1050,7 @@ export class Img extends ImageBase {
                     }
                 }
             } else if (src instanceof ImageSource) {
-                drawable = new android.graphics.drawable.BitmapDrawable(Utils.android.getApplicationContext().getResources(), src.android as android.graphics.Bitmap);
+                drawable = createLimitedBitmapDrawable(src.android);
             }
 
             if (drawable) {
@@ -1098,7 +1098,7 @@ export class Img extends ImageBase {
                 }
             }
         } else if (path instanceof ImageSource) {
-            return new android.graphics.drawable.BitmapDrawable(Utils.android.getApplicationContext().getResources(), path.android);
+            return createLimitedBitmapDrawable(path.android);
         }
         return null;
     }
@@ -1106,7 +1106,7 @@ export class Img extends ImageBase {
     private getDrawableFromLocalFile(localFilePath: string): android.graphics.drawable.BitmapDrawable {
         const img = ImageSource.fromFileSync(localFilePath);
         if (img) {
-            return new android.graphics.drawable.BitmapDrawable(Utils.android.getApplicationContext().getResources(), img.android);
+            return createLimitedBitmapDrawable(img.android);
         }
         return null;
     }
@@ -1131,6 +1131,11 @@ export class Img extends ImageBase {
             drawable.stop();
         }
     }
+}
+
+// bitmaps given as is (not decoded by Glide) are not downsampled and a too big one cannot be drawn
+function createLimitedBitmapDrawable(bitmap: android.graphics.Bitmap) {
+    return new android.graphics.drawable.BitmapDrawable(Utils.android.getApplicationContext().getResources(), com.nativescript.image.BoundedCenterOutside.limitSize(bitmap));
 }
 
 function getScaleType(scaleType: ScaleType): android.widget.ImageView.ScaleType {

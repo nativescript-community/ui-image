@@ -434,6 +434,12 @@ declare namespace com {
 				public setAlpha(alpha: number): void;
 				public getOpacity(): number;
 			}
+			export class BoundedCenterOutside {
+				public static class: java.lang.Class<com.nativescript.image.BoundedCenterOutside>;
+				public constructor();
+				/** Returns the bitmap itself or a scaled copy when it is too big to be drawn. */
+				public static limitSize(bitmap: globalAndroid.graphics.Bitmap): globalAndroid.graphics.Bitmap;
+			}
 			export class MatrixDrawableImageViewTarget extends com.bumptech.glide.request.target.ViewTarget<globalAndroid.widget.ImageView,globalAndroid.graphics.drawable.Drawable> implements com.bumptech.glide.request.transition.Transition.ViewAdapter  {
                 setClearFirst(arg0: boolean) {
                     throw new Error('Method not implemented.');

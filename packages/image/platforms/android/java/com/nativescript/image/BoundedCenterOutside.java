@@ -1,5 +1,6 @@
 package com.nativescript.image;
 
+import android.graphics.Bitmap;
 import androidx.annotation.NonNull;
 import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy;
 
@@ -15,13 +16,32 @@ public final class BoundedCenterOutside extends DownsampleStrategy {
     // stays under the maximum texture size of most GPUs
     private static final float MAX_SIDE = 8192f;
 
+    private static float getMaxScale(int width, int height) {
+        return Math.min(
+                (float) Math.sqrt(MAX_PIXELS / ((float) width * height)),
+                MAX_SIDE / Math.max(width, height));
+    }
+
+    /**
+     * For bitmaps which do not go through Glide (eg an ImageSource): returns the bitmap itself,
+     * or a scaled copy when it is above the same limits.
+     */
+    public static Bitmap limitSize(Bitmap bitmap) {
+        float scale = getMaxScale(bitmap.getWidth(), bitmap.getHeight());
+        if (scale >= 1f) {
+            return bitmap;
+        }
+        return Bitmap.createScaledBitmap(
+                bitmap,
+                Math.max(1, Math.round(bitmap.getWidth() * scale)),
+                Math.max(1, Math.round(bitmap.getHeight() * scale)),
+                true);
+    }
+
     @Override
     public float getScaleFactor(int sourceWidth, int sourceHeight, int requestedWidth, int requestedHeight) {
         float scale = CENTER_OUTSIDE.getScaleFactor(sourceWidth, sourceHeight, requestedWidth, requestedHeight);
-        float maxScale = Math.min(
-                (float) Math.sqrt(MAX_PIXELS / ((float) sourceWidth * sourceHeight)),
-                MAX_SIDE / Math.max(sourceWidth, sourceHeight));
-        return Math.min(scale, maxScale);
+        return Math.min(scale, getMaxScale(sourceWidth, sourceHeight));
     }
 
     @NonNull
