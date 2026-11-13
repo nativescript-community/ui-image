@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.1.1](https://github.com/@nativescript-community/ui-image/compare/v5.1.0...v5.1.1) (2026-11-13)
+
+### Bug Fixes
+
+* **android:** cap the decoded size of images with an extreme aspect ratio ([8282d0b](https://github.com/@nativescript-community/ui-image/commit/8282d0b559f834bd7a4195f712263f72e15dfc13))
+* **android:** limit the size of the bitmaps not decoded by Glide ([c999950](https://github.com/@nativescript-community/ui-image/commit/c999950351ac6c98c23bfd2d68ed1fc6e51c2390))
+* **android:** load images of views sized by their content ([1970c4c](https://github.com/@nativescript-community/ui-image/commit/1970c4c328ce4adff9e1babfff17063a510b3a1f))
+* **android:** load images of views with no side defined ([909c00b](https://github.com/@nativescript-community/ui-image/commit/909c00b783a200dd98e95a1fe2c524ec377919ac))
+* **android:** return a real float from the shared transition blend progress ([92d6414](https://github.com/@nativescript-community/ui-image/commit/92d64140d51d39d78a743c21cd8116dde19b4ad3))
+
 ## [5.1.0](https://github.com/@nativescript-community/ui-image/compare/v5.0.18...v5.1.0) (2026-11-10)
 
 ### Features
