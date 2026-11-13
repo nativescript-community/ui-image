@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import android.view.View;
 import android.view.ViewTreeObserver;
 import com.bumptech.glide.request.target.SizeReadyCallback;
 import com.bumptech.glide.request.target.ViewTarget;
@@ -51,7 +52,8 @@ public class MatrixDrawableImageViewTarget extends ViewTarget<ImageView, Drawabl
     /**
      * A view measured from its image (eg width and height set to auto, or only one of them) is laid out
      * with a size of 0 on that side until the image is loaded, and Glide waits for a size forever.
-     * When the view is laid out with only one positive side, that side is used for both.
+     * When the view is laid out with only one positive side, that side is used for both,
+     * and with no positive side the original size of the image is used.
      */
     @Override
     public void getSize(@NonNull final SizeReadyCallback cb) {
@@ -79,9 +81,13 @@ public class MatrixDrawableImageViewTarget extends ViewTarget<ImageView, Drawabl
                 if (!done[0] && view.isLaidOut() && !view.isLayoutRequested()) {
                     int width = view.getWidth() - view.getPaddingLeft() - view.getPaddingRight();
                     int height = view.getHeight() - view.getPaddingTop() - view.getPaddingBottom();
-                    if ((width > 0) != (height > 0)) {
-                        int side = Math.max(width, height);
-                        once.onSizeReady(side, side);
+                    if (width > 0 || height > 0) {
+                        if ((width > 0) != (height > 0)) {
+                            int side = Math.max(width, height);
+                            once.onSizeReady(side, side);
+                        }
+                    } else if (view.getVisibility() == View.VISIBLE) {
+                        once.onSizeReady(SIZE_ORIGINAL, SIZE_ORIGINAL);
                     }
                 }
                 if (done[0]) {
